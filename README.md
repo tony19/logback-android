@@ -239,5 +239,5 @@ Tentative upcoming plans include:
  [15]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
  [16]: http://www.slf4j.org/download.html
  [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
- [18]: https://github.com/tony19/logback-android/blob/master/bin/logback-android-0.9.30-RC1.jar
- [19]: https://github.com/tony19/logback-android/blob/master/bin/slf4j-api-1.6.1.jar
+ [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC1.jar
+ [19]: https://github.com/tony19/logback-android/raw/master/bin/slf4j-api-1.6.1.jar
