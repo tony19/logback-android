@@ -6,7 +6,7 @@
 Overview
 --------
 
-**Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [SLF4J-Android][3] allows for greater logging flexibility and portability across Java platforms.
+**Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [*SLF4J*][3] allows for greater logging flexibility and portability across Java platforms.
 
 
 Quickstart
@@ -224,7 +224,7 @@ Tentative upcoming plans include:
 
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
- [3]: http://www.slf4j.org/android
+ [3]: http://www.slf4j.org
  [4]: http://logback.qos.ch/consolePlugin.html
  [5]: http://logback.qos.ch/codes.html
  [6]: http://logback.qos.ch/faq.html
