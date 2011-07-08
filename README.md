@@ -1,19 +1,20 @@
-<h1><img src="https://github.com/tony19/logback/raw/master/logback-site/src/site/resources/images/logos/lblogo-72x72.png" width="72" height="72" valign="middle"/>logback-android</h1>
+<h1><img src="https://github.com/tony19/logback-android/raw/master/logback-site/src/site/resources/images/logos/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/>logback-android</h1>
 
 *Advanced logging library for Android*
 
 
-<font color="green">Overview</font>
------------------------------------
+Overview
+--------
 
 **Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [SLF4J-Android][3] allows for greater logging flexibility and portability across Java platforms.
 
 
-<font color="green">Quickstart</font>
--------------------------------------
+Quickstart
+----------
 
  1. Configure your Android project's *Java Build Path*:
-     * Include *logback-android-0.9.30.jar* and [*slf4j-api-1.6.1.jar*][16]. (Note: Download the archive, and extract the standard API JAR, which is usable in Android.)
+
+     * Include [logback-android-0.9.30.jar][18] and [slf4j-api-1.6.1.jar][19].
      * Exclude all other SLF4J bindings/libraries (i.e., *log4j-over-slf4j.jar*, *slf4j-android-1.5.8.jar*, etc).
 
  1. Load configuration XML from pre-determined location (e.g., `/sdcard/logback-test.xml`). 
@@ -117,9 +118,9 @@
 	2556 [main] TRACE s.testapp.HelloAndroidActivity - toString() entered
 	2602 [main] DEBUG s.testapp.HelloAndroidActivity - toString: slf4jandroid.testapp.HelloAndroidActivity
 
-<font color="green">Features</font>
------------------------------------------------
-Logback-Android currently supports only the **`logback-core`** and **`logback-classic`** modules **excluding** the following features:
+Features
+--------
+Logback-Android currently supports only the **logback-core** and **logback-classic** modules **excluding** the following features:
 
 * Groovy configuration
 * Conditionals in XML configuration files
@@ -127,8 +128,8 @@ Logback-Android currently supports only the **`logback-core`** and **`logback-cl
 
 
 
-<font color="green">Documentation</font>
-----------------------------------------
+Documentation
+-------------
 * [Logback manual][7]
 * [Reasons to switch to logback from log4j][2]
 * [Frequently Asked Questions (FAQ)][6]
@@ -138,80 +139,88 @@ Logback-Android currently supports only the **`logback-core`** and **`logback-cl
 
 For help with using **Logback-Android**, ask the mailing list: [logback-user AT qos DOT ch][9].
 
-<font color="green">License</font>
-----------------------------------
+License
+-------
 Logback-Android uses the same license as Logback. See [LICENSE][17].
 
-<font color="green">Building Logback</font>
--------------------------------------------
+Build
+-----
 
 ### *Eclipse*
 Logback-Android is currently built from Eclipse (without Maven or any other plugins). The goal is to create `logback-android.jar`, containing only the `logback-core` and `logback-classic` modules with select features omitted. The toughest part is setting up your Eclipse project as outlined below.
 
 
  1. Create new Android project.
-   1. Name the project "logback-android".
-   2. For **Contents**, select **Create new project in workspace** (this is the default).
-   3. You can specify any root source directory (does not have to be Logback's src).
-   4. Pick the **Build Target**.
-   5. For **Package Name**, enter **ch.qos.logback**.
-   6. Uncheck the box for **Create Activity**.
-   7. Click **Finish**.
+
+	* Name the project "logback-android".
+	* For **Contents**, select **Create new project in workspace** (this is the default).
+	* You can specify any root source directory (does not have to be Logback's src).
+	* Pick the **Build Target**.
+	* For **Package Name**, enter **ch.qos.logback**.
+	* Uncheck the box for **Create Activity**.
+	* Click **Finish**.
 
  1. Edit **Project Properties > Android**. 
-   1. Check the box for **Is Library**.
+
+	* Check the box for **Is Library**.
 
  1. Edit **Project Properties > Java Build Path**. 
 
-   For **Libraries** tab:
-   1. Click **Add External JARs**.
-   2. Browse to `slf4j-api-1.6.1.jar`, and click **OK**
+ 1. Click **Libraries** tab:
+
+	* Click **Add External JARs**.
+	* Browse to `slf4j-api-1.6.1.jar`, and click **OK**
    
-   For **Source** tab:
-   1. Select `logback-android/src`, and click **Remove**
-   2. Click **Link Source**.
-   3. Browse to `${logback-android-src}/logback-classic/src/main/java`, and click **Next**
-   4. For **Exclusion pattterns**, enter the following:
-         * `ch/qos/logback/classic/boolex/GEventEvaluator.java`
-         * `ch/qos/logback/classic/boolex/JaninoEventEvaluator.java`
-         * `ch/qos/logback/classic/gaffer/`
-         * `ch/qos/logback/classic/helpers/`
-         * `ch/qos/logback/classic/jmx/`
-         * `ch/qos/logback/classic/joran/action/EvaluatorAction.java`
-         * `ch/qos/logback/classic/joran/action/InsertFromJNDIAction.java`
-         * `ch/qos/logback/classic/joran/action/JMXConfiguratorAction.java`
-         * `ch/qos/logback/classic/net/JMSQueueAppender.java`
-         * `ch/qos/logback/classic/net/JMSQueueSink.java`
-         * `ch/qos/logback/classic/net/JMSTopicAppender.java`
-         * `ch/qos/logback/classic/net/JMSTopicSink.java`
-         * `ch/qos/logback/classic/net/SMTPAppender.java`
-         * `ch/qos/logback/classic/selector/ContextJNDISelector.java`
-         * `ch/qos/logback/classic/selector/servlet/`
-         * `ch/qos/logback/classic/util/JNDIUtil.java`
-         * `ch/qos/logback/classic/ViewStatusMessagesServlet.java`
+ 1. Click **Source** tab:
 
-   5. For **Folder name**, enter **logback-classic**
-   6. Click **Link Source** again.
-   7. Browse to `${logback-android-src}/logback-core/src/main/java`, and click **Next**
-   8. For **Exclusion pattterns**, enter the following:
-         * `ch/qos/logback/core/boolex/JaninoEventEvaluatorBase.java`
-         * `ch/qos/logback/core/db/BindDataSourceToJNDIAction.java`
-         * `ch/qos/logback/core/db/JNDIConnectionSource.java`
-         * `ch/qos/logback/core/net/JMSAppenderBase.java`
-         * `ch/qos/logback/core/net/LoginAuthenticator.java`
-         * `ch/qos/logback/core/net/SMTPAppenderBase.java`
-         * `ch/qos/logback/core/status/ViewStatusMessagesServletBase.java`
+	* Select `logback-android/src`, and click **Remove**
+	* Click **Link Source**.
+	* Browse to `${logback-android-src}/logback-classic/src/main/java`
+	* Click **Next**
+	* For **Exclusion pattterns**, enter the following:
+
+		* `ch/qos/logback/classic/boolex/GEventEvaluator.java`
+		* `ch/qos/logback/classic/boolex/JaninoEventEvaluator.java`
+		* `ch/qos/logback/classic/gaffer/`
+		* `ch/qos/logback/classic/helpers/`
+		* `ch/qos/logback/classic/jmx/`
+		* `ch/qos/logback/classic/joran/action/EvaluatorAction.java`
+		* `ch/qos/logback/classic/joran/action/InsertFromJNDIAction.java`
+		* `ch/qos/logback/classic/joran/action/JMXConfiguratorAction.java`
+		* `ch/qos/logback/classic/net/JMSQueueAppender.java`
+		* `ch/qos/logback/classic/net/JMSQueueSink.java`
+		* `ch/qos/logback/classic/net/JMSTopicAppender.java`
+		* `ch/qos/logback/classic/net/JMSTopicSink.java`
+		* `ch/qos/logback/classic/net/SMTPAppender.java`
+		* `ch/qos/logback/classic/selector/ContextJNDISelector.java`
+		* `ch/qos/logback/classic/selector/servlet/`
+		* `ch/qos/logback/classic/util/JNDIUtil.java`
+		* `ch/qos/logback/classic/ViewStatusMessagesServlet.java`
+
+	* For **Folder name**, enter **logback-classic**
+	* Click **Link Source** again.
+	* Browse to `${logback-android-src}/logback-core/src/main/java`, and click **Next**
+	* For **Exclusion pattterns**, enter the following:
+
+		* `ch/qos/logback/core/boolex/JaninoEventEvaluatorBase.java`
+		* `ch/qos/logback/core/db/BindDataSourceToJNDIAction.java`
+		* `ch/qos/logback/core/db/JNDIConnectionSource.java`
+		* `ch/qos/logback/core/net/JMSAppenderBase.java`
+		* `ch/qos/logback/core/net/LoginAuthenticator.java`
+		* `ch/qos/logback/core/net/SMTPAppenderBase.java`
+		* `ch/qos/logback/core/status/ViewStatusMessagesServletBase.java`
   
-   9. For **Folder name**, enter **logback-core**
-   10. Click **Finish**. Eclipse should begin building automatically, and if no errors, `logback-android.jar` is created in the project's output directory.
+	* For **Folder name**, enter **logback-core**
+	* Click **Finish**. Eclipse should begin building automatically, and if no errors, `logback-android.jar` is created in the project's output directory.
 
-<font color="green">Future Work</font>
---------------------------------------
+
+Future Work
+-----------
 Tentative upcoming plans include:
 
- * Add script-able builds ([Ant][11], [Maven][12], or [Gradle][13]) <font color="gray">(medium)</font>
- * Add [support][14] for `SMTPAppender` <font color="gray">(easy)</font>
- * Add [support][15] for Groovy configuration <font color="gray">(hard)</font>
+ * Add script-able builds (one of [Ant][11], [Maven][12], or [Gradle][13]) (medium)
+ * Add [support][14] for `SMTPAppender` (easy)
+ * Add [support][15] for Groovy configuration (hard)
 
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
@@ -229,4 +238,6 @@ Tentative upcoming plans include:
  [14]: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app
  [15]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
  [16]: http://www.slf4j.org/download.html
- [17]: https://github.com/tony19/logback/blob/master/LICENSE.md
+ [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
+ [18]: https://github.com/tony19/logback-android/blob/master/bin/logback-android-0.9.30-RC1.jar
+ [19]: https://github.com/tony19/logback-android/blob/master/bin/slf4j-api-1.6.1.jar
