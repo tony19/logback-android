@@ -147,7 +147,7 @@ Build
 -----
 
 ### *Eclipse*
-Logback-Android is currently built from Eclipse (without Maven or any other plugins). The goal is to create `logback-android.jar`, containing only the `logback-core` and `logback-classic` modules with select features omitted. The toughest part is setting up your Eclipse project as outlined below.
+Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]. The goal is to create `logback-android.jar`, containing only the `logback-core` and `logback-classic` modules with select features omitted. The toughest part is setting up your Eclipse project as outlined below.
 
 
  1. Create new Android project.
@@ -241,3 +241,4 @@ Tentative upcoming plans include:
  [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
  [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC1.jar
  [19]: https://github.com/tony19/logback-android/raw/master/bin/slf4j-api-1.6.1.jar
+ [20]: http://developer.android.com/sdk/eclipse-adt.html
