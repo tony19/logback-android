@@ -49,9 +49,12 @@ public class JoranConfigurator extends JoranConfiguratorBase {
         new ContextNameAction());
       rs.addRule(new Pattern("configuration/contextListener"),
         new LoggerContextListenerAction());
-    rs.addRule(new Pattern("configuration/insertFromJNDI"),
-        new InsertFromJNDIAction());
-    rs.addRule(new Pattern("configuration/evaluator"), new EvaluatorAction());
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//    rs.addRule(new Pattern("configuration/insertFromJNDI"),
+//        new InsertFromJNDIAction());
+//    rs.addRule(new Pattern("configuration/evaluator"), new EvaluatorAction());
 
     rs.addRule(new Pattern("configuration/appender/sift"), new SiftAction());
     rs.addRule(new Pattern("configuration/appender/sift/*"), new NOPAction());
@@ -76,10 +79,13 @@ public class JoranConfigurator extends JoranConfiguratorBase {
     // add jmxConfigurator only if we have JMX available.
     // If running under JDK 1.4 (retrotranslateed logback) then we
     // might not have JMX.
-    if (PlatformInfo.hasJMXObjectName()) {
-      rs.addRule(new Pattern("configuration/jmxConfigurator"),
-          new JMXConfiguratorAction());
-    }
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//    if (PlatformInfo.hasJMXObjectName()) {
+//      rs.addRule(new Pattern("configuration/jmxConfigurator"),
+//          new JMXConfiguratorAction());
+//    }
     rs.addRule(new Pattern("configuration/include"), new IncludeAction());
 
     rs.addRule(new Pattern("configuration/consolePlugin"),

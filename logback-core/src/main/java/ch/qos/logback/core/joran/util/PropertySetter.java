@@ -14,11 +14,16 @@
 // Contributors:  Georg Lundesgaard
 package ch.qos.logback.core.joran.util;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.MethodDescriptor;
-import java.beans.PropertyDescriptor;
+// #############################################
+// XXX: Not supported in Logback-Android
+// Replaced by classes in ch.qos.logback.core.joran.util
+// #############################################
+//import java.beans.BeanInfo;
+//import java.beans.IntrospectionException;
+//import java.beans.Introspector;
+//import java.beans.MethodDescriptor;
+//import java.beans.PropertyDescriptor;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
@@ -31,8 +36,7 @@ import ch.qos.logback.core.util.PropertySetterException;
 /**
  * General purpose Object property setter. Clients repeatedly invokes
  * {@link #setProperty setProperty(name,value)} in order to invoke setters on
- * the Object specified in the constructor. This class relies on the JavaBeans
- * {@link Introspector} to analyze the given Object Class using reflection.
+ * the Object specified in the constructor.
  * 
  * <p>
  * Usage:
@@ -76,9 +80,15 @@ public class PropertySetter extends ContextAwareBase {
    */
   protected void introspect() {
     try {
-      BeanInfo bi = Introspector.getBeanInfo(obj.getClass());
-      propertyDescriptors = bi.getPropertyDescriptors();
-      methodDescriptors = bi.getMethodDescriptors();
+// #############################################
+// XXX: Not supported in Logback-Android
+// Replaced by classes in ch.qos.logback.core.joran.util
+// #############################################
+//      BeanInfo bi = Introspector.getBeanInfo(obj.getClass());
+//      propertyDescriptors = bi.getPropertyDescriptors();
+//      methodDescriptors = bi.getMethodDescriptors();
+      propertyDescriptors = Introspector.getPropertyDescriptors(this.objClass);
+      methodDescriptors = Introspector.getMethodDescriptors(this.objClass);
     } catch (IntrospectionException ex) {
       addError("Failed to introspect " + obj + ": " + ex.getMessage());
       propertyDescriptors = new PropertyDescriptor[0];
@@ -172,9 +182,8 @@ public class PropertySetter extends ContextAwareBase {
   }
 
   public AggregationType computeAggregationType(String name) {
-    String cName = capitalizeFirstLetter(name);
-
-    Method addMethod = findAdderMethod(cName);
+    // findAdderMethod() capitalizes name's 1st letter before search
+    Method addMethod = findAdderMethod(name);
 
     // if the
     if (addMethod != null) {

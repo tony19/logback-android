@@ -14,7 +14,10 @@
 package ch.qos.logback.classic.util;
 
 import ch.qos.logback.classic.PatternLayout;
-import ch.qos.logback.classic.boolex.JaninoEventEvaluator;
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//import ch.qos.logback.classic.boolex.JaninoEventEvaluator;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
@@ -38,8 +41,11 @@ public class DefaultNestedComponentRules {
     registry.add(AppenderBase.class, "encoder", PatternLayoutEncoder.class);
     registry.add(UnsynchronizedAppenderBase.class, "encoder", PatternLayoutEncoder.class);
     
-    registry
-        .add(EvaluatorFilter.class, "evaluator", JaninoEventEvaluator.class);
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//    registry
+//        .add(EvaluatorFilter.class, "evaluator", JaninoEventEvaluator.class);
 
   }
 

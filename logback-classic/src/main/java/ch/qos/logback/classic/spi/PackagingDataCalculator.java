@@ -16,7 +16,10 @@ package ch.qos.logback.classic.spi;
 import java.net.URL;
 import java.util.HashMap;
 
-import sun.reflect.Reflection;
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//import sun.reflect.Reflection;
 
 /**
  * 
@@ -33,22 +36,25 @@ public class PackagingDataCalculator {
 
   private static boolean GET_CALLER_CLASS_METHOD_AVAILABLE = false;
 
-  static {
-    // if either the Reflection class or the getCallerClass method
-    // are unavailable, then we won't invoke Reflection.getCallerClass()
-    // This approach ensures that this class will *run* on JDK's lacking
-    // sun.reflect.Reflection class. However, this class will *not compile*
-    // on JDKs lacking sun.reflect.Reflection.
-    try {
-      Reflection.getCallerClass(2);
-      GET_CALLER_CLASS_METHOD_AVAILABLE = true;
-    } catch (NoClassDefFoundError e) {
-    } catch (NoSuchMethodError e) {
-    } catch (Throwable e) {
-      System.err.println("Unexpected exception");
-      e.printStackTrace();
-    }
-  }
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//  static {
+//    // if either the Reflection class or the getCallerClass method
+//    // are unavailable, then we won't invoke Reflection.getCallerClass()
+//    // This approach ensures that this class will *run* on JDK's lacking
+//    // sun.reflect.Reflection class. However, this class will *not compile*
+//    // on JDKs lacking sun.reflect.Reflection.
+//    try {
+//      Reflection.getCallerClass(2);
+//      GET_CALLER_CLASS_METHOD_AVAILABLE = true;
+//    } catch (NoClassDefFoundError e) {
+//    } catch (NoSuchMethodError e) {
+//    } catch (Throwable e) {
+//      System.err.println("Unexpected exception");
+//      e.printStackTrace();
+//    }
+//  }
 
   public PackagingDataCalculator() {
   }
@@ -76,10 +82,14 @@ public class PackagingDataCalculator {
     int missfireCount = 0;
     for (int i = 0; i < commonFrames; i++) {
       Class callerClass = null;
-      if (GET_CALLER_CLASS_METHOD_AVAILABLE) {
-        callerClass = Reflection.getCallerClass(localFirstCommon + i
-            - missfireCount + 1);
-      }
+
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//      if (GET_CALLER_CLASS_METHOD_AVAILABLE) {
+//        callerClass = Reflection.getCallerClass(localFirstCommon + i
+//            - missfireCount + 1);
+//      }
       StackTraceElementProxy step = stepArray[stepFirstCommon + i];
       String stepClassname = step.ste.getClassName();
 

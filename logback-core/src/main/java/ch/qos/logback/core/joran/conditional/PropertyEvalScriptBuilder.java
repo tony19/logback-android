@@ -18,10 +18,13 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.janino.ClassBodyEvaluator;
-import org.codehaus.janino.CompileException;
-import org.codehaus.janino.Parser.ParseException;
-import org.codehaus.janino.Scanner.ScanException;
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//import org.codehaus.janino.ClassBodyEvaluator;
+//import org.codehaus.janino.CompileException;
+//import org.codehaus.janino.Parser.ParseException;
+//import org.codehaus.janino.Scanner.ScanException;
 
 import ch.qos.logback.core.spi.ContextAwareBase;
 
@@ -36,25 +39,31 @@ public class PropertyEvalScriptBuilder extends ContextAwareBase {
 
   Map<String, String> map = new HashMap<String, String>();
 
-  public Condition build(String script) throws IllegalAccessException,
-      CompileException, ParseException, ScanException, InstantiationException,
-      SecurityException, NoSuchMethodException, IllegalArgumentException,
-      InvocationTargetException {
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//  public Condition build(String script) throws IllegalAccessException,
+//      CompileException, ParseException, ScanException, InstantiationException,
+//      SecurityException, NoSuchMethodException, IllegalArgumentException,
+//      InvocationTargetException {
+//
+//    ClassBodyEvaluator cbe = new ClassBodyEvaluator();
+//    cbe.setImplementedTypes(new Class[] { Condition.class });
+//    cbe.setExtendedType(MapWrapperForScripts.class);
+//    cbe.cook(SCRIPT_PREFIX + script + SCRIPT_SUFFIX);
+//
+//    Class<?> clazz = cbe.getClazz();
+//    Condition instance = (Condition) clazz.newInstance();
+//    Method setMapMethod = clazz.getMethod("setMap", Map.class);
+//    setMapMethod.invoke(instance, context.getCopyOfPropertyMap());
+//
+//    Method setNameMethod = clazz.getMethod("setName", String.class);
+//    setNameMethod.invoke(instance, context.getName());
+//
+//    return instance;
+//  }
 
-    ClassBodyEvaluator cbe = new ClassBodyEvaluator();
-    cbe.setImplementedTypes(new Class[] { Condition.class });
-    cbe.setExtendedType(MapWrapperForScripts.class);
-    cbe.cook(SCRIPT_PREFIX + script + SCRIPT_SUFFIX);
-
-    Class<?> clazz = cbe.getClazz();
-    Condition instance = (Condition) clazz.newInstance();
-    Method setMapMethod = clazz.getMethod("setMap", Map.class);
-    setMapMethod.invoke(instance, context.getCopyOfPropertyMap());
-
-    Method setNameMethod = clazz.getMethod("setName", String.class);
-    setNameMethod.invoke(instance, context.getName());
-
-    return instance;
+  public Condition build(String script) throws RuntimeException {
+    throw new RuntimeException("Not supported");
   }
-
 }

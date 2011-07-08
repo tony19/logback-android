@@ -143,6 +143,10 @@
                         <exclude>**/PackageTest.java</exclude>
                         <exclude>**/ConsoleAppenderTest.java</exclude>
                         <exclude>**/TimeBasedRollingTest.java</exclude>
+
+                        <!-- exclude classes not supported in Logback-Android -->
+                        <exclude>**/core/joran/conditional/If*.java</exclude>
+                        <exclude>**/core/joran/conditional/PropertyEvalScriptBuilderTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

@@ -17,7 +17,10 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
-import ch.qos.logback.classic.gaffer.GafferUtil;
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//import ch.qos.logback.classic.gaffer.GafferUtil;
 import ch.qos.logback.classic.util.EnvUtil;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.event.SaxEvent;
@@ -165,7 +168,10 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
           lc.reset();
           // avoid directly referring to GafferConfigurator so as to avoid
           // loading  groovy.lang.GroovyObject . See also http://jira.qos.ch/browse/LBCLASSIC-214
-          GafferUtil.runGafferConfiguratorOn(lc, this, mainConfigurationURL);
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+          //GafferUtil.runGafferConfiguratorOn(lc, this, mainConfigurationURL);
         } else {
           addError("Groovy classes are not available on the class path. ABORTING INITIALIZATION.");
         }

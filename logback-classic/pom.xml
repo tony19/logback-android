@@ -333,6 +333,12 @@
             <exclude>**/test_osgi/BundleTest.java</exclude>
             <exclude>**/ch/qos/logback/classic/util/InitializationIntegrationTest.java</exclude>
             <exclude>**/SerializationPerfTest.java</exclude>
+
+            <!-- exclude classes not supported in Logback-Android --> 
+            <exclude>**/classic/joran/EvaluatorJoranTest.java</exclude>
+            <exclude>**/classic/joran/conditional/ConditionalTest.java</exclude>
+            <exclude>**/classic/selector/ContextJNDISelectorTest.java</exclude>
+            <exclude>**/classic/selector/ContextDetachingSCLTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
