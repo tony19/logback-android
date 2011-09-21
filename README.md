@@ -14,7 +14,7 @@ Quickstart
 
  1. Configure your Android project's *Java Build Path*:
 
-     * Include [logback-android-0.9.30.jar][18] and [slf4j-api-1.6.1.jar][19].
+     * Include [logback-android-0.9.30.jar][18] and [slf4j-api-1.6.2.jar][19].
      * Exclude all other SLF4J bindings/libraries (i.e., *log4j-over-slf4j.jar*, *slf4j-android-1.5.8.jar*, etc).
 
  1. Load configuration XML from pre-determined location (e.g., `/sdcard/logback-test.xml`). 
@@ -169,7 +169,7 @@ Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]
  1. Click **Libraries** tab:
 
 	* Click **Add External JARs**.
-	* Browse to `slf4j-api-1.6.1.jar`, and click **OK**
+	* Browse to `slf4j-api-1.6.2.jar`, and click **OK**
    
  1. Click **Source** tab:
 
@@ -239,6 +239,6 @@ Tentative upcoming plans include:
  [15]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
  [16]: http://www.slf4j.org/download.html
  [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
- [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC1.jar
- [19]: https://github.com/tony19/logback-android/raw/master/bin/slf4j-api-1.6.1.jar
+ [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC2.jar
+ [19]: https://github.com/tony19/logback-android/raw/master/bin/slf4j-api-1.6.2.jar
  [20]: http://developer.android.com/sdk/eclipse-adt.html
