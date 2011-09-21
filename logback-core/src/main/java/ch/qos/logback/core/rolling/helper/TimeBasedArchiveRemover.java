@@ -19,7 +19,10 @@ import java.util.Date;
 import ch.qos.logback.core.pattern.Converter;
 import ch.qos.logback.core.pattern.LiteralConverter;
 import ch.qos.logback.core.spi.ContextAwareBase;
-import org.codehaus.groovy.tools.shell.util.NoExitSecurityManager;
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+// import org.codehaus.groovy.tools.shell.util.NoExitSecurityManager;
 
 public class TimeBasedArchiveRemover extends DefaultArchiveRemover {
 
