@@ -69,7 +69,7 @@ public class CoreConstants {
    */
   public final static Class<?>[] EMPTY_CLASS_ARRAY = new Class[]{};
   public final static String CAUSED_BY = "Caused by: ";
-
+  public final static String WRAPPED_BY = "Wrapped by: ";
 
   public final static char PERCENT_CHAR = '%';
   public static final char LEFT_PARENTHESIS_CHAR = '(';
@@ -134,4 +134,9 @@ public class CoreConstants {
 
   public static int BYTES_PER_INT = 4;
   public static final int MILLIS_IN_ONE_SECOND = 1000;
+  public static final int MILLIS_IN_ONE_MINUTE = MILLIS_IN_ONE_SECOND*60;
+  public static final int MILLIS_IN_ONE_HOUR = MILLIS_IN_ONE_MINUTE*60;
+  public static final int MILLIS_IN_ONE_DAY = MILLIS_IN_ONE_HOUR*24;
+  public static final int MILLIS_IN_ONE_WEEK = MILLIS_IN_ONE_DAY*7;
+
 }

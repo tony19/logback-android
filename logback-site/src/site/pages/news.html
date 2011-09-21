@@ -28,7 +28,47 @@
 
     <hr width="80%" align="center" />
 
-    <h3>July xxx, 2011 - Release of version 0.9.30</h3>
+    <h3>September 21st, 2011 - Release of version 0.9.30</h3>
+
+
+    <p>Archive removal can now deal with prolonged periods of
+    application inactivity and application stop and restarts. The
+    issue is described in <a
+    href="http://jira.qos.ch/browse/LBCORE-147">LBCORE-147</a>
+    reported by Rafael Diaz Maurin.
+    </p>
+
+    <p>Logback-classic now supports printing stack traces "root cause
+    first" instead of the standard "root cause last". See the
+    documentaiton for <a
+    href="manual/layouts.html#rootException">%rootException</a>
+    converter for further details. The <code>%rootException</code>
+    converter was contributed by Tomasz Nurkiewicz in relation with <a
+    href="http://jira.qos.ch/browse/LBCLASSIC-217">LBCLASSIC-217</a>.
+    </p>
+
+    <p>In the <code>ILoggingEvent</code> interface the
+    <code>getMDC</code> method is now deprecated and replaced by
+    <code>getMDCPropertyMap</code>. The latter method was already part
+    of the <code>ILoggingEvent</code> interface in prior versions of
+    logback-classic. Furthermore, the value returned by
+    <code>ILoggingEvent.getMDCPropertyMap</code> can now be an empty
+    map but never null.</p>
+   
+
+    <p><code>LoggingEvent</code> no longer assumes that
+    <code>LogbackMDCAdapter</code> is the only possible implementation
+    of the <code>MDCAdapter</code> interface. This fixes <a
+    href="http://jira.qos.ch/browse/LBCLASSIC-275">LBCLASSIC-275</a>
+    reported by Chris Dolan.
+    </p>
+
+    <p><code>LogbackMDCAdapter</code> now synchronizes over its thread
+    local map. This prevents
+    <code>ConcurrentModificationException</code> from occuring while a
+    child thread copies the map from the parent. This fixes <a
+    href="http://jira.qos.ch/browse/LBCLASSIC-289">LBCLASSIC-289</a>
+    reported by Josh Oddman.</p>
 
     <p>It is now possible to specify multiple destination addresses
     separated by commas in the the <span class="option">to</span>
@@ -39,17 +79,23 @@
     addresses could only be specified by using multiple <span
     class="option">to</span> properties. As of version 0.9.30 both
     comma separated addresses and multiple <span
-    class="option">to</span> properties are suported.
+    class="option">to</span> properties are supported.
     </p>
 
-    <p>When debug attribute is set to true within
-    <code>&lt;the></code> configuration element, status messages are
+    <p>When debug attribute is set to true within the
+    <code>&lt;configuration></code> element, status messages are
     printed on the console after Joran (re)configures
     logback. Previously, all status messages were printed. With this
     release, only status messages created during (re)configuration are
     printed. This change fixes <a
-    href="http://jira.qos.ch/browse/LBCLASSIC-273">/LBCLASSIC-273</a>
+    href="http://jira.qos.ch/browse/LBCLASSIC-273">LBCLASSIC-273</a>
     reported by Joern Huxhorn.
+    </p>
+
+    <p>Single quotes within a date conversion specifier in filename
+    patterns are now handled correctly. This fixes <a
+    href="http://jira.qos.ch/browse/LBCORE-214">LBCORE-214</a>
+    reported by Derek Libby.
     </p>
 
     <hr width="80%" align="center" />
