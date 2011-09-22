@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<!-- EXCLUDE ALL CLASSES NOT SUPPORTED IN ANDROID -->
+	<classpathentry excluding="ch/qos/logback/classic/boolex/GEventEvaluator.java|ch/qos/logback/classic/boolex/JaninoEventEvaluator.java|ch/qos/logback/classic/gaffer/|ch/qos/logback/classic/helpers/|ch/qos/logback/classic/jmx/|ch/qos/logback/classic/joran/action/EvaluatorAction.java|ch/qos/logback/classic/joran/action/InsertFromJNDIAction.java|ch/qos/logback/classic/joran/action/JMXConfiguratorAction.java|ch/qos/logback/classic/net/JMSQueueAppender.java|ch/qos/logback/classic/net/JMSQueueSink.java|ch/qos/logback/classic/net/JMSTopicAppender.java|ch/qos/logback/classic/net/JMSTopicSink.java|ch/qos/logback/classic/net/SMTPAppender.java|ch/qos/logback/classic/selector/ContextJNDISelector.java|ch/qos/logback/classic/selector/servlet/|ch/qos/logback/classic/util/JNDIUtil.java|ch/qos/logback/classic/ViewStatusMessagesServlet.java" kind="src" path="logback-classic"/>
+	<classpathentry excluding="ch/qos/logback/core/boolex/JaninoEventEvaluatorBase.java|ch/qos/logback/core/db/BindDataSourceToJNDIAction.java|ch/qos/logback/core/db/JNDIConnectionSource.java|ch/qos/logback/core/net/JMSAppenderBase.java|ch/qos/logback/core/net/LoginAuthenticator.java|ch/qos/logback/core/net/SMTPAppenderBase.java|ch/qos/logback/core/status/ViewStatusMessagesServletBase.java" kind="src" path="logback-core"/>
+	
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	
+	<!--  XXX: CUSTOMIZE THIS PATH FOR YOUR DEVELOPMENT MACHINE -->
+	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/bin/slf4j-api-1.6.2.jar"/>
+	
+	<classpathentry kind="output" path="bin"/>
+</classpath>

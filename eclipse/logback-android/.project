@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>logback-android</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>com.android.ide.eclipse.adt.PreCompilerBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>com.android.ide.eclipse.adt.ApkBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	
+	<!--  XXX: CUSTOMIZE THESE PATHS FOR YOUR DEVELOPMENT MACHINE -->
+	<linkedResources>
+		<link>
+			<name>logback-classic</name>
+			<type>2</type>
+			<location>/Users/tony/Developer/src/logback-android/logback-classic/src/main/java</location>
+		</link>
+		<link>
+			<name>logback-core</name>
+			<type>2</type>
+			<location>/Users/tony/Developer/src/logback-android/logback-core/src/main/java</location>
+		</link>
+	</linkedResources>
+</projectDescription>
