@@ -36,12 +36,11 @@ public class HelloAndroidActivity extends Activity {
      */
     private void configureLog() {
         InputStream xml = null;
-		try {
-			xml = getAssets().open("logback.xml");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            xml = getAssets().open("logback.xml");
+        } catch (IOException e) {
+            return;
+        }
 
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         try {
