@@ -34,10 +34,14 @@ public class Introspector {
    * @return the name with its first letter in lowercase
    */
   static public String decapitalize(String name) {
-    if (name.length() > 1) {
-      return name.substring(0, 1).concat(name.substring(1));
-    } else {
+    if (name == null || name.length() == 0) {
       return name;
+    } else {
+      String nm = name.substring(0, 1).toLowerCase();
+      if (name.length() > 1) {
+    	  nm += name.substring(1);
+      }
+      return nm;
     }
   }
 
@@ -68,18 +72,19 @@ public class Introspector {
   static public PropertyDescriptor[] getPropertyDescriptors(Class<?> clazz) {
     final String SETTER_PREFIX = "set";
     final String GETTER_PREFIX = "get";
+    final int LEN_PREFIX = SETTER_PREFIX.length();
 
     Map<String, PropertyDescriptor> map = new HashMap<String, PropertyDescriptor>();
     for (Method m : clazz.getMethods()) {
       PropertyDescriptor pd = null;
       String mName = m.getName();
 
-      boolean isGet = mName.startsWith(GETTER_PREFIX);
-      boolean isSet = mName.startsWith(SETTER_PREFIX);
+      boolean isGet = mName.startsWith(GETTER_PREFIX) && (mName.length() > LEN_PREFIX);
+      boolean isSet = mName.startsWith(SETTER_PREFIX) && (mName.length() > LEN_PREFIX);
 
       if (isGet || isSet) {
-        String propName = mName.substring(SETTER_PREFIX.length()).toLowerCase();
-
+        String propName = decapitalize(mName.substring(LEN_PREFIX));
+        
         pd = map.get(propName);
         if (pd == null) {
           pd = new PropertyDescriptor(propName);
