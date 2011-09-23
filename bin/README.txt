@@ -1,8 +1,8 @@
-21-September-2011
+23-September-2011
 
 
-logback-android-0.9.30-RC2.jar:
-	Logback-Android built from source as of 21-September-2011 
+logback-android-0.9.30-RC3.jar:
+	Logback-Android built from source as of 23-September-2011 
 
 
 slf4j-api-1.6.2.jar:
