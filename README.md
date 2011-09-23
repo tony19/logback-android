@@ -8,6 +8,7 @@ Overview
 
 **Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [*SLF4J*][3] allows for greater logging flexibility and portability across Java platforms.
 
+The current version is **0.9.30**.
 
 Quickstart
 ----------
@@ -108,15 +109,17 @@ Quickstart
 
 #### Output of Android logcat:
 
-	I/System.out( 6948): 03:41:26.403 [main] INFO  s.testapp.HelloAndroidActivity - Hello Android!
-	I/System.out( 6948): 03:41:26.453 [main] TRACE s.testapp.HelloAndroidActivity - toString() entered
-	I/System.out( 6948): 03:41:26.499 [main] DEBUG s.testapp.HelloAndroidActivity - toString: slf4jandroid.testapp.HelloAndroidActivity
+	I/System.out( 6948): 03:41:26.403 [main] INFO  com.google.HelloAndroidActivity - Hello Android!
+	I/System.out( 6948): 03:41:26.453 [main] TRACE com.google.HelloAndroidActivity - toString() entered
+	I/System.out( 6948): 03:41:26.499 [main] DEBUG com.google.HelloAndroidActivity - toString: slf4jandroid.testapp.HelloAndroidActivity
 
 #### Output of /sdcard/test.log:
 
-	2506 [main] INFO  s.testapp.HelloAndroidActivity - Hello Android!
-	2556 [main] TRACE s.testapp.HelloAndroidActivity - toString() entered
-	2602 [main] DEBUG s.testapp.HelloAndroidActivity - toString: slf4jandroid.testapp.HelloAndroidActivity
+	2506 [main] INFO  com.google.HelloAndroidActivity - Hello Android!
+	2556 [main] TRACE com.google.HelloAndroidActivity - toString() entered
+	2602 [main] DEBUG com.google.HelloAndroidActivity - toString: slf4jandroid.testapp.HelloAndroidActivity
+
+See the sample project in the `eclipse/HelloAndroid` subdirectory.
 
 Features
 --------
@@ -126,6 +129,7 @@ Logback-Android currently supports only the **logback-core** and **logback-class
 * Conditionals in XML configuration files
 * JMS, JMX, JNDI, SMTP, and Servlets
 
+**Logback-Android currently cannot read XML files in Android 2.1 (due to an Android [bug][21] in the SAXParser). This is not a problem in newer versions of Android. I'm looking into a workaround (soon).**
 
 
 Documentation
@@ -147,8 +151,9 @@ Build
 -----
 
 ### *Eclipse*
-Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]. The goal is to create `logback-android.jar`, containing only the `logback-core` and `logback-classic` modules with select features omitted. The toughest part is setting up your Eclipse project as outlined below.
+Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]. You can import the pre-configured project from the `eclipse/logback-android` subdirectory (you'll have to customize a couple paths in the `.classpath` file).
 
+**OR** you can setup your own Eclipse project as outlined below. The goal is to create `logback-android.jar`, containing only the `logback-core` and `logback-classic` modules with select features omitted.
 
  1. Create new Android project.
 
@@ -176,8 +181,12 @@ Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]
 	* Select `logback-android/src`, and click **Remove**
 	* Click **Link Source**.
 	* Browse to `${logback-android-src}/logback-classic/src/main/java`
-	* Click **Next**
-	* For **Exclusion pattterns**, enter the following:
+	* For **Folder name**, enter **logback-classic**
+	* Click **Link Source** again.
+	* Browse to `${logback-android-src}/logback-core/src/main/java` 
+	* For **Folder name**, enter **logback-core**
+	* Click **Finish**. 
+	* From the Package Explorer pane, navigate to each of the following file/directory elements, and right-click to **Build Path > Exclude**:
 
 		* `ch/qos/logback/classic/boolex/GEventEvaluator.java`
 		* `ch/qos/logback/classic/boolex/JaninoEventEvaluator.java`
@@ -196,12 +205,6 @@ Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]
 		* `ch/qos/logback/classic/selector/servlet/`
 		* `ch/qos/logback/classic/util/JNDIUtil.java`
 		* `ch/qos/logback/classic/ViewStatusMessagesServlet.java`
-
-	* For **Folder name**, enter **logback-classic**
-	* Click **Link Source** again.
-	* Browse to `${logback-android-src}/logback-core/src/main/java`, and click **Next**
-	* For **Exclusion pattterns**, enter the following:
-
 		* `ch/qos/logback/core/boolex/JaninoEventEvaluatorBase.java`
 		* `ch/qos/logback/core/db/BindDataSourceToJNDIAction.java`
 		* `ch/qos/logback/core/db/JNDIConnectionSource.java`
@@ -209,9 +212,11 @@ Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]
 		* `ch/qos/logback/core/net/LoginAuthenticator.java`
 		* `ch/qos/logback/core/net/SMTPAppenderBase.java`
 		* `ch/qos/logback/core/status/ViewStatusMessagesServletBase.java`
-  
-	* For **Folder name**, enter **logback-core**
-	* Click **Finish**. Eclipse should begin building automatically, and if no errors, `logback-android.jar` is created in the project's output directory.
+
+	* Open a terminal to the project's output directory, and create the JAR with:
+
+		`cd ${logback-android-src}/bin`
+		`jar cf logback-android.jar *`
 
 
 Future Work
@@ -239,6 +244,7 @@ Tentative upcoming plans include:
  [15]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
  [16]: http://www.slf4j.org/download.html
  [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
- [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC2.jar
+ [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC3.jar
  [19]: https://github.com/tony19/logback-android/raw/master/bin/slf4j-api-1.6.2.jar
  [20]: http://developer.android.com/sdk/eclipse-adt.html
+ [21]: http://code.google.com/p/android/issues/detail?id=11223
