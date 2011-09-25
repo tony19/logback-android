@@ -111,13 +111,13 @@ Quickstart
 
 	I/System.out( 6948): 03:41:26.403 [main] INFO  com.google.HelloAndroidActivity - Hello Android!
 	I/System.out( 6948): 03:41:26.453 [main] TRACE com.google.HelloAndroidActivity - toString() entered
-	I/System.out( 6948): 03:41:26.499 [main] DEBUG com.google.HelloAndroidActivity - toString: slf4jandroid.testapp.HelloAndroidActivity
+	I/System.out( 6948): 03:41:26.499 [main] DEBUG com.google.HelloAndroidActivity - toString: com.google.HelloAndroidActivity
 
 #### Output of /sdcard/test.log:
 
 	2506 [main] INFO  com.google.HelloAndroidActivity - Hello Android!
 	2556 [main] TRACE com.google.HelloAndroidActivity - toString() entered
-	2602 [main] DEBUG com.google.HelloAndroidActivity - toString: slf4jandroid.testapp.HelloAndroidActivity
+	2602 [main] DEBUG com.google.HelloAndroidActivity - toString: com.google.HelloAndroidActivity
 
 See the sample project in the `eclipse/HelloAndroid` subdirectory.
 
