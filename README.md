@@ -129,9 +129,6 @@ Logback-Android currently supports only the **logback-core** and **logback-class
 * Conditionals in XML configuration files
 * JMS, JMX, JNDI, SMTP, and Servlets
 
-**Logback-Android currently cannot read XML files in Android 2.1 (due to an Android [bug][21] in the SAXParser). This is not a problem in newer versions of Android. I'm looking into a workaround (soon).**
-
-
 Documentation
 -------------
 * [Logback manual][7]
@@ -244,7 +241,7 @@ Tentative upcoming plans include:
  [15]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
  [16]: http://www.slf4j.org/download.html
  [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
- [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC3.jar
+ [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC4.jar
  [19]: https://github.com/tony19/logback-android/raw/master/bin/slf4j-api-1.6.2.jar
  [20]: http://developer.android.com/sdk/eclipse-adt.html
  [21]: http://code.google.com/p/android/issues/detail?id=11223

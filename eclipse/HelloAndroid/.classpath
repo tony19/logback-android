@@ -5,7 +5,7 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	
 	<!--  XXX: CUSTOMIZE THESE PATHS FOR YOUR DEVELOPMENT MACHINE -->
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/bin/logback-android-0.9.30-RC2.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/bin/logback-android-0.9.30-RC4.jar"/>
 	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/bin/slf4j-api-1.6.2.jar"/>
 	
 	<classpathentry kind="output" path="bin"/>

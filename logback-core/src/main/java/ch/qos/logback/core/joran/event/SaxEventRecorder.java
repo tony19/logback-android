@@ -18,16 +18,23 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+//####################################################
+// XXX: Android 2.1 SAXParser cannot parse XML files. 
+// Instead, use the XML Pull Parser since it works on  
+// all versions of Android.
+// ###################################################
+//import javax.xml.parsers.SAXParser;
+//import javax.xml.parsers.SAXParserFactory;
 
 import static ch.qos.logback.core.CoreConstants.XML_PARSING;
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xmlpull.v1.sax2.Driver;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -54,9 +61,12 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
 
   public List<SaxEvent> recordEvents(InputSource inputSource)
       throws JoranException {
-    SAXParser saxParser = buildSaxParser();
+    //SAXParser saxParser = buildSaxParser();
+  	Driver parser = buildPullParser(); 
     try {
-      saxParser.parse(inputSource, this);
+      //saxParser.parse(inputSource, this);
+      parser.setContentHandler((ContentHandler) this);
+      parser.parse(inputSource);
       return saxEventList;
     } catch (IOException ie) {
       handleError("I/O error occurred while parsing xml file", ie);
@@ -74,19 +84,37 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
     throw new JoranException(errMsg, t);
   }
 
-  private SAXParser buildSaxParser() throws JoranException {
-    try {
-      SAXParserFactory spf = SAXParserFactory.newInstance();
-      spf.setValidating(false);
-      spf.setNamespaceAware(true);
-      return spf.newSAXParser();
+// ####################################################
+// XXX: Android 2.1 SAXParser cannot parse XML files. 
+// Instead, use the XML Pull Parser since it works on  
+// all versions of Android.
+// ###################################################
+//  private SAXParser buildSaxParser() throws JoranException {
+//    try {
+//      SAXParserFactory spf = SAXParserFactory.newInstance();
+//      spf.setValidating(false);
+//      spf.setNamespaceAware(true);
+//      return spf.newSAXParser();
+//    } catch (Exception pce) {
+//      String errMsg = "Parser configuration error occurred";
+//      addError(errMsg, pce);
+//      throw new JoranException(errMsg, pce);
+//    }
+//  }
+
+  private Driver buildPullParser() throws JoranException {
+  	try {
+  		Driver driver = new Driver();
+  		driver.setFeature("http://xml.org/sax/features/validation", false);
+  		driver.setFeature("http://xml.org/sax/features/namespaces", true);
+      return driver;
     } catch (Exception pce) {
       String errMsg = "Parser configuration error occurred";
       addError(errMsg, pce);
       throw new JoranException(errMsg, pce);
     }
   }
-
+  
   public void startDocument() {
   }
 
