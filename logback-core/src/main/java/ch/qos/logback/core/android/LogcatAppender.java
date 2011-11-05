@@ -27,8 +27,8 @@ import ch.qos.logback.core.AppenderBase;
  */
 public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 
-	private PatternLayoutEncoder	encoder;
-	
+	private PatternLayoutEncoder encoder;
+
 	/**
 	 * As in most cases, the default constructor does nothing.
 	 */
@@ -53,7 +53,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 * Writes an event to Android's logging mechanism (logcat)
 	 * 
 	 * @param event
-	 *          the event to be logged
+	 *            the event to be logged
 	 */
 	public void append(ILoggingEvent event) {
 
@@ -63,27 +63,27 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 
 		// format message based on encoder layout
 		String msg = this.encoder.getLayout().doLayout(event);
-		
+
 		switch (event.getLevel().levelInt) {
-			case Level.ALL_INT:
-			case Level.TRACE_INT:
-				Log.v(event.getLoggerName(), msg);
-				break;
-			case Level.DEBUG_INT:
-				Log.d(event.getLoggerName(), msg);
-				break;
-			case Level.INFO_INT:
-				Log.i(event.getLoggerName(), msg);
-				break;
-			case Level.WARN_INT:
-				Log.w(event.getLoggerName(), msg);
-				break;
-			case Level.ERROR_INT:
-				Log.e(event.getLoggerName(), msg);
-				break;
-			case Level.OFF_INT:
-			default:
-				break;
+		case Level.ALL_INT:
+		case Level.TRACE_INT:
+			Log.v(event.getLoggerName(), msg);
+			break;
+		case Level.DEBUG_INT:
+			Log.d(event.getLoggerName(), msg);
+			break;
+		case Level.INFO_INT:
+			Log.i(event.getLoggerName(), msg);
+			break;
+		case Level.WARN_INT:
+			Log.w(event.getLoggerName(), msg);
+			break;
+		case Level.ERROR_INT:
+			Log.e(event.getLoggerName(), msg);
+			break;
+		case Level.OFF_INT:
+		default:
+			break;
 		}
 	}
 
