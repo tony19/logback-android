@@ -28,6 +28,7 @@ import ch.qos.logback.core.AppenderBase;
 public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 
 	private PatternLayoutEncoder encoder;
+	private PatternLayoutEncoder tagEncoder = null;
 
 	/**
 	 * As in most cases, the default constructor does nothing.
@@ -45,7 +46,13 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 			addError("No layout set for the appender named [" + name + "].");
 			return;
 		}
-
+		
+		// tag encoder is optional but needs a layout
+		if ((this.tagEncoder != null) && (this.tagEncoder.getLayout() == null)) {
+			addError("No tag layout set for the appender named [" + name + "].");
+			return;
+		}
+		
 		super.start();
 	}
 
@@ -63,23 +70,24 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 
 		// format message based on encoder layout
 		String msg = this.encoder.getLayout().doLayout(event);
-
+		String tag = (this.tagEncoder != null) ? this.tagEncoder.getLayout().doLayout(event) : event.getLoggerName();
+		
 		switch (event.getLevel().levelInt) {
 		case Level.ALL_INT:
 		case Level.TRACE_INT:
-			Log.v(event.getLoggerName(), msg);
+			Log.v(tag, msg);
 			break;
 		case Level.DEBUG_INT:
-			Log.d(event.getLoggerName(), msg);
+			Log.d(tag, msg);
 			break;
 		case Level.INFO_INT:
-			Log.i(event.getLoggerName(), msg);
+			Log.i(tag, msg);
 			break;
 		case Level.WARN_INT:
-			Log.w(event.getLoggerName(), msg);
+			Log.w(tag, msg);
 			break;
 		case Level.ERROR_INT:
-			Log.e(event.getLoggerName(), msg);
+			Log.e(tag, msg);
 			break;
 		case Level.OFF_INT:
 		default:
@@ -93,6 +101,14 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 
 	public void setEncoder(PatternLayoutEncoder encoder) {
 		this.encoder = encoder;
+	}
+
+	public PatternLayoutEncoder getTagEncoder() {
+		return this.tagEncoder;
+	}
+
+	public void setTagEncoder(PatternLayoutEncoder encoder) {
+		this.tagEncoder = encoder;
 	}
 
 }

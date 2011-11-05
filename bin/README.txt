@@ -1,7 +1,7 @@
 5-November-2011
 
 
-logback-android-0.9.30-RC5.jar:
+logback-android-0.9.30-RC6.jar:
 	Logback-Android built from source as of 5-November-2011 
 
 
