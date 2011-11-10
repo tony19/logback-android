@@ -8,14 +8,14 @@ Overview
 
 **Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [*SLF4J*][3] allows for greater logging flexibility and portability across Java platforms.
 
-The current version is **0.9.30**.
+The current version is **1.0.0-1**.
 
 Quickstart
 ----------
 
  1. Configure your Android project's *Java Build Path*:
 
-     * Include [logback-android-0.9.30.jar][18] and [slf4j-api-1.6.2.jar][19].
+     * Include [logback-android-1.0.0-1.jar][18] and [slf4j-api-1.6.2.jar][19].
      * Exclude all other SLF4J bindings/libraries (i.e., *log4j-over-slf4j.jar*, *slf4j-android-1.5.8.jar*, etc).
 
  1. Load configuration XML from pre-determined location (e.g., `/sdcard/logback-test.xml`). 
@@ -241,7 +241,7 @@ Tentative upcoming plans include:
  [15]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
  [16]: http://www.slf4j.org/download.html
  [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
- [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-0.9.30-RC6.jar
+ [18]: https://github.com/tony19/logback-android/raw/master/bin/logback-android-1.0.0-1.jar
  [19]: https://github.com/tony19/logback-android/raw/master/bin/slf4j-api-1.6.2.jar
  [20]: http://developer.android.com/sdk/eclipse-adt.html
  [21]: http://code.google.com/p/android/issues/detail?id=11223
