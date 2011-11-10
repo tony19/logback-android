@@ -57,15 +57,19 @@ public class IfAction extends Action {
 
 
     if (!OptionHelper.isEmpty(conditionAttribute)) {
-      conditionAttribute = OptionHelper.substVars(conditionAttribute, context);
-      PropertyEvalScriptBuilder pesb = new PropertyEvalScriptBuilder();
-      pesb.setContext(context);
-      try {
-        condition = pesb.build(conditionAttribute);
-      } catch (Exception e) {
-        addError("Faield to parse condition ["+conditionAttribute+"]", e);
-      }
-     
+      conditionAttribute = OptionHelper.substVars(conditionAttribute, ic, context);
+//#############################################
+//XXX: Not supported in Logback-Android
+//#############################################
+//      PropertyEvalScriptBuilder pesb = new PropertyEvalScriptBuilder(ic);
+//      pesb.setContext(context);
+//      try {
+//        condition = pesb.build(conditionAttribute);
+//      } catch (Exception e) {
+//        addError("Failed to parse condition ["+conditionAttribute+"]", e);
+//      }
+      addError("Failed to parse condition ["+conditionAttribute+"]");
+      
       if(condition!=null) {
         state.boolResult = condition.evaluate();
       }

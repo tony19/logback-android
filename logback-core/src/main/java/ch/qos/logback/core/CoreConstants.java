@@ -82,7 +82,6 @@ public class CoreConstants {
   public static final char DOUBLE_QUOTE_CHAR = '"';
   public static final char SINGLE_QUOTE_CHAR = '\'';
 
-
   /**
    * Number of rows before in an HTML table before,
    * we close the table and create a new one
@@ -139,4 +138,7 @@ public class CoreConstants {
   public static final int MILLIS_IN_ONE_DAY = MILLIS_IN_ONE_HOUR*24;
   public static final int MILLIS_IN_ONE_WEEK = MILLIS_IN_ONE_DAY*7;
 
+  public static final String CONTEXT_SCOPE_VALUE = "context";
+
+  final public static String RESET_MSG_PREFIX = "Will reset and reconfigure context ";
 }

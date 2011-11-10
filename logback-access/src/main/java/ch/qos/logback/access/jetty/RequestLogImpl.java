@@ -18,9 +18,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.RequestLog;
-import org.mortbay.jetty.Response;
+import ch.qos.logback.core.util.StatusPrinter;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.RequestLog;
+import org.eclipse.jetty.server.Response;
+
 
 import ch.qos.logback.access.joran.JoranConfigurator;
 import ch.qos.logback.access.spi.AccessEvent;
@@ -36,7 +38,6 @@ import ch.qos.logback.core.spi.FilterAttachable;
 import ch.qos.logback.core.spi.FilterAttachableImpl;
 import ch.qos.logback.core.spi.FilterReply;
 import ch.qos.logback.core.status.ErrorStatus;
-import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.WarnStatus;
 import ch.qos.logback.core.util.OptionHelper;
 
@@ -47,15 +48,15 @@ import ch.qos.logback.core.util.OptionHelper;
  * LoggerContext does. It also provides containers for properties. <p> To
  * configure jetty in order to use RequestLogImpl, the following lines must be
  * added to the jetty configuration file, namely <em>etc/jetty.xml</em>:
- * 
+ * <p/>
  * <pre>
- *    &lt;Ref id=&quot;requestLog&quot;&gt; 
- *      &lt;Set name=&quot;requestLog&quot;&gt; 
+ *    &lt;Ref id=&quot;requestLog&quot;&gt;
+ *      &lt;Set name=&quot;requestLog&quot;&gt;
  *        &lt;New id=&quot;requestLogImpl&quot; class=&quot;ch.qos.logback.access.jetty.RequestLogImpl&quot;&gt;&lt;/New&gt;
- *      &lt;/Set&gt; 
+ *      &lt;/Set&gt;
  *    &lt;/Ref&gt;
  * </pre>
- * 
+ * <p/>
  * By default, RequestLogImpl looks for a logback configuration file called
  * logback-access.xml, in the same folder where jetty.xml is located, that is
  * <em>etc/logback-access.xml</em>. The logback-access.xml file is slightly
@@ -64,34 +65,34 @@ import ch.qos.logback.core.util.OptionHelper;
  * loggers elements are not allowed. <p> It is possible to put the logback
  * configuration file anywhere, as long as it's path is specified. Here is
  * another example, with a path to the logback-access.xml file.
- * 
+ * <p/>
  * <pre>
- *    &lt;Ref id=&quot;requestLog&quot;&gt; 
- *      &lt;Set name=&quot;requestLog&quot;&gt; 
+ *    &lt;Ref id=&quot;requestLog&quot;&gt;
+ *      &lt;Set name=&quot;requestLog&quot;&gt;
  *        &lt;New id=&quot;requestLogImpl&quot; class=&quot;ch.qos.logback.access.jetty.RequestLogImpl&quot;&gt;&lt;/New&gt;
  *          &lt;Set name=&quot;fileName&quot;&gt;path/to/logback.xml&lt;/Set&gt;
- *      &lt;/Set&gt; 
+ *      &lt;/Set&gt;
  *    &lt;/Ref&gt;
  * </pre>
- * 
+ * <p/>
  * <p> Here is a sample logback-access.xml file that can be used right away:
- * 
+ * <p/>
  * <pre>
- *    &lt;configuration&gt; 
- *      &lt;appender name=&quot;STDOUT&quot; class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt; 
- *        &lt;layout class=&quot;ch.qos.logback.access.PatternLayout&quot;&gt; 
+ *    &lt;configuration&gt;
+ *      &lt;appender name=&quot;STDOUT&quot; class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;
+ *        &lt;layout class=&quot;ch.qos.logback.access.PatternLayout&quot;&gt;
  *          &lt;param name=&quot;Pattern&quot; value=&quot;%date %server %remoteIP %clientHost %user %requestURL&quot; /&gt;
- *        &lt;/layout&gt; 
- *      &lt;/appender&gt; 
- *      
- *      &lt;appender-ref ref=&quot;STDOUT&quot; /&gt; 
+ *        &lt;/layout&gt;
+ *      &lt;/appender&gt;
+ *
+ *      &lt;appender-ref ref=&quot;STDOUT&quot; /&gt;
  *    &lt;/configuration&gt;
  * </pre>
- * 
+ * <p/>
  * <p> Another configuration file, using SMTPAppender, could be:
- * 
+ * <p/>
  * <pre>
- *    &lt;configuration&gt; 
+ *    &lt;configuration&gt;
  *      &lt;appender name=&quot;SMTP&quot; class=&quot;ch.qos.logback.access.net.SMTPAppender&quot;&gt;
  *        &lt;layout class=&quot;ch.qos.logback.access.PatternLayout&quot;&gt;
  *          &lt;param name=&quot;pattern&quot; value=&quot;%remoteIP [%date] %requestURL %statusCode %bytesSent&quot; /&gt;
@@ -101,23 +102,24 @@ import ch.qos.logback.core.util.OptionHelper;
  *         &lt;param name=&quot;Subject&quot; value=&quot;Last Event: %statusCode %requestURL&quot; /&gt;
  *         &lt;param name=&quot;To&quot; value=&quot;server_admin@domain.org&quot; /&gt;
  *      &lt;/appender&gt;
- *      &lt;appender-ref ref=&quot;SMTP&quot; /&gt; 
+ *      &lt;appender-ref ref=&quot;SMTP&quot; /&gt;
  *    &lt;/configuration&gt;
  * </pre>
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  * @author S&eacute;bastien Pennec
  */
 public class RequestLogImpl extends ContextBase implements RequestLog,
-    AppenderAttachable<IAccessEvent>, FilterAttachable<IAccessEvent> {
+        AppenderAttachable<IAccessEvent>, FilterAttachable<IAccessEvent> {
 
   public final static String DEFAULT_CONFIG_FILE = "etc" + File.separatorChar
-      + "logback-access.xml";
+          + "logback-access.xml";
 
   AppenderAttachableImpl<IAccessEvent> aai = new AppenderAttachableImpl<IAccessEvent>();
   FilterAttachableImpl<IAccessEvent> fai = new FilterAttachableImpl<IAccessEvent>();
-  String filename;
+  String fileName;
   boolean started = false;
+  boolean quiet = false;
 
   public RequestLogImpl() {
     putObject(CoreConstants.EVALUATOR_MAP, new HashMap());
@@ -125,9 +127,9 @@ public class RequestLogImpl extends ContextBase implements RequestLog,
 
   public void log(Request jettyRequest, Response jettyResponse) {
     JettyServerAdapter adapter = new JettyServerAdapter(jettyRequest,
-        jettyResponse);
+            jettyResponse);
     IAccessEvent accessEvent = new AccessEvent(jettyRequest, jettyResponse,
-        adapter);
+            adapter);
     if (getFilterChainDecision(accessEvent) == FilterReply.DENY) {
       return;
     }
@@ -135,37 +137,40 @@ public class RequestLogImpl extends ContextBase implements RequestLog,
   }
 
   public void start() {
-    if (filename == null) {
+    if (fileName == null) {
       String jettyHomeProperty = OptionHelper.getSystemProperty("jetty.home");
-
-      filename = jettyHomeProperty + File.separatorChar + DEFAULT_CONFIG_FILE;
-      getStatusManager().add(
-          new WarnStatus("filename property not set. Assuming [" + filename
-              + "]", this));
-
-    }
-    try {
-      File configFile = new File(filename);
-      if (configFile.exists()) {
-        JoranConfigurator jc = new JoranConfigurator();
-        jc.setContext(this);
-        jc.doConfigure(filename);
-
-      } else {
+      if (OptionHelper.isEmpty(jettyHomeProperty)) {
         getStatusManager().add(
-            new ErrorStatus("[" + filename + "] does not exist", this));
+                new WarnStatus("[jetty.home] system property not set.", this));
+        fileName = DEFAULT_CONFIG_FILE;
+      } else {
+        fileName = jettyHomeProperty + File.separatorChar + DEFAULT_CONFIG_FILE;
       }
+      getStatusManager().add(
+              new WarnStatus("fileName property not set. Assuming [" + fileName
+                      + "]", this));
+    }
+    File configFile = new File(fileName);
+    if (configFile.exists()) {
+      runJoranOnFile(configFile);
+    } else {
+      getStatusManager().add(
+              new ErrorStatus("Could not find logback-access configuration file [" + fileName + "]", this));
+    }
+    if (!isQuiet()) {
+      StatusPrinter.print(getStatusManager());
+    }
+    started = true;
+  }
 
+  private void runJoranOnFile(File configFile) {
+    try {
+      JoranConfigurator jc = new JoranConfigurator();
+      jc.setContext(this);
+      jc.doConfigure(configFile);
       if (getName() == null) {
         setName("LogbackRequestLog");
       }
-      RequestLogRegistry.register(this);
-      getStatusManager().add(
-          new InfoStatus("RequestLog added to RequestLogRegistry with name: "
-              + getName(), this));
-
-      started = true;
-
     } catch (JoranException e) {
       // errors have been registered as status messages
     }
@@ -180,8 +185,8 @@ public class RequestLogImpl extends ContextBase implements RequestLog,
     return started;
   }
 
-  public void setFileName(String filename) {
-    this.filename = filename;
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
   }
 
   public boolean isStarted() {
@@ -202,6 +207,14 @@ public class RequestLogImpl extends ContextBase implements RequestLog,
 
   public boolean isFailed() {
     return false;
+  }
+
+  public boolean isQuiet() {
+    return quiet;
+  }
+
+  public void setQuiet(boolean quiet) {
+    this.quiet = quiet;
   }
 
   public void addAppender(Appender<IAccessEvent> newAppender) {
@@ -244,9 +257,17 @@ public class RequestLogImpl extends ContextBase implements RequestLog,
   public List<Filter<IAccessEvent>> getCopyOfAttachedFiltersList() {
     return fai.getCopyOfAttachedFiltersList();
   }
-  
+
   public FilterReply getFilterChainDecision(IAccessEvent event) {
     return fai.getFilterChainDecision(event);
+  }
+
+  public void addLifeCycleListener(Listener listener) {
+    // we'll implement this when asked
+  }
+
+  public void removeLifeCycleListener(Listener listener) {
+    // we'll implement this when asked
   }
 
 }

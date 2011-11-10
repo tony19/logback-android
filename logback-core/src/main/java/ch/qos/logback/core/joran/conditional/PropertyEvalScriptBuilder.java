@@ -30,18 +30,21 @@ import ch.qos.logback.core.spi.ContextAwareBase;
 
 public class PropertyEvalScriptBuilder extends ContextAwareBase {
 
-  private static String SCRIPT_PREFIX = ""
-      + "public boolean evaluate() { return ";
-  private static String SCRIPT_SUFFIX = "" + "; }";
-
-  static String SCRIPT = ""
-      + "public boolean eval() { return p(\"Ka\").equals(\"Va\"); }";
-
-  Map<String, String> map = new HashMap<String, String>();
-
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
+//#############################################
+//XXX: Not supported in Logback-Android
+//#############################################
+//  private static String SCRIPT_PREFIX = ""
+//          + "public boolean evaluate() { return ";
+//  private static String SCRIPT_SUFFIX = "" + "; }";
+//
+//  final PropertyContainer localPropContainer;
+//
+//  PropertyEvalScriptBuilder(PropertyContainer localPropContainer) {
+//    this.localPropContainer = localPropContainer;
+//  }
+//
+//  Map<String, String> map = new HashMap<String, String>();
+//
 //  public Condition build(String script) throws IllegalAccessException,
 //      CompileException, ParseException, ScanException, InstantiationException,
 //      SecurityException, NoSuchMethodException, IllegalArgumentException,

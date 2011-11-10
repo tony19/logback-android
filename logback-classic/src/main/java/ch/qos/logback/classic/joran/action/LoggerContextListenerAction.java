@@ -14,7 +14,6 @@
 package ch.qos.logback.classic.joran.action;
 
 import ch.qos.logback.classic.spi.LoggerContextListener;
-import ch.qos.logback.core.boolex.EventEvaluator;
 import ch.qos.logback.core.spi.ContextAware;
 import ch.qos.logback.core.spi.LifeCycle;
 import org.xml.sax.Attributes;
