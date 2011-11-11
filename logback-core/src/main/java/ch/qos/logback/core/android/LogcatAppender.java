@@ -75,19 +75,29 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 		switch (event.getLevel().levelInt) {
 		case Level.ALL_INT:
 		case Level.TRACE_INT:
-			Log.v(tag, msg);
+			if (Log.isLoggable(tag, Log.VERBOSE)) {
+				Log.v(tag, msg);
+			}
 			break;
 		case Level.DEBUG_INT:
-			Log.d(tag, msg);
+			if (Log.isLoggable(tag, Log.DEBUG)) {
+				Log.d(tag, msg);
+			}
 			break;
 		case Level.INFO_INT:
-			Log.i(tag, msg);
+			if (Log.isLoggable(tag, Log.INFO)) {
+				Log.i(tag, msg);
+			}
 			break;
 		case Level.WARN_INT:
-			Log.w(tag, msg);
+			if (Log.isLoggable(tag, Log.WARN)) {
+				Log.w(tag, msg);
+			}
 			break;
 		case Level.ERROR_INT:
-			Log.e(tag, msg);
+			if (Log.isLoggable(tag, Log.ERROR)) {
+				Log.e(tag, msg);
+			}
 			break;
 		case Level.OFF_INT:
 		default:
