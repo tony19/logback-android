@@ -26,7 +26,11 @@ import ch.qos.logback.core.AppenderBase;
  * @author Anthony Trinh
  */
 public class LogcatAppender extends AppenderBase<ILoggingEvent> {
-
+	/**
+	 * Max tag length enforced by Android 
+	 * http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)
+	 */
+	private static final int MAX_TAG_LENGTH = 23;
 	private PatternLayoutEncoder encoder;
 	private PatternLayoutEncoder tagEncoder = null;
 
@@ -71,6 +75,12 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 		// format message based on encoder layout
 		String msg = this.encoder.getLayout().doLayout(event);
 		String tag = (this.tagEncoder != null) ? this.tagEncoder.getLayout().doLayout(event) : event.getLoggerName();
+		
+		// truncate tag if max length exceeded
+		if (tag.length() > MAX_TAG_LENGTH) {
+			addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
+			tag = tag.substring(0, MAX_TAG_LENGTH - 1) + "*";
+		}
 		
 		switch (event.getLevel().levelInt) {
 		case Level.ALL_INT:

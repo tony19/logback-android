@@ -28,6 +28,7 @@ import ch.qos.logback.classic.LoggerContext;
 //import ch.qos.logback.classic.gaffer.GafferConfigurator;
 //import ch.qos.logback.classic.gaffer.GafferUtil;
 
+import ch.qos.logback.classic.android.BasicLogcatConfigurator;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.ErrorStatus;
@@ -65,19 +66,22 @@ public class ContextInitializer {
       throw new IllegalArgumentException("URL argument cannot be null");
     }
     if (url.toString().endsWith("groovy")) {
-      if (EnvUtil.isGroovyAvailable()) {
-        // avoid directly referring to GafferConfigurator so as to avoid
-        // loading  groovy.lang.GroovyObject . See also http://jira.qos.ch/browse/LBCLASSIC-214
 // #############################################
 // XXX: Not supported in Logback-Android
-// #############################################
+// #############################################    	
+//      if (EnvUtil.isGroovyAvailable()) {
+//        // avoid directly referring to GafferConfigurator so as to avoid
+//        // loading  groovy.lang.GroovyObject . See also http://jira.qos.ch/browse/LBCLASSIC-214
 //        GafferUtil.runGafferConfiguratorOn(loggerContext, this, url);
-        throw new RuntimeException("Not supported");
-      } else {
-        StatusManager sm = loggerContext.getStatusManager();
-        sm.add(new ErrorStatus("Groovy classes are not available on the class path. ABORTING INITIALIZATION.",
-                loggerContext));
-      }
+//        throw new RuntimeException("Not supported");
+//      } else {
+//        StatusManager sm = loggerContext.getStatusManager();
+//        sm.add(new ErrorStatus("Groovy classes are not available on the class path. ABORTING INITIALIZATION.",
+//                loggerContext));
+//      }
+      StatusManager sm = loggerContext.getStatusManager();
+      sm.add(new ErrorStatus("Groovy classes are not available on the class path. ABORTING INITIALIZATION.",
+              loggerContext));
     }
     if (url.toString().endsWith("xml")) {
       JoranConfigurator configurator = new JoranConfigurator();
@@ -157,7 +161,11 @@ public class ContextInitializer {
     if (url != null) {
       configureByResource(url);
     } else {
-      BasicConfigurator.configure(loggerContext);
+// ##################################################
+// XXX: Use BasicLogcatConfigurator Logback-Android
+// ##################################################
+//      BasicConfigurator.configure(loggerContext);
+      BasicLogcatConfigurator.configure(loggerContext);
     }
   }
 
