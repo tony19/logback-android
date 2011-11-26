@@ -8,14 +8,14 @@ Overview
 
 **Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [*SLF4J*][3] allows for greater logging flexibility and portability across Java platforms.
 
-The current version is **1.0.0-1**.
+The current version is **1.0.0-2**.
 
 Quickstart
 ----------
 
  1. Configure your Android project's *Java Build Path*:
 
-     * Include [logback-android-1.0.0-1.jar][18] and [slf4j-api-1.6.4.jar][19].
+     * Include [logback-android-1.0.0-2.jar][13] and [slf4j-api-1.6.4.jar][14].
      * Exclude all other SLF4J bindings/libraries (i.e., *log4j-over-slf4j.jar*, *slf4j-android-1.5.8.jar*, etc).
 
  1. Load configuration XML from pre-determined location (e.g., `/sdcard/logback-test.xml`). 
@@ -119,7 +119,7 @@ Quickstart
 	2556 [main] TRACE com.google.HelloAndroidActivity - toString() entered
 	2602 [main] DEBUG com.google.HelloAndroidActivity - toString: com.google.HelloAndroidActivity
 
-See the sample project in the `eclipse/HelloAndroid` subdirectory.
+See the sample project in the `build/eclipse/HelloAndroid` subdirectory.
 
 Features
 --------
@@ -142,87 +142,25 @@ For help with using **Logback-Android**, ask the mailing list: [logback-user AT 
 
 License
 -------
-Logback-Android uses the same license as Logback. See [LICENSE][17].
+Logback-Android uses the same license as Logback. See [LICENSE][12].
 
 Build
 -----
+Logback-Android is built from [Ant][16], using the Android SDK.
 
-### *Eclipse*
-Logback-Android is currently built from Eclipse using Android's [ADT Plugin][20]. You can import the pre-configured project from the `eclipse/logback-android` subdirectory (you'll have to customize a couple paths in the `.classpath` file).
-
-**OR** you can setup your own Eclipse project as outlined below. The goal is to create `logback-android.jar`, containing only the `logback-core` and `logback-classic` modules with select features omitted.
-
- 1. Create new Android project.
-
-	* Name the project "logback-android".
-	* For **Contents**, select **Create new project in workspace** (this is the default).
-	* You can specify any root source directory (does not have to be Logback's src).
-	* Pick the **Build Target**.
-	* For **Package Name**, enter **ch.qos.logback**.
-	* Uncheck the box for **Create Activity**.
-	* Click **Finish**.
-
- 1. Edit **Project Properties > Android**. 
-
-	* Check the box for **Is Library**.
-
- 1. Edit **Project Properties > Java Build Path**. 
-
- 1. Click **Libraries** tab:
-
-	* Click **Add External JARs**.
-	* Browse to `slf4j-api-1.6.2.jar`, and click **OK**
-   
- 1. Click **Source** tab:
-
-	* Select `logback-android/src`, and click **Remove**
-	* Click **Link Source**.
-	* Browse to `${logback-android-src}/logback-classic/src/main/java`
-	* For **Folder name**, enter **logback-classic**
-	* Click **Link Source** again.
-	* Browse to `${logback-android-src}/logback-core/src/main/java` 
-	* For **Folder name**, enter **logback-core**
-	* Click **Finish**. 
-	* From the Package Explorer pane, navigate to each of the following file/directory elements, and right-click to **Build Path > Exclude**:
-
-		* `ch/qos/logback/classic/boolex/GEventEvaluator.java`
-		* `ch/qos/logback/classic/boolex/JaninoEventEvaluator.java`
-		* `ch/qos/logback/classic/gaffer/`
-		* `ch/qos/logback/classic/helpers/`
-		* `ch/qos/logback/classic/jmx/`
-		* `ch/qos/logback/classic/joran/action/EvaluatorAction.java`
-		* `ch/qos/logback/classic/joran/action/InsertFromJNDIAction.java`
-		* `ch/qos/logback/classic/joran/action/JMXConfiguratorAction.java`
-		* `ch/qos/logback/classic/net/JMSQueueAppender.java`
-		* `ch/qos/logback/classic/net/JMSQueueSink.java`
-		* `ch/qos/logback/classic/net/JMSTopicAppender.java`
-		* `ch/qos/logback/classic/net/JMSTopicSink.java`
-		* `ch/qos/logback/classic/net/SMTPAppender.java`
-		* `ch/qos/logback/classic/selector/ContextJNDISelector.java`
-		* `ch/qos/logback/classic/selector/servlet/`
-		* `ch/qos/logback/classic/util/JNDIUtil.java`
-		* `ch/qos/logback/classic/ViewStatusMessagesServlet.java`
-		* `ch/qos/logback/core/boolex/JaninoEventEvaluatorBase.java`
-		* `ch/qos/logback/core/db/BindDataSourceToJNDIAction.java`
-		* `ch/qos/logback/core/db/JNDIConnectionSource.java`
-		* `ch/qos/logback/core/net/JMSAppenderBase.java`
-		* `ch/qos/logback/core/net/LoginAuthenticator.java`
-		* `ch/qos/logback/core/net/SMTPAppenderBase.java`
-		* `ch/qos/logback/core/status/ViewStatusMessagesServletBase.java`
-
-	* Open a terminal to the project's output directory, and create the JAR with:
-
-		`cd ${logback-android-src}/bin`
-		`jar cf logback-android.jar *`
-
+1. Download the [Android SDK][15].
+2. Change directory to `${logback-android-src}/build/ant`.
+2. Edit `build.properties`:
+	* Edit the path to the root directory of the Android SDK.
+	* Edit the path to the [SLF4J API library][14].
+3. Enter `ant` to begin the build. The JAR is created at `bin/logback-android-1.0.0-2.jar`.
 
 Future Work
 -----------
 Tentative upcoming plans include:
 
- * Add script-able builds (one of [Ant][11], [Maven][12], or [Gradle][13]) (medium)
- * Add [support][14] for `SMTPAppender` (easy)
- * Add [support][15] for Groovy configuration (hard)
+ * Add [support][10] for `SMTPAppender` (easy)
+ * Add [support][11] for Groovy configuration (hard)
 
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
@@ -233,15 +171,10 @@ Tentative upcoming plans include:
  [7]: http://logback.qos.ch/manual/index.html
  [8]: http://logback.qos.ch/apidocs/index.html
  [9]: mailto:logback-user@qos.ch
- [10]: http://code.google.com/p/maven-android-plugin/
- [11]: http://www.androidengineer.com/2010/06/using-ant-to-automate-building-android.html
- [12]: http://code.google.com/p/maven-android-plugin/
- [13]: https://github.com/jvoegele/gradle-android-plugin/wiki/
- [14]: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app
- [15]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
- [16]: http://www.slf4j.org/download.html
- [17]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
- [18]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-1.jar 
- [19]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
- [20]: http://developer.android.com/sdk/eclipse-adt.html
- [21]: http://code.google.com/p/android/issues/detail?id=11223
+ [10]: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app
+ [11]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
+ [12]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
+ [13]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-2.jar 
+ [14]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
+ [15]: http://developer.android.com/sdk/index.html
+ [16]: http://ant.apache.org/

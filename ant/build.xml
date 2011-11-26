@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+##############################################################################
+# Logback: the reliable, generic, fast and flexible logging framework.
+# Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+#
+# This program and the accompanying materials are dual-licensed under
+# either the terms of the Eclipse Public License v1.0 as published by
+# the Eclipse Foundation
+#
+#   or (per the licensee's choosing)
+#
+# under the terms of the GNU Lesser General Public License version 2.1
+# as published by the Free Software Foundation.
+##############################################################################-->
+<project name="logback_android" default="build">
+
+	<!-- Keystore parameters to sign JAR (for 'release' target only) -->
+	<property name="key.alias" value="releasekey" />
+	<property name="key.store" value="/Users/tony/.javakeystore" />
+
+    <property file="build.properties" />
+    <property file="default.properties" />
+
+    <!-- require Android SDK path (from build.properties) -->
+    <available 
+    	file="${sdk.dir}"
+    	type="dir"
+    	property="android.sdk.present"
+    />
+    <fail unless="android.sdk.present" message="Android SDK path not found" />
+    
+    <!-- require pre-setup import (from Android SDK) -->
+    <import file="${sdk.dir}/tools/ant/pre_setup.xml" />
+    <import file="${sdk.dir}/tools/ant/lib_rules.xml" />
+    <setup />
+    
+    <!-- require Android JAR (from lib_rules.xml) -->
+    <fail unless="android.jar" message="Android JAR (i.e., {android.jar} property) not set" />
+    
+    <!-- require SLF4J JAR (from build.properties) -->
+    <available 
+    	file="${slf4j.jar}" 
+    	type="file" property="slf4j.present"
+    />
+    <fail unless="slf4j.present" message="SLF4J not found" />
+    
+    <!-- assert ${version} property -->
+    <condition property="version" else="${version.default}">
+    	<isset property="version"/>
+    </condition>
+
+    <path id="libs.path">
+		<pathelement path="${slf4j.jar}" />
+		<pathelement path="${android.jar}" />
+    </path>
+    
+    <target name="compile"
+    		description="Compiles project's .java files into .class files">
+    	<mkdir dir="${out.dir}"/>
+		<javac srcdir="${source.dir}" destdir="${out.dir}"
+
+			classpathref="libs.path"
+			source="1.5"
+			target="1.5"
+			includeantruntime="false"
+			debug="${debug}"
+			verbose="${verbose}"
+			
+			includes="**/logback-classic/src/main/java/**/classic/**,
+					  **/logback-core/src/main/java/**/core/**"
+
+			excludes="**/core/boolex/JaninoEventEvaluatorBase.java,
+					  **/core/boolex/JaninoEventEvaluatorBase.java,
+					  **/core/db/BindDataSourceToJNDIAction.java,
+					  **/core/db/JNDIConnectionSource.java,
+					  **/core/net/JMSAppenderBase.java,
+					  **/core/net/LoginAuthenticator.java,
+					  **/core/net/SMTPAppenderBase.java,
+					  **/core/status/ViewStatusMessagesServletBase.java,
+					  **/classic/boolex/GEventEvaluator.java,
+					  **/classic/boolex/JaninoEventEvaluator.java,
+					  **/classic/gaffer/**,
+					  **/classic/helpers/**,
+					  **/classic/jmx/**,
+					  **/classic/joran/action/EvaluatorAction.java,
+					  **/classic/joran/action/InsertFromJNDIAction.java,
+					  **/classic/joran/action/JMXConfiguratorAction.java,
+					  **/classic/net/JMSQueueAppender.java,
+					  **/classic/net/JMSQueueSink.java,
+					  **/classic/net/JMSTopicAppender.java,
+					  **/classic/net/JMSTopicSink.java,
+					  **/classic/net/SMTPAppender.java,
+					  **/classic/selector/ContextJNDISelector.java,
+					  **/classic/selector/servlet/,
+					  **/classic/util/JNDIUtil.java,
+					  **/classic/ViewStatusMessagesServlet.java"
+		/>
+	</target>
+	
+	<target name="build"
+			depends="compile"
+			description="Compiles classes and create a jar file">
+		<jar
+			destfile="${out.dir}/logback-android-${version}.jar"
+			basedir="${out.dir}"
+			index="true"
+			excludes="*.jar"
+		/>
+	</target>
+	
+	<target name="release"
+			depends="build"
+			description="Signs JAR for release">
+			
+		<!-- Securely prompt for keystore password (hide input)
+		     on command line. Don't run this from IDE or else it
+		     can hang, but this prompt is skipped if ${key.pass}
+		     is already defined.
+		-->
+		<input message="Enter keystore password to sign JAR: "
+			addproperty="key.store.password">
+			<handler 
+				classname="org.apache.tools.ant.input.SecureInputHandler" />
+		</input>
+		
+		<signjar 
+			jar="${out.dir}/logback-android-${version}.jar"
+			alias="${key.alias}"
+			keystore="${key.store}"
+			storepass="${key.store.password}"
+			preservelastmodified="true"
+		/>
+	</target>
+	
+    <target name="help">
+        <echo>Logback-Android Ant Build. Available targets:</echo>
+        <echo>   help:      Displays this help.</echo>
+        <echo>   clean:     Removes output files created by other targets.</echo>
+        <echo>   compile:   Compiles project's .java files into .class files.</echo>
+		<echo>   build:     Creates JAR of the .class files.</echo>
+		<echo>   release:   Signs JAR for release.</echo>
+    </target>
+</project>
