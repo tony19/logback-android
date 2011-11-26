@@ -13,7 +13,8 @@
 # as published by the Free Software Foundation.
 ##############################################################################
 
-cd ant || exit 1
+readme=../../README.md
+cd build/ant || exit 1
 
 #
 # Release version "x.x.x-N"
@@ -40,6 +41,6 @@ stty echo
 ant release -Dkey.store.password=${password} -Dversion=${version} && \
 md5 bin/logback-android-${version}.jar && \
 echo "Updating README.md" && \
-gsed -e "s/logback-android-[^j]*\.jar/logback-android-${version}.jar/" -e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" ../README.md
+gsed -i -e "s/logback-android-[^j]*\.jar/logback-android-${version}.jar/" -e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" ${readme}
 
 echo Done
