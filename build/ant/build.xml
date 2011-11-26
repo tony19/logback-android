@@ -68,6 +68,7 @@
 			verbose="${verbose}"
 			
 			includes="**/logback-classic/src/main/java/**/classic/**,
+					  **/logback-classic/src/main/java/org/**,
 					  **/logback-core/src/main/java/**/core/**"
 
 			excludes="**/core/boolex/JaninoEventEvaluatorBase.java,

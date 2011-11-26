@@ -23,7 +23,7 @@ public class HelloAndroidActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        configureLog();
+        //configureLog();
         LOG.info("Hello Android!");
 
         // this.toString() is only called if the DEBUG level is enabled
