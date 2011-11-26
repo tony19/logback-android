@@ -20,7 +20,7 @@ Quickstart
 
  1. Load configuration XML from pre-determined location (e.g., `/sdcard/logback-test.xml`). 
 
-**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and default appender is the Console *stdout* (which can be seen from Android *logcat*).
+**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and the default appender is `LogcatAppender`.
 
 #### Example config file:
 
