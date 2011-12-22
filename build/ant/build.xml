@@ -19,10 +19,10 @@
 	<property name="key.alias" value="releasekey" />
 	<property name="key.store" value="/Users/tony/.javakeystore" />
 
-    <property file="build.properties" />
-    <property file="default.properties" />
+    <property file="ant.properties" />
+    <loadproperties srcFile="project.properties" />
 
-    <!-- require Android SDK path (from build.properties) -->
+    <!-- require Android SDK path (from ant.properties) -->
     <available 
     	file="${sdk.dir}"
     	type="dir"
@@ -30,15 +30,28 @@
     />
     <fail unless="android.sdk.present" message="Android SDK path not found" />
     
-    <!-- require pre-setup import (from Android SDK) -->
-    <import file="${sdk.dir}/tools/ant/pre_setup.xml" />
-    <import file="${sdk.dir}/tools/ant/lib_rules.xml" />
-    <setup />
+    <!-- ***********************
+         ****** IMPORTANT ******
+         ***********************
+         In all cases you must update the value of version-tag below to read 'custom' instead of an integer,
+         in order to avoid having your file be overridden by tools such as "android update project"
+    -->
+    <!-- version-tag: custom -->
+   <import file="${sdk.dir}/tools/ant/build.xml" />
+ 
+    <!-- find Android JAR in platform-tools -->
+    <condition
+        property="android.jar"
+        else="${sdk.dir}/platforms/${target}/android.jar">
+    	<isset property="android.jar"/>
+    </condition>
+    <available 
+    	file="${android.jar}"
+    	type="file" property="android.jar.present"
+    />
+    <fail unless="android.jar.present" message="Android JAR not found: ${android.jar}" />
     
-    <!-- require Android JAR (from lib_rules.xml) -->
-    <fail unless="android.jar" message="Android JAR (i.e., {android.jar} property) not set" />
-    
-    <!-- require SLF4J JAR (from build.properties) -->
+    <!-- require SLF4J JAR (from ant.properties) -->
     <available 
     	file="${slf4j.jar}" 
     	type="file" property="slf4j.present"
@@ -101,7 +114,7 @@
 	
 	<target name="build"
 			depends="compile"
-			description="Compiles classes and create a jar file">
+			description="Creates JAR of the .class files">
 		<jar
 			destfile="${out.dir}/logback-android-${version}.jar"
 			basedir="${out.dir}"
@@ -116,7 +129,7 @@
 			
 		<!-- Securely prompt for keystore password (hide input)
 		     on command line. Don't run this from IDE or else it
-		     can hang, but this prompt is skipped if ${key.pass}
+		     can hang, but this prompt is skipped if ${key.store.password}
 		     is already defined.
 		-->
 		<input message="Enter keystore password to sign JAR: "

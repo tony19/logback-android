@@ -41,6 +41,9 @@ stty echo
 ant release -Dkey.store.password=${password} -Dversion=${version} && \
 md5 bin/logback-android-${version}.jar && \
 echo "Updating README.md" && \
-gsed -i -e "s/logback-android-[^j]*\.jar/logback-android-${version}.jar/" -e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" ${readme}
+gsed -i -e "s/logback-android-[^j]*\.jar/logback-android-${version}.jar/" \
+-e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" \
+-e "s/\(logback-android.*MD5\:\).*\\)/\1 `md5 bin/logback-android-${version}.jar | awk '{print $4}'`\)/" \
+${readme}
 
 echo Done
