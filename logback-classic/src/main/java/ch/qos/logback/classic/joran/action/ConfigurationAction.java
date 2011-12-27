@@ -45,7 +45,21 @@ public class ConfigurationAction extends Action {
 
     processScanAttrib(attributes);
 
-    new ContextUtil(context).addHostNameAsProperty();
+  	/* http://developer.android.com/reference/java/net/InetAddress.html#getLocalHost()
+  	 * 
+  	 * addHostNameasProperty() leads to InetAddress.getLocalHost(), which performs
+  	 * a DNS query and thus causes an android.os.NetworkOnMainThreadException if 
+  	 * this logger configuration originated from the main thread (Issue #3). It
+  	 * turns out the hostname is atypical in Android devices, and the DNS query
+  	 * is normally fruitless. The end result is a hostname of "localhost" (the
+  	 * default) at the cost of a DNS query. 
+  	 * 
+  	 * The reason the hostname is added to the context's properties is for the 
+  	 * variable-lookup of ${HOSTNAME} in configuration XML, but the context is only
+  	 * one of the sources. If the context doesn't have the variable, the OS environment
+  	 * is searched next. We can safely omit this next call.
+  	 */
+    //new ContextUtil(context).addHostNameAsProperty();
 
     // the context is turbo filter attachable, so it is pushed on top of the
     // stack
