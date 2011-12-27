@@ -13,18 +13,11 @@
  */
 package ch.qos.logback.core.joran.event;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-//####################################################
-// XXX: Android 2.1 SAXParser cannot parse XML files. 
-// Instead, use the XML Pull Parser since it works on  
-// all versions of Android.
-// ###################################################
-//import javax.xml.parsers.SAXParser;
-//import javax.xml.parsers.SAXParserFactory;
 
 import static ch.qos.logback.core.CoreConstants.XML_PARSING;
 import org.xml.sax.Attributes;
@@ -32,6 +25,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmlpull.v1.sax2.Driver;
@@ -61,13 +55,15 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
 
   public List<SaxEvent> recordEvents(InputSource inputSource)
       throws JoranException {
-    //SAXParser saxParser = buildSaxParser();
   	Driver parser = buildPullParser(); 
     try {
-      //saxParser.parse(inputSource, this);
       parser.setContentHandler((ContentHandler) this);
+      parser.setErrorHandler(this);
       parser.parse(inputSource);
       return saxEventList;
+    } catch (EOFException eof) {
+      handleError(eof.getLocalizedMessage(), 
+          new SAXParseException(eof.getLocalizedMessage(), locator, eof));
     } catch (IOException ie) {
       handleError("I/O error occurred while parsing xml file", ie);
     } catch(SAXException se) {
@@ -83,30 +79,17 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
     addError(errMsg, t);
     throw new JoranException(errMsg, t);
   }
-
-// ####################################################
-// XXX: Android 2.1 SAXParser cannot parse XML files. 
-// Instead, use the XML Pull Parser since it works on  
-// all versions of Android.
-// ###################################################
-//  private SAXParser buildSaxParser() throws JoranException {
-//    try {
-//      SAXParserFactory spf = SAXParserFactory.newInstance();
-//      spf.setValidating(false);
-//      spf.setNamespaceAware(true);
-//      return spf.newSAXParser();
-//    } catch (Exception pce) {
-//      String errMsg = "Parser configuration error occurred";
-//      addError(errMsg, pce);
-//      throw new JoranException(errMsg, pce);
-//    }
-//  }
-
+  
   private Driver buildPullParser() throws JoranException {
-  	try {
-  		Driver driver = new Driver();
-  		driver.setFeature("http://xml.org/sax/features/validation", false);
-  		driver.setFeature("http://xml.org/sax/features/namespaces", true);
+    try {
+      Driver driver = new Driver();
+      try {
+         driver.setFeature("http://xml.org/sax/features/validation", false);
+      } catch (SAXNotSupportedException e) {
+         // this is ok...we're trying to disable validation, so if it's not
+         // supported, that's even better
+      }
+      driver.setFeature("http://xml.org/sax/features/namespaces", true);
       return driver;
     } catch (Exception pce) {
       String errMsg = "Parser configuration error occurred";
@@ -129,10 +112,11 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
   public void startElement(String namespaceURI, String localName, String qName,
       Attributes atts) {
 
+    String q = qName == null || qName.length() == 0 ? localName : qName;
     String tagName = getTagName(localName, qName);
     globalPattern.push(tagName);
     Pattern current = (Pattern) globalPattern.clone();
-    saxEventList.add(new StartEvent(current, namespaceURI, localName, qName,
+    saxEventList.add(new StartEvent(current, namespaceURI, localName, q,
         atts, getLocator()));
   }
 
@@ -164,8 +148,9 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
   }
 
   public void endElement(String namespaceURI, String localName, String qName) {
+    String q = qName == null || qName.length() == 0 ? localName : qName;
     saxEventList
-        .add(new EndEvent(namespaceURI, localName, qName, getLocator()));
+        .add(new EndEvent(namespaceURI, localName, q, getLocator()));
     globalPattern.pop();
   }
 
