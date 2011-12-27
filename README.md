@@ -10,6 +10,11 @@ Overview
 
 The current version is **1.0.0-2**.
 
+Download
+--------
+ * [logback-android-1.0.0-2.jar][13] (MD5: `6858996b8164b05c3c814b08a60b752f`)
+ * [slf4j-api-1.6.4.jar][14] (MD5: `a134d83e0c12a9611824284c855ffb13`)
+
 Quickstart
 ----------
 
@@ -148,12 +153,13 @@ Build
 -----
 Logback-Android is built from [Ant][16], using the Android SDK.
 
-1. Download the [Android SDK][15].
+1. Download the [Android SDK][15], Revision 14 (or newer).
 2. Change directory to `${logback-android-src}/build/ant`.
-2. Edit `build.properties`:
-	* Edit the path to the root directory of the Android SDK.
-	* Edit the path to the [SLF4J API library][14].
+2. Edit `ant.properties`:
+	* Set `sdk.dir` to the root directory of the Android SDK.
+	* Set `slf4j.jar` to the path of [SLF4J API library][14].
 3. Enter `ant` to begin the build. The JAR is created at `bin/logback-android-1.0.0-2.jar`.
+
 
 Future Work
 -----------

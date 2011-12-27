@@ -16,10 +16,10 @@ package ch.qos.logback.core.joran.conditional;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-@RunWith(Suite.class)
-@SuiteClasses( { PropertyEvalScriptBuilderTest.class, IfThenElseTest.class,
-    IfThenElseAndIncludeCompositionTest.class })
+// XXX: NOT SUPPORTED IN ANDROID
+//@RunWith(Suite.class)
+//@SuiteClasses( { PropertyEvalScriptBuilderTest.class, IfThenElseTest.class,
+//    IfThenElseAndIncludeCompositionTest.class })
 public class PackageTest {
 
 }

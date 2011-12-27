@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.pattern.parser;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 import org.junit.Test;
 

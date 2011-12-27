@@ -22,7 +22,9 @@ public class ClassicTestConstants {
 
 
   final static public String MAIN_REGEX = "\\[" + NAKED_MAIN_REGEX + "\\]";
-  final static public String INPUT_PREFIX = "src/test/input/";
+  final static public String TEST_PREFIX = CoreTestConstants.BASE_DIR + "src/test/";
+  final static public String INPUT_PREFIX = TEST_PREFIX + "input/";
+  final static public String RESOURCES_PREFIX = TEST_PREFIX + "resources/";
   final static public String JORAN_INPUT_PREFIX = INPUT_PREFIX + "joran/";
   final static public String GAFFER_INPUT_PREFIX = INPUT_PREFIX + "gaffer/";
   final static public String OUTPUT_DIR_PREFIX= CoreTestConstants.OUTPUT_DIR_PREFIX;

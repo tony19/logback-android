@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.joran.event;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 import java.io.FileInputStream;
 import java.util.List;

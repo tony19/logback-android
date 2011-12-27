@@ -13,8 +13,8 @@
  */
 package ch.qos.logback.classic.net;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;

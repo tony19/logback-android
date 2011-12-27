@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.classic.rolling;
 
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertTrue;
 
 import java.util.Date;
 

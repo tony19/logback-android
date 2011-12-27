@@ -27,6 +27,7 @@ import java.util.Map;
 //import org.codehaus.janino.Scanner.ScanException;
 
 import ch.qos.logback.core.spi.ContextAwareBase;
+import ch.qos.logback.core.spi.PropertyContainer;
 
 public class PropertyEvalScriptBuilder extends ContextAwareBase {
 
@@ -66,6 +67,9 @@ public class PropertyEvalScriptBuilder extends ContextAwareBase {
 //    return instance;
 //  }
 
+  PropertyEvalScriptBuilder(PropertyContainer localPropContainer) {
+  }
+  
   public Condition build(String script) throws RuntimeException {
     throw new RuntimeException("Not supported");
   }

@@ -13,14 +13,15 @@
  */
 package ch.qos.logback.classic.pattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.MDC;
 import org.slf4j.MarkerFactory;
@@ -67,6 +68,7 @@ public class ConverterTest {
     le = makeLoggingEvent(ex);
   }
 
+  @Ignore("Can't get line number in Android")
   @Test
   public void testLineOfCaller() {
     {
@@ -217,6 +219,7 @@ public class ConverterTest {
     assertEquals("testMethodOfCaller", buf.toString());
   }
 
+  @Ignore("Can't get file of caller in Android")
   @Test
   public void testFileOfCaller() {
     DynamicConverter<ILoggingEvent> converter = new FileOfCallerConverter();

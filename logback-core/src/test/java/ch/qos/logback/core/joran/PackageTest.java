@@ -25,8 +25,10 @@ import org.junit.runners.Suite.SuiteClasses;
     ch.qos.logback.core.joran.util.PackageTest.class,
     ch.qos.logback.core.joran.spi.PackageTest.class,
     ch.qos.logback.core.joran.replay.PackageTest.class,
-    ch.qos.logback.core.joran.implicitAction.PackageTest.class,
-    ch.qos.logback.core.joran.conditional.PackageTest.class
+    ch.qos.logback.core.joran.implicitAction.PackageTest.class
+    
+    // XXX: NOT SUPPORTED IN ANDROID
+    //ch.qos.logback.core.joran.conditional.PackageTest.class
   })
 public class PackageTest {
 

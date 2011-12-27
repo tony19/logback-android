@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.classic.pattern;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

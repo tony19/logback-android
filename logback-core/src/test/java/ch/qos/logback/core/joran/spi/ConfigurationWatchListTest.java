@@ -19,7 +19,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Ceki G&uuml;c&uuml;

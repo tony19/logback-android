@@ -13,15 +13,16 @@
  */
 package ch.qos.logback.classic.turbo;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import ch.qos.logback.classic.gaffer.GafferConfigurator;
+//XXX: NOT SUPPORTED IN ANDROID
+//import ch.qos.logback.classic.gaffer.GafferConfigurator;
 import ch.qos.logback.core.contention.AbstractMultiThreadedHarness;
 import ch.qos.logback.core.contention.MultiThreadedHarness;
 import ch.qos.logback.core.contention.WaitOnExecutionMultiThreadedHarness;
@@ -132,8 +133,9 @@ public class ReconfigureOnChangeTest {
   }
 
   void gConfigure(File file) throws JoranException {
-    GafferConfigurator gc = new GafferConfigurator(loggerContext);
-    gc.run(file);
+    	// XXX: NOT SUPPORTED IN ANDROID
+//    GafferConfigurator gc = new GafferConfigurator(loggerContext);
+//    gc.run(file);
   }
 
   RunnableWithCounterAndDone[] buildRunnableArray(File configFile, UpdateType updateType) {
@@ -180,6 +182,7 @@ public class ReconfigureOnChangeTest {
     doScanTest(innerFile);
   }
 
+  @Ignore("Not supported in Android")
   @Test(timeout = 4000L)
   public void scanWithResourceInclusion() throws JoranException, IOException, InterruptedException {
     File topLevelFile = new File(INCLUSION_SCAN_TOP_BY_RESOURCE_AS_STR);
@@ -192,7 +195,7 @@ public class ReconfigureOnChangeTest {
   @Test(timeout = 4000L)
   public void includeScanViaInputStreamSuppliedConfigFile() throws IOException, JoranException, InterruptedException {
     harness = new MultiThreadedHarness(1000);
-    String configurationStr = "<configuration scan=\"true\" scanPeriod=\"50 millisecond\"><include resource=\"asResource/inner1.xml\"/></configuration>";
+    String configurationStr = "<configuration scan=\"true\" scanPeriod=\"50 millisecond\"><include file=\""+ CoreTestConstants.TEST_DIR_PREFIX +"resources/asResource/inner1.xml\"/></configuration>";
     configure(new ByteArrayInputStream(configurationStr.getBytes("UTF-8")));
     File innerFile = new File(INCLUSION_SCAN_INNER1_AS_STR);
     doScanTest(innerFile, UpdateType.TOUCH, FORCED_RECONFIGURATION_SKIP, MUST_BE_ERROR_FREE);
@@ -220,7 +223,7 @@ public class ReconfigureOnChangeTest {
     doScanTest(innerFile, UpdateType.MALFORMED_INNER, REGULAR_RECONFIGURATION, ERRORS_EXPECTED);
   }
 
-
+  @Ignore("Not supported in Android")
   @Test(timeout = 4000L)
   public void gscan1() throws JoranException, IOException, InterruptedException {
     File file = new File(G_SCAN1_FILE_AS_STR);

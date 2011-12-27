@@ -13,9 +13,11 @@
  */
 package ch.qos.logback.classic.corpus;
 
+import java.io.IOException;
 import java.util.Random;
 
-import javax.management.remote.JMXProviderException;
+//XXX: NOT SUPPORTED IN ANDROID
+//import javax.management.remote.JMXProviderException;
 
 public class ExceptionBuilder {
 
@@ -38,7 +40,9 @@ public class ExceptionBuilder {
     switch(exType) {
     case 0: return new IllegalArgumentException("an illegal argument was passed", cause);
     case 1: return new Exception("this is a test", cause);
-    case 2: return new JMXProviderException("jmx provider exception error occured", cause);
+    // XXX: NOT SUPPORTED IN ANDROID
+    //case 2: return new JMXProviderException("jmx provider exception error occured", cause);
+    case 2: return new IOException("jmx provider exception error occured", cause);
     case 3: return new OutOfMemoryError("ran out of memory");
     }
     return null;

@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.joran.spi;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 import org.junit.Test;
 

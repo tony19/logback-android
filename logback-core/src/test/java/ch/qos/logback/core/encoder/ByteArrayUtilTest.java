@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.encoder;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 import java.util.Random;
 

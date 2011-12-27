@@ -18,7 +18,7 @@ import ch.qos.logback.core.read.ListAppender;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * @author Ceki G&uuml;c&uuml;

@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.joran.conditional;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashMap;

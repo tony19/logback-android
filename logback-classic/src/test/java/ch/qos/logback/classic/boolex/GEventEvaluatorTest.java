@@ -31,7 +31,7 @@ import org.slf4j.MarkerFactory;
 import org.slf4j.helpers.BogoPerf;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Ceki G&uuml;c&uuml;

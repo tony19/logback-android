@@ -15,7 +15,7 @@ package ch.qos.logback.core.joran.action;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertTrue;
 
 import java.util.HashMap;
 

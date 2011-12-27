@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 import java.util.Calendar;
 

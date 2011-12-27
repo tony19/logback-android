@@ -18,7 +18,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses( { JoranConfiguratorTest.class, EvaluatorJoranTest.class,
-    ch.qos.logback.classic.joran.conditional.PackageTest.class })
+//XXX: NOT SUPPORTED IN ANDROID
+//@SuiteClasses( { JoranConfiguratorTest.class, EvaluatorJoranTest.class,
+//    ch.qos.logback.classic.joran.conditional.PackageTest.class })
+@SuiteClasses( { JoranConfiguratorTest.class })
 public class PackageTest {
 }

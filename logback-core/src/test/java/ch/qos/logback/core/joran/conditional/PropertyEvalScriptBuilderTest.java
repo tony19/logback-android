@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.joran.conditional;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 import ch.qos.logback.core.joran.spi.InterpretationContext;
 

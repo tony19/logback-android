@@ -14,8 +14,8 @@
 package ch.qos.logback.core.util;
 
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;

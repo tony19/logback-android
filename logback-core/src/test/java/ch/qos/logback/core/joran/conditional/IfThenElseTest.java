@@ -36,7 +36,7 @@ import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 public class IfThenElseTest {
 

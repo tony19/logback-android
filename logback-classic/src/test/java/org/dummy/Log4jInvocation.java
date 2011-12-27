@@ -13,7 +13,7 @@
  */
 package org.dummy;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;

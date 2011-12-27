@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.classic.corpusTest;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;

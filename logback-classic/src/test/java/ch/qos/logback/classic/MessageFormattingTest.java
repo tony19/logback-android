@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.classic;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;

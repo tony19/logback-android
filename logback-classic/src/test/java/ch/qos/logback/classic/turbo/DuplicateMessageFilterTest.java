@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.classic.turbo;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 import org.junit.Test;
 

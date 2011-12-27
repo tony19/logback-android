@@ -13,8 +13,8 @@
  */
 package ch.qos.logback.classic.pattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -66,13 +66,13 @@ public class ExtendedThrowableProxyConverterTest {
     String res = pl.doLayout(e);
 
     // make sure that at least some package data was output
-    Pattern p = Pattern.compile(" \\[junit.*\\]");
+    Pattern p = Pattern.compile(this.getClass().getName() + "\\.integration");
     Matcher m = p.matcher(res);
     int i = 0;
     while(m.find()) {
       i++;
     }
-    assertTrue(i+ " should be larger than 5", i > 5);
+    assertTrue(i+ " should be larger than 1", i >= 1);
   }
 
   @Test

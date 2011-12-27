@@ -13,14 +13,25 @@
  */
 package ch.qos.logback.core.util;
 
+import java.io.File;
+
 public class CoreTestConstants {
 
-  public static final String TEST_DIR_PREFIX = "src/test/";
+	public static final String BASE_DIR;
+	static {
+		String dir = "/sdcard/.logback_test/";
+		if (!new File(dir).exists()) {
+			dir = "";
+		}
+		BASE_DIR = dir;
+	}
+	
+  public static final String TEST_DIR_PREFIX = BASE_DIR + "src/test/";
   public static final String JORAN_INPUT_PREFIX = TEST_DIR_PREFIX
       + "input/joran/";
 
-  public static final String TARGET_DIR = "target/";
-  public static final String OUTPUT_DIR_PREFIX = TARGET_DIR+"test-output/";
+  public static final String TARGET_DIR = BASE_DIR + "target/";
+  public static final String OUTPUT_DIR_PREFIX = TARGET_DIR + "test-output/";
 
   public static final int SUCCESSFUL_EXIT_CODE = 8;
   public static final int FAILURE_EXIT_CODE = 1;

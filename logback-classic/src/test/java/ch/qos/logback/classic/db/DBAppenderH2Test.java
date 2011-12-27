@@ -13,9 +13,9 @@
  */
 package ch.qos.logback.classic.db;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

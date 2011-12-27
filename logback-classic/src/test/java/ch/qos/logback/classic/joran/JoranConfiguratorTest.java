@@ -47,7 +47,7 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.StringListAppender;
 
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 public class JoranConfiguratorTest {
 

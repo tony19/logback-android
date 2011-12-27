@@ -15,8 +15,8 @@ package ch.qos.logback.core.rolling;
 
 import static ch.qos.logback.core.util.CoreTestConstants.FAILURE_EXIT_CODE;
 import static ch.qos.logback.core.util.CoreTestConstants.SUCCESSFUL_EXIT_CODE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;

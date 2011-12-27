@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.classic.encoder;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

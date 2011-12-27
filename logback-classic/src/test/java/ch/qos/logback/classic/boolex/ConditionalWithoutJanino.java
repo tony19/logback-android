@@ -24,7 +24,7 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.*;
 
 /**
  * @author Ceki G&uuml;c&uuml;

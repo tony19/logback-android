@@ -14,7 +14,7 @@
 package ch.qos.logback.core;
 
 
-import static org.junit.Assert.assertTrue;
+import static junit.framework.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 

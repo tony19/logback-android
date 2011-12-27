@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.classic.db;
 
-import static org.junit.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotNull;
 
 import java.io.PrintWriter;
 import java.sql.Connection;

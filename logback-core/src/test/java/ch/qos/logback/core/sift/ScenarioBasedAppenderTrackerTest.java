@@ -13,7 +13,7 @@
  */
 package ch.qos.logback.core.sift;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 import org.junit.Ignore;
 import org.junit.Test;
