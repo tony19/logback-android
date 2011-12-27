@@ -18,16 +18,15 @@
 	<!-- Keystore parameters to sign JAR (for 'release' target only) -->
 	<property name="key.alias" value="releasekey" />
 	<property name="key.store" value="/Users/tony/.javakeystore" />
-
-    <property file="ant.properties" />
+	
+	<property name="tmp.dir" value="/sdcard/.logback_test" />
+	<property name="libs.dir" value="libs" />
+	<property name="apktool.jar" value="${libs.dir}/apktool-min-android.jar" />
+	<property file="ant.properties" />
     <loadproperties srcFile="project.properties" />
 
     <!-- require Android SDK path (from ant.properties) -->
-    <available 
-    	file="${sdk.dir}"
-    	type="dir"
-    	property="android.sdk.present"
-    />
+    <available file="${sdk.dir}" type="dir" property="android.sdk.present" />
     <fail unless="android.sdk.present" message="Android SDK path not found" />
     
     <!-- ***********************
@@ -37,25 +36,26 @@
          in order to avoid having your file be overridden by tools such as "android update project"
     -->
     <!-- version-tag: custom -->
-   <import file="${sdk.dir}/tools/ant/build.xml" />
+    <import file="${sdk.dir}/tools/ant/build.xml" />
  
     <!-- find Android JAR in platform-tools -->
-    <condition
-        property="android.jar"
-        else="${sdk.dir}/platforms/${target}/android.jar">
+    <condition property="android.jar" else="${sdk.dir}/platforms/${target}/android.jar">
     	<isset property="android.jar"/>
     </condition>
-    <available 
-    	file="${android.jar}"
-    	type="file" property="android.jar.present"
-    />
+    <available file="${android.jar}" type="file" property="android.jar.present" />
     <fail unless="android.jar.present" message="Android JAR not found: ${android.jar}" />
+
+	<condition property="build.debug" value="true" else="false">
+		<isset property="debug" />
+	</condition>
+	
+	<!-- get path to ADB -->
+	<condition property="adb" value="${sdk.dir}/platform-tools/adb.exe" else="${sdk.dir}/platform-tools/adb">
+		<os family="windows" />
+	</condition>
     
     <!-- require SLF4J JAR (from ant.properties) -->
-    <available 
-    	file="${slf4j.jar}" 
-    	type="file" property="slf4j.present"
-    />
+    <available file="${slf4j.jar}" type="file" property="slf4j.present" />
     <fail unless="slf4j.present" message="SLF4J not found" />
     
     <!-- assert ${version} property -->
@@ -64,20 +64,29 @@
     </condition>
 
     <path id="libs.path">
+	    <pathelement path="${apktool.jar}" />
 		<pathelement path="${slf4j.jar}" />
 		<pathelement path="${android.jar}" />
     </path>
-    
+    <path id="test.libs.path">
+	    <fileset dir="libs/test">
+	    	<include name="**/*.jar"/>
+	    </fileset>
+		<pathelement path="${junit.jar}" />
+		<pathelement path="${out.dir}/logback-android-${version}.jar" />
+		<pathelement path="${out.dir}/logback-android-test-${version}.jar" />
+	</path>
+	
     <target name="compile"
     		description="Compiles project's .java files into .class files">
     	<mkdir dir="${out.dir}"/>
 		<javac srcdir="${source.dir}" destdir="${out.dir}"
-
 			classpathref="libs.path"
 			source="1.5"
 			target="1.5"
 			includeantruntime="false"
-			debug="${debug}"
+			debug="${build.debug}"
+			debuglevel="lines,vars,source"
 			verbose="${verbose}"
 			
 			includes="**/logback-classic/src/main/java/**/classic/**,
@@ -85,7 +94,6 @@
 					  **/logback-core/src/main/java/**/core/**"
 
 			excludes="**/core/boolex/JaninoEventEvaluatorBase.java,
-					  **/core/boolex/JaninoEventEvaluatorBase.java,
 					  **/core/db/BindDataSourceToJNDIAction.java,
 					  **/core/db/JNDIConnectionSource.java,
 					  **/core/net/JMSAppenderBase.java,
@@ -100,10 +108,7 @@
 					  **/classic/joran/action/EvaluatorAction.java,
 					  **/classic/joran/action/InsertFromJNDIAction.java,
 					  **/classic/joran/action/JMXConfiguratorAction.java,
-					  **/classic/net/JMSQueueAppender.java,
-					  **/classic/net/JMSQueueSink.java,
-					  **/classic/net/JMSTopicAppender.java,
-					  **/classic/net/JMSTopicSink.java,
+					  **/classic/net/JMS*.java,
 					  **/classic/net/SMTPAppender.java,
 					  **/classic/selector/ContextJNDISelector.java,
 					  **/classic/selector/servlet/,
@@ -112,12 +117,71 @@
 		/>
 	</target>
 	
+	<target name="compile-test"
+    		description="Compiles project's .java files into .class files (for unit tests)">
+    	<mkdir dir="${out.dir}/test"/>
+		<javac srcdir="${source.dir}" destdir="${out.dir}/test"
+			source="1.5"
+			target="1.5"
+			includeantruntime="false"
+			debug="${build.debug}"
+			debuglevel="lines,vars,source"
+			verbose="${verbose}"
+			
+			includes="**/logback-classic/src/test/java/**/classic/**,
+					  **/logback-classic/src/test/java/org/**,
+					  **/logback-core/src/test/java/**/core/**"
+
+			excludes="**/core/boolex/Janino*.java,
+					  **/db/**,
+					  **/core/net/JMS*.java,
+					  **/core/net/LoginAuthenticator*.java,
+					  **/core/net/SMTP*.java,
+					  **/core/status/*ServletBase*.java,
+					  **/classic/boolex/GEventEvaluator*.java,
+					  **/classic/boolex/Janino*.java,
+					  **/classic/gaffer/**,
+					  **/classic/helpers/**,
+					  **/classic/jmx/**,
+					  **/classic/joran/Evaluator*.java,
+					  **/classic/joran/action/*JNDI*.java,
+					  **/classic/joran/action/JMX*.java,
+					  **/classic/net/JMS*.java,
+					  **/classic/net/*SMTP*.java,
+  					  **/classic/net/SyslogAppender*.java,
+					  **/classic/net/mock/Mock*.java,
+
+					  **/logback-classic/**/test_osgi/**,					  
+					  **/classic/selector/**,
+					  **/classic/util/JNDI*.java,
+					  **/classic/*Servlet*.java" 
+		>
+			<classpath refid="libs.path"/>
+			<classpath refid="test.libs.path"/>
+		</javac>
+	</target>
+
 	<target name="build"
 			depends="compile"
 			description="Creates JAR of the .class files">
 		<jar
 			destfile="${out.dir}/logback-android-${version}.jar"
 			basedir="${out.dir}"
+			index="true"
+			excludes="*.jar,test/**,classes/**"
+			update="true"
+		>
+			<zipfileset includes="**/*.class" src="${apktool.jar}" />
+		</jar>
+
+	</target>
+	
+	<target name="build-test"
+			depends="compile-test"
+			description="Creates JAR of the .class files (for unit tests)">
+		<jar
+			destfile="${out.dir}/logback-android-test-${version}.jar"
+			basedir="${out.dir}/test"
 			index="true"
 			excludes="*.jar"
 		/>
@@ -147,6 +211,95 @@
 		/>
 	</target>
 	
+	<target name="-pre-test">
+		<echo>Creating temporary directory on device: ${tmp.dir}</echo>
+		<exec executable="${adb}" failonerror="true">
+			<arg line="shell mkdir -p ${tmp.dir}/target" />
+		</exec>
+		
+		<echo>Copying test files to device"</echo>
+		<exec executable="${adb}" failonerror="true">
+			<arg line="push ${source.dir}/logback-classic/src/test/resources ${tmp.dir}/src/test/resources"/>
+		</exec>
+		<exec executable="${adb}" failonerror="true">
+			<arg line="push ${source.dir}/logback-classic/src/test/input ${tmp.dir}/src/test/input"/>
+		</exec>
+		<exec executable="${adb}" failonerror="true">
+			<arg line="push ${source.dir}/logback-core/src/test/resources ${tmp.dir}/src/test/resources"/>
+		</exec>
+		<exec executable="${adb}" failonerror="true">
+			<arg line="push ${source.dir}/logback-core/src/test/input ${tmp.dir}/src/test/input"/>
+		</exec>
+	</target>
+	<target name="-post-test">
+		<echo>Deleting temporary directory from device: ${tmp.dir}</echo>
+		<exec executable="${adb}" failonerror="true">
+			<arg line="shell rm -r ${tmp.dir}" />
+		</exec>
+	</target>
+	
+	<target name="test"
+			depends="build,build-test"
+			description="Runs unit tests">
+			
+		<available file="${junit.jar}" type="file" property="junit.present" />
+		<fail unless="junit.present" message="JUnit not found" />
+
+		<!--<antcall target="-pre-test" />-->
+		
+		<junit haltonfailure="true" fork="yes" dir="${source.dir}/logback-core">
+			
+			<classpath refid="test.libs.path" />
+			<formatter type="plain" usefile="false" />
+			
+			<test name="ch.qos.logback.core.BasicStatusManagerTest" />
+			<test name="ch.qos.logback.core.util.PackageTest" />
+			<test name="ch.qos.logback.core.helpers.PackageTest" />
+			<test name="ch.qos.logback.core.pattern.PackageTest" />
+			<test name="ch.qos.logback.core.PackageTest" />
+			<test name="ch.qos.logback.core.joran.PackageTest" />
+			<test name="ch.qos.logback.core.appender.PackageTest" />
+			<test name="ch.qos.logback.core.spi.PackageTest" />
+			<test name="ch.qos.logback.core.rolling.PackageTest" />
+			<test name="ch.qos.logback.core.sift.PackageTest" /> 
+			<test name="ch.qos.logback.core.encoder.PackageTest" />
+			<test name="ch.qos.logback.core.recovery.PackageTest" />
+		</junit>
+
+		<junit haltonfailure="true" fork="yes" dir="${source.dir}/logback-classic">
+			
+			<classpath refid="test.libs.path" />
+			<classpath refid="libs.path" />
+			<formatter type="plain" usefile="false" />
+
+			<!-- XXX: NOT SUPPORTED IN ANDROID -->
+			<!--
+			<test name="ch.qos.logback.classic.jmx.PackageTest" />
+			<test name="ch.qos.logback.classic.selector.PackageTest" />
+			<test name="ch.qos.logback.classic.net.PackageTest" />
+			<test name="ch.qos.logback.classic.db.PackageTest" />
+			<test name="ch.qos.logback.classic.jul.PackageTest" />
+			<test name="ch.qos.logback.classic.html.PackageTest" /> 
+			-->
+
+			<test name="org.slf4j.impl.PackageTest" />
+			<test name="ch.qos.logback.classic.PackageTest" />
+			<test name="ch.qos.logback.classic.util.PackageTest" />
+			<test name="ch.qos.logback.classic.control.PackageTest" />
+			<test name="ch.qos.logback.classic.joran.PackageTest" />
+			<test name="ch.qos.logback.classic.rolling.PackageTest" />
+			<test name="ch.qos.logback.classic.boolex.PackageTest" />
+			<test name="ch.qos.logback.classic.pattern.PackageTest" />
+			<test name="ch.qos.logback.classic.encoder.PackageTest" />
+			<test name="ch.qos.logback.classic.spi.PackageTest" />
+			<test name="ch.qos.logback.classic.turbo.PackageTest" />
+			<test name="ch.qos.logback.classic.sift.PackageTest" />
+			<test name="ch.qos.logback.classic.issue.PackageTest" />
+		</junit>
+		
+		<!--<antcall target="-post-test" />-->
+	</target>
+			
     <target name="help">
         <echo>Logback-Android Ant Build. Available targets:</echo>
         <echo>   help:      Displays this help.</echo>
@@ -154,5 +307,6 @@
         <echo>   compile:   Compiles project's .java files into .class files.</echo>
 		<echo>   build:     Creates JAR of the .class files.</echo>
 		<echo>   release:   Signs JAR for release.</echo>
+		<echo>   test:      Runs unit tests.</echo>
     </target>
 </project>

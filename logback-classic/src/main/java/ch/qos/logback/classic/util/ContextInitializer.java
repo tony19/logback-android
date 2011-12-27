@@ -15,21 +15,17 @@ package ch.qos.logback.classic.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
-import ch.qos.logback.classic.BasicConfigurator;
 import ch.qos.logback.classic.LoggerContext;
-
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
-//import ch.qos.logback.classic.gaffer.GafferConfigurator;
-//import ch.qos.logback.classic.gaffer.GafferUtil;
-
 import ch.qos.logback.classic.android.BasicLogcatConfigurator;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.android.ASaxEventRecorder;
+import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.InfoStatus;
@@ -48,37 +44,97 @@ import ch.qos.logback.core.util.OptionHelper;
  */
 public class ContextInitializer {
 
-  final public static String GROOVY_AUTOCONFIG_FILE = "logback.groovy";
-  final public static String AUTOCONFIG_FILE = "logback.xml";
-  final public static String TEST_AUTOCONFIG_FILE = "logback-test.xml";
-  final public static String CONFIG_FILE_PROPERTY = "logback.configurationFile";
-  final public static String STATUS_LISTENER_CLASS = "logback.statusListenerClass";
-  final public static String SYSOUT = "SYSOUT";
-
+  final public static String  GROOVY_AUTOCONFIG_FILE = "logback.groovy";
+  final public static String  AUTOCONFIG_FILE        = "logback.xml";
+  final public static String  TEST_AUTOCONFIG_FILE   = "logback-test.xml";
+  final public static String  CONFIG_FILE_PROPERTY   = "logback.configurationFile";
+  final public static String  STATUS_LISTENER_CLASS  = "logback.statusListenerClass";
+  final public static String  SYSOUT                 = "SYSOUT";
+  final private static String  TAG_MANIFEST          = "manifest";
+  final private static String  TAG_LOGBACK           = "logback";
+  final private static String  MANIFEST_FILE         = "AndroidManifest.xml";
+	
   final LoggerContext loggerContext;
 
   public ContextInitializer(LoggerContext loggerContext) {
     this.loggerContext = loggerContext;
   }
+  
+  private InputStream openManifest(ClassLoader classLoader, boolean updateStatus) {
+    StatusManager sm = loggerContext.getStatusManager();
 
+    // fetch the URL to AndroidManifest.xml
+    URL url = getResource(MANIFEST_FILE, classLoader, updateStatus);
+    if (url == null) {
+      return null;
+    }
+    // open the file (via URL connection's input stream)
+    InputStream stream = null;
+    try {
+      URLConnection conn = url.openConnection();
+
+      // per http://jira.qos.ch/browse/LBCORE-105
+      // per http://jira.qos.ch/browse/LBCORE-127
+      conn.setUseCaches(false);
+
+      stream = conn.getInputStream();
+    } catch (IOException e) {
+      sm.add(new ErrorStatus("Could not open URL [" + url + "].", e));
+    }
+    return stream;
+  }
+  
+  /**
+   * Configures Logback by reading the configuration from the
+   * AndroidManifest.xml
+   * 
+   * @return {@code true} if successfully processed config from manifest;
+   *         {@code false} otherwise
+   */
+  public boolean configureByManifest() {
+
+    ClassLoader classLoader = Loader.getClassLoaderOfObject(this);
+    InputStream stream = openManifest(classLoader, true);
+    if (stream == null) {
+      // error already reported in openManifest(), so no need to repeat
+      return false;
+    }
+
+    // use Android XML resource parser to process AndroidManifest.xml
+    // (which is in compressed binary form; not text)
+    ASaxEventRecorder recorder = new ASaxEventRecorder(loggerContext);
+    recorder.setFilter(TAG_MANIFEST, TAG_LOGBACK);
+
+    boolean ok = false;
+    try {
+      // begin parsing...
+      recorder.recordEvents(stream);
+
+      try {
+        stream.close();
+      } catch (IOException e) {
+      }
+
+      // ...and get the results to pass to Joran
+      List<SaxEvent> events = recorder.getSaxEventList();
+      if ((events != null) && (events.size() > 0)) {
+        JoranConfigurator joran = new JoranConfigurator();
+        joran.setContext(loggerContext);
+        joran.doConfigure(events);
+        ok = true;
+      }
+    } catch (JoranException e) {
+      StatusManager sm = loggerContext.getStatusManager();
+      sm.add(new ErrorStatus("Could not configure by AndroidManifest.xml", e));
+    }
+    return ok;
+  }
+  
   public void configureByResource(URL url) throws JoranException {
     if (url == null) {
       throw new IllegalArgumentException("URL argument cannot be null");
     }
     if (url.toString().endsWith("groovy")) {
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################    	
-//      if (EnvUtil.isGroovyAvailable()) {
-//        // avoid directly referring to GafferConfigurator so as to avoid
-//        // loading  groovy.lang.GroovyObject . See also http://jira.qos.ch/browse/LBCLASSIC-214
-//        GafferUtil.runGafferConfiguratorOn(loggerContext, this, url);
-//        throw new RuntimeException("Not supported");
-//      } else {
-//        StatusManager sm = loggerContext.getStatusManager();
-//        sm.add(new ErrorStatus("Groovy classes are not available on the class path. ABORTING INITIALIZATION.",
-//                loggerContext));
-//      }
       StatusManager sm = loggerContext.getStatusManager();
       sm.add(new ErrorStatus("Groovy classes are not available on the class path. ABORTING INITIALIZATION.",
               loggerContext));
@@ -134,11 +190,6 @@ public class ContextInitializer {
       return url;
     }
 
-    url = getResource(GROOVY_AUTOCONFIG_FILE, myClassLoader, updateStatus);
-    if (url != null) {
-      return url;
-    }
-
     url = getResource(TEST_AUTOCONFIG_FILE, myClassLoader, updateStatus);
     if (url != null) {
       return url;
@@ -160,11 +211,7 @@ public class ContextInitializer {
     URL url = findURLOfDefaultConfigurationFile(true);
     if (url != null) {
       configureByResource(url);
-    } else {
-// ##################################################
-// XXX: Use BasicLogcatConfigurator Logback-Android
-// ##################################################
-//      BasicConfigurator.configure(loggerContext);
+    } else if (!configureByManifest()) {
       BasicLogcatConfigurator.configure(loggerContext);
     }
   }
@@ -199,5 +246,4 @@ public class ContextInitializer {
       multiplicityWarning(resourceName, classLoader);
     }
   }
-
 }
