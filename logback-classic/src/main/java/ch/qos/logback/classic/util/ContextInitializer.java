@@ -22,9 +22,9 @@ import java.net.URLConnection;
 import java.util.List;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.android.ASaxEventRecorder;
 import ch.qos.logback.classic.android.BasicLogcatConfigurator;
 import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.android.ASaxEventRecorder;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.ErrorStatus;
