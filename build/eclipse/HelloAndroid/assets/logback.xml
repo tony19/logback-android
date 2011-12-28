@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration> 
-  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender"> 
+  <appender name="LOGCAT" class="ch.qos.logback.core.android.LogcatAppender"> 
     <!-- encoders are  by default assigned the type
      ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
     <encoder>
@@ -8,18 +8,7 @@
     </encoder>
   </appender>
 
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>/sdcard/test.log</file>
-    <append>true</append>
-    <!-- encoders are assigned the type
-     ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-    <encoder>
-      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
-    </encoder>
-  </appender>
-
   <root level="TRACE">
-    <appender-ref ref="FILE" />
-    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="LOGCAT" />
   </root>
 </configuration>

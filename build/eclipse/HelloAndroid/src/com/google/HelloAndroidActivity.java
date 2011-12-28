@@ -23,7 +23,7 @@ public class HelloAndroidActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        //configureLog();
+        configureLog();
         LOG.info("Hello Android!");
 
         // this.toString() is only called if the DEBUG level is enabled
@@ -31,8 +31,23 @@ public class HelloAndroidActivity extends Activity {
     }
 
     /**
-     * Checks the application assets for logback config XML file. If not found,
-     * this function does nothing.
+     * Configures Logback from the config XML in assets/logback.xml
+     * <p>
+     * Alternatively, you can enter the XML config in AndroidManifest.xml,
+     * which obviates the need for any code-based configuration.
+     * The Logback config should be inside a {@code <logback>} tag within 
+     * the manifest like this:
+     * <pre>
+     * &lt;manifest  ...>
+     *     ...
+     *     
+     *     &lt;logback>
+     *        &lt;configuration>
+     *           ...
+     *        &lt;/configuration>
+     *     &lt;/logback>
+     * &lt;manifest>
+     * </pre>
      */
     private void configureLog() {
         InputStream xml = null;

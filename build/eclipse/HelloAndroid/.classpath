@@ -3,10 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	
-	<!--  XXX: CUSTOMIZE THESE PATHS FOR YOUR DEVELOPMENT MACHINE -->
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/bin/logback-android-1.0.0-2.jar"/>
 	<classpathentry kind="lib" path="/Users/tony/Developer/slf4j-api-1.6.4.jar"/>
-	
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/bin/logback-android-1.0.0-3-SNAPSHOT.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
