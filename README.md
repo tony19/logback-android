@@ -6,7 +6,7 @@
 Overview
 --------
 
-**Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [*SLF4J*][3] allows for greater logging flexibility and portability across Java platforms.
+**Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications. 
 
 The current version is **1.0.0-3**.
 
@@ -25,7 +25,7 @@ Quickstart
 
  1. Edit AndroidManifest.xml with your Logback configuration (shown in example below).
 
-**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and the default appender is `LogcatAppender`. However, Android has its own logging filters that supersede all loggers, including Logback. So, if you don't see an expected log message in logcat, your logcat filters are likely blocking it. See [Android documentation][17] for details on setting the logcat filters.
+**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and the default appender is `LogcatAppender`. However, Android has its own independent filter settings for logcat. So, if you don't see an expected log message in logcat, your logcat filters are likely blocking it. See [Android documentation][17] for details on setting the logcat filters.
 
 #### Example AndroidManifest.xml:
 
@@ -119,12 +119,12 @@ Logback-Android currently supports only the **logback-core** and **logback-class
 
 Documentation
 -------------
+* [Logback-Android Javadoc][8]
 * [Logback manual][7]
 * [Reasons to switch to logback from log4j][2]
 * [Frequently Asked Questions (FAQ)][6]
 * [Logback error codes and their meanings][5]
 * [Logback Console Plugin for Eclipse][4]
-* [Original Logback Javadoc][8]
 
 For help with using **Logback-Android**, ask the mailing list: [logback-user AT qos DOT ch][9].
 
@@ -158,7 +158,7 @@ Tentative upcoming plans include:
  [5]: http://logback.qos.ch/codes.html
  [6]: http://logback.qos.ch/faq.html
  [7]: http://logback.qos.ch/manual/index.html
- [8]: http://logback.qos.ch/apidocs/index.html
+ [8]: http://tony19.github.com/logback-android/doc/1.0.0-3/
  [9]: mailto:logback-user@qos.ch
  [10]: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app
  [11]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
