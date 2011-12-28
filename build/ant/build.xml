@@ -90,8 +90,7 @@
 				  **/core/net/LoginAuthenticator.java,
 				  **/core/net/SMTPAppenderBase.java,
 				  **/core/status/ViewStatusMessagesServletBase.java,
-				  **/classic/boolex/GEventEvaluator.java,
-				  **/classic/boolex/JaninoEventEvaluator.java,
+				  **/classic/boolex/**,
 				  **/classic/gaffer/**,
 				  **/classic/helpers/**,
 				  **/classic/jmx/**,
@@ -104,6 +103,7 @@
 				  **/classic/selector/servlet/,
 				  **/classic/util/JNDIUtil.java,
 				  **/classic/ViewStatusMessagesServlet.java,
+				  **/*JNDI*/**,
 				  **/test/**,
 				  **/performance/**"
 	/>
@@ -111,43 +111,6 @@
     <target name="compile"
     		description="Compiles project's .java files into .class files">
     	<mkdir dir="${out.dir}"/>
-    	<!--
-		<javac srcdir="${source.dir}" destdir="${out.dir}"
-			classpathref="libs.path"
-			source="1.5"
-			target="1.5"
-			includeantruntime="false"
-			debug="${build.debug}"
-			debuglevel="lines,vars,source"
-			verbose="${verbose}"
-			
-			includes="**/logback-classic/src/main/java/**/classic/**,
-					  **/logback-classic/src/main/java/org/**,
-					  **/logback-core/src/main/java/**/core/**"
-
-			excludes="**/core/boolex/JaninoEventEvaluatorBase.java,
-					  **/core/db/BindDataSourceToJNDIAction.java,
-					  **/core/db/JNDIConnectionSource.java,
-					  **/core/net/JMSAppenderBase.java,
-					  **/core/net/LoginAuthenticator.java,
-					  **/core/net/SMTPAppenderBase.java,
-					  **/core/status/ViewStatusMessagesServletBase.java,
-					  **/classic/boolex/GEventEvaluator.java,
-					  **/classic/boolex/JaninoEventEvaluator.java,
-					  **/classic/gaffer/**,
-					  **/classic/helpers/**,
-					  **/classic/jmx/**,
-					  **/classic/joran/action/EvaluatorAction.java,
-					  **/classic/joran/action/InsertFromJNDIAction.java,
-					  **/classic/joran/action/JMXConfiguratorAction.java,
-					  **/classic/net/JMS*.java,
-					  **/classic/net/SMTPAppender.java,
-					  **/classic/selector/ContextJNDISelector.java,
-					  **/classic/selector/servlet/,
-					  **/classic/util/JNDIUtil.java,
-					  **/classic/ViewStatusMessagesServlet.java"
-		/>
-		-->
 		<javac srcdir="${source.dir}" destdir="${out.dir}"
 			classpathref="libs.path"
 			source="1.5"
@@ -182,8 +145,7 @@
 					  **/core/net/LoginAuthenticator*.java,
 					  **/core/net/SMTP*.java,
 					  **/core/status/*ServletBase*.java,
-					  **/classic/boolex/GEventEvaluator*.java,
-					  **/classic/boolex/Janino*.java,
+					  **/classic/boolex/**,
 					  **/classic/gaffer/**,
 					  **/classic/helpers/**,
 					  **/classic/jmx/**,
@@ -208,6 +170,7 @@
 	<target name="build"
 			depends="compile"
 			description="Creates JAR of the .class files">
+
 		<jar
 			destfile="${out.dir}/logback-android-${version}.jar"
 			basedir="${out.dir}"

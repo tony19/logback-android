@@ -50,7 +50,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
 	/**
 	 * Sets a filter so that only sub-elements of a specific element 
-	 * are captured.
+	 * are captured
 	 * 
 	 * <p>
 	 * For example, if the desired elements were inside
@@ -63,7 +63,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 	 * <br>
 	 * <blockquote>{@code <a/><b/><c/>}</blockquote>
 	 * 
-	 * The call in this example would be: {@code new setFilter("x", "y")}.
+	 * The call in this example would be: {@code setFilter("x", "y")}.
 	 * 
 	 * @param names names of elements leading to the target elements;
 	 * use {@code null} to disable filtering (capture all events)
@@ -75,7 +75,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 	/**
 	 * Parses SAX events from a compressed Android XML resource
 	 * 
-	 * @param src input source pointing to a compressed Android xml resource
+	 * @param src input source pointing to a compressed Android XML resource
 	 */
 	@Override
 	public List<SaxEvent> recordEvents(InputSource src) throws JoranException {
