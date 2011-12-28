@@ -24,8 +24,12 @@
 	<property name="apktool.jar" value="${libs.dir}/apktool-min-android-1.4.3-1.jar" />
 	<property file="ant.properties" />
     <loadproperties srcFile="project.properties" />
-	
-	<property name="doc.dir" value="${source.dir}/gh-pages/doc/${version}" />
+
+    <!-- assert ${version} property (depends on ant.properties) -->
+    <condition property="version" else="${version.default}">
+    	<isset property="version"/>
+    </condition>
+	<property name="doc.dir" value="doc/${version}" />
 	
     <!-- require Android SDK path (from ant.properties) -->
     <available file="${sdk.dir}" type="dir" property="android.sdk.present" />
@@ -59,11 +63,6 @@
     <!-- require SLF4J JAR (from ant.properties) -->
     <available file="${slf4j.jar}" type="file" property="slf4j.present" />
     <fail unless="slf4j.present" message="SLF4J not found" />
-    
-    <!-- assert ${version} property -->
-    <condition property="version" else="${version.default}">
-    	<isset property="version"/>
-    </condition>
 
     <path id="libs.path">
 	    <pathelement path="${apktool.jar}" />

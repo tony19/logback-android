@@ -13,6 +13,11 @@
 # as published by the Free Software Foundation.
 ##############################################################################
 
+if [ ! $1 ]; then
+	echo "Usage: $0 {version}"
+	exit 1
+fi
+
 readme=../../README.md
 cd build/ant || exit 1
 
@@ -24,7 +29,8 @@ cd build/ant || exit 1
 # and 
 #	N is the integral release number of Logback-Android.
 #
-version=1.0.0-2
+version=$1
+outf=logback-android-${version}.jar
 
 echo "Starting release process for Logback-Android ${version}..."
 
@@ -38,12 +44,11 @@ stty echo
 # Build the JAR and print its MD5. The last line uses GNU sed (gsed)
 # to update the README with the current release version.
 #
-ant release -Dkey.store.password=${password} -Dversion=${version} && \
-md5 bin/logback-android-${version}.jar && \
+ant clean release -Dkey.store.password=${password} -Dversion=${version} && \
+md5 bin/${outf} && \
 echo "Updating README.md" && \
-gsed -i -e "s/logback-android-[^j]*\.jar/logback-android-${version}.jar/" \
+gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 -e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" \
--e "s/\(logback-android.*MD5\:\).*\\)/\1 `md5 bin/logback-android-${version}.jar | awk '{print $4}'`\)/" \
-${readme}
+-e "s/\(logback-android.*MD5\:\).*/\1 \`$(md5 bin/${outf} | awk '{print $4}')\`)/" ${readme}
 
 echo Done

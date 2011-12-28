@@ -8,103 +8,92 @@ Overview
 
 **Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications written by the creator of the popular (but now defunct) Apache log4j project. Logback-Android provides a richer API than `android.util.Log` (including automatic log file compression). Additionally, Logback-Android together with [*SLF4J*][3] allows for greater logging flexibility and portability across Java platforms.
 
-The current version is **1.0.0-2**.
+The current version is **1.0.0-3**.
 
 Download
 --------
- * [logback-android-1.0.0-2.jar][13] (MD5: `6858996b8164b05c3c814b08a60b752f`)
+ * [logback-android-1.0.0-3.jar][13] (MD5: `f11370158aff171a37d8dc4c087bf7e8`)
  * [slf4j-api-1.6.4.jar][14] (MD5: `a134d83e0c12a9611824284c855ffb13`)
 
 Quickstart
 ----------
 
- 1. Configure your Android project's *Java Build Path*:
+ 1. Edit your project's library references:
 
-     * Include [logback-android-1.0.0-2.jar][13] and [slf4j-api-1.6.4.jar][14].
+     * Include [logback-android-1.0.0-3.jar][13] and [slf4j-api-1.6.4.jar][14].
      * Exclude all other SLF4J bindings/libraries (i.e., *log4j-over-slf4j.jar*, *slf4j-android-1.5.8.jar*, etc).
 
- 1. Load configuration XML from pre-determined location (e.g., `/sdcard/logback-test.xml`). 
+ 1. Edit AndroidManifest.xml with your Logback configuration (shown in example below).
 
-**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and the default appender is `LogcatAppender`.
+**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and the default appender is `LogcatAppender`. However, Android has its own logging filters that supersede all loggers, including Logback. So, if you don't see an expected log message in logcat, your logcat filters are likely blocking it. See [Android documentation][17] for details on setting the logcat filters.
 
-#### Example config file:
+#### Example AndroidManifest.xml:
 
-	<configuration> 
-	  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender"> 
-	    <!-- encoders are  by default assigned the type
-		 ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
-	    <encoder>
-	      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-	    </encoder>
-	  </appender>
-
-	  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-	    <file>/sdcard/test.log</file>
-	    <append>true</append>
-	    <!-- encoders are assigned the type
-		 ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-	    <encoder>
-	      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
-	    </encoder>
-	  </appender>
-
-	  <root level="TRACE">
-	    <appender-ref ref="FILE" />
-	    <appender-ref ref="CONSOLE" />
-	  </root>
-	</configuration>
+	<?xml version="1.0" encoding="utf-8"?>
+	<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+		package="com.example"
+		android:versionCode="1"
+		android:versionName="1.0" >
+		
+		<uses-sdk android:minSdkVersion="15" />
+		
+		<application
+			android:icon="@drawable/ic_launcher"
+			android:label="@string/app_name" >
+			<activity
+				android:name=".HelloAndroidActivity"
+				android:label="@string/app_name" >
+				<intent-filter>
+					<action android:name="android.intent.action.MAIN" />
+					<category android:name="android.intent.category.LAUNCHER" />
+				</intent-filter>
+			</activity>
+		</application>
+	
+		<logback>
+			<configuration>
+				<appender
+					name="CONSOLE"
+					class="ch.qos.logback.core.ConsoleAppender" >
+					<encoder>
+						<pattern>[%thread] %msg%n</pattern>
+					</encoder>
+				</appender>
+	
+				<root level="TRACE" >
+					<appender-ref ref="CONSOLE" />
+				</root>
+			</configuration>
+		</logback>
+	
+	</manifest>
 
 
 #### Example Android Activity:
 
-	/* (other imports not shown for brevity) */
+	package com.example;
+	
+	import android.app.Activity;
+	import android.os.Bundle;
+
 	import org.slf4j.Logger;
 	import org.slf4j.LoggerFactory;
 
 	public class HelloAndroidActivity extends Activity {
 		static private final Logger LOG = LoggerFactory.getLogger(HelloAndroidActivity.class);
-		static private final String CONFIG_FILE = "/sdcard/logback.xml";
-		static private final String TEST_CONFIG_FILE = "/sdcard/logback-test.xml";
-	
+		
 		/** Called when the activity is first created. */
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.main);
 		
-			configureLog();
 			LOG.info("Hello Android!");
 		
 			// this.toString() is only called if the DEBUG level is enabled
 			LOG.debug("toString: {}", this);
 		}
 	
-		/**
-		 * Checks the SD card for logback config XML files (first for test config
-		 * and if not found, checks for normal config). If no config files
-		 * exist in the root of SD card, this function does nothing.
-		 */
-		private void configureLog() {
-			File xml = new File(TEST_CONFIG_FILE); 
-			if (!xml.exists()) {
-				xml = new File(CONFIG_FILE);
-				if (!xml.exists()) {
-					return; // no configuration files found
-				}
-			}
-		
-			LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-			try {
-				JoranConfigurator configurator = new JoranConfigurator();
-				configurator.setContext(lc);
-				lc.reset();
-				configurator.doConfigure(xml);
-			} catch (JoranException je) {
-				// StatusPrinter will handle this
-			}
-			StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
-		}
-
 		@Override
 		public String toString() {
 			LOG.trace("toString() entered");
@@ -114,15 +103,9 @@ Quickstart
 
 #### Output of Android logcat:
 
-	I/System.out( 6948): 03:41:26.403 [main] INFO  com.google.HelloAndroidActivity - Hello Android!
-	I/System.out( 6948): 03:41:26.453 [main] TRACE com.google.HelloAndroidActivity - toString() entered
-	I/System.out( 6948): 03:41:26.499 [main] DEBUG com.google.HelloAndroidActivity - toString: com.google.HelloAndroidActivity
-
-#### Output of /sdcard/test.log:
-
-	2506 [main] INFO  com.google.HelloAndroidActivity - Hello Android!
-	2556 [main] TRACE com.google.HelloAndroidActivity - toString() entered
-	2602 [main] DEBUG com.google.HelloAndroidActivity - toString: com.google.HelloAndroidActivity
+	I/System.out( 6948): 03:41:26.403 [main] Hello Android!
+	I/System.out( 6948): 03:41:26.453 [main] toString() entered
+	I/System.out( 6948): 03:41:26.499 [main] toString: com.example.HelloAndroidActivity
 
 See the sample project in the `build/eclipse/HelloAndroid` subdirectory.
 
@@ -158,7 +141,7 @@ Logback-Android is built from [Ant][16], using the Android SDK.
 2. Edit `ant.properties`:
 	* Set `sdk.dir` to the root directory of the Android SDK.
 	* Set `slf4j.jar` to the path of [SLF4J API library][14].
-3. Enter `ant` to begin the build. The JAR is created at `bin/logback-android-1.0.0-2.jar`.
+3. Enter `ant` to begin the build. The JAR is created at `bin/logback-android-1.0.0-3.jar`.
 
 
 Future Work
@@ -180,7 +163,8 @@ Tentative upcoming plans include:
  [10]: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app
  [11]: http://thediscobot.blogspot.com/2009/07/howto-run-groovy-on-android.html
  [12]: https://github.com/tony19/logback-android/blob/master/LICENSE.md
- [13]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-2.jar 
+ [13]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-3.jar 
  [14]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
  [15]: http://developer.android.com/sdk/index.html
  [16]: http://ant.apache.org/
+ [17]: http://developer.android.com/guide/developing/tools/adb.html#filteringoutput
