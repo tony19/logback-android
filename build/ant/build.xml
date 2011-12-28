@@ -21,10 +21,12 @@
 	
 	<property name="tmp.dir" value="/sdcard/.logback_test" />
 	<property name="libs.dir" value="libs" />
-	<property name="apktool.jar" value="${libs.dir}/apktool-min-android.jar" />
+	<property name="apktool.jar" value="${libs.dir}/apktool-min-android-1.4.3-1.jar" />
 	<property file="ant.properties" />
     <loadproperties srcFile="project.properties" />
-
+	
+	<property name="doc.dir" value="${source.dir}/gh-pages/doc/${version}" />
+	
     <!-- require Android SDK path (from ant.properties) -->
     <available file="${sdk.dir}" type="dir" property="android.sdk.present" />
     <fail unless="android.sdk.present" message="Android SDK path not found" />
@@ -77,9 +79,40 @@
 		<pathelement path="${out.dir}/logback-android-test-${version}.jar" />
 	</path>
 	
+	<patternset id="src.files"
+		includes="**/logback-classic/src/main/java/**/classic/**/*.java,
+				  **/logback-classic/src/main/java/org/**/*.java,
+				  **/logback-core/src/main/java/**/core/**/*.java"
+
+		excludes="**/core/boolex/JaninoEventEvaluatorBase.java,
+				  **/core/db/BindDataSourceToJNDIAction.java,
+				  **/core/db/JNDIConnectionSource.java,
+				  **/core/net/JMSAppenderBase.java,
+				  **/core/net/LoginAuthenticator.java,
+				  **/core/net/SMTPAppenderBase.java,
+				  **/core/status/ViewStatusMessagesServletBase.java,
+				  **/classic/boolex/GEventEvaluator.java,
+				  **/classic/boolex/JaninoEventEvaluator.java,
+				  **/classic/gaffer/**,
+				  **/classic/helpers/**,
+				  **/classic/jmx/**,
+				  **/classic/joran/action/EvaluatorAction.java,
+				  **/classic/joran/action/InsertFromJNDIAction.java,
+				  **/classic/joran/action/JMXConfiguratorAction.java,
+				  **/classic/net/JMS*.java,
+				  **/classic/net/SMTPAppender.java,
+				  **/classic/selector/ContextJNDISelector.java,
+				  **/classic/selector/servlet/,
+				  **/classic/util/JNDIUtil.java,
+				  **/classic/ViewStatusMessagesServlet.java,
+				  **/test/**,
+				  **/performance/**"
+	/>
+	
     <target name="compile"
     		description="Compiles project's .java files into .class files">
     	<mkdir dir="${out.dir}"/>
+    	<!--
 		<javac srcdir="${source.dir}" destdir="${out.dir}"
 			classpathref="libs.path"
 			source="1.5"
@@ -115,6 +148,18 @@
 					  **/classic/util/JNDIUtil.java,
 					  **/classic/ViewStatusMessagesServlet.java"
 		/>
+		-->
+		<javac srcdir="${source.dir}" destdir="${out.dir}"
+			classpathref="libs.path"
+			source="1.5"
+			target="1.5"
+			includeantruntime="false"
+			debug="${build.debug}"
+			debuglevel="lines,vars,source"
+			verbose="${verbose}"
+			>
+			<patternset refid="src.files" />
+		</javac>
 	</target>
 	
 	<target name="compile-test"
@@ -299,7 +344,39 @@
 		
 		<!--<antcall target="-post-test" />-->
 	</target>
+	
+	<target name="doc" description="Generates Javadoc">
+		<javadoc
+			classpathref="libs.path"
+			destdir="${doc.dir}"
+			author="true"
+			version="true"
+			use="true"
+			failonerror="true"
+			windowtitle="Logback Android ${version} API"
+			doctitle="Logback Android ${version} API"
+		>
+			<sourcefiles>
+				<fileset dir="${source.dir}">
+					<patternset refid="src.files" />
+				</fileset>
+			</sourcefiles>
 			
+			<packageset dir="${source.dir}/logback-core" defaultexcludes="yes">
+				<exclude name="**/test/**" />
+			</packageset>
+			
+			<packageset dir="${source.dir}/logback-classic" defaultexcludes="yes">
+				<exclude name="**/test/**" />
+				<exclude name="**/performance/**" />
+			</packageset>
+			
+			<group title="Logback Android" packages="ch.qos.logback.*.android*" />
+			<group title="Logback Core" packages="ch.qos.logback.core*" />
+			<group title="Logback Classic" packages="ch.qos.logback.classic*" />
+		</javadoc>
+	</target>
+	
     <target name="help">
         <echo>Logback-Android Ant Build. Available targets:</echo>
         <echo>   help:      Displays this help.</echo>
@@ -308,5 +385,6 @@
 		<echo>   build:     Creates JAR of the .class files.</echo>
 		<echo>   release:   Signs JAR for release.</echo>
 		<echo>   test:      Runs unit tests.</echo>
+		<echo>   doc:       Generates Javadoc.</echo>
     </target>
 </project>

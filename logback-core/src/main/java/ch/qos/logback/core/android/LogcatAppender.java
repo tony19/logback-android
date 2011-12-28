@@ -20,7 +20,16 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
 /**
- * An appender that wraps the native Android logging mechanism (logcat).
+ * An appender that wraps the native Android logging mechanism (<i>logcat</i>);
+ * redirects all logging requests to <i>logcat</i> 
+ * <p>
+ * <b>Note:</b><br>The output of <i>logcat</i> is ultimately controlled by the OS.
+ * Therefore, even if a logger is at Level.DEBUG, calling Logger.debug() (which
+ * invokes android.os.util.Log.d()) does not log a message if <i>logcat</i> 
+ * filtering prevents it. See the Android Developer Guide for details on adjusting 
+ * the <i>logcat</i> filter.
+ * 
+ * @see http://developer.android.com/guide/developing/tools/adb.html#filteringoutput 
  * 
  * @author Fred Eisele
  * @author Anthony Trinh
@@ -78,7 +87,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 		
 		// truncate tag if max length exceeded
 		if (tag.length() > MAX_TAG_LENGTH) {
-			addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
+			//addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
 			tag = tag.substring(0, MAX_TAG_LENGTH - 1) + "*";
 		}
 		
@@ -115,18 +124,44 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 		}
 	}
 
+	/**
+	 * Gets the pattern-layout encoder for this appender's <i>logcat</i> message
+	 * 
+	 * @return the pattern-layout encoder
+	 */
 	public PatternLayoutEncoder getEncoder() {
 		return this.encoder;
 	}
 
+	/**
+	 * Sets the pattern-layout encoder for this appender's <i>logcat</i> message
+	 * 
+	 * @param encoder the pattern-layout encoder
+	 */
 	public void setEncoder(PatternLayoutEncoder encoder) {
 		this.encoder = encoder;
 	}
 
+	/**
+	 * Gets the pattern-layout encoder for this appender's <i>logcat</i> tag
+	 * 
+	 * @return the pattern encoder
+	 */
 	public PatternLayoutEncoder getTagEncoder() {
 		return this.tagEncoder;
 	}
 
+	/**
+	 * Sets the pattern-layout encoder for this appender's <i>logcat</i> tag
+	 * <p>
+	 * The expanded text of the pattern must be less than 23 characters as
+	 * limited by Android. Layouts that exceed this limit are truncated, 
+	 * and a star is appended to the tag to indicate this.
+	 * 
+	 * @param encoder
+	 *            the pattern-layout encoder; specify {@code null} to
+	 *            automatically use the logger's name as the tag
+	 */
 	public void setTagEncoder(PatternLayoutEncoder encoder) {
 		this.tagEncoder = encoder;
 	}

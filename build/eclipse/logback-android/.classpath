@@ -11,6 +11,6 @@
 	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/slf4j-api-1.6.4-tests.jar"/>
 	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/xpp3-1.1.4.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/apktool-min-android.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/apktool-min-android-1.4.3-1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

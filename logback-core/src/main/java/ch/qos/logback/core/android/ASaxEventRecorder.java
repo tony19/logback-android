@@ -28,7 +28,7 @@ import ch.qos.logback.core.joran.event.SaxEventRecorder;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 /**
- * A SAX event recorder for compressed Android XML resource files.
+ * SAX event recorder for compressed Android XML resource files.
  * Supports filtering to capture only the sub-events of an event 
  * of interest.
  * 
@@ -73,8 +73,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 	}
 	
 	/**
-	 * Parses SAX events (within xpath://manifest/logback) from a 
-	 * compressed Android XML resource
+	 * Parses SAX events from a compressed Android XML resource
 	 * 
 	 * @param src input source pointing to a compressed Android xml resource
 	 */

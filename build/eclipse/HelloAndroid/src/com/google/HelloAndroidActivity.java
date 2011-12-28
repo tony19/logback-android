@@ -23,6 +23,16 @@ public class HelloAndroidActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        /*
+         * If you don't specify a Logback config (either by loading a file
+         * from code; or by using AndroidManifest.xml), Logback defaults to
+         * the LogcatAppender. Note that Android has its own logging filters
+         * that supersede all loggers, including Logback. So, if you don't
+         * see an expected log message in logcat, your logcat filters are
+         * likely blocking it.
+         * 
+         * See http://developer.android.com/guide/developing/tools/adb.html#filteringoutput
+         */
         configureLog();
         LOG.info("Hello Android!");
 
