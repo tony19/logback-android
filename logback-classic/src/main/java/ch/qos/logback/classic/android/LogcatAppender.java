@@ -23,11 +23,11 @@ import ch.qos.logback.core.AppenderBase;
  * An appender that wraps the native Android logging mechanism (<i>logcat</i>);
  * redirects all logging requests to <i>logcat</i> 
  * <p>
- * <b>Note:</b><br>The output of <i>logcat</i> is ultimately controlled by the OS.
- * Therefore, even if a logger is at Level.DEBUG, calling Logger.debug() (which
- * invokes android.os.util.Log.d()) does not log a message if <i>logcat</i> 
- * filtering prevents it. See the Android Developer Guide for details on adjusting 
- * the <i>logcat</i> filter.
+ * <b>Note:</b><br>
+ * By default, this appender pushes all messages to <i>logcat</i> regardless
+ * of <i>logcat</i>'s own filter settings (i.e., everything is printed). To disable this
+ * behavior and enable filter-checking, use {@link #setCheckLoggable(boolean)}. 
+ * See the Android Developer Guide for details on adjusting the <i>logcat</i> filter. 
  * 
  * @see http://developer.android.com/guide/developing/tools/adb.html#filteringoutput 
  * 
@@ -40,9 +40,10 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 * http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)
 	 */
 	private static final int MAX_TAG_LENGTH = 23;
-	private PatternLayoutEncoder encoder;
+	private PatternLayoutEncoder encoder = null;
 	private PatternLayoutEncoder tagEncoder = null;
-
+	private boolean checkLoggable = false;
+	
 	/**
 	 * As in most cases, the default constructor does nothing.
 	 */
@@ -81,41 +82,40 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 			return;
 		}
 
-		// format message based on encoder layout
-		String msg = this.encoder.getLayout().doLayout(event);
+		// format tag based on encoder layout; truncate if max length 
+		// exceeded (only necessary for isLoggable(), which throws 
+		// IllegalArgumentException)
 		String tag = (this.tagEncoder != null) ? this.tagEncoder.getLayout().doLayout(event) : event.getLoggerName();
-		
-		// truncate tag if max length exceeded
-		if (tag.length() > MAX_TAG_LENGTH) {
-			//addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
+		if (checkLoggable && (tag.length() > MAX_TAG_LENGTH)) {
+			// addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
 			tag = tag.substring(0, MAX_TAG_LENGTH - 1) + "*";
 		}
-		
+
 		switch (event.getLevel().levelInt) {
 		case Level.ALL_INT:
 		case Level.TRACE_INT:
-			if (Log.isLoggable(tag, Log.VERBOSE)) {
-				Log.v(tag, msg);
+			if (!checkLoggable || Log.isLoggable(tag, Log.VERBOSE)) {
+				Log.v(tag, this.encoder.getLayout().doLayout(event));
 			}
 			break;
 		case Level.DEBUG_INT:
-			if (Log.isLoggable(tag, Log.DEBUG)) {
-				Log.d(tag, msg);
+			if (!checkLoggable || Log.isLoggable(tag, Log.DEBUG)) {
+				Log.d(tag, this.encoder.getLayout().doLayout(event));
 			}
 			break;
 		case Level.INFO_INT:
-			if (Log.isLoggable(tag, Log.INFO)) {
-				Log.i(tag, msg);
+			if (!checkLoggable || Log.isLoggable(tag, Log.INFO)) {
+				Log.i(tag, this.encoder.getLayout().doLayout(event));
 			}
 			break;
 		case Level.WARN_INT:
-			if (Log.isLoggable(tag, Log.WARN)) {
-				Log.w(tag, msg);
+			if (!checkLoggable || Log.isLoggable(tag, Log.WARN)) {
+				Log.w(tag, this.encoder.getLayout().doLayout(event));
 			}
 			break;
 		case Level.ERROR_INT:
-			if (Log.isLoggable(tag, Log.ERROR)) {
-				Log.e(tag, msg);
+			if (!checkLoggable || Log.isLoggable(tag, Log.ERROR)) {
+				Log.e(tag, this.encoder.getLayout().doLayout(event));
 			}
 			break;
 		case Level.OFF_INT:
@@ -166,6 +166,26 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 		this.tagEncoder = encoder;
 	}
 
+	/**
+	 * Sets whether to ask Android before logging a message with a specific
+	 * tag and priority (i.e., calls <a href="http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)"><code>isLoggable()</code>)</a>.
+	 * 
+	 * @param enable
+	 * 			{@code true} to enable; {@code false} to disable
+	 */
+	public void setCheckLoggable(boolean enable) {
+		this.checkLoggable = enable;
+	}
+	
+	/**
+	 * Gets the enable status of the <a href="http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)"><code>isLoggable()</code></a>-check
+	 * that is called before logging
+	 * 
+	 * @return {@code true} if enabled; {@code false} otherwise
+	 */
+	public boolean getCheckLoggable() {
+		return this.checkLoggable;
+	}
 }
 
 /**

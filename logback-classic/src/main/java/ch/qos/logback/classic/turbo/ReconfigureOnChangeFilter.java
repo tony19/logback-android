@@ -21,7 +21,7 @@ import java.util.List;
 // XXX: Not supported in Logback-Android
 // #############################################
 //import ch.qos.logback.classic.gaffer.GafferUtil;
-import ch.qos.logback.classic.util.EnvUtil;
+//import ch.qos.logback.classic.util.EnvUtil;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.ConfigurationWatchList;
@@ -158,17 +158,18 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
       if (mainConfigurationURL.toString().endsWith("xml")) {
         performXMLConfiguration(lc);
       } else if (mainConfigurationURL.toString().endsWith("groovy")) {
-        if (EnvUtil.isGroovyAvailable()) {
-          lc.reset();
-          // avoid directly referring to GafferConfigurator so as to avoid
-          // loading  groovy.lang.GroovyObject . See also http://jira.qos.ch/browse/LBCLASSIC-214
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
-          //GafferUtil.runGafferConfiguratorOn(lc, this, mainConfigurationURL);
-        } else {
-          addError("Groovy classes are not available on the class path. ABORTING INITIALIZATION.");
-        }
+    	// #############################################
+    	// XXX: Not supported in Logback-Android
+    	// #############################################
+//    	  if (EnvUtil.isGroovyAvailable()) {
+//          lc.reset();
+//          // avoid directly referring to GafferConfigurator so as to avoid
+//          // loading  groovy.lang.GroovyObject . See also http://jira.qos.ch/browse/LBCLASSIC-214
+//          GafferUtil.runGafferConfiguratorOn(lc, this, mainConfigurationURL);
+//        } else {
+//          addError("Groovy classes are not available on the class path. ABORTING INITIALIZATION.");
+//        }
+    	  addError("Groovy classes are not available on the class path. ABORTING INITIALIZATION.");
       }
     }
 
