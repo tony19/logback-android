@@ -1,4 +1,4 @@
-<h1><img src="https://github.com/tony19/logback-android/raw/master/logback-site/src/site/resources/images/logos/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/>logback-android</h1>
+<h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/master/logback-site/src/site/resources/images/logos/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a>logback-android</h1>
 
 *Advanced logging library for Android*
 
@@ -25,47 +25,35 @@ Quickstart
 
  1. Edit AndroidManifest.xml with your Logback configuration (shown in example below).
 
-**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and the default appender is `LogcatAppender`. However, Android has its own independent filter settings for logcat. So, if you don't see an expected log message in logcat, your logcat filters are likely blocking it. See [Android documentation][17] for details on setting the logcat filters.
+**NOTE**: If no configuration is loaded, the default level is set to `DEBUG` and the default appender is `LogcatAppender`.
 
 #### Example AndroidManifest.xml:
 
-	<?xml version="1.0" encoding="utf-8"?>
 	<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		package="com.example"
 		android:versionCode="1"
 		android:versionName="1.0" >
 		
-		<uses-sdk android:minSdkVersion="15" />
+		<!-- {...} -->
 		
-		<application
-			android:icon="@drawable/ic_launcher"
-			android:label="@string/app_name" >
-			<activity
-				android:name=".HelloAndroidActivity"
-				android:label="@string/app_name" >
-				<intent-filter>
-					<action android:name="android.intent.action.MAIN" />
-					<category android:name="android.intent.category.LAUNCHER" />
-				</intent-filter>
-			</activity>
-		</application>
-	
 		<logback>
 			<configuration>
 				<appender
-					name="CONSOLE"
-					class="ch.qos.logback.core.ConsoleAppender" >
+					name="LOGCAT"
+					class="ch.qos.logback.core.android.LogcatAppender" >
+					<tagEncoder>
+						<pattern>%logger{0}</pattern>
+					</tagEncoder>
 					<encoder>
-						<pattern>[%thread] %msg%n</pattern>
+						<pattern>[%method] > %msg%n</pattern>
 					</encoder>
 				</appender>
-	
+		
 				<root level="TRACE" >
-					<appender-ref ref="CONSOLE" />
+					<appender-ref ref="LOGCAT" />
 				</root>
 			</configuration>
 		</logback>
-	
 	</manifest>
 
 
@@ -73,39 +61,43 @@ Quickstart
 
 	package com.example;
 	
-	import android.app.Activity;
-	import android.os.Bundle;
-
 	import org.slf4j.Logger;
 	import org.slf4j.LoggerFactory;
-
+	import com.google.R;
+	import android.app.Activity;
+	import android.os.Bundle;
+	
 	public class HelloAndroidActivity extends Activity {
-		static private final Logger LOG = LoggerFactory.getLogger(HelloAndroidActivity.class);
-		
-		/** Called when the activity is first created. */
+	
+		static private final Logger LOG = LoggerFactory
+										   .getLogger(HelloAndroidActivity.class);
+										   
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.main);
-		
-			LOG.info("Hello Android!");
-		
-			// this.toString() is only called if the DEBUG level is enabled
-			LOG.debug("toString: {}", this);
-		}
 	
-		@Override
-		public String toString() {
-			LOG.trace("toString() entered");
-			return HelloAndroidActivity.class.getName();
+			LOG.info("Hello Android!");
+			LOG.debug("reply: {}", Example.hello());
+		}
+	}
+	
+	class Example {
+		static private final Logger LOG = LoggerFactory.getLogger(Example.class);
+	  
+		static public String hello() {
+			LOG.trace("entered hello()");
+			return "Hi there!";
 		}
 	}
 
 #### Output of Android logcat:
 
-	I/System.out( 6948): 03:41:26.403 [main] Hello Android!
-	I/System.out( 6948): 03:41:26.453 [main] toString() entered
-	I/System.out( 6948): 03:41:26.499 [main] toString: com.example.HelloAndroidActivity
+	I/ActivityManager(   76): Start proc com.example for activity com.example/com.example.HelloAndroidActivity: pid=1142 uid=10040 gids={1015}
+	D/dalvikvm( 1142): GC_CONCURRENT freed 353K, 5% free 9183K/9607K, paused 4ms+4ms
+	I/HelloAndroidActivity( 1142): [onCreate] Hello Android!
+	V/Example ( 1142): [hello] entered hello()
+	D/HelloAndroidActivity( 1142): [onCreate] reply: Hi there!
 
 See the sample project in the `build/eclipse/HelloAndroid` subdirectory.
 
@@ -113,8 +105,9 @@ Features
 --------
 Logback-Android currently supports only the **logback-core** and **logback-classic** modules **excluding** the following features:
 
+* logback-access
 * Groovy configuration
-* Conditionals in XML configuration files
+* Evaluators and conditionals in the configuration XML
 * JMS, JMX, JNDI, SMTP, and Servlets
 
 Documentation
@@ -123,8 +116,6 @@ Documentation
 * [Logback manual][7]
 * [Reasons to switch to logback from log4j][2]
 * [Frequently Asked Questions (FAQ)][6]
-* [Logback error codes and their meanings][5]
-* [Logback Console Plugin for Eclipse][4]
 
 For help with using **Logback-Android**, ask the mailing list: [logback-user AT qos DOT ch][9].
 
@@ -153,9 +144,6 @@ Tentative upcoming plans include:
 
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
- [3]: http://www.slf4j.org
- [4]: http://logback.qos.ch/consolePlugin.html
- [5]: http://logback.qos.ch/codes.html
  [6]: http://logback.qos.ch/faq.html
  [7]: http://logback.qos.ch/manual/index.html
  [8]: http://tony19.github.com/logback-android/doc/1.0.0-3/
@@ -167,4 +155,3 @@ Tentative upcoming plans include:
  [14]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
  [15]: http://developer.android.com/sdk/index.html
  [16]: http://ant.apache.org/
- [17]: http://developer.android.com/guide/developing/tools/adb.html#filteringoutput

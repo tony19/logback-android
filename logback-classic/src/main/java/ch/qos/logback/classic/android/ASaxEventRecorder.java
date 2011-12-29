@@ -30,13 +30,13 @@ import ch.qos.logback.core.joran.spi.JoranException;
 /**
  * SAX event recorder for compressed Android XML resource files.
  * Supports filtering to capture only the sub-events of an event 
- * of interest.
+ * of interest in order to conserve memory usage.
  * 
  * @author Anthony Trinh
  */
 public class ASaxEventRecorder extends SaxEventRecorder {
-	private int	            holderForStartAndLength[]	= new int[2];
-	private StatePassFilter	filter										= new StatePassFilter();
+	private int holderForStartAndLength[] = new int[2];
+	private StatePassFilter filter = new StatePassFilter();
 	
 	/**
 	 * Constructor
