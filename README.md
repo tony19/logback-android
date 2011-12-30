@@ -1,6 +1,7 @@
-<h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/master/logback-site/src/site/resources/images/logos/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a>logback-android</h1>
+<h1><a href="http://tony19.github.com/logback-android/"><img src="http://tony19.github.com/logback-android/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android</h1>
 
-*Advanced logging library for Android*
+
+*Advanced logging library for Android applications*
 
 
 Overview
