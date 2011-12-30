@@ -16,7 +16,40 @@ h3 { text-align: center; color: #260321; }
 a { color: #260321; }
 .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
 .download { float: right; }
-pre { background: #000; color: #aaa; padding: 15px;}
-.hilite { color: #fff; }
+pre { background: #D3D3D3; color: #000; padding: 15px;}
+.hilite { color: #27408B; }
 hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
 .footer { text-align:center; padding-top:30px; font-style: italic; }
+#share-buttons {
+	margin: 0 0 0 -95px;
+	padding: 2px;
+	position: fixed;
+	top: 255px;
+	z-index: 1;
+	width: 60px;
+}
+
+#content {
+	width: 400px;
+	margin: 40px auto 0 auto;
+	padding: 0 60px 30px 60px;
+	border: solid 1px #cbcbcb;
+	background: #fafafa;
+	-moz-box-shadow: 0px 0px 10px #cbcbcb;
+	-webkit-box-shadow: 0px 0px 10px #cbcbcb;
+}
+
+a {
+	outline: none;
+}
+
+a img {
+	border: 1px solid #BBB;
+	padding: 2px;
+	margin: 10px 20px 10px 0;
+	vertical-align: top;
+}
+
+a img.last {
+	margin-right: 0;	
+}
