@@ -7,7 +7,7 @@
 Overview
 --------
 
-**Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications. 
+[*Logback-Android*][3] brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications. 
 
 The current version is **1.0.0-3**.
 
@@ -145,6 +145,7 @@ Tentative upcoming plans include:
 
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
+ [3]: http://tony19.github.com/logback-android
  [6]: http://logback.qos.ch/faq.html
  [7]: http://logback.qos.ch/manual/index.html
  [8]: http://tony19.github.com/logback-android/doc/1.0.0-3/
