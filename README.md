@@ -46,6 +46,7 @@ Documentation
 * [Logback manual][7]
 * [Why switch from log4j?][2]
 * [FAQ][6]
+* [Changelog][4]
 
 For help with using **Logback-Android**, ask the mailing list: [logback-user AT qos DOT ch][9].
 
@@ -64,6 +65,7 @@ Logback-Android is built from [Ant][16], using the Android SDK.
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
  [3]: http://tony19.github.com/logback-android
+ [4]: http://tony19.github.com/logback-android/changelog.html
  [6]: http://logback.qos.ch/faq.html
  [7]: http://logback.qos.ch/manual/index.html
  [8]: http://tony19.github.com/logback-android/doc/1.0.0-3/
