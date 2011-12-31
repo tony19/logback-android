@@ -86,6 +86,7 @@
 		excludes="**/core/boolex/JaninoEventEvaluatorBase.java,
 				  **/core/db/BindDataSourceToJNDIAction.java,
 				  **/core/db/JNDIConnectionSource.java,
+  				  **/core/joran/conditional/**,				  
 				  **/core/net/JMSAppenderBase.java,
 				  **/core/net/LoginAuthenticator.java,
 				  **/core/net/SMTPAppenderBase.java,
@@ -102,11 +103,11 @@
 				  **/classic/selector/ContextJNDISelector.java,
 				  **/classic/selector/servlet/,
 				  **/classic/util/JNDIUtil.java,
+				  **/classic/util/EnvUtil.java,				  
 				  **/classic/ViewStatusMessagesServlet.java,
 				  **/*JNDI*/**,
 				  **/test/**,
-				  **/performance/**,
-				  **/EnvUtil.java"
+				  **/performance/**"
 	/>
 	
     <target name="compile"
