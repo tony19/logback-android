@@ -36,12 +36,12 @@
 		<link>
 			<name>logback-classic</name>
 			<type>2</type>
-			<location>/Users/tony/Developer/src/logback-android/logback-classic/src/main/java</location>
+			<location>/Users/tony/dev/src/logback-android/logback-classic/src/main/java</location>
 		</link>
 		<link>
 			<name>logback-core</name>
 			<type>2</type>
-			<location>/Users/tony/Developer/src/logback-android/logback-core/src/main/java</location>
+			<location>/Users/tony/dev/src/logback-android/logback-core/src/main/java</location>
 		</link>
 	</linkedResources>
 </projectDescription>

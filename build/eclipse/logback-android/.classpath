@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="ch/qos/logback/core/boolex/JaninoEventEvaluatorBase.java|ch/qos/logback/core/db/BindDataSourceToJNDIAction.java|ch/qos/logback/core/db/JNDIConnectionSource.java|ch/qos/logback/core/net/JMSAppenderBase.java|ch/qos/logback/core/net/LoginAuthenticator.java|ch/qos/logback/core/net/SMTPAppenderBase.java|ch/qos/logback/core/status/ViewStatusMessagesServletBase.java" kind="src" path="logback-core"/>
-	
-	<classpathentry excluding="ch/qos/logback/classic/boolex/**|ch/qos/logback/classic/gaffer/|ch/qos/logback/classic/helpers/|ch/qos/logback/classic/jmx/|ch/qos/logback/classic/joran/action/EvaluatorAction.java|ch/qos/logback/classic/joran/action/InsertFromJNDIAction.java|ch/qos/logback/classic/joran/action/JMXConfiguratorAction.java|ch/qos/logback/classic/net/JMSQueueAppender.java|ch/qos/logback/classic/net/JMSQueueSink.java|ch/qos/logback/classic/net/JMSTopicAppender.java|ch/qos/logback/classic/net/JMSTopicSink.java|ch/qos/logback/classic/net/SMTPAppender.java|ch/qos/logback/classic/selector/ContextJNDISelector.java|ch/qos/logback/classic/selector/servlet/|ch/qos/logback/classic/util/JNDIUtil.java|ch/qos/logback/classic/ViewStatusMessagesServlet.java" kind="src" path="logback-classic"/>
-	
+	<classpathentry excluding="ch/qos/logback/classic/boolex/**|ch/qos/logback/classic/boolex/JaninoEventEvaluator.java|ch/qos/logback/classic/gaffer/|ch/qos/logback/classic/helpers/|ch/qos/logback/classic/jmx/|ch/qos/logback/classic/joran/action/EvaluatorAction.java|ch/qos/logback/classic/joran/action/InsertFromJNDIAction.java|ch/qos/logback/classic/joran/action/JMXConfiguratorAction.java|ch/qos/logback/classic/net/JMSQueueAppender.java|ch/qos/logback/classic/net/JMSQueueSink.java|ch/qos/logback/classic/net/JMSTopicAppender.java|ch/qos/logback/classic/net/JMSTopicSink.java|ch/qos/logback/classic/net/SMTPAppender.java|ch/qos/logback/classic/selector/ContextJNDISelector.java|ch/qos/logback/classic/selector/servlet/|ch/qos/logback/classic/util/JNDIUtil.java|ch/qos/logback/classic/ViewStatusMessagesServlet.java" kind="src" path="logback-classic"/>
 	<classpathentry kind="src" path="gen"/>
-	
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/slf4j-api-1.6.4.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/easymock-3.1.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/joda-time-2.0.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/slf4j-api-1.6.4-tests.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/test/xpp3-1.1.4.jar"/>
-	<classpathentry kind="lib" path="/Users/tony/Developer/src/logback-android/build/ant/libs/apktool-min-android-1.4.3-1.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/jars/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/src/logback-android/build/ant/libs/test/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/src/logback-android/build/ant/libs/test/easymock-3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/src/logback-android/build/ant/libs/test/joda-time-2.0.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/src/logback-android/build/ant/libs/test/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/src/logback-android/build/ant/libs/test/slf4j-api-1.6.4-tests.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/src/logback-android/build/ant/libs/test/xpp3-1.1.4.jar"/>
+	<classpathentry kind="lib" path="/Users/tony/dev/src/logback-android/build/ant/libs/apktool-min-android-1.4.3-1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
