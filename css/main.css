@@ -33,6 +33,7 @@ hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
 
 a {
 	outline: none;
+	color: blue;
 }
 
 a img {
@@ -44,4 +45,18 @@ a img {
 
 a img.last {
 	margin-right: 0;	
+}
+
+li.pad {
+    margin-top: 10px; margin-bottom: 10px;
+}
+
+.read-more, .read-less {
+    font-size: 60%;
+    font-style: italic;
+    color: blue;
+}
+
+div.block {
+    margin-top: 5px; margin-bottom: 10px;
 }
