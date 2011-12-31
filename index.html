@@ -64,7 +64,7 @@
                 <li><b>AndroidManifest.xml</b>
                     <div class="block">
                         Put a <code>&lt;logback>&lt;configuration></code> element in your application's <i>AndroidManifest.xml</i>.
-                        The manifest is read automatically upon loading Logback-Android.
+                        Logback-Android reads the manifest <i>automatically</i> (no need to code).
                         <div class="expander">
                             <span class="read-more"><a href="#">[Example]</a></span>
                             <div class="details">
@@ -111,10 +111,10 @@
                 </li>
 
 
-                <li><b>sdcard/logback/logback.xml</b> or <b>assets/logback.xml</b>
+                <li><b>/sdcard/logback/logback.xml</b>  or  <b>assets/logback.xml</b>
                     <div class="block">
                         Put <i>logback.xml</i> in the <i>assets</i> directory in your application's root directory or in <i>/sdcard/logback</i> (the SD card is searched first).
-                        Create the directory if necessary. This file is read automatically upon loading Logback-Android.
+                        Logback-Android searches for this file <i>automatically</i> (no need to code).
                     </div>
                 </li>
 
