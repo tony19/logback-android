@@ -1,12 +1,13 @@
-<h1><a href="http://tony19.github.com/logback-android/"><img src="http://tony19.github.com/logback-android/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a>logback-android</h1>
+<h1><a href="http://tony19.github.com/logback-android/"><img src="http://tony19.github.com/logback-android/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android</h1>
 
-*Advanced logging library for Android*
+
+*Advanced logging library for Android applications*
 
 
 Overview
 --------
 
-**Logback-Android** brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications.
+[*Logback-Android*][3] brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications. 
 
 The current version is **1.0.0-3**.
 
@@ -62,6 +63,7 @@ Logback-Android is built from [Ant][16], using the Android SDK.
 
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
+ [3]: http://tony19.github.com/logback-android
  [6]: http://logback.qos.ch/faq.html
  [7]: http://logback.qos.ch/manual/index.html
  [8]: http://tony19.github.com/logback-android/doc/1.0.0-3/
