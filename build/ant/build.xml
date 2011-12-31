@@ -105,7 +105,8 @@
 				  **/classic/ViewStatusMessagesServlet.java,
 				  **/*JNDI*/**,
 				  **/test/**,
-				  **/performance/**"
+				  **/performance/**,
+				  **/EnvUtil.java"
 	/>
 	
     <target name="compile"
@@ -182,7 +183,7 @@
 		</jar>
 
 	</target>
-	
+
 	<target name="build-test"
 			depends="compile-test"
 			description="Creates JAR of the .class files (for unit tests)">

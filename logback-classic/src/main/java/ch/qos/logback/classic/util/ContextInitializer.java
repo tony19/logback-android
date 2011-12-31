@@ -50,10 +50,12 @@ public class ContextInitializer {
   final public static String  CONFIG_FILE_PROPERTY   = "logback.configurationFile";
   final public static String  STATUS_LISTENER_CLASS  = "logback.statusListenerClass";
   final public static String  SYSOUT                 = "SYSOUT";
-  final private static String  TAG_MANIFEST          = "manifest";
-  final private static String  TAG_LOGBACK           = "logback";
-  final private static String  MANIFEST_FILE         = "AndroidManifest.xml";
-	
+  final private static String TAG_MANIFEST           = "manifest";
+  final private static String TAG_LOGBACK            = "logback";
+  final private static String MANIFEST_FILE          = "AndroidManifest.xml";
+  final private static String ASSETS_DIR             = "assets/";
+  final private static String SDCARD_DIR             = "/sdcard/logback/";
+  
   final LoggerContext loggerContext;
 
   public ContextInitializer(LoggerContext loggerContext) {
@@ -140,9 +142,7 @@ public class ContextInitializer {
               loggerContext));
     }
     if (url.toString().endsWith("xml")) {
-      JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(loggerContext);
-      configurator.doConfigure(url);
+    	joranConfigureByResource(url);
     }
   }
 
@@ -183,21 +183,21 @@ public class ContextInitializer {
     return null;
   }
 
-  public URL findURLOfDefaultConfigurationFile(boolean updateStatus) {
+  public URL findURLOfDefaultConfigurationFile(boolean updateStatus, String dir) {
     ClassLoader myClassLoader = Loader.getClassLoaderOfObject(this);
     URL url = findConfigFileURLFromSystemProperties(myClassLoader, updateStatus);
     if (url != null) {
       return url;
     }
 
-    url = getResource(TEST_AUTOCONFIG_FILE, myClassLoader, updateStatus);
+    url = getResource(dir + TEST_AUTOCONFIG_FILE, myClassLoader, updateStatus);
     if (url != null) {
       return url;
     }
 
-    return getResource(AUTOCONFIG_FILE, myClassLoader, updateStatus);
+    return getResource(dir + AUTOCONFIG_FILE, myClassLoader, updateStatus);
   }
-
+  
   private URL getResource(String filename, ClassLoader myClassLoader, boolean updateStatus) {
     URL url = Loader.getResource(filename, myClassLoader);
     if (updateStatus) {
@@ -206,13 +206,50 @@ public class ContextInitializer {
     return url;
   }
 
+  private File findSDConfigFile(boolean updateStatus) {
+    
+    File file = new File(SDCARD_DIR + TEST_AUTOCONFIG_FILE);
+    if (!file.exists()) {
+      file = new File(SDCARD_DIR + AUTOCONFIG_FILE);
+    }
+    
+    if (updateStatus) {
+      StatusManager sm = loggerContext.getStatusManager();
+      if (file.exists()) {
+        sm.add(new InfoStatus("Found config in SD card: ["+ file.getAbsolutePath() +"]", loggerContext));
+      } else {
+        sm.add(new WarnStatus("No config in SD card", loggerContext));
+      }
+    }
+    
+    return file.exists() ? file : null;
+  }
+  
   public void autoConfig() throws JoranException {
     StatusListenerConfigHelper.installIfAsked(loggerContext);
-    URL url = findURLOfDefaultConfigurationFile(true);
-    if (url != null) {
-      configureByResource(url);
+    
+    /* Search for configuration from:
+     *   1. SD card
+     *   2. Android Manifest
+     *   3. assets directory
+     *   
+     * If not found, fall back to simple LogcatAppender.
+     */
+    File file = findSDConfigFile(true);
+    if (file != null) {
+      JoranConfigurator configurator = new JoranConfigurator();
+      configurator.setContext(loggerContext);
+      configurator.doConfigure(file);
+      
     } else if (!configureByManifest()) {
-      BasicLogcatConfigurator.configure(loggerContext);
+    	
+      URL url = findURLOfDefaultConfigurationFile(true, ASSETS_DIR);
+      if (url != null) {
+        configureByResource(url);
+        
+      } else {	
+      	BasicLogcatConfigurator.configure(loggerContext);
+      }
     }
   }
 
