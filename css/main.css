@@ -1,62 +1,112 @@
 body {
-  margin-top: 1.0em;
-  background-color: #f5f5f5;
-  font-family: Helvetica, Arial, FreeSans, san-serif;
-  color: #000000;
+margin-top:1em;
+background-color:#f5f5f5;
+font-family:Helvetica, Arial, FreeSans, san-serif;
+color:#000;
 }
-#container {
-  margin: 0 auto;
-  width: 700px;
-}
-h1 { font-size: 3.8em; color: #260321; margin-bottom: 3px; }
-h1 .small { font-size: 0.4em; }
-h1 a { text-decoration: none }
-h2 { font-size: 1.5em; color: #260321; }
-h3 { text-align: center; color: #260321; }
-a { color: #260321; }
-.description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-.download { float: right; }
-pre { background: #D3D3D3; color: #000; padding: 15px;}
-.hilite { color: #27408B; }
-hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-.footer { text-align:center; padding-top:30px; font-style: italic; }
 
-#content {
-	width: 400px;
-	margin: 40px auto 0 auto;
-	padding: 0 60px 30px 60px;
-	border: solid 1px #cbcbcb;
-	background: #fafafa;
-	-moz-box-shadow: 0px 0px 10px #cbcbcb;
-	-webkit-box-shadow: 0px 0px 10px #cbcbcb;
+#container {
+width:700px;
+margin:0 auto;
+}
+
+h1 {
+font-family:Monaco, Consolas, Lucida Console, Courier New;
+font-size:3.8em;
+text-shadow: 2px 2px 4px #32cd32;
+color:#260321;
+margin-bottom:3px;
+}
+
+h1 .small {
+font-size:0.4em;
+}
+
+h1 a {
+text-decoration:none;
+}
+
+h2 {
+font-size:1.5em;
+color:#260321;
+}
+
+h3 {
+text-align:center;
+color:#260321;
 }
 
 a {
-	outline: none;
-	color: blue;
+outline:none;
+color:darkblue;
+}
+
+.description {
+font-size:1.2em;
+margin-bottom:30px;
+margin-top:30px;
+font-style:italic;
+}
+
+.download {
+float:right;
+}
+
+pre {
+background:#D3D3D3;
+color:#000;
+padding:15px;
+}
+
+.hilite {
+color:#27408B;
+}
+
+hr {
+border:0;
+width:80%;
+border-bottom:1px solid #aaa;
+}
+
+.footer {
+text-align:center;
+padding-top:30px;
+font-style:italic;
+}
+
+#content {
+width:400px;
+border:solid 1px #cbcbcb;
+background:#fafafa;
+-moz-box-shadow:0 0 10px #cbcbcb;
+-webkit-box-shadow:0 0 10px #cbcbcb;
+margin:40px auto 0;
+padding:0 60px 30px;
 }
 
 a img {
-	border: 1px solid #BBB;
-	padding: 2px;
-	margin: 10px 20px 10px 0;
-	vertical-align: top;
+border:1px solid #BBB;
+vertical-align:top;
+margin:10px 20px 10px 0;
+padding:2px;
 }
 
 a img.last {
-	margin-right: 0;	
+margin-right:0;
 }
 
 li.pad {
-    margin-top: 10px; margin-bottom: 10px;
+margin-top:10px;
+margin-bottom:10px;
 }
 
-.read-more, .read-less {
-    font-size: 60%;
-    font-style: italic;
-    color: blue;
+.read-more,.read-less {
+font-size:60%;
+font-style:italic;
+color:blue;
 }
 
 div.block {
-    margin-top: 5px; margin-bottom: 10px;
+margin-top:5px;
+margin-bottom:10px;
 }

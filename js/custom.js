@@ -3,14 +3,15 @@
 $(function() {
 
 	$(".expander").expander();
-
-	$("a#shot_hello").fancybox({
-		'overlayShow'	: false,
+	$(".zoom").fancybox({
 		'titlePosition'	: 'inside',
 		'transitionIn'	: 'elastic',
-		'transitionOut'	: 'elastic'
+		'transitionOut'	: 'elastic',
+		'overlayColor'	: '#000',
+		'overlayOpacity': 0.8
 	});
 
+	$("a#changelog").fancybox();
 });
 
 $.trackPage('UA-27964159-1')
