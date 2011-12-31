@@ -15,15 +15,15 @@ package ch.qos.logback.classic.joran;
 
 import ch.qos.logback.classic.joran.action.*;
 import ch.qos.logback.classic.sift.SiftAction;
-import ch.qos.logback.classic.spi.PlatformInfo;
+//import ch.qos.logback.classic.spi.PlatformInfo;
 import ch.qos.logback.classic.util.DefaultNestedComponentRules;
 import ch.qos.logback.core.joran.JoranConfiguratorBase;
 import ch.qos.logback.core.joran.action.AppenderRefAction;
 import ch.qos.logback.core.joran.action.IncludeAction;
 import ch.qos.logback.core.joran.action.NOPAction;
-import ch.qos.logback.core.joran.conditional.ElseAction;
-import ch.qos.logback.core.joran.conditional.IfAction;
-import ch.qos.logback.core.joran.conditional.ThenAction;
+//import ch.qos.logback.core.joran.conditional.ElseAction;
+//import ch.qos.logback.core.joran.conditional.IfAction;
+//import ch.qos.logback.core.joran.conditional.ThenAction;
 import ch.qos.logback.core.joran.spi.DefaultNestedComponentRegistry;
 import ch.qos.logback.core.joran.spi.Pattern;
 import ch.qos.logback.core.joran.spi.RuleStore;
@@ -68,13 +68,16 @@ public class JoranConfigurator extends JoranConfiguratorBase {
         new AppenderRefAction());
     rs.addRule(new Pattern("configuration/root/appender-ref"),
         new AppenderRefAction());
-    
-    // add if-then-else support
-    rs.addRule(new Pattern("*/if"), new IfAction());
-    rs.addRule(new Pattern("*/if/then"), new ThenAction());
-    rs.addRule(new Pattern("*/if/then/*"), new NOPAction());
-    rs.addRule(new Pattern("*/if/else"), new ElseAction());
-    rs.addRule(new Pattern("*/if/else/*"), new NOPAction());   
+  
+// #############################################
+// XXX: Not supported in Logback-Android
+// #############################################
+//    // add if-then-else support
+//    rs.addRule(new Pattern("*/if"), new IfAction());
+//    rs.addRule(new Pattern("*/if/then"), new ThenAction());
+//    rs.addRule(new Pattern("*/if/then/*"), new NOPAction());
+//    rs.addRule(new Pattern("*/if/else"), new ElseAction());
+//    rs.addRule(new Pattern("*/if/else/*"), new NOPAction());   
     
     // add jmxConfigurator only if we have JMX available.
     // If running under JDK 1.4 (retrotranslateed logback) then we
