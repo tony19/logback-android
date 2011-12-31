@@ -20,7 +20,7 @@ Quickstart
 ----------
 1. Add [Logback][13] and [SLF4J][14] to your project classpath.
 2. Enter configuration XML in one of the following locations. Note that Logback-Android checks them in exact order and uses the first one found.
-	* SD card (/sdcard/logback/logback.xml)
+	* SD card (`/sdcard/logback/logback.xml`)
 	* Your application's `AndroidManifest.xml`
 	* Your application's `assets/logback.xml` (create dir if necessary)
 
