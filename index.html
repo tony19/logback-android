@@ -276,18 +276,20 @@ class Example {
     </p>
 
     <h2>Features Supported</h2>
-    <p>
-        Logback-Android supports only a subset of Logback's features (i.e., the <i>logback-core</i> and <i>logback-classic</i>
-        modules). It does <b>NOT</b> support the following:
-
-    <ul>
-        <li><i>logback-access</i></li>
-        <li>Groovy configuration</li>
-        <li>Evaluators or conditionals in the configuration XML</li>
-        <li>JMS, JMX, JNDI, SMTP, and Servlets</li>
-    </ul>
-    </p>
-
+	<ul>
+		<li>Android 2.1+</li>
+		<li>Auto-config from Android Manifest or local XML</li>
+		<li>Write to Logcat, files, or sockets</li>
+		<li>Most original Logback features <b>except</b>:
+			<ul>
+				<li><i>logback-access</i></li>
+				<li>Groovy config</li>
+				<li>Evaluators or conditionals in the configuration XML</li>
+				<li>JMS, JMX, JNDI, SMTP, and Servlets</li>
+			</ul>
+		</li>
+	</ul>
+	
     <h2>Download</h2>
     <ul>
         <li><code><a href="https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-4.jar">logback-android-1.0.0-4.jar</a></code>
