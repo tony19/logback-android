@@ -28,11 +28,13 @@ Quickstart
 
 3. Ready to run!
 
-See examples at http://tony19.github.com/logback-android
+See **[examples][3]**
 
 
 Features Supported
 ------------------
+Runs on Android 2.1+
+
 Logback-Android supports only a subset of Logback's features (i.e., the logback-core and logback-classic modules). It does **NOT** support the following:
 
 * logback-access
@@ -45,7 +47,6 @@ Documentation
 * [Logback-Android Javadoc][8]
 * [Logback manual][7]
 * [Why switch from log4j?][2]
-* [FAQ][6]
 * [Changelog][4]
 
 For help with using **Logback-Android**, ask the mailing list: [logback-user AT qos DOT ch][9].
@@ -66,9 +67,8 @@ Logback-Android is built from [Ant][16], using the Android SDK.
  [2]: http://logback.qos.ch/reasonsToSwitch.html
  [3]: http://tony19.github.com/logback-android
  [4]: http://tony19.github.com/logback-android/changelog.html
- [6]: http://logback.qos.ch/faq.html
  [7]: http://logback.qos.ch/manual/index.html
- [8]: http://tony19.github.com/logback-android/doc/1.0.0-3/
+ [8]: http://tony19.github.com/logback-android/doc/1.0.0-4/
  [9]: mailto:logback-user@qos.ch
  [13]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-4.jar 
  [14]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
