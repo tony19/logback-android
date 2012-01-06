@@ -2,7 +2,7 @@
 <!--
 ##############################################################################
 # Logback: the reliable, generic, fast and flexible logging framework.
-# Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+# Copyright (C) 2012, Anthony Trinh. All rights reserved.
 #
 # This program and the accompanying materials are dual-licensed under
 # either the terms of the Eclipse Public License v1.0 as published by
@@ -43,7 +43,11 @@
     -->
     <!-- version-tag: custom -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
- 
+ 	
+    <!-- can't use out.dir until SDK's build.xml is imported above -->
+    <property name="out.jar" value="${out.dir}/logback-android-${version}.jar" />
+    <property name="test.out.jar" value="${out.dir}/logback-android-test-${version}.jar" />
+	
     <!-- find Android JAR in platform-tools -->
     <condition property="android.jar" else="${sdk.dir}/platforms/${target}/android.jar">
     	<isset property="android.jar"/>
@@ -74,8 +78,8 @@
 	    	<include name="**/*.jar"/>
 	    </fileset>
 		<pathelement path="${junit.jar}" />
-		<pathelement path="${out.dir}/logback-android-${version}.jar" />
-		<pathelement path="${out.dir}/logback-android-test-${version}.jar" />
+		<pathelement path="${out.jar}" />
+		<pathelement path="${test.out.jar}" />
 	</path>
 	
 	<patternset id="src.files"
@@ -91,7 +95,8 @@
 				  **/core/net/LoginAuthenticator.java,
 				  **/core/net/SMTPAppenderBase.java,
 				  **/core/status/ViewStatusMessagesServletBase.java,
-				  **/classic/boolex/**,
+				  **/classic/boolex/GEvent*.java,
+				  **/classic/boolex/Janino*.java,
 				  **/classic/gaffer/**,
 				  **/classic/helpers/**,
 				  **/classic/jmx/**,
@@ -112,8 +117,8 @@
 	
     <target name="compile"
     		description="Compiles project's .java files into .class files">
-    	<mkdir dir="${out.dir}"/>
-		<javac srcdir="${source.dir}" destdir="${out.dir}"
+    	<mkdir dir="${out.dir}/classes"/>
+		<javac srcdir="${source.dir}" destdir="${out.dir}/classes"
 			classpathref="libs.path"
 			source="1.5"
 			target="1.5"
@@ -146,8 +151,11 @@
 					  **/core/net/JMS*.java,
 					  **/core/net/LoginAuthenticator*.java,
 					  **/core/net/SMTP*.java,
+					  **/core/joran/conditional/*.java,
 					  **/core/status/*ServletBase*.java,
-					  **/classic/boolex/**,
+					  **/classic/boolex/GEvent*.java,
+					  **/classic/boolex/Janino*.java,
+					  **/classic/boolex/Conditional*.java,
 					  **/classic/gaffer/**,
 					  **/classic/helpers/**,
 					  **/classic/jmx/**,
@@ -174,10 +182,9 @@
 			description="Creates JAR of the .class files">
 
 		<jar
-			destfile="${out.dir}/logback-android-${version}.jar"
-			basedir="${out.dir}"
+			destfile="${out.jar}"
+			basedir="${out.dir}/classes"
 			index="true"
-			excludes="*.jar,test/**,classes/**"
 			update="true"
 		>
 			<zipfileset includes="**/*.class" src="${apktool.jar}" />
@@ -189,10 +196,9 @@
 			depends="compile-test"
 			description="Creates JAR of the .class files (for unit tests)">
 		<jar
-			destfile="${out.dir}/logback-android-test-${version}.jar"
+			destfile="${out.jar}"
 			basedir="${out.dir}/test"
 			index="true"
-			excludes="*.jar"
 		/>
 	</target>
 	
@@ -212,7 +218,7 @@
 		</input>
 		
 		<signjar 
-			jar="${out.dir}/logback-android-${version}.jar"
+			jar="${out.jar}"
 			alias="${key.alias}"
 			keystore="${key.store}"
 			storepass="${key.store.password}"
@@ -308,6 +314,40 @@
 		
 		<!--<antcall target="-post-test" />-->
 	</target>
+		
+	<target name="shrink" 
+			depends="build,-setup"
+			description="Runs ProGuard to shrink the output JAR by optimization and obfuscation">
+
+		<pathconvert property="lib.jars">
+			<path refid="android.target.classpath" />
+			<path location="${slf4j.jar}" />
+			<firstmatchmapper>
+				<regexpmapper from='^([^ ]*)( .*)$$' to='"\1\2"'/>
+				<identitymapper/>
+			</firstmatchmapper>
+		</pathconvert>
+
+		<property name="obfuscate.dir" location="${out.dir}/proguard" />
+		<mkdir dir="${obfuscate.dir}" />
+
+		<taskdef name="proguard"
+				classname="proguard.ant.ProGuardTask"
+				classpath="${android.tools.dir}/proguard/lib/proguard.jar"
+				/>
+
+		<proguard>
+			@proguard.cfg
+			-injars       ${out.jar}
+			-outjars      "${obfuscate.dir}/logback-android-${version}.jar"
+			-libraryjars  ${lib.jars}
+			-dump         "${obfuscate.dir}/dump.txt"
+			-printseeds   "${obfuscate.dir}/seeds.txt"
+			-printusage   "${obfuscate.dir}/usage.txt"
+			-printmapping "${obfuscate.dir}/mapping.txt"
+		</proguard>
+                
+	</target>
 	
 	<target name="doc" description="Generates Javadoc">
 		<javadoc
@@ -348,6 +388,7 @@
         <echo>   compile:   Compiles project's .java files into .class files.</echo>
 		<echo>   build:     Creates JAR of the .class files.</echo>
 		<echo>   release:   Signs JAR for release.</echo>
+		<echo>   shrink:    Runs Proguard to shrink JAR.</echo>
 		<echo>   test:      Runs unit tests.</echo>
 		<echo>   doc:       Generates Javadoc.</echo>
     </target>
