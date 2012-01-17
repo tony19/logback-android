@@ -4,7 +4,7 @@ LICENSE
 Logback-Android: the reliable, generic, fast and flexible logging framework
 for Android.
 
-**Copyright &copy; 2011, Anthony Trinh.** All rights reserved. 
+**Copyright &copy; 2011-2012, Anthony Trinh.** All rights reserved. 
 
 This program and the accompanying materials are dual-licensed under
 either the terms of the [Eclipse Public License v1.0][1] as published by
