@@ -196,7 +196,7 @@
 			depends="compile-test"
 			description="Creates JAR of the .class files (for unit tests)">
 		<jar
-			destfile="${out.jar}"
+			destfile="${test.out.jar}"
 			basedir="${out.dir}/test"
 			index="true"
 		/>
