@@ -189,7 +189,7 @@
 			depends="compile-test"
 			description="Creates JAR of the .class files (for unit tests)">
 		<jar
-			destfile="${out.dir}/logback-android-test-${version}.jar"
+			destfile="${test.out.jar}"
 			basedir="${out.dir}/test"
 			index="true"
 			excludes="*.jar"
