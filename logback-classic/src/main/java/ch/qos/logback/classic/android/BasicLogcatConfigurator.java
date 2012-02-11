@@ -27,6 +27,22 @@ import ch.qos.logback.core.status.StatusManager;
  * {@link LogcatAppender} to the root logger. The appender's layout is set to a
  * {@link PatternLayout} with the pattern "%msg".
  * 
+ * The equivalent default configuration in XML would be:
+ * <pre>
+ * &lt;configuration>
+ *  &lt;appender name="LOGCAT"
+ *           class="ch.qos.logback.classic.android.LogcatAppender" >
+ *      &lt;checkLoggable>false&lt;/checkLoggable>
+ *      &lt;encoder>
+ *          &lt;pattern>%msg&lt;/pattern>
+ *      &lt;/encoder>
+ *  &lt;/appender>
+ *  &lt;root level="DEBUG" >
+ *     &lt;appender-ref ref="LOGCAT" />
+ *  &lt;/root>
+ * &lt;/configuration>
+ * </pre>
+ * 
  * @author Anthony Trinh
  */
 public class BasicLogcatConfigurator {

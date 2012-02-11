@@ -157,6 +157,15 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 * The expanded text of the pattern must be less than 23 characters as
 	 * limited by Android. Layouts that exceed this limit are truncated, 
 	 * and a star is appended to the tag to indicate this.
+	 * </p><p>
+	 * The <code>tagEncoder</code> result is limited to 22 characters plus a star to 
+	 * indicate truncation (<code>%logger{0}</code> has no length limit in logback, 
+	 * but <code>LogcatAppender</code></a> limits the length internally). For example,
+	 * if the <code>tagEncoder</code> evaluated to <code>foo.foo.foo.foo.foo.bar.Test</code>, 
+	 * the tag seen in Logcat would be: <code>foo.foo.foo.foo.foo.ba*</code>. 
+	 * Note that <code>%logger{23}</code> yields more useful results 
+	 * (in this case: <code>f.f.foo.foo.bar.Test</code>).
+	 * </p>
 	 * 
 	 * @param encoder
 	 *            the pattern-layout encoder; specify {@code null} to

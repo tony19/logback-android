@@ -430,7 +430,8 @@ public class JoranConfiguratorTest {
     assertNull(System.getProperty("sys"));
 
     configure(configFileAsStr);
-    assertNotNull(loggerContext.getProperty(CoreConstants.HOSTNAME_KEY));
+    // Not supported in Android due to Issue #3
+    //assertNotNull(loggerContext.getProperty(CoreConstants.HOSTNAME_KEY));
     assertNull(loggerContext.getProperty("transientKey1"));
     assertNull(loggerContext.getProperty("transientKey2"));
     assertEquals("node0", loggerContext.getProperty("nodeId"));
