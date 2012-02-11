@@ -76,7 +76,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   private String smtpHost;
   private int smtpPort = 25;
   private boolean starttls = false;
-  private boolean ssl = false;
+  private boolean ssl = true;
 
   String username;
   String password;

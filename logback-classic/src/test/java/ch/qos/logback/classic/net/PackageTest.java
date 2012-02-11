@@ -19,9 +19,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 // XXX: maybe ;-) NOT SUPPORTED IN ANDROID
 @RunWith(Suite.class)
-    @SuiteClasses( { SocketAppenderTest.class, 
-                SMTPAppender_GreenTest.class,
-                DilutedSMTPAppenderTest.class
+    @SuiteClasses( { SocketAppenderTest.class,
+                DilutedSMTPAppenderTest.class, 
+                SMTPAppender_GreenTest.class
             })
 //@RunWith(Suite.class)
 //@SuiteClasses( { SyslogAppenderTest.class, DilutedSMTPAppenderTest.class,
