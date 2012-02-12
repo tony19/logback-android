@@ -18,6 +18,9 @@
 	<!-- Keystore parameters to sign JAR (for 'release' target only) -->
 	<property name="key.alias" value="releasekey" />
 	<property name="key.store" value="/Users/tony/.javakeystore" />
+
+	<property name="project.name" value="logback-android" />	
+	<property name="project.site" value="http://tony19.github.com/logback-android" />
 	
 	<property name="tmp.dir" value="/sdcard/.logback_test" />
 	<property name="libs.dir" value="libs" />
@@ -30,6 +33,9 @@
     	<isset property="version"/>
     </condition>
 	<property name="doc.dir" value="doc/${version}" />
+	
+	<property name="out.jar" value="${out.dir}/logback-android-${version}.jar" />	
+	<property name="test.out.jar" value="${out.dir}/logback-android-test-${version}.jar" />	
 	
     <!-- require Android SDK path (from ant.properties) -->
     <available file="${sdk.dir}" type="dir" property="android.sdk.present" />
@@ -74,8 +80,8 @@
 	    	<include name="**/*.jar"/>
 	    </fileset>
 		<pathelement path="${junit.jar}" />
-		<pathelement path="${out.dir}/logback-android-${version}.jar" />
-		<pathelement path="${out.dir}/logback-android-test-${version}.jar" />
+		<pathelement path="${out.jar}" />
+		<pathelement path="${test.out.jar}" />
 	</path>
 	
 	<patternset id="src.files"
@@ -143,6 +149,7 @@
 
 			excludes="**/core/boolex/Janino*.java,
 					  **/db/**,
+					  **/core/joran/conditional/**.java,
 					  **/core/net/JMS*.java,
 					  **/core/net/LoginAuthenticator*.java,
 					  **/core/net/SMTP*.java,
@@ -173,14 +180,29 @@
 			depends="compile"
 			description="Creates JAR of the .class files">
 
+		<tstamp/>
+		<buildnumber/>
 		<jar
-			destfile="${out.dir}/logback-android-${version}.jar"
+			destfile="${out.jar}"
 			basedir="${out.dir}"
 			index="true"
 			excludes="*.jar,test/**,classes/**"
 			update="true"
 		>
 			<zipfileset includes="**/*.class" src="${apktool.jar}" />
+			
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<section name="ch.qos.logback">
+				  <attribute name="Specification-Title" value="${project.name}"/>
+				  <attribute name="Specification-Version" value="${version}"/>
+				  <attribute name="Specification-Vendor" value="${project.site}"/>
+				  <attribute name="Implementation-Title" value="${project.name}"/>
+				  <attribute name="Implementation-Version" value="${version}.${build.number} ${DSTAMP}"/> 
+				  <attribute name="Implementation-Vendor" value="${project.site}"/>
+				</section>
+			</manifest>
+			  
 		</jar>
 
 	</target>
@@ -188,12 +210,27 @@
 	<target name="build-test"
 			depends="compile-test"
 			description="Creates JAR of the .class files (for unit tests)">
+
+		<tstamp/>
+		<buildnumber/>
 		<jar
 			destfile="${test.out.jar}"
 			basedir="${out.dir}/test"
 			index="true"
 			excludes="*.jar"
-		/>
+		>
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<section name="ch.qos.logback">
+				  <attribute name="Specification-Title" value="${project.name}"/>
+				  <attribute name="Specification-Version" value="${version}"/>
+				  <attribute name="Specification-Vendor" value="${project.site}"/>
+				  <attribute name="Implementation-Title" value="${project.name}"/>
+				  <attribute name="Implementation-Version" value="${version}.${build.number} ${DSTAMP}"/> 
+				  <attribute name="Implementation-Vendor" value="${project.site}"/>
+				</section>
+			</manifest>
+		</jar>
 	</target>
 	
 	<target name="release"
@@ -289,6 +326,7 @@
 			<test name="ch.qos.logback.classic.db.PackageTest" />
 			<test name="ch.qos.logback.classic.jul.PackageTest" />
 			<test name="ch.qos.logback.classic.html.PackageTest" /> 
+			<test name="ch.qos.logback.classic.boolex.PackageTest" />
 			-->
 
 			<test name="org.slf4j.impl.PackageTest" />
@@ -297,7 +335,6 @@
 			<test name="ch.qos.logback.classic.control.PackageTest" />
 			<test name="ch.qos.logback.classic.joran.PackageTest" />
 			<test name="ch.qos.logback.classic.rolling.PackageTest" />
-			<test name="ch.qos.logback.classic.boolex.PackageTest" />
 			<test name="ch.qos.logback.classic.pattern.PackageTest" />
 			<test name="ch.qos.logback.classic.encoder.PackageTest" />
 			<test name="ch.qos.logback.classic.spi.PackageTest" />

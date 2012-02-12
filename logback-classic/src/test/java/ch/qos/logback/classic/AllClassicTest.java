@@ -27,10 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
         
         // XXX: NOT SUPPORTED IN ANDROID
         //ch.qos.logback.classic.jmx.PackageTest.class,
-        
-        ch.qos.logback.classic.boolex.PackageTest.class,
-
-        // XXX: NOT SUPPORTED IN ANDROID
+        //ch.qos.logback.classic.boolex.PackageTest.class,
         //ch.qos.logback.classic.selector.PackageTest.class,
         
         ch.qos.logback.classic.html.PackageTest.class, 
