@@ -346,6 +346,40 @@
 		<!--<antcall target="-post-test" />-->
 	</target>
 	
+	<target name="shrink" 
+			depends="build,-setup"
+			description="Runs ProGuard to shrink the output JAR by optimization and obfuscation">
+
+		<pathconvert property="lib.jars">
+			<path refid="android.target.classpath" />
+			<path location="${slf4j.jar}" />
+			<firstmatchmapper>
+				<regexpmapper from='^([^ ]*)( .*)$$' to='"\1\2"'/>
+				<identitymapper/>
+			</firstmatchmapper>
+		</pathconvert>
+
+		<property name="obfuscate.dir" location="${out.dir}/proguard" />
+		<mkdir dir="${obfuscate.dir}" />
+
+		<taskdef name="proguard"
+				classname="proguard.ant.ProGuardTask"
+				classpath="${android.tools.dir}/proguard/lib/proguard.jar"
+				/>
+
+		<proguard>
+			@proguard.cfg
+			-injars       ${out.jar}
+			-outjars      "${obfuscate.dir}/logback-android-${version}.jar"
+			-libraryjars  ${lib.jars}
+			-dump         "${obfuscate.dir}/dump.txt"
+			-printseeds   "${obfuscate.dir}/seeds.txt"
+			-printusage   "${obfuscate.dir}/usage.txt"
+			-printmapping "${obfuscate.dir}/mapping.txt"
+		</proguard>
+                
+	</target>
+	
 	<target name="doc" description="Generates Javadoc">
 		<javadoc
 			classpathref="libs.path"
