@@ -2,8 +2,10 @@
 <html>
 <head>
     <meta charset='utf-8'>
-    <title>tony19/logback-android @ GitHub</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>logback-android</title>
 
+    <link rel="stylesheet" type="text/css" href="css/museo/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <link rel="stylesheet" type="text/css" href="js/fancybox/jquery.fancybox-1.3.4.css" media="screen"/>
 
@@ -24,7 +26,7 @@
 
 <div id="container">
 
-    <h1><a href="https://github.com/tony19/logback-android">logback-android</a></h1>
+    <h1><span class="slidein"><a href="https://github.com/tony19/logback-android">logback-android</a></span></h1>
 
     <p>
         <g:plusone size="small"/>
@@ -37,7 +39,7 @@
         logging library for Java applications.
     </p>
 
-    <h2>Quickstart</h2>
+    <h2>Quick Start</h2>
     <ol>
         <li class="pad">
             Add <a href="https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-4.jar">Logback-Android</a> and <a
@@ -52,7 +54,7 @@
                     <div class="block">
                         No action necessary! If no configuration is specified, Logback-Android uses the default
                         appender (<a
-                                href="http://tony19.github.com/logback-android/doc/1.0.0-4/ch/qos/logback/core/android/LogcatAppender.html"><code>LogcatAppender</code></a>) set to the <code>DEBUG</code> level.
+                                href="http://tony19.github.com/logback-android/doc/1.0.0-4/ch/qos/logback/classic/android/LogcatAppender.html"><code>LogcatAppender</code></a>) set to the <code>DEBUG</code> level.
                     </div>
                 </li>
 
@@ -79,7 +81,7 @@
         &lt;configuration>
             &lt;appender
                 name="LOGCAT"
-                class="ch.qos.logback.core.android.LogcatAppender" >
+                class="ch.qos.logback.classic.android.LogcatAppender" >
                 &lt;tagEncoder>
                     &lt;pattern>%logger{0}&lt;/pattern>
                 &lt;/tagEncoder>
@@ -266,6 +268,7 @@ class Example {
         <li><a href="http://logback.qos.ch/manual/">Logback Manual</a></li>
         <li><a href="http://logback.qos.ch/reasonsToSwitch.html">Why switch from log4j?</a></li>
         <li><a href="./changelog.html">Changelog</a></li>
+        <li><a href="./faq.html">FAQ</a></li>
     </ul>
 
     <h2>License</h2>

@@ -2,40 +2,50 @@
 <html>
 <head>
     <meta charset='utf-8'>
-    <title>tony19/logback-android @ GitHub</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>logback-android Changelog</title>
+
+    <link rel="stylesheet" type="text/css" href="css/museo/stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.google-analytics.js"></script>
+    <script type="text/javascript" src="js/custom.js"></script>
 </head>
 <body>
 	<div class="release">
-		<h2>1.0.0-4</h2>
-		<h3>Released on 12/31/2011</h3>
+		<div class="version">1.0.0-4</div>
+		<div class="reldate">Released on 12/31/2011</div>
 		<ul>
 			<li>Add auto-config support from SD card or assets dir</li>
+			<li>Move <code>android</code> package (including <a
+href="http://tony19.github.com/logback-android/doc/1.0.0-4/ch/qos/logback/classic/android/LogcatAppender.html"><code>LogcatAppender</code></a>) from <code>core</code> to <code>classic</code></li>
 			<li>Remove dead code</li>
 		</ul>
 	</div>
 	<div class="release">
-		<h2>1.0.0-3</h2>
-		<h3>Released on 12/29/2011</h3>
+		<div class="version">1.0.0-3</div>
+		<div class="reldate">Released on 12/29/2011</div>
 		<ul>
 			<li>Add auto-config support from <i>AndroidManifest.xml</i></li>
-			<li>Fix Issue <a href="https://github.com/tony19/logback-android/issues/3">#3</a></li>
-			<li>Add <a href="http://tony19.github.com/logback-android/doc/1.0.0-4/ch/qos/logback/classic/android/LogcatAppender.html#setCheckLoggable(boolean)"><code>LogcatAppender.checkLoggable</code></a> flag (Issue <a href="https://github.com/tony19/logback-android/issues/5">#5</a>)</li>
+			<li>Remove unnecessary local hostname lookup in context init. Fixes <code>NetworkOnMainThreadException</code> (Issue <a href="https://github.com/tony19/logback-android/issues/3">#3</a>)</li>
+			<li>Add <a href="http://tony19.github.com/logback-android/doc/1.0.0-3/ch/qos/logback/core/android/LogcatAppender.html#setCheckLoggable(boolean)"><code>LogcatAppender.checkLoggable</code></a> flag (Issue <a href="https://github.com/tony19/logback-android/issues/5">#5</a>)</li>
 		</ul>
 	</div>
 	<div class="release">
-		<h2>1.0.0-2</h2>
-		<h3>Released on 11/25/2011</h3>
+		<div class="version">1.0.0-2</div>
+		<div class="reldate">Released on 11/25/2011</div>
 		<ul>
-			<li>Default to LogcatAppender instead of ConsoleAppender</li>
+			<li>Default to <code>LogcatAppender</code> instead of <code>ConsoleAppender</code></li>
 			<li>Check Android log level before writing to logcat</li>
 		</ul>
 	</div>
 	<div class="release">
-		<h2>1.0.0-1</h2>
-		<h3>Released on 11/09/2011</h3>
+		<div class="version">1.0.0-1</div>
+		<div class="reldate">Released on 11/09/2011</div>
 		<ul>
 			<li>Sync with Logback 1.0.0</li>
-			<li>Add LogcatAppender</li>
+			<li>Add <code>LogcatAppender</code> to <code>core</code> package</li>
 		</ul>
 	</div>
 

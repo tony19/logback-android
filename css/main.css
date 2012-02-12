@@ -1,7 +1,7 @@
 body {
 margin-top:1em;
 background-color:#f5f5f5;
-font-family:Helvetica, Arial, FreeSans, san-serif;
+font-family: Museo300, Monaco, Century Gothic;
 color:#000;
 }
 
@@ -11,7 +11,6 @@ margin:0 auto;
 }
 
 h1 {
-font-family:Monaco, Consolas, Lucida Console, Courier New;
 font-size:3.8em;
 text-shadow: 2px 2px 4px #32cd32;
 color:#260321;
@@ -87,7 +86,7 @@ padding:0 60px 30px;
 a img {
 border:1px solid #BBB;
 vertical-align:top;
-margin:10px 20px 10px 0;
+margin: 0;
 padding:2px;
 }
 
@@ -109,4 +108,14 @@ color:blue;
 div.block {
 margin-top:5px;
 margin-bottom:10px;
+}
+
+div > p.q {
+font-size:1.1em;
+color:green;
+}
+
+div.version {
+font-size:1.1em;
+color:green;
 }
