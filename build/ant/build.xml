@@ -34,9 +34,6 @@
     </condition>
 	<property name="doc.dir" value="doc/${version}" />
 	
-	<property name="out.jar" value="${out.dir}/logback-android-${version}.jar" />	
-	<property name="test.out.jar" value="${out.dir}/logback-android-test-${version}.jar" />	
-	
     <!-- require Android SDK path (from ant.properties) -->
     <available file="${sdk.dir}" type="dir" property="android.sdk.present" />
     <fail unless="android.sdk.present" message="Android SDK path not found" />
@@ -50,6 +47,9 @@
     <!-- version-tag: custom -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
  
+	<property name="out.jar" value="${out.dir}/logback-android-${version}.jar" />	
+	<property name="test.out.jar" value="${out.dir}/logback-android-test-${version}.jar" />	
+	
     <!-- find Android JAR in platform-tools -->
     <condition property="android.jar" else="${sdk.dir}/platforms/${target}/android.jar">
     	<isset property="android.jar"/>
