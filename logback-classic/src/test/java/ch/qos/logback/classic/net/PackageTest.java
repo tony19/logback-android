@@ -17,7 +17,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-// XXX: NOT SUPPORTED IN ANDROID
+@RunWith(Suite.class)
+@SuiteClasses( { 
+	SocketAppenderTest.class,
+	DilutedSMTPAppenderTest.class 
+})
 //@RunWith(Suite.class)
 //@SuiteClasses( { SyslogAppenderTest.class, DilutedSMTPAppenderTest.class,
 //    SocketAppenderTest.class, JMSQueueAppenderTest.class, JMSTopicAppenderTest.class,

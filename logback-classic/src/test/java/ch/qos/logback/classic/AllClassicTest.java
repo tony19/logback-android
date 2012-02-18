@@ -31,9 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
         //ch.qos.logback.classic.selector.PackageTest.class,
         
         ch.qos.logback.classic.html.PackageTest.class, 
-        
-        // XXX: NOT SUPPORTED IN ANDROID
-        //ch.qos.logback.classic.net.PackageTest.class,
+        ch.qos.logback.classic.net.PackageTest.class,
         ch.qos.logback.classic.pattern.PackageTest.class,
         ch.qos.logback.classic.encoder.PackageTest.class,
 

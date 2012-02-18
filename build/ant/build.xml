@@ -70,11 +70,26 @@
     <available file="${slf4j.jar}" type="file" property="slf4j.present" />
     <fail unless="slf4j.present" message="SLF4J not found" />
 
+  <!-- require javamail JARs (from http://code.google.com/p/javamail-android/) -->
+  <fail message="javamail jars for android not found">
+    <condition>
+      <not>
+        <and>
+          <available file="${android.javamail.jar}" type="file" />
+          <available file="${android.jaf.jar}" type="file" />
+        </and>
+      </not>
+    </condition>
+  </fail>
+  	
     <path id="libs.path">
 	    <pathelement path="${apktool.jar}" />
 		<pathelement path="${slf4j.jar}" />
 		<pathelement path="${android.jar}" />
+	    <pathelement path="${android.javamail.jar}" />
+	    <pathelement path="${android.jaf.jar}" />
     </path>
+    
     <path id="test.libs.path">
 	    <fileset dir="libs/test">
 	    	<include name="**/*.jar"/>
@@ -94,10 +109,9 @@
 				  **/core/db/JNDIConnectionSource.java,
   				  **/core/joran/conditional/**,				  
 				  **/core/net/JMSAppenderBase.java,
-				  **/core/net/LoginAuthenticator.java,
-				  **/core/net/SMTPAppenderBase.java,
 				  **/core/status/ViewStatusMessagesServletBase.java,
-				  **/classic/boolex/**,
+				  **/classic/boolex/GEvent*.java,
+				  **/classic/boolex/Janino*.java,
 				  **/classic/gaffer/**,
 				  **/classic/helpers/**,
 				  **/classic/jmx/**,
@@ -105,7 +119,6 @@
 				  **/classic/joran/action/InsertFromJNDIAction.java,
 				  **/classic/joran/action/JMXConfiguratorAction.java,
 				  **/classic/net/JMS*.java,
-				  **/classic/net/SMTPAppender.java,
 				  **/classic/selector/ContextJNDISelector.java,
 				  **/classic/selector/servlet/,
 				  **/classic/util/JNDIUtil.java,
@@ -118,8 +131,8 @@
 	
     <target name="compile"
     		description="Compiles project's .java files into .class files">
-    	<mkdir dir="${out.dir}"/>
-		<javac srcdir="${source.dir}" destdir="${out.dir}"
+    	<mkdir dir="${out.dir}/classes"/>
+		<javac srcdir="${source.dir}" destdir="${out.dir}/classes"
 			classpathref="libs.path"
 			source="1.5"
 			target="1.5"
@@ -151,8 +164,6 @@
 					  **/db/**,
 					  **/core/joran/conditional/**.java,
 					  **/core/net/JMS*.java,
-					  **/core/net/LoginAuthenticator*.java,
-					  **/core/net/SMTP*.java,
 					  **/core/status/*ServletBase*.java,
 					  **/classic/boolex/**,
 					  **/classic/gaffer/**,
@@ -162,7 +173,6 @@
 					  **/classic/joran/action/*JNDI*.java,
 					  **/classic/joran/action/JMX*.java,
 					  **/classic/net/JMS*.java,
-					  **/classic/net/*SMTP*.java,
   					  **/classic/net/SyslogAppender*.java,
 					  **/classic/net/mock/Mock*.java,
 
@@ -184,9 +194,8 @@
 		<buildnumber/>
 		<jar
 			destfile="${out.jar}"
-			basedir="${out.dir}"
+			basedir="${out.dir}/classes"
 			index="true"
-			excludes="*.jar,test/**,classes/**"
 			update="true"
 		>
 			<zipfileset includes="**/*.class" src="${apktool.jar}" />
@@ -217,7 +226,6 @@
 			destfile="${test.out.jar}"
 			basedir="${out.dir}/test"
 			index="true"
-			excludes="*.jar"
 		>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}"/>
@@ -322,7 +330,6 @@
 			<!--
 			<test name="ch.qos.logback.classic.jmx.PackageTest" />
 			<test name="ch.qos.logback.classic.selector.PackageTest" />
-			<test name="ch.qos.logback.classic.net.PackageTest" />
 			<test name="ch.qos.logback.classic.db.PackageTest" />
 			<test name="ch.qos.logback.classic.jul.PackageTest" />
 			<test name="ch.qos.logback.classic.html.PackageTest" /> 
@@ -341,6 +348,7 @@
 			<test name="ch.qos.logback.classic.turbo.PackageTest" />
 			<test name="ch.qos.logback.classic.sift.PackageTest" />
 			<test name="ch.qos.logback.classic.issue.PackageTest" />
+			<test name="ch.qos.logback.classic.net.PackageTest" />
 		</junit>
 		
 		<!--<antcall target="-post-test" />-->
@@ -353,6 +361,9 @@
 		<pathconvert property="lib.jars">
 			<path refid="android.target.classpath" />
 			<path location="${slf4j.jar}" />
+			<path location="${android.javamail.jar}" />
+			<path location="${android.jaf.jar}" />
+
 			<firstmatchmapper>
 				<regexpmapper from='^([^ ]*)( .*)$$' to='"\1\2"'/>
 				<identitymapper/>
