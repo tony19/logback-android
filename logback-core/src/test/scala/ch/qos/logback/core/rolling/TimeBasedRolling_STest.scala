@@ -44,7 +44,8 @@ class TimeBasedRolling_STest extends RollingScaffolding {
     }
   }
 
- private def initTRBP(rfa: RollingFileAppender[AnyRef], tbrp: TimeBasedRollingPolicy[AnyRef], filenamePattern: String, givenTime: Long): Unit = {
+ private def initTRBP(rfa: RollingFileAppender[AnyRef], tbrp: TimeBasedRollingPolicy[AnyRef],
+                      filenamePattern: String, givenTime: Long): Unit = {
     tbrp.setContext(context)
     tbrp.setFileNamePattern(filenamePattern)
     tbrp.setParent(rfa)
@@ -80,7 +81,7 @@ class TimeBasedRolling_STest extends RollingScaffolding {
     }
     rfa1.stop
 
-    if (waitDuration != 0) {
+    if (waitDuration != NO_RESTART) {
       doRestart(testId, fileOptionIsSet, waitDuration);
     }
 
@@ -109,7 +110,6 @@ class TimeBasedRolling_STest extends RollingScaffolding {
     val witnessFileName: String = CoreTestConstants.TEST_DIR_PREFIX + "witness/rolling/tbr-" + testId
     println(lastFile+"  "+witnessFileName)
     assertTrue(Compare.compare(lastFile, witnessFileName));
-
   }
 
 
@@ -179,8 +179,7 @@ class TimeBasedRolling_STest extends RollingScaffolding {
 
   @Test
   def failed_rename: Unit = {
-
-    if(!Env.isWindows) null
+    if(!Env.isWindows) return
 
     var fos: FileOutputStream = null
     try {

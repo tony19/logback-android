@@ -8,20 +8,12 @@ import ch.qos.logback.core.encoder.EchoEncoder
 import java.util.concurrent.TimeUnit
 import java.io.{FileFilter, File}
 import collection.mutable.ListBuffer
-import java.util.Calendar
 import ch.qos.logback.core.util.{StatusPrinter, CoreTestConstants}
 import ch.qos.logback.core.CoreConstants._
 import java.util.regex.{Matcher, Pattern}
 import scala.collection.mutable.{Set, HashSet}
 import org.junit.{Ignore, Before, Test}
-
-/**
- * Created by IntelliJ IDEA.
- * User: ceki
- * Date: 29.08.11
- * Time: 18:08
- * To change this template use File | Settings | File Templates.
- */
+import java.util.{Date, Calendar}
 
 class TimeBasedRollingWithArchiveRemoval_STest {
   var context: Context = new ContextBase
@@ -35,7 +27,8 @@ class TimeBasedRollingWithArchiveRemoval_STest {
   val MILLIS_IN_MINUTE: Long = 60 * 1000
   val MILLIS_IN_HOUR: Long = 60 * MILLIS_IN_MINUTE
   val MILLIS_IN_DAY: Long = 24 * MILLIS_IN_HOUR
-  val MILLIS_IN_MONTH: Long = ((365.0 / 12) * MILLIS_IN_DAY).asInstanceOf[Long]
+  val MILLIS_IN_MONTH: Long = ((365.242199 / 12) * MILLIS_IN_DAY).asInstanceOf[Long]
+  val MONTHS_IN_YEAR = 12
 
   var diff: Int = _
   var randomOutputDir: String = _
@@ -58,60 +51,77 @@ class TimeBasedRollingWithArchiveRemoval_STest {
     else datePattern.foldLeft(0)((count, c) => if (c == '/') count + 1 else count)
   }
 
-  def genMontlyRollover(maxHistory: Int, simulatedNumberOfPeriods: Int, startInactivity: Int, numInactivityPeriods: Int) {
-    slashCount = computeSlashCount(MONTHLY_DATE_PATTERN)
-    doRollover(now, randomOutputDir + "clean-%d{" + MONTHLY_DATE_PATTERN + "}.txt", MILLIS_IN_MONTH, maxHistory, simulatedNumberOfPeriods, startInactivity, numInactivityPeriods)
-    check(expectedCountWithoutFolders(maxHistory))
+
+  // test that the number of files at the end of the test is same as the expected number taking into account end dates
+  // near the beginning of a new year. This test has been run in a loop with start date varying over a two years
+  // with success.
+  @Test def monthlyRolloverOverManyPeriods() {
+
+    slashCount = computeSlashCount(MONTHLY_CRONOLOG_DATE_PATTERN)
+    val numPeriods: Int = 40
+    val maxHistory: Int = 2
+    val fileNamePattern = randomOutputDir + "/%d{" + MONTHLY_CRONOLOG_DATE_PATTERN + "}/clean.txt.zip"
+    val (startTime, endTime) = logOverMultiplePeriods(now, fileNamePattern, MILLIS_IN_MONTH, maxHistory, numPeriods)
+    val differenceInMonths = RollingCalendar.diffInMonths(startTime, endTime)
+    val startTimeAsCalendar = Calendar.getInstance()
+    startTimeAsCalendar.setTimeInMillis(startTime)
+    val indexOfStartPeriod: Int = startTimeAsCalendar.get(Calendar.MONTH)
+    val withExtraFolder = extraFolder(differenceInMonths, MONTHS_IN_YEAR, indexOfStartPeriod, maxHistory)
+
+    def expectedCountWithFolders(): Int = {
+      val numLogFiles = (maxHistory + 1)
+      val numLogFilesAndFolders = numLogFiles * 2
+      var result: Int = numLogFilesAndFolders + slashCount
+      if (withExtraFolder) result += 1
+      result
+    }
+    //StatusPrinter.print(context)
+    check(expectedCountWithFolders())
+  }
+
+  def generateDailyRollover(now: Long, maxHistory: Int, simulatedNumberOfPeriods: Int, startInactivity: Int, numInactivityPeriods: Int) {
+    slashCount = computeSlashCount(DAILY_DATE_PATTERN)
+    logOverMultiplePeriods(now, randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt", MILLIS_IN_DAY, maxHistory, simulatedNumberOfPeriods, startInactivity, numInactivityPeriods)
+    //StatusPrinter.print(context)
+    check(expectedCountWithoutFoldersWithInactivity(maxHistory, simulatedNumberOfPeriods, startInactivity + numInactivityPeriods))
   }
 
   @Test
-  def montlyRollover {
-    genMontlyRollover(maxHistory = 20, simulatedNumberOfPeriods = 20 * 3, startInactivity = 0, numInactivityPeriods = 0)
-    setUp
-    genMontlyRollover(maxHistory = 6, simulatedNumberOfPeriods = 70, startInactivity = 30, numInactivityPeriods = 1)
-    setUp
-    genMontlyRollover(maxHistory = 6, simulatedNumberOfPeriods = 10, startInactivity = 3, numInactivityPeriods = 4)
-
+  def basicDailyRollover {
+    generateDailyRollover(now, maxHistory = 20, simulatedNumberOfPeriods = 20 * 3, startInactivity = 0, numInactivityPeriods = 0)
   }
 
-  @Test def monthlyRolloverOverManyPeriods {
-    System.out.println("randomOutputDir=" + randomOutputDir)
-    slashCount = computeSlashCount(MONTHLY_CRONOLOG_DATE_PATTERN)
-    var numPeriods: Int = 40
-    var maxHistory: Int = 2
-
-    val (startTime, endTime) = doRollover(now, randomOutputDir + "/%d{" + MONTHLY_CRONOLOG_DATE_PATTERN + "}/clean.txt.zip", MILLIS_IN_MONTH, maxHistory, numPeriods)
-    val differenceInMonths = RollingCalendar.diffInMonths(startTime, endTime)
-    var indexOfStartPeriod: Int = Calendar.getInstance.get(Calendar.MONTH)
-    val withExtraFolder = extraFolder(differenceInMonths, 12, indexOfStartPeriod, maxHistory)
-    StatusPrinter.print(context)
-    check(expectedCountWithFolders(2, withExtraFolder))
+  // Since the duration of a month (in seconds) varies from month to month, tests with inactivity period must
+  // be conducted with daily rollover  not monthly
+  @Test def dailyRollover15 {
+    generateDailyRollover(now, maxHistory = 5, simulatedNumberOfPeriods = 15, startInactivity = 6, numInactivityPeriods = 3)
   }
 
-  @Test def dailyRollover {
-    slashCount = computeSlashCount(DAILY_DATE_PATTERN)
-    doRollover(now, randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt.zip", MILLIS_IN_DAY, 5, 5 * 3, startInactivity = 6, numInactivityPeriods = 3)
-    StatusPrinter.print(context)
-    check(expectedCountWithoutFolders(5))
+  @Test def dailyRolloverWithInactivity70 {
+    generateDailyRollover(now, maxHistory = 6, simulatedNumberOfPeriods = 70, startInactivity = 30, numInactivityPeriods = 1)
   }
+
+  @Test def dailyRolloverWithInactivity10 {
+    generateDailyRollover(now, maxHistory = 6, simulatedNumberOfPeriods = 10, startInactivity = 3, numInactivityPeriods = 4)
+  }
+
 
   @Test def dailyRolloverWithSecondPhase {
     slashCount = computeSlashCount(DAILY_DATE_PATTERN)
     val maxHistory = 5
     val simulatedNumberOfPeriods = maxHistory * 2
-    val (startTime, endTime) = doRollover(now, randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt", MILLIS_IN_DAY, maxHistory, maxHistory * 2)
-    doRollover(endTime + MILLIS_IN_DAY * 10, randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt", MILLIS_IN_DAY, maxHistory, maxHistory)
+    val (startTime, endTime) = logOverMultiplePeriods(now, randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt", MILLIS_IN_DAY, maxHistory, maxHistory * 2)
+    logOverMultiplePeriods(endTime + MILLIS_IN_DAY * 10, randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt", MILLIS_IN_DAY, maxHistory, maxHistory)
     check(expectedCountWithoutFolders(maxHistory))
   }
 
 
   @Test def dailyCronologRollover {
     slashCount = computeSlashCount(DAILY_CRONOLOG_DATE_PATTERN)
-    doRollover(now, randomOutputDir + "/%d{" + DAILY_CRONOLOG_DATE_PATTERN + "}/clean.txt.zip", MILLIS_IN_DAY, 8, 8 * 3)
+    logOverMultiplePeriods(now, randomOutputDir + "/%d{" + DAILY_CRONOLOG_DATE_PATTERN + "}/clean.txt.zip", MILLIS_IN_DAY, 8, 8 * 3)
     var expectedDirMin: Int = 9 + slashCount
     var expectDirMax: Int = expectedDirMin + 1 + 1
     expectedFileAndDirCount(9, expectedDirMin, expectDirMax)
-
   }
 
   @Test def dailySizeBasedRollover {
@@ -119,7 +129,7 @@ class TimeBasedRollingWithArchiveRemoval_STest {
     sizeAndTimeBasedFNATP.setMaxFileSize("10000")
     tbfnatp = sizeAndTimeBasedFNATP
     slashCount = computeSlashCount(DAILY_DATE_PATTERN)
-    doRollover(now, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}-clean.%i.zip", MILLIS_IN_DAY, 5, 5 * 4)
+    logOverMultiplePeriods(now, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}-clean.%i.zip", MILLIS_IN_DAY, 5, 5 * 4)
     checkPatternCompliance(5 + 1 + slashCount, "\\d{4}-\\d{2}-\\d{2}-clean(\\.\\d)(.zip)?")
   }
 
@@ -128,7 +138,7 @@ class TimeBasedRollingWithArchiveRemoval_STest {
     sizeAndTimeBasedFNATP.setMaxFileSize("10000")
     tbfnatp = sizeAndTimeBasedFNATP
     slashCount = 1
-    doRollover(now, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i.zip", MILLIS_IN_DAY, 5, 5 * 4)
+    logOverMultiplePeriods(now, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i.zip", MILLIS_IN_DAY, 5, 5 * 4)
     checkDirPatternCompliance(6)
   }
 
@@ -139,35 +149,36 @@ class TimeBasedRollingWithArchiveRemoval_STest {
     slashCount = 1
     val maxHistory = 5
     val simulatedNumberOfPeriods = maxHistory * 4
-    val (startTime, endTime) = doRollover(now, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i", MILLIS_IN_DAY, maxHistory, 3)
-    doRollover(endTime+MILLIS_IN_DAY*7, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i", MILLIS_IN_DAY, maxHistory, simulatedNumberOfPeriods)
-    checkDirPatternCompliance(maxHistory+1)
+    val (startTime, endTime) = logOverMultiplePeriods(now, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i", MILLIS_IN_DAY, maxHistory, 3)
+    logOverMultiplePeriods(endTime + MILLIS_IN_DAY * 7, randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i", MILLIS_IN_DAY, maxHistory, simulatedNumberOfPeriods)
+    checkDirPatternCompliance(maxHistory + 1)
   }
 
 
-  // this test requires changing the current working directory which is impossible in Java
-  @Ignore
-  @Test def dailyChronologSizeBasedRolloverWhenLogFilenameDoesNotContainDirectory: Unit = {
-    var sizeAndTimeBasedFNATP: SizeAndTimeBasedFNATP[AnyRef] = new SizeAndTimeBasedFNATP[AnyRef]
-    sizeAndTimeBasedFNATP.setMaxFileSize("10000")
-    tbfnatp = sizeAndTimeBasedFNATP
-    slashCount = 1
-    doRollover(now, "clean.%d{" + DAILY_DATE_PATTERN + "}.%i.zip", MILLIS_IN_DAY, 5, 5 * 4)
-    checkDirPatternCompliance(6)
+  def logOncePeriod(currentTime: Long, fileNamePattern: String, maxHistory: Int) = {
+    val (rfa, tbrp) = buildRollingFileAppender(currentTime, fileNamePattern, maxHistory, true)
+    rfa.doAppend("Hello ----------------------------------------------------------" + new Date(currentTime))
+    rfa.stop()
+  }
+
+  @Test def cleanHistoryOnStart {
+    var now = this.now
+    val fileNamePattern = randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt"
+    val maxHistory = 3
+    for (i <- 0 to 5) {
+      logOncePeriod(now, fileNamePattern, maxHistory)
+      now = now + MILLIS_IN_DAY
+    }
+    StatusPrinter.print(context)
+    check(expectedCountWithoutFolders(maxHistory))
   }
 
   def extraFolder(numPeriods: Int, periodsPerEra: Int, beginPeriod: Int, maxHistory: Int): Boolean = {
+    println("numPeriods=" + numPeriods + ", beginPeriod=" + beginPeriod + ", maxHistory=" + maxHistory)
     var valueOfLastMonth: Int = ((beginPeriod) + numPeriods) % periodsPerEra
     return (valueOfLastMonth < maxHistory)
   }
 
-  def expectedCountWithFolders(maxHistory: Int, extraFolder: Boolean): Int = {
-    val numLogFiles = (maxHistory + 1)
-    val numLogFilesAndFolders = numLogFiles * 2
-    var result: Int = numLogFilesAndFolders + slashCount
-    if (extraFolder) result += 1
-    result
-  }
 
   def addTime(currentTime: Long, timeToWait: Long): Long = {
     return currentTime + timeToWait
@@ -175,41 +186,51 @@ class TimeBasedRollingWithArchiveRemoval_STest {
 
   def waitForCompression(tbrp: TimeBasedRollingPolicy[AnyRef]): Unit = {
     if (tbrp.future != null && !tbrp.future.isDone) {
-      tbrp.future.get(800, TimeUnit.MILLISECONDS)
+      tbrp.future.get(1000, TimeUnit.MILLISECONDS)
     }
   }
 
-  def doRollover(currentTime: Long, fileNamePattern: String, periodDurationInMillis: Long, maxHistory: Int, simulatedNumberOfPeriods: Int, startInactivity: Int = 0, numInactivityPeriods: Int = 0): (Long, Long) = {
-    val startTime = currentTime
-    var rfa: RollingFileAppender[AnyRef] = new RollingFileAppender[AnyRef]
+  def buildRollingFileAppender(currentTime: Long, fileNamePattern: String, maxHistory: Int,
+                               cleanHistoryOnStart: Boolean = false): (RollingFileAppender[AnyRef], TimeBasedRollingPolicy[AnyRef]) = {
+    val rfa: RollingFileAppender[AnyRef] = new RollingFileAppender[AnyRef]
     rfa.setContext(context)
     rfa.setEncoder(encoder)
-    var tbrp: TimeBasedRollingPolicy[AnyRef] = new TimeBasedRollingPolicy[AnyRef]
+    val tbrp: TimeBasedRollingPolicy[AnyRef] = new TimeBasedRollingPolicy[AnyRef]
     tbrp.setContext(context)
     tbrp.setFileNamePattern(fileNamePattern)
     tbrp.setMaxHistory(maxHistory)
     tbrp.setParent(rfa)
+    tbrp.setCleanHistoryOnStart(cleanHistoryOnStart)
     tbrp.timeBasedFileNamingAndTriggeringPolicy = tbfnatp
     tbrp.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(currentTime)
     tbrp.start
     rfa.setRollingPolicy(tbrp)
     rfa.start
-    var ticksPerPeriod: Int = 512
-    var runLength = simulatedNumberOfPeriods * ticksPerPeriod
-    val startInactivityIndex: Int = 1 + startInactivity * ticksPerPeriod
-    val endInactivityIndex = startInactivity + numInactivityPeriods * ticksPerPeriod
+    (rfa, tbrp)
+  }
 
+  def logOverMultiplePeriods(currentTime: Long, fileNamePattern: String, periodDurationInMillis: Long, maxHistory: Int,
+                 simulatedNumberOfPeriods: Int, startInactivity: Int = 0,
+                 numInactivityPeriods: Int = 0): (Long, Long) = {
+    val startTime = currentTime
+    val (rfa, tbrp) = buildRollingFileAppender(currentTime, fileNamePattern, maxHistory)
+    val ticksPerPeriod: Int = 512
+    val runLength = simulatedNumberOfPeriods * ticksPerPeriod
+    val startInactivityIndex: Int = 1 + startInactivity * ticksPerPeriod
+    val endInactivityIndex = startInactivityIndex + numInactivityPeriods * ticksPerPeriod
+    val tickDuration = periodDurationInMillis / ticksPerPeriod
 
     for (i <- 0 to runLength) {
       if (i < startInactivityIndex || i > endInactivityIndex) {
         rfa.doAppend("Hello ----------------------------------------------------------" + i)
       }
-      tbrp.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(addTime(tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime, periodDurationInMillis / ticksPerPeriod))
+      tbrp.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(addTime(tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime, tickDuration))
       if (i % (ticksPerPeriod / 2) == 0) {
         waitForCompression(tbrp)
       }
     }
 
+    println("Last date" + new Date(tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime()));
     waitForCompression(tbrp)
     rfa.stop
     (startTime, tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime)
@@ -219,10 +240,16 @@ class TimeBasedRollingWithArchiveRemoval_STest {
     return maxHistory + 1
   }
 
+  def expectedCountWithoutFoldersWithInactivity(maxHistory: Int, totalPeriods: Int, endOfInactivity: Int): Int = {
+    val availableHistory = (totalPeriods + 1) - endOfInactivity;
+    val actualHistory = scala.math.min(availableHistory, maxHistory + 1)
+    return actualHistory
+  }
+
 
   def genericFindMatching(matchFunc: (File, String) => Boolean, dir: File, fileList: ListBuffer[File], pattern: String = null, includeDirs: Boolean = false) {
     if (dir.isDirectory) {
-      var `match` : Array[File] = dir.listFiles(new FileFilter {
+      val `match` : Array[File] = dir.listFiles(new FileFilter {
         def accept(f: File): Boolean = {
           return f.isDirectory() || matchFunc(f, pattern)
         }
@@ -251,46 +278,47 @@ class TimeBasedRollingWithArchiveRemoval_STest {
 
 
   def expectedFileAndDirCount(expectedFileAndDirCount: Int, expectedDirCountMin: Int, expectedDirCountMax: Int): Unit = {
-    var dir: File = new File(randomOutputDir)
-    var fileList = new ListBuffer[File]
+    val dir: File = new File(randomOutputDir)
+    val fileList = new ListBuffer[File]
     findFilesInFolderRecursivelyByPatterMatch(dir, fileList, "clean")
-    var dirList = new ListBuffer[File]
+    val dirList = new ListBuffer[File]
     findAllFoldersInFolderRecursively(dir, dirList)
-    assertTrue("expectedDirCountMin=" + expectedDirCountMin + ", expectedDirCountMax=" + expectedDirCountMax + " actual value=" + dirList.size, expectedDirCountMin <= dirList.size && dirList.size <= expectedDirCountMax)
+    val msg = "expectedDirCountMin=" + expectedDirCountMin + ", expectedDirCountMax=" + expectedDirCountMax + " actual value=" + dirList.size
+    assertTrue(msg, expectedDirCountMin <= dirList.size && dirList.size <= expectedDirCountMax)
   }
 
   def check(expectedCount: Int): Unit = {
-    var dir: File = new File(randomOutputDir)
+    val dir: File = new File(randomOutputDir)
     val fileList = new ListBuffer[File]
     findAllDirsOrStringContainsFilesRecursively(dir, fileList, "clean")
     assertEquals(expectedCount, fileList.size)
   }
 
   def groupByClass(fileList: ListBuffer[File], regex: String): Set[String] = {
-    var p: Pattern = Pattern.compile(regex)
+    val p: Pattern = Pattern.compile(regex)
     val set = new HashSet[String]
     for (f <- fileList) {
-      var n: String = f.getName
-      var m: Matcher = p.matcher(n)
+      val n: String = f.getName
+      val m: Matcher = p.matcher(n)
       m.matches
-      var begin: Int = m.start(1)
-      var reduced: String = n.substring(0, begin)
+      val begin: Int = m.start(1)
+      val reduced: String = n.substring(0, begin)
       set.add(reduced)
     }
     return set
   }
 
   def checkPatternCompliance(expectedClassCount: Int, regex: String) {
-    var dir: File = new File(randomOutputDir)
-    var fileList = new ListBuffer[File]
+    val dir: File = new File(randomOutputDir)
+    val fileList = new ListBuffer[File]
     findFilesInFolderRecursivelyByPatterMatch(dir, fileList, regex)
-    var set: Set[String] = groupByClass(fileList, regex)
+    val set: Set[String] = groupByClass(fileList, regex)
     assertEquals(expectedClassCount, set.size)
   }
 
   def checkDirPatternCompliance(expectedClassCount: Int): Unit = {
-    var dir: File = new File(randomOutputDir)
-    var fileList = new ListBuffer[File]
+    val dir: File = new File(randomOutputDir)
+    val fileList = new ListBuffer[File]
     findAllFoldersInFolderRecursively(dir, fileList)
     for (f <- fileList) {
       assertTrue(f.list.length >= 1)

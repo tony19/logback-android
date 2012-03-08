@@ -81,7 +81,10 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
 
     try {
       String msg = layout.doLayout(eventObject);
-      if (msg != null && msg.length() > MSG_SIZE_LIMIT) {
+      if(msg == null) {
+        return;
+      }
+      if (msg.length() > MSG_SIZE_LIMIT) {
         msg = msg.substring(0, MSG_SIZE_LIMIT);
       }
       sos.write(msg.getBytes());
@@ -236,7 +239,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    * The <b>suffixPattern</b> option specifies the format of the
    * non-standardized part of the message sent to the syslog server.
    * 
-   * @param pattern
+   * @param suffixPattern
    */
   public void setSuffixPattern(String suffixPattern) {
     this.suffixPattern = suffixPattern;

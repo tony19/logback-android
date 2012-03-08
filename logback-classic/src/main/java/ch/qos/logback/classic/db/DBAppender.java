@@ -79,9 +79,6 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
     GET_GENERATED_KEYS_METHOD = getGeneratedKeysMethod;
   }
 
-  public DBAppender() {
-  }
-
   public void setDbNameResolver(DBNameResolver dbNameResolver) {
     this.dbNameResolver = dbNameResolver;
   }
@@ -229,7 +226,6 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
       }
 
       insertPropertiesStatement.close();
-      insertPropertiesStatement = null;
     }
   }
 
@@ -296,7 +292,5 @@ public class DBAppender extends DBAppenderBase<ILoggingEvent> {
       exceptionStatement.executeBatch();
     }
     exceptionStatement.close();
-    exceptionStatement = null;
-
   }
 }

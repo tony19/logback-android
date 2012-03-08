@@ -7,7 +7,7 @@
   <parent>
     <groupId>ch.qos.logback</groupId>
     <artifactId>logback-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>logback-classic</artifactId>
@@ -106,7 +106,7 @@
     </dependency>
 
     <dependency>
-      <groupId>janino</groupId>
+      <groupId>org.codehaus.janino</groupId>
       <artifactId>janino</artifactId>
       <scope>compile</scope>
       <optional>true</optional>
@@ -166,13 +166,6 @@
           <artifactId>slf4j-api</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>1.6</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>

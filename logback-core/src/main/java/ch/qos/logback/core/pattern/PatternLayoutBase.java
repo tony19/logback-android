@@ -32,7 +32,12 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   String pattern;
   protected PostCompileProcessor<E> postCompileProcessor;
 
+
   Map<String, String> instanceConverterMap = new HashMap<String, String>();
+
+
+
+  boolean forceEmptyPresentationHeader = false;
 
   /**
    * Concrete implementations of this class are responsible for elaborating the
@@ -135,5 +140,26 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
 
   public Map<String, String> getInstanceConverterMap() {
     return instanceConverterMap;
+  }
+
+  
+  protected String getPresentationHeaderPrefix() {
+    return CoreConstants.EMPTY_STRING;
+  }
+
+  public boolean isForceEmptyPresentationHeader() {
+    return forceEmptyPresentationHeader;
+  }
+
+  public void setForceEmptyPresentationHeader(boolean forceEmptyPresentationHeader) {
+    this.forceEmptyPresentationHeader = forceEmptyPresentationHeader;
+  }
+  
+  @Override
+  public String getPresentationHeader() {
+    if(forceEmptyPresentationHeader)
+      return null;
+    else
+      return getPresentationHeaderPrefix()+pattern;
   }
 }

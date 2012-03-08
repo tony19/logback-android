@@ -209,8 +209,7 @@ public class PropertySetter extends ContextAwareBase {
 
   private Method findAdderMethod(String name) {
     name = capitalizeFirstLetter(name);
-    Method adderMethod = getMethod("add" + name);
-    return adderMethod;
+    return getMethod("add" + name);
   }
 
   private Method findSetterMethod(String name) {
@@ -460,8 +459,7 @@ public class PropertySetter extends ContextAwareBase {
     DefaultClass defaultClassAnnon = getAnnotation(name, DefaultClass.class,
         relevantMethod);
     if (defaultClassAnnon != null) {
-      Class defaultClass = defaultClassAnnon.value();
-      return defaultClass;
+      return defaultClassAnnon.value();
     }
     return null;
   }

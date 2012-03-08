@@ -27,7 +27,6 @@ import org.junit.runners.Suite;
 //        ch.qos.logback.core.rolling.helper.PackageTest.class})
 
 @Suite.SuiteClasses({RenameUtilTest.class, 
-  TimeBasedRollingTest.class,
     MultiThreadedRollingTest.class,
     RollingFileAppenderTest.class,
     ch.qos.logback.core.rolling.helper.PackageTest.class})

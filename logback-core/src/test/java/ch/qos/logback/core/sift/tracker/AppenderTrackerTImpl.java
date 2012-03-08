@@ -33,9 +33,6 @@ public class AppenderTrackerTImpl implements AppenderTracker<Object> {
   List<TEntry> entryList = new LinkedList<TEntry>();
   long lastCheck = 0;
 
-  public AppenderTrackerTImpl() {
-  }
-
   @SuppressWarnings("unchecked")
   synchronized public void put(String k, Appender<Object> appender,
       long timestamp) {
@@ -85,7 +82,7 @@ public class AppenderTrackerTImpl implements AppenderTracker<Object> {
 
   }
 
-  final private boolean isEntryStale(TEntry entry, long now) {
+  private boolean isEntryStale(TEntry entry, long now) {
     return ((entry.timestamp + THRESHOLD) < now);
   }
 

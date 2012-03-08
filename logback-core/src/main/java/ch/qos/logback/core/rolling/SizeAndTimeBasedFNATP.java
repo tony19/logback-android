@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.Date;
 
 import ch.qos.logback.core.joran.spi.NoAutoStart;
+import ch.qos.logback.core.rolling.helper.CompressionMode;
 import ch.qos.logback.core.rolling.helper.FileFilterUtil;
 import ch.qos.logback.core.rolling.helper.SizeAndTimeBasedArchiveRemover;
 import ch.qos.logback.core.util.FileSize;
@@ -52,8 +53,8 @@ public class SizeAndTimeBasedFNATP<E> extends
 
   void computeCurrentPeriodsHighestCounterValue(final String stemRegex) {
     File file = new File(getCurrentPeriodsFileNameWithoutCompressionSuffix());
-
     File parentDir = file.getParentFile();
+
     File[] matchingFileArray = FileFilterUtil
             .filesInFolderMatchingStemRegex(parentDir, stemRegex);
 
@@ -62,7 +63,11 @@ public class SizeAndTimeBasedFNATP<E> extends
       return;
     }
     currentPeriodsCounter = FileFilterUtil.findHighestCounter(matchingFileArray, stemRegex);
-    if (tbrp.getParentsRawFileProperty() != null) {
+
+    // if parent raw file property is not null, then the next
+    // counter is max  found counter+1
+    if (tbrp.getParentsRawFileProperty() != null || (tbrp.compressionMode != CompressionMode.NONE)) {
+      // TODO test me
       currentPeriodsCounter++;
     }
   }
@@ -104,6 +109,12 @@ public class SizeAndTimeBasedFNATP<E> extends
 
     return false;
   }
+
+  private String getFileNameIncludingCompressionSuffix(Date date, int counter) {
+    return tbrp.fileNamePattern.convertMultipleArguments(
+            dateInCurrentPeriod, counter);
+  }
+
 
   @Override
   public String getCurrentPeriodsFileNameWithoutCompressionSuffix() {

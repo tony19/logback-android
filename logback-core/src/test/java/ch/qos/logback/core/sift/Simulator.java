@@ -63,8 +63,7 @@ public class Simulator {
 
   private String getRandomKeyStr() {
     int ri = randomKeyGen.nextInt();
-    String s = String.format("%X", ri);
-    return s;
+    return String.format("%X", ri);
   }
 
   void buildScenario(int simLen) {
@@ -117,6 +116,7 @@ public class Simulator {
     Appender<Object> appender = appenderTracker.get(key, timestamp);
     if (appender == null) {
       appender = new NOPAppender<Object>();
+      appender.start();
       appenderTracker.put(key, appender, timestamp);
     }
     appenderTracker.stopStaleAppenders(timestamp);

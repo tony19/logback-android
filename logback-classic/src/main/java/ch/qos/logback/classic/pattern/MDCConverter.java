@@ -24,9 +24,6 @@ public class MDCConverter extends ClassicConverter {
   String key;
   private static final String EMPTY_STRING = "";
 
-  public MDCConverter() {
-  }
-
   @Override
   public void start() {
     key = getFirstOption();
@@ -51,18 +48,15 @@ public class MDCConverter extends ClassicConverter {
       // if no key is specified, return all the
       // values present in the MDC, separated with a single space.
       StringBuilder buf = new StringBuilder();
-      Set<String> keys = mdcPropertyMap.keySet();
-      Iterator it = keys.iterator();
-      String tmpKey;
-      String tmpValue;
-      while (it.hasNext()) {
-        tmpKey = (String)it.next();
-        tmpValue = (String)mdcPropertyMap.get(tmpKey);
-        //format: {testeKey=testValue, testKey2=testValue2}
-        buf.append(tmpKey).append('=').append(tmpValue);
-        if (it.hasNext()) {
+      boolean first = true;
+      for(Map.Entry<String, String> entry : mdcPropertyMap.entrySet()) {
+        if(first) {
+          first = false;
+        } else {
           buf.append(", ");
         }
+        //format: {testKey=testValue, testKey2=testValue2}
+        buf.append(entry.getKey()).append('=').append(entry.getValue());
       }
       return buf.toString();
     }

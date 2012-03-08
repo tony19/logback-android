@@ -14,6 +14,7 @@
 package ch.qos.logback.core.rolling.helper;
 
 import java.util.Date;
+import java.util.List;
 
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.DynamicConverter;
@@ -30,18 +31,26 @@ public class DateTokenConverter<E> extends DynamicConverter<E> implements MonoTy
    * The conversion word/character with which this converter is registered.
    */
   public final static String CONVERTER_KEY = "d";
+  public final static String AUXILIARY_TOKEN = "AUX";
   public static final String DEFAULT_DATE_PATTERN = CoreConstants.DAILY_DATE_PATTERN;
 
   private String datePattern;
   private CachingDateFormatter cdf;
-
-  public DateTokenConverter() {
-  }
-
+  // is this token converter primary or auxiliary? Only the primary converter
+  // determines the rolling period
+  private boolean primary = true;
   public void start() {
     this.datePattern = getFirstOption();
     if (this.datePattern == null) {
       this.datePattern = DEFAULT_DATE_PATTERN;
+    }
+
+    final List<String> optionList = getOptionList();
+    if(optionList != null && optionList.size()> 1) {
+      String secondOption = optionList.get(1);
+      if(AUXILIARY_TOKEN.equalsIgnoreCase(secondOption)) {
+        primary = false;
+      }
     }
     cdf = new CachingDateFormatter(datePattern);
   }
@@ -74,5 +83,9 @@ public class DateTokenConverter<E> extends DynamicConverter<E> implements MonoTy
   public String toRegex() {
     DatePatternToRegexUtil toRegex = new DatePatternToRegexUtil(datePattern);
     return toRegex.toRegex();
+  }
+
+  public boolean isPrimary() {
+    return primary;
   }
 }

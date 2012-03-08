@@ -184,8 +184,13 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
     try {
       if (eventEvaluator.evaluate(eventObject)) {
+        // clone the CyclicBuffer before sending out asynchronously
+        CyclicBuffer<E> cbClone = new CyclicBuffer<E>(cb);
+        // see http://jira.qos.ch/browse/LBCLASSIC-221
+        cb.clear();
+
         // perform actual sending asynchronously
-        SenderRunnable senderRunnable = new SenderRunnable(new CyclicBuffer<E>(cb), eventObject);
+        SenderRunnable senderRunnable = new SenderRunnable(cbClone, eventObject);
         context.getExecutorService().execute(senderRunnable);
       }
     } catch (EvaluationException ex) {
@@ -323,17 +328,20 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
         sbuf.append(footer);
       }
 
+      String subjectStr = "Undefined subject";
       if (subjectLayout != null) {
-        mimeMsg.setSubject(subjectLayout.doLayout(lastEventObject),
-                charsetEncoding);
+        subjectStr = subjectLayout.doLayout(lastEventObject);
       }
+      mimeMsg.setSubject(subjectStr, charsetEncoding);
 
       List<InternetAddress> destinationAddresses = parseAddress(lastEventObject);
       if (destinationAddresses.isEmpty()) {
         addInfo("Empty destination address. Aborting email transmission");
         return;
       }
-      mimeMsg.setRecipients(Message.RecipientType.TO, destinationAddresses.toArray(EMPTY_IA_ARRAY));
+
+      InternetAddress[] toAddressArray = destinationAddresses.toArray(EMPTY_IA_ARRAY);
+      mimeMsg.setRecipients(Message.RecipientType.TO, toAddressArray);
 
       String contentType = layout.getContentType();
 
@@ -350,6 +358,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
       mimeMsg.setSentDate(new Date());
       Transport.send(mimeMsg);
+      addInfo("Sent out SMTP message \""+subjectStr+"\" to "+Arrays.toString(toAddressArray));
     } catch (Exception e) {
       addError("Error occurred while sending e-mail notification.", e);
     }

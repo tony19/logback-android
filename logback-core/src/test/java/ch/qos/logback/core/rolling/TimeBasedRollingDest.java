@@ -46,7 +46,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
  *
  * @author Ceki G&uuml;lc&uuml;
  */
-public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
+public class TimeBasedRollingDest extends ScaffoldingForRollingTests {
 
   RollingFileAppender<Object> rfa1 = new RollingFileAppender<Object>();
   TimeBasedRollingPolicy<Object> tbrp1 = new TimeBasedRollingPolicy<Object>();

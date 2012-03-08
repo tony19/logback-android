@@ -107,7 +107,13 @@ public class AppenderTrackerImpl<E> implements AppenderTracker<E> {
   }
   
   
-  final private boolean isEntryStale(Entry entry, long now) {
+  private boolean isEntryStale(Entry entry, long now) {
+    // stopped or improperly started appenders are considered stale
+    // see also http://jira.qos.ch/browse/LBCLASSIC-316
+    if(!entry.value.isStarted())
+      return true;
+
+    // unused appenders are also considered stale
     return ((entry.timestamp + THRESHOLD) < now);
   }
 

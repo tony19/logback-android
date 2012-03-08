@@ -73,10 +73,6 @@ public class JaninoEventEvaluator extends
     DEFAULT_PARAM_TYPE_LIST.add(Throwable.class);
   }
 
-  public JaninoEventEvaluator() {
-
-  }
-
   protected String getDecoratedExpression() {
     String expression = getExpression();
     if(!expression.contains("return")) {
@@ -127,7 +123,7 @@ public class JaninoEventEvaluator extends
     values[i++] = loggingEvent.getLoggerName();
     values[i++] = loggingEvent.getLoggerContextVO();
     values[i++] = loggingEvent.getLevel().toInteger();
-    values[i++] = new Long(loggingEvent.getTimeStamp());
+    values[i++] = loggingEvent.getTimeStamp();
     // In order to avoid NullPointerException, we could push a dummy marker if
     // the event's marker is null. However, this would surprise user who
     // expect to see a null marker instead of a dummy one.

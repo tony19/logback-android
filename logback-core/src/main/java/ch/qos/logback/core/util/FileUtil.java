@@ -19,11 +19,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
 public class FileUtil {
 
+
+  public static URL fileToURL(File file) {
+    try {
+      return file.toURI().toURL();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException("Unexpected exception on file ["+file+"]", e);
+    }
+  }
 
   static public boolean isParentDirectoryCreationRequired(File file) {
     File parent = file.getParentFile();
@@ -53,23 +62,28 @@ public class FileUtil {
       return null;
     }
 
-    URLConnection urlConnection = null;
+    InputStreamReader isr = null;
     try {
-      urlConnection = url.openConnection();
+      URLConnection urlConnection = url.openConnection();
       urlConnection.setUseCaches(false);
-      InputStream is = urlConnection.getInputStream();
-      InputStreamReader isr = new InputStreamReader(is);
+      isr = new InputStreamReader(urlConnection.getInputStream());
       char[] buf = new char[128];
       StringBuilder builder = new StringBuilder();
       int count = -1;
       while ((count = isr.read(buf, 0, buf.length)) != -1) {
         builder.append(buf, 0, count);
       }
-      isr.close();
-      is.close();
       return builder.toString();
     } catch (IOException e) {
       ca.addError("Failled to open " + resourceName, e);
+    } finally {
+      if(isr != null) {
+        try {
+          isr.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
     }
     return null;
   }
