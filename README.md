@@ -1,4 +1,4 @@
-<h1><a href="http://tony19.github.com/logback-android/"><img src="http://tony19.github.com/logback-android/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android</h1>
+<h1><a href="http://qos-ch.github.com/logback-android/"><img src="https://github.com/qos-ch/logback-android/raw/gh-pages/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android</h1>
 
 
 *Advanced logging library for Android applications*
@@ -65,12 +65,12 @@ Logback-Android is built from [Ant][16], using the Android SDK.
 
  [1]: http://logback.qos.ch
  [2]: http://logback.qos.ch/reasonsToSwitch.html
- [3]: http://tony19.github.com/logback-android
- [4]: http://tony19.github.com/logback-android/changelog.html
+ [3]: http://qos-ch.github.com/logback-android
+ [4]: http://qos-ch.github.com/logback-android/changelog.html
  [7]: http://logback.qos.ch/manual/index.html
- [8]: http://tony19.github.com/logback-android/doc/1.0.0-4/
+ [8]: http://qos-ch.github.com/logback-android/doc/1.0.0-4/
  [9]: mailto:logback-user@qos.ch
- [13]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.0-4.jar 
- [14]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
+ [13]: https://github.com/downloads/qos-ch/logback-android/logback-android-1.0.0-4.jar 
+ [14]: https://github.com/downloads/qos-ch/logback-android/slf4j-api-1.6.4.jar
  [15]: http://developer.android.com/sdk/index.html
  [16]: http://ant.apache.org/
