@@ -136,14 +136,4 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   public Map<String, String> getInstanceConverterMap() {
     return instanceConverterMap;
   }
-
-  
-  protected String getPresentationHeaderPrefix() {
-    return CoreConstants.EMPTY_STRING;
-  }
-
-  @Override
-  public String getPresentationHeader() {
-    return getPresentationHeaderPrefix()+pattern;
-  }
 }
