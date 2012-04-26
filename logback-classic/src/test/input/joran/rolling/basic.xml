@@ -10,7 +10,8 @@
       </FileNamePattern>
     </rollingPolicy>
     <encoder>
-      <Pattern>%msg%n</Pattern>
+      <pattern>%msg%n</pattern>
+      <outputPatternAsPresentationHeader>false</outputPatternAsPresentationHeader>
     </encoder>
   </appender>
 

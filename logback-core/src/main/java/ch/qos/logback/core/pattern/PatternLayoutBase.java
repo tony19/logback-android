@@ -33,6 +33,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   protected PostCompileProcessor<E> postCompileProcessor;
 
   Map<String, String> instanceConverterMap = new HashMap<String, String>();
+  protected boolean outputPatternAsPresentationHeader = true;
 
   /**
    * Concrete implementations of this class are responsible for elaborating the
@@ -135,5 +136,26 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
 
   public Map<String, String> getInstanceConverterMap() {
     return instanceConverterMap;
+  }
+  
+  protected String getPresentationHeaderPrefix() {
+    return CoreConstants.EMPTY_STRING;
+  }
+
+  public boolean isOutputPatternAsPresentationHeader() {
+    return outputPatternAsPresentationHeader;
+  }
+
+  public void setOutputPatternAsPresentationHeader(boolean outputPatternAsPresentationHeader) {
+    this.outputPatternAsPresentationHeader = outputPatternAsPresentationHeader;
+  }
+  
+  @Override
+  public String getPresentationHeader() {
+    if(outputPatternAsPresentationHeader)
+      return getPresentationHeaderPrefix()+pattern;
+    else
+      return super.getPresentationHeader();
+
   }
 }

@@ -36,6 +36,8 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.spi.FilterReply;
 
+import static ch.qos.logback.core.CoreConstants.MILLIS_IN_ONE_SECOND;
+
 /**
  * Reconfigure a LoggerContext when the configuration file changes.
  *
@@ -47,7 +49,7 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
    * Scan for changes in configuration file once every minute.
    */
   // 1 minute - value mentioned in documentation
-  public final static long DEFAULT_REFRESH_PERIOD = 60 * 1000;
+  public final static long DEFAULT_REFRESH_PERIOD = 60 * MILLIS_IN_ONE_SECOND;
 
   long refreshPeriod = DEFAULT_REFRESH_PERIOD;
   URL mainConfigurationURL;
@@ -85,8 +87,12 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
   // IMPORTANT: This field can be updated by multiple threads. It follows that
   // its values may *not* be incremented sequentially. However, we don't care
   // about the actual value of the field except that from time to time the
-  // expression (invocationCounter++ & 0xF) == 0xF) should be true.
+  // expression (invocationCounter++ & mask) == mask) should be true.
   private long invocationCounter = 0;
+
+  private volatile long mask = 0xF;
+  private volatile long lastMaskCheck = System.currentTimeMillis();
+
 
   @Override
   public FilterReply decide(Marker marker, Logger logger, Level level,
@@ -95,14 +101,18 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
       return FilterReply.NEUTRAL;
     }
 
-    // for performance reasons, skip any type of computation 15 times out of 16.
-    // Only once every 16 calls is the check for elapsed type is performed
-    if (((invocationCounter++) & 0xF) != 0xF) {
+    // for performance reasons, skip change detection (MASK-1) times out of MASK.
+    // Only once every MASK calls is change detection code executed
+    // Note that MASK is a variable itself.
+    if (((invocationCounter++) & mask) != mask) {
       return FilterReply.NEUTRAL;
     }
 
+    long now = System.currentTimeMillis();
+
     synchronized (configurationWatchList) {
-      if (changeDetected()) {
+      updateMaskIfNecessary(now);
+      if (changeDetected(now)) {
         // Even though reconfiguration involves resetting the loggerContext,
         // which clears the list of turbo filters including this instance, it is
         // still possible for this instance to be subsequently invoked by another
@@ -113,6 +123,30 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
     }
 
     return FilterReply.NEUTRAL;
+  }
+
+  // experiments indicate that even for CPU intensive applications with 200 or more threads MASK
+  // values in the order of 0xFFFF is appropriate
+  private static final int MAX_MASK = 0xFFFF;
+
+
+  // if less  than MASK_INCREASE_THRESHOLD milliseconds elapse between invocations of updateMaskIfNecessary() method,
+  // then the mask should be increased
+  private static final long MASK_INCREASE_THRESHOLD = 100;
+
+  // if more than MASK_DECREASE_THRESHOLD milliseconds elapse between invocations of updateMaskIfNecessary() method,
+  // then the mask should be decreased
+  private static final long MASK_DECREASE_THRESHOLD = MASK_INCREASE_THRESHOLD*8;
+
+  // update the mask so as to execute change detection code about once every 100 to 8000 milliseconds.
+  private void updateMaskIfNecessary(long now) {
+    final long timeElapsedSinceLastMaskUpdateCheck = now - lastMaskCheck;
+    lastMaskCheck = now;
+    if (timeElapsedSinceLastMaskUpdateCheck < MASK_INCREASE_THRESHOLD && (mask < MAX_MASK)) {
+        mask = (mask << 1) | 1;
+    } else if (timeElapsedSinceLastMaskUpdateCheck > MASK_DECREASE_THRESHOLD) {
+      mask = mask >>> 2;
+    }
   }
 
   // by detaching reconfiguration to a new thread, we release the various
@@ -127,8 +161,7 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
     nextCheck = now + refreshPeriod;
   }
 
-  protected boolean changeDetected() {
-    long now = System.currentTimeMillis();
+  protected boolean changeDetected(long now) {
     if (now >= nextCheck) {
       updateNextCheck(now);
       return configurationWatchList.changeDetected();
@@ -155,7 +188,7 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
         return;
       }
       LoggerContext lc = (LoggerContext) context;
-      addInfo(CoreConstants.RESET_MSG_PREFIX + "named ["+context.getName() + "]");
+      addInfo(CoreConstants.RESET_MSG_PREFIX + "named [" + context.getName() + "]");
       if (mainConfigurationURL.toString().endsWith("xml")) {
         performXMLConfiguration(lc);
       } else if (mainConfigurationURL.toString().endsWith("groovy")) {

@@ -19,6 +19,7 @@ import java.util.List;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.DynamicConverter;
 import ch.qos.logback.core.util.CachingDateFormatter;
+import ch.qos.logback.core.util.DatePatternToRegexUtil;
 
 /**
  * Returns a date formatted by SimpleDateFormatter.
@@ -81,8 +82,8 @@ public class DateTokenConverter<E> extends DynamicConverter<E> implements MonoTy
   }
 
   public String toRegex() {
-    DatePatternToRegexUtil toRegex = new DatePatternToRegexUtil(datePattern);
-    return toRegex.toRegex();
+    DatePatternToRegexUtil datePatternToRegexUtil = new DatePatternToRegexUtil(datePattern);
+    return datePatternToRegexUtil.toRegex();
   }
 
   public boolean isPrimary() {
