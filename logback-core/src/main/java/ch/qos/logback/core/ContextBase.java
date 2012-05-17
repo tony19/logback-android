@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 import ch.qos.logback.core.status.StatusManager;
+import ch.qos.logback.core.util.EnvUtil;
 
 import static ch.qos.logback.core.CoreConstants.CONTEXT_NAME_KEY;
 
@@ -35,8 +36,12 @@ public class ContextBase implements Context {
 
   Object configurationLock = new Object();
 
-  // 0 idle threads, 2 maximum threads, no idle waiting
-  ExecutorService executorService = new ThreadPoolExecutor(0, 2,
+  // CORE_POOL_SIZE must be 1 for JDK 1.5. For JD 1.6 or higher it's set to 0
+  // so that there are no idle threads
+  private static final int CORE_POOL_SIZE = EnvUtil.isJDK5() ? 1 : 0;
+
+  // 0 (JDK 1,6+) or 1 (JDK 1.5) idle threads, 2 maximum threads, no idle waiting
+  ExecutorService executorService = new ThreadPoolExecutor(CORE_POOL_SIZE, 2,
           0L, TimeUnit.MILLISECONDS,
           new LinkedBlockingQueue<Runnable>());
 

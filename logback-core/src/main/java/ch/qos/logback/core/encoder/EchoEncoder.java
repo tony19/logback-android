@@ -26,6 +26,8 @@ public class EchoEncoder<E> extends EncoderBase<E> {
   public void doEncode(E event) throws IOException {
     String val = event + CoreConstants.LINE_SEPARATOR;
     outputStream.write(val.getBytes());
+    // necessary if ResilientFileOutputStream is buffered
+    outputStream.flush();
   }
 
   public void close() throws IOException {
