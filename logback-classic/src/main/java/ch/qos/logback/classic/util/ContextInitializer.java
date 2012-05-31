@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.Set;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.android.ASaxEventRecorder;
@@ -254,18 +255,18 @@ public class ContextInitializer {
   }
 
   private void multiplicityWarning(String resourceName, ClassLoader classLoader) {
-    List<URL> urlList = null;
+    Set<URL> urlSet = null;
     StatusManager sm = loggerContext.getStatusManager();
     try {
-      urlList = Loader.getResourceOccurenceCount(resourceName, classLoader);
+      urlSet = Loader.getResourceOccurenceCount(resourceName, classLoader);
     } catch (IOException e) {
       sm.add(new ErrorStatus("Failed to get url list for resource [" + resourceName + "]",
               loggerContext, e));
     }
-    if (urlList != null && urlList.size() > 1) {
+    if (urlSet != null && urlSet.size() > 1) {
       sm.add(new WarnStatus("Resource [" + resourceName + "] occurs multiple times on the classpath.",
               loggerContext));
-      for (URL url : urlList) {
+      for (URL url : urlSet) {
         sm.add(new WarnStatus("Resource [" + resourceName + "] occurs at [" + url.toString() + "]",
                 loggerContext));
       }

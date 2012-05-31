@@ -61,7 +61,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
     }
 
     if (layout == null) {
-      layout = buildLayout(facilityStr);
+      layout = buildLayout();
     }
 
     if (errorCount == 0) {
@@ -69,7 +69,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
     }
   }
 
-  abstract public Layout<E> buildLayout(String facilityStr);
+  abstract public Layout<E> buildLayout();
 
   abstract public int getSeverityForEvent(Object eventObject);
 
