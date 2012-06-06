@@ -53,27 +53,28 @@ gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 -e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" \
 -e "s/\(logback-android.*MD5\:\).*/\1 \`$(md5 bin/${outf} | awk '{print $4}')\`)/" ${readme}
 
-git add README.md
-git commit -m 'preparing release ${version}'
+git add ${readme}
+git commit -m "release ${version}"
 
-echo 'Deleting existing tag if it exists...'
+echo "Deleting existing tag if it exists..."
 git tag -d v_${version}
-echo 'Tagging as ${version}...'
-git tag -a v_${version} -m 'tagging as ${version}'
+echo "Tagging as ${version}..."
+git tag -a v_${version} -m "tagging as ${version}"
 
-echo 'Generating javadoc...'
+echo "Generating javadoc..."
 ant doc -Dversion=${version}
 
 # Update the web pages
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
 cd gh-pages
-cp -r ../doc/${version} doc/.
+mv ../doc/${version} doc/.
+git add doc/${version}
 
 echo "Updating index.html..."
-gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
--e "s/doc\/[0-9]\+\.[0-9]\+\.[0-9]\+\-[0-9]\+/doc\/${version}/" index.html
+gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/g" \
+-e "s/doc\/[0-9]\+\.[0-9]\+\.[0-9]\+\-[0-9]\+/doc\/${version}/g" index.html
+git add index.html
 
-echo "Updating changelog.html..."
 insdiv="<div id=\"${version}\" class=\"release\">\n\
 \t\t<div class=\"version\">${version}</div>\n\
 \t\t<div class=\"reldate\">Released on $(date +'%m-%d-%Y')</div>\n\
@@ -86,7 +87,14 @@ insdiv="<div id=\"${version}\" class=\"release\">\n\
 grep -q "id=\"${version}\" class=\"release\"" changelog.html
 if [ $? -gt 0 ]; then
 	echo "Updating changelog.html"
-	gsed -ie "s@<div id=\"notes\">@&\n\t${insdiv}@" changelog.html
+	
+	echo Press any key to continue
+	read $x
+	gsed -i -e "s@<div id=[\"\']notes[\"\']>@&\n\t${insdiv}@" changelog.html
 fi
+git add changelog.html
+
+# checkin changes to the web pages
+git commit -m "release ${version}"
 
 echo Done
