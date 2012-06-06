@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2011, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2012, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -11,12 +11,18 @@
  * under the terms of the GNU Lesser General Public License version 2.1
  * as published by the Free Software Foundation.
  */
-package ch.qos.logback.core.pattern;
+package ch.qos.logback.core.pattern.color;
 
-public class IdentityCompositeConverter<E> extends CompositeConverter<E> {
+/**
+ * Encloses a given set of converter output in red using the appropriate ANSI escape codes.
+ * @param <E>
+ * @author  Ceki G&uuml;lc&uuml;
+ * @sincee 1.0.5
+ */
+public class RedCompositeConverter<E> extends ForegroundCompositeConverterBase<E> {
 
   @Override
-  protected String transform(E event, String in) {
-    return in;
+  protected String getForegroundColorCode(E event) {
+    return ANSIConstants.RED_FG;
   }
 }

@@ -26,14 +26,14 @@ cd build/ant || exit 1
 # Release version "x.x.x-N"
 #
 # where 
-#	x.x.x is the version of Logback on which Logback-Android is based
+#	x.x.x is the version of logback on which logback-android is based
 # and 
-#	N is the integral release number of Logback-Android.
+#	N is the integral release number of logback-android.
 #
 version=$1
 outf=logback-android-${version}.jar
 
-echo "Starting release process for Logback-Android ${version}..."
+echo "Starting release process for logback-android ${version}..."
 
 # prompt for keystore password (hide input)
 echo "Enter keystore password to sign JAR: "
@@ -47,9 +47,46 @@ stty echo
 #
 ant clean release -Dkey.store.password=${password} -Dversion=${version} && \
 md5 bin/${outf} && \
-echo "Updating README.md" && \
+echo "Updating README.md..." && \
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
+-e "s/doc\/[0-9]\+\.[0-9]\+\.[0-9]\+\-[0-9]\+/doc\/${version}/" \
 -e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" \
 -e "s/\(logback-android.*MD5\:\).*/\1 \`$(md5 bin/${outf} | awk '{print $4}')\`)/" ${readme}
+
+git add README.md
+git commit -m 'preparing release ${version}'
+
+echo 'Deleting existing tag if it exists...'
+git tag -d v_${version}
+echo 'Tagging as ${version}...'
+git tag -a v_${version} -m 'tagging as ${version}'
+
+echo 'Generating javadoc...'
+ant doc -Dversion=${version}
+
+# Update the web pages
+git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
+cd gh-pages
+cp -r ../doc/${version} doc/.
+
+echo "Updating index.html..."
+gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
+-e "s/doc\/[0-9]\+\.[0-9]\+\.[0-9]\+\-[0-9]\+/doc\/${version}/" index.html
+
+echo "Updating changelog.html..."
+insdiv="<div id=\"${version}\" class=\"release\">\n\
+\t\t<div class=\"version\">${version}</div>\n\
+\t\t<div class=\"reldate\">Released on $(date +'%m-%d-%Y')</div>\n\
+\t\t<ul>\n\
+\t\t\t<li>Sync with Logback <a href=\"http://logback.qos.ch/news.html\">${version%-*}</a></li>\n\
+\t\t</ul>\n\
+\t</div>"
+
+# insert the release div if not already present (it shouldn't be present)
+grep -q "id=\"${version}\" class=\"release\"" changelog.html
+if [ $? -gt 0 ]; then
+	echo "Updating changelog.html"
+	gsed -ie "s@<div id=\"notes\">@&\n\t${insdiv}@" changelog.html
+fi
 
 echo Done

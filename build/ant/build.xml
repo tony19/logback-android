@@ -71,6 +71,10 @@
     <available file="${slf4j.jar}" type="file" property="slf4j.present" />
     <fail unless="slf4j.present" message="SLF4J not found" />
 
+    <!-- require JANSI JAR (from ant.properties) -->
+    <available file="${jansi.jar}" type="file" property="jansi.present" />
+    <fail unless="jansi.present" message="JANSI not found" />
+
   <!-- require javamail JARs (from http://code.google.com/p/javamail-android/) -->
   <fail message="javamail jars for android not found">
     <condition>
@@ -89,6 +93,7 @@
 		<pathelement path="${android.jar}" />
 	    <pathelement path="${android.javamail.jar}" />
 	    <pathelement path="${android.jaf.jar}" />
+	    <pathelement path="${jansi.jar}" />
     </path>
     
     <path id="test.libs.path">
