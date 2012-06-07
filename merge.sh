@@ -1,3 +1,4 @@
+#!/bin/sh
 ##############################################################################
 # Logback: the reliable, generic, fast and flexible logging framework.
 # Copyright (C) 2011-2012, Anthony Trinh. All rights reserved.
@@ -13,24 +14,26 @@
 # as published by the Free Software Foundation.
 ##############################################################################
 
-# Path to Android SDK
-sdk.dir=/Users/tony/dev/Tools/android-sdk-mac_x86
+if [ ! $1 ]; then
+	echo "Usage: $0 {version}"
+	exit 1
+fi
 
-# Path to SLF4J library
-slf4j.jar=/Users/tony/dev/jars/slf4j-api-1.6.4.jar
+version=$1
 
-# Path to JUnit library
-junit.jar=/Users/tony/dev/jars/junit-4.10.jar
+echo "Fetching the latest logback code from Github..."
+git remote add upstream https://github.com/qos-ch/logback.git
+git fetch upstream
 
-# Path to Android javamail jars
-android.javamail.jar=/Users/tony/dev/jars/android-javamail.jar
-android.jaf.jar=/Users/tony/dev/jars/android-jaf.jar
+echo "Merging with logback ${version%-*}..."
+git merge tags/v_${version%-*}
+git rm -rf logback-access logback-site
 
-# Path to JANSI library
-jansi.jar=/Users/tony/dev/jars/jansi-1.9.jar
-
-# Path to Logback-Android source directory (doesn't need to change)
-source.dir=../..
-
-# Default version string used if {version} property not set (from command line)
-version.default=1.0.6-1-SNAPSHOT
+# Delete all tags from upstream that don't belong to logback-android
+echo "Deleting all extraneous tags..."
+for x in $(git tag -l)
+do
+	if [[ ! $x =~ [0-9]+\.[0-9]+\.[0-9]+-[0-9]+ ]]; then
+		git tag -d $x
+	fi
+done

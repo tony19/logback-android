@@ -56,8 +56,12 @@ gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 git add ${readme}
 git commit -m "release ${version}"
 
+echo "Updating snapshot version..."
+gsed -i -e "s/\(version\.default\s*=\s*\)\(.*\)/\1${version}-SNAPSHOT/g" ant.properties
+git add ant.properties
+
 echo "Deleting existing tag if it exists..."
-git tag -d v_${version}
+git tag -l | grep -q v_${version} && git tag -d v_${version}
 echo "Tagging as ${version}..."
 git tag -a v_${version} -m "tagging as ${version}"
 
@@ -86,10 +90,7 @@ insdiv="<div id=\"${version}\" class=\"release\">\n\
 # insert the release div if not already present (it shouldn't be present)
 grep -q "id=\"${version}\" class=\"release\"" changelog.html
 if [ $? -gt 0 ]; then
-	echo "Updating changelog.html"
-	
-	echo Press any key to continue
-	read $x
+	echo "Updating changelog.html..."
 	gsed -i -e "s@<div id=[\"\']notes[\"\']>@&\n\t${insdiv}@" changelog.html
 fi
 git add changelog.html
