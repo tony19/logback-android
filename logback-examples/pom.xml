@@ -83,8 +83,25 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+          <excludes>
+            <exclude>**/Marked_EMail_Activity.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
+
+	        <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <extensions>true</extensions>
+                    <configuration>
+                        <sdk>
+                             <platform>8</platform>
+                             <!--<path>/home/matthew/.m2/repository/com/google/android/ammo-android</path-->
+                        </sdk>
+                        <undeployBeforeDeploy>true</undeployBeforeDeploy>
+                    </configuration>
+            </plugin>
 
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
