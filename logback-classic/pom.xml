@@ -197,7 +197,7 @@
     <dependency>
      <groupId>brut.androlib.res</groupId>
      <artifactId>decoder</artifactId>
-     <version>1.0.0</version>
+     <version>1.4.3-1</version>
    </dependency>
 
   </dependencies>

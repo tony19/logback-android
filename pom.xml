@@ -60,7 +60,6 @@
     <jetty.version>7.5.1.v20110908</jetty.version>
     <jansi.version>1.9</jansi.version>
     <!--<jetty.version>8.0.1.v20110908</jetty.version>-->
-    <custom.release.url>http://ammo.isis.vanderbilt.edu:8081/nexus/content/repositories/Vanderbilt/</custom.release.url>
   </properties>
 
   <developers>
@@ -421,14 +420,6 @@
     </repository>
 
   </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>nexus-custom</id>
-      <url>${custom.release.url}</url>
-    </repository>
-  </repositories>
-
 
   <profiles>
     <profile>
