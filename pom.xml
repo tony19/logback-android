@@ -41,8 +41,8 @@
   <modules>
     <module>logback-core</module>
     <module>logback-classic</module>
-    <module>logback-access</module>
-    <module>logback-site</module>
+    <!--module>logback-access</module>
+    <module>logback-site</module-->
     <module>logback-examples</module>
   </modules>
 
@@ -89,6 +89,11 @@
       <artifactId>fest-assert</artifactId>
       <version>1.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.google.android</groupId>
+        <artifactId>android</artifactId>
+        <version>2.2.1</version>
     </dependency>
   </dependencies>
 
