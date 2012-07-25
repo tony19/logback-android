@@ -37,12 +37,11 @@
   </scm>
 
   
-
   <modules>
     <module>logback-core</module>
     <module>logback-classic</module>
-    <module>logback-access</module>
-    <module>logback-site</module>
+    <!--module>logback-access</module>
+    <module>logback-site</module-->
     <module>logback-examples</module>
   </modules>
 
@@ -58,8 +57,9 @@
     <consolePlugin.version>1.1.0</consolePlugin.version>
     <tomcat.version>7.0.21</tomcat.version>
     <jetty.version>7.5.1.v20110908</jetty.version>
-    <jansi.version>1.8</jansi.version>
+    <jansi.version>1.9</jansi.version>
     <!--<jetty.version>8.0.1.v20110908</jetty.version>-->
+    <apktool.lib.version>1.4.4-1</apktool.lib.version>
   </properties>
 
   <developers>
@@ -90,6 +90,18 @@
       <version>1.2</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>com.google.android</groupId>
+        <artifactId>android</artifactId>
+        <version>2.2.1</version>
+    </dependency>
+<!--
+     <dependency>
+          <groupId>org.apache.geronimo.configs</groupId>
+          <artifactId>javamail</artifactId>
+          <version>3.0.0</version>
+    </dependency>
+-->
   </dependencies>
 
 
@@ -172,6 +184,11 @@
         <version>5.1.9</version>
       </dependency>
 
+      <dependency>
+          <groupId>org.apache.geronimo.configs</groupId>
+          <artifactId>javamail</artifactId>
+          <version>3.0.0</version>
+      </dependency>
 
       <dependency>
         <groupId>org.apache.tomcat</groupId>
@@ -206,6 +223,12 @@
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-library</artifactId>
         <version>${scala.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.tony19</groupId>
+        <artifactId>apktool-lib</artifactId>
+        <version>1.4.4-1</version>
       </dependency>
 
     </dependencies>
@@ -403,7 +426,6 @@
     </repository>
 
   </distributionManagement>
-
 
   <profiles>
     <profile>
