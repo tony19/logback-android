@@ -195,10 +195,9 @@
     <!--</dependency>-->
 
     <dependency>
-     <groupId>brut.androlib.res</groupId>
-     <artifactId>decoder</artifactId>
-     <version>1.4.3-1</version>
-   </dependency>
+      <groupId>com.github.tony19</groupId>
+      <artifactId>apktool-lib</artifactId>
+    </dependency>
 
   </dependencies>
 

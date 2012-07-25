@@ -37,7 +37,6 @@
   </scm>
 
   
-
   <modules>
     <module>logback-core</module>
     <module>logback-classic</module>
@@ -60,6 +59,7 @@
     <jetty.version>7.5.1.v20110908</jetty.version>
     <jansi.version>1.9</jansi.version>
     <!--<jetty.version>8.0.1.v20110908</jetty.version>-->
+    <apktool.lib.version>1.4.4-1</apktool.lib.version>
   </properties>
 
   <developers>
@@ -223,6 +223,12 @@
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-library</artifactId>
         <version>${scala.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.tony19</groupId>
+        <artifactId>apktool-lib</artifactId>
+        <version>1.4.4-1</version>
       </dependency>
 
     </dependencies>
