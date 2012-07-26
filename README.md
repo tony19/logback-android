@@ -53,14 +53,13 @@ For help with using **logback-android**, ask the mailing list: [logback-user@qos
 
 Build
 -----
-logback-android is built from [Ant][16], using the Android SDK.
+logback-android is built with Maven 3.
 
-1. Download the [Android SDK][15], Revision 14 (or newer).
-2. Change directory to `${logback-android-src}/build/ant`.
-2. Edit `ant.properties`:
-	* Set `sdk.dir` to the root directory of the Android SDK.
-	* Set `slf4j.jar` to the path of [SLF4J API library][14].
-3. Enter `ant` to begin the build. The JAR is created at `bin/logback-android-1.0.6-1.jar`.
+    # Build core and classic components
+    $ mvn install
+
+    # Build logback-android-1.0.6-1.jar
+    $ mvn -f pom-aggregate.xml package
 
 
  [1]: http://logback.qos.ch
@@ -72,5 +71,3 @@ logback-android is built from [Ant][16], using the Android SDK.
  [9]: mailto:logback-user@qos.ch
  [13]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.6-1.jar 
  [14]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
- [15]: http://developer.android.com/sdk/index.html
- [16]: http://ant.apache.org/
