@@ -1,53 +1,53 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+  
   <parent>
     <groupId>com.github.tony19</groupId>
     <artifactId>logback-android-parent</artifactId>
     <version>1.0.6-1-SNAPSHOT</version>
   </parent>
-
+  
   <modelVersion>4.0.0</modelVersion>
-
+  
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-examples</artifactId>
   <packaging>jar</packaging>
   <name>Logback Examples Module</name>
   <description>logback-examples module</description>
-
+  
   <url>http://logback.qos.ch/android</url>
-
+  
   <licenses>
     <license>
       <name>Eclipse Public License - v 1.0</name>
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
-
+    
     <license>
       <name>GNU Lesser General Public License</name>
       <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
     </license>
   </licenses>
-
+  
   <dependencies>
-
+    
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-core</artifactId>
     </dependency>
-
+    
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-classic</artifactId>
     </dependency>
-
+    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-ext</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
-
+    
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -55,7 +55,7 @@
     </dependency>
     
   </dependencies>
-
+  
   <build>
     <resources>
       <resource>
@@ -69,7 +69,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <excludes>
-          	<exclude>**/Marked_EMail_Activity.java</exclude>
+            <exclude>**/Marked_EMail_Activity.java</exclude>
           </excludes>
         </configuration>
       </plugin>

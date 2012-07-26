@@ -1,49 +1,49 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+  
   <modelVersion>4.0.0</modelVersion>
-
+  
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-parent</artifactId>
   <version>1.0.6-1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Logback-Parent</name>
   <description>logback-android project pom.xml file</description>
-
+  
   <url>http://logback.qos.ch/android</url>
-
+  
   <organization>
     <name>QOS.ch</name>
     <url>http://www.qos.ch</url>
   </organization>
   <inceptionYear>2005</inceptionYear>
-
+  
   <licenses>
     <license>
       <name>Eclipse Public License - v 1.0</name>
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
-
+    
     <license>
       <name>GNU Lesser General Public License</name>
       <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
     </license>
   </licenses>
-
+  
   <scm>
     <url>https://github.com/tony19/logback-android</url>
     <connection>git@github.com:tony19/logback-android.git</connection> 
   </scm>
-
   
-
+  
+  
   <modules>
     <module>logback-core</module>
     <module>logback-classic</module>
     <module>logback-examples</module>
   </modules>
-
+  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- slf4j.version property is used below, in
@@ -54,20 +54,20 @@
     <android.version>2.1_r1</android.version>
     <apktool.version>1.4.4-2</apktool.version>
   </properties>
-
+  
   <developers>
     <developer>
       <id>ceki</id>
       <name>Ceki Gulcu</name>
       <email>ceki@qos.ch</email>
     </developer>
-
+    
     <developer>
       <id>hixi</id>
       <name>Joern Huxhorn</name>
       <email>huxi@undisclosed.org</email>
     </developer>
-
+    
     <developer>
       <id>tony19</id>
       <name>Tony Trinh</name>
@@ -76,7 +76,7 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
-
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -91,8 +91,8 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-
+  
+  
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -100,32 +100,32 @@
         <artifactId>android</artifactId>
         <version>${android.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>com.github.tony19</groupId>
         <artifactId>apktool-lib</artifactId>
         <version>${apktool.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>com.github.tony19</groupId>
         <artifactId>logback-android-core</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>com.github.tony19</groupId>
         <artifactId>logback-android-core</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
       </dependency>
-
+      
       <dependency>
         <groupId>com.github.tony19</groupId>
         <artifactId>logback-android-classic</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
@@ -137,13 +137,13 @@
         <artifactId>jansi</artifactId>
         <version>${jansi.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
         <version>1.4</version>
       </dependency>
-
+      
       <dependency>
         <groupId>hsqldb</groupId>
         <artifactId>hsqldb</artifactId>
@@ -157,8 +157,8 @@
       
     </dependencies>
   </dependencyManagement>
-
-
+  
+  
   <build>
     <plugins>
       <plugin>
@@ -170,13 +170,13 @@
           <showWarnings>true</showWarnings>
         </configuration>
       </plugin>
-
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.12</version>
       </plugin>
-<!--
+      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -196,7 +196,7 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.3.1</version>
       </plugin>
-
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -210,7 +210,7 @@
           <outputDirectory>target/site/dist/</outputDirectory>
         </configuration>
       </plugin>
-
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -243,7 +243,7 @@
                 <linkJavadoc>true</linkJavadoc>
               </configuration>
             </plugin>
-
+            
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
@@ -279,14 +279,14 @@
                 </groups>
               </configuration>
             </plugin>
-
+            
           </reportPlugins>
         </configuration>
       </plugin>
-
+      
     </plugins>
   </build>
-
+  
   <profiles>
     <profile>
       <id>testSkip</id>
@@ -322,8 +322,8 @@
           </plugin>
         </plugins>
       </build>
-	</profile>
-
+    </profile>
+    
     <profile>
       <id>release-sign-artifacts</id>
       <activation>
@@ -351,30 +351,30 @@
         </plugins>
       </build>
     </profile>
-
-	  <profile>
-		<id>release</id>
-		<activation>
-		  <activeByDefault>true</activeByDefault>
-		</activation>
-		<properties>
-		<!-- 
+    
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <!-- 
           	To disable debug compilation, debug must be "true" AND 
           	debuglevel must be "none".
           	http://jira.codehaus.org/browse/MCOMPILER-114 
           -->
-			<maven.compiler.debug>true</maven.compiler.debug>
-			<maven.compiler.debuglevel>none</maven.compiler.debuglevel>
-		</properties>
-	  </profile>
-	  <profile>
-		<id>debug</id>
-		<properties>
-			<maven.compiler.debug>true</maven.compiler.debug>
-			<maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
-		</properties>
-	  </profile>
-
+        <maven.compiler.debug>true</maven.compiler.debug>
+        <maven.compiler.debuglevel>none</maven.compiler.debuglevel>
+      </properties>
+    </profile>
+    <profile>
+      <id>debug</id>
+      <properties>
+        <maven.compiler.debug>true</maven.compiler.debug>
+        <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
+      </properties>
+    </profile>
+    
   </profiles>
-
+  
 </project>
