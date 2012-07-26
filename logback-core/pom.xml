@@ -66,18 +66,6 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
-          <excludes>
-            <exclude>**/core/boolex/JaninoEventEvaluatorBase.java</exclude>
-            <exclude>**/core/db/BindDataSourceToJNDIAction.java</exclude>
-            <exclude>**/core/db/JNDIConnectionSource.java</exclude>
-            <exclude>**/core/joran/conditional/**/*.java</exclude>                           
-            <exclude>**/core/net/JMSAppenderBase.java</exclude>
-            <exclude>**/core/status/ViewStatusMessagesServletBase.java</exclude>
-            <exclude>**/*JNDI*/**/*.java</exclude>
-          </excludes>
-          <testExcludes>
-            <exclude>**/core/joran/conditional/**/*.java</exclude>
-          </testExcludes>
         </configuration>
       </plugin>
 
@@ -102,12 +90,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-<!--        <configuration>
+<!--
+        <configuration>
           <archive>
             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF
             </manifestFile>
           </archive>
-        </configuration>-->
+        </configuration>
+-->
         <executions>
           <execution>
             <id>bundle-test-jar</id>
