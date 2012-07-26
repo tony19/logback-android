@@ -109,6 +109,19 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.subethamail</groupId>
+      <artifactId>subethasmtp</artifactId>
+      <version>2.1.0</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
 	<dependency>
 		<groupId>org.apache.directory.studio</groupId>
 		<artifactId>org.dom4j.dom4j</artifactId>
@@ -132,32 +145,6 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
-          <excludes>
-            <exclude>**/classic/boolex/GEvent*.java</exclude>
-            <exclude>**/classic/boolex/Janino*.java</exclude>
-            <exclude>**/classic/gaffer/**/*.java</exclude>
-            <exclude>**/classic/helpers/**/*.java</exclude>
-            <exclude>**/classic/jmx/**/*.java</exclude>
-            <exclude>**/classic/joran/action/EvaluatorAction.java</exclude>
-            <exclude>**/classic/joran/action/InsertFromJNDIAction.java</exclude>
-            <exclude>**/classic/joran/action/JMXConfiguratorAction.java</exclude>
-            <exclude>**/classic/net/JMS*.java</exclude>
-            <exclude>**/classic/selector/servlet/</exclude>
-            <exclude>**/classic/util/EnvUtil.java</exclude>                           
-            <exclude>**/classic/ViewStatusMessagesServlet.java</exclude>
-            <exclude>**/*JNDI*/**/*.java</exclude>
-          </excludes>
-          <testExcludes>
-          	<exclude>**/classic/boolex/ConditionalWithoutJanino.java</exclude>
-            <exclude>**/classic/net/SMTPAppender_GreenTest.java</exclude>
-            <exclude>**/classic/net/SMTPAppender_SubethaSMTPTest.java</exclude>
-            <exclude>**/classic/net/mock/*.java</exclude>
-            <exclude>**/classic/net/JMS*.java</exclude>
-            <exclude>**/classic/jmx/**/*.java</exclude>
-            <exclude>**/classic/boolex/GEventEvaluatorTest.java</exclude>
-            <exclude>**/classic/boolex/JaninoEventEvaluatorTest.java</exclude>
-            <exclude>**/classic/joran/EvaluatorJoranTest.java</exclude>
-          </testExcludes>
         </configuration>
       </plugin>
 

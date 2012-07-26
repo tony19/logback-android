@@ -82,9 +82,9 @@ public class PackagingDataCalculator {
     ClassLoader lastExactClassLoader = null;
     ClassLoader firsExactClassLoader = null;
 
-    int missfireCount = 0;
+//    int missfireCount = 0;
     for (int i = 0; i < commonFrames; i++) {
-      Class callerClass = null;
+//      Class callerClass = null;
 
 // #############################################
 // XXX: Not supported in Logback-Android
@@ -94,21 +94,21 @@ public class PackagingDataCalculator {
 //            - missfireCount + 1);
 //      }
       StackTraceElementProxy step = stepArray[stepFirstCommon + i];
-      String stepClassname = step.ste.getClassName();
+//      String stepClassname = step.ste.getClassName();
 
-      if (callerClass != null && stepClassname.equals(callerClass.getName())) {
-        // see also LBCLASSIC-263
-        lastExactClassLoader = callerClass.getClassLoader();
-        if (firsExactClassLoader == null) {
-          firsExactClassLoader = lastExactClassLoader;
-        }
-        ClassPackagingData pi = calculateByExactType(callerClass);
-        step.setClassPackagingData(pi);
-      } else {
-        missfireCount++;
+//      if (callerClass != null && stepClassname.equals(callerClass.getName())) {
+//        // see also LBCLASSIC-263
+//        lastExactClassLoader = callerClass.getClassLoader();
+//        if (firsExactClassLoader == null) {
+//          firsExactClassLoader = lastExactClassLoader;
+//        }
+//        ClassPackagingData pi = calculateByExactType(callerClass);
+//        step.setClassPackagingData(pi);
+//      } else {
+        //missfireCount++;
         ClassPackagingData pi = computeBySTEP(step, lastExactClassLoader);
         step.setClassPackagingData(pi);
-      }
+//      }
     }
     populateUncommonFrames(commonFrames, stepArray, firsExactClassLoader);
   }
