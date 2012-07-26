@@ -3,6 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   
   <modelVersion>4.0.0</modelVersion>
+    
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-parent</artifactId>
@@ -34,9 +40,12 @@
   <scm>
     <url>https://github.com/tony19/logback-android</url>
     <connection>git@github.com:tony19/logback-android.git</connection> 
+    <developerConnection>scm:git:git@github.com:tony19/apktool-lib.git</developerConnection>
   </scm>
-  
-  
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/tony19/logback-android/issues</url>
+  </issueManagement>
   
   <modules>
     <module>logback-core</module>
