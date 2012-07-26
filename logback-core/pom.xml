@@ -37,6 +37,7 @@
       <optional>true</optional>      
     </dependency>
 
+	<!-- FIXME: Use the Android javamail JAR -->
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
@@ -60,6 +61,7 @@
 
   <build>
     <plugins>
+     
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

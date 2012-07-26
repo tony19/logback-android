@@ -38,7 +38,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <apktool.version>1.4.4-1</apktool.version>
+    <apktool.version>1.4.4-2</apktool.version>
   </properties>
   
   <dependencies>
@@ -103,13 +103,6 @@
                     <exclude>**/asResource/**</exclude>
                   </excludes>
                 </filter>
-                <filter>
-                  <artifact>com.github.tony19:apktool-lib</artifact>
-                  <excludes>
-                    <exclude>brut/androlib/android-framework.jar</exclude>
-                  </excludes>
-                </filter>
-                	
               </filters>
               
             </configuration>
