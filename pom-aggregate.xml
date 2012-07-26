@@ -38,7 +38,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <apktool.version>1.4.4-2</apktool.version>
+    <apktool.version>1.4.4-3</apktool.version>
   </properties>
   
   <dependencies>

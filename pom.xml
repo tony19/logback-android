@@ -60,8 +60,8 @@
     <slf4j.version>1.6.5</slf4j.version>
     <junit.version>4.10</junit.version>
     <jansi.version>1.9</jansi.version>
-    <android.version>2.1_r1</android.version>
-    <apktool.version>1.4.4-2</apktool.version>
+    <android.version>2.1.2</android.version>
+    <apktool.version>1.4.4-3</apktool.version>
   </properties>
   
   <developers>
