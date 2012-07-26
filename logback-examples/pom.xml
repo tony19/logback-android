@@ -70,6 +70,7 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+          <debug>false</debug>
           <excludes>
           	<exclude>**/*Servlet*.java</exclude>
           	<exclude>**/Marked_EMail_Activity.java</exclude>
