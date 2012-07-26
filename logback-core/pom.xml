@@ -5,17 +5,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-parent</artifactId>
-    <version>1.0.6</version>
+    <groupId>com.github.tony19</groupId>
+    <artifactId>logback-android-parent</artifactId>
+    <version>1.0.6-1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>logback-core</artifactId>
+  <artifactId>logback-android-core</artifactId>
   <packaging>jar</packaging>
   <name>Logback Core Module</name>
-  <description>logback-core module</description>
+  <description>logback-android-core module</description>
 
-  <url>http://logback.qos.ch</url>
+  <url>http://logback.qos.ch/android</url>
 
 
   <licenses>
@@ -32,20 +32,6 @@
 
   <dependencies>
     <dependency>
-       <groupId>org.codehaus.janino</groupId>
-      <artifactId>janino</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
       <optional>true</optional>      
@@ -54,12 +40,6 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jms_1.1_spec</artifactId>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
@@ -72,18 +52,9 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
+      <groupId>com.google.android</groupId>
+      <artifactId>android</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
 
@@ -95,26 +66,20 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+          <excludes>
+            <exclude>**/core/boolex/JaninoEventEvaluatorBase.java</exclude>
+            <exclude>**/core/db/BindDataSourceToJNDIAction.java</exclude>
+            <exclude>**/core/db/JNDIConnectionSource.java</exclude>
+            <exclude>**/core/joran/conditional/**/*.java</exclude>                           
+            <exclude>**/core/net/JMSAppenderBase.java</exclude>
+            <exclude>**/core/status/ViewStatusMessagesServletBase.java</exclude>
+            <exclude>**/*JNDI*/**/*.java</exclude>
+          </excludes>
+          <testExcludes>
+            <exclude>**/core/joran/conditional/**/*.java</exclude>
+          </testExcludes>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <configuration>
-          <testSourceDir>src/test/scala</testSourceDir>
-        </configuration>
-        <executions>
-          <execution>
-            <id>scala-test-compile</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -125,6 +90,7 @@
           <parallel>classes</parallel>
           <trimStackTrace>false</trimStackTrace>
           <excludes>
+            <exclude>**/*.java</exclude>
             <exclude>**/All*Test.java</exclude>
             <exclude>**/PackageTest.java</exclude>
             <exclude>**/ConsoleAppenderTest.java</exclude>
@@ -136,12 +102,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
+<!--        <configuration>
           <archive>
             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF
             </manifestFile>
           </archive>
-        </configuration>
+        </configuration>-->
         <executions>
           <execution>
             <id>bundle-test-jar</id>
@@ -154,34 +120,6 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <instructions>
-            <Export-Package>ch.qos.logback.core.*</Export-Package>
-            <Import-Package>
-              javax.*;resolution:=optional,
-              org.xml.*;resolution:=optional,
-              org.fusesource.jansi;resolution:=optional,
-              org.codehaus.janino;resolution:=optional,
-              *
-            </Import-Package>
-            <Bundle-RequiredExecutionEnvironment>J2SE-1.5
-            </Bundle-RequiredExecutionEnvironment>
-          </instructions>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 

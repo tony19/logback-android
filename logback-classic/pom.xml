@@ -5,17 +5,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-parent</artifactId>
-    <version>1.0.6</version>
+    <groupId>com.github.tony19</groupId>
+    <artifactId>logback-android-parent</artifactId>
+    <version>1.0.6-1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>logback-classic</artifactId>
+  <artifactId>logback-android-classic</artifactId>
   <packaging>jar</packaging>
   <name>Logback Classic Module</name>
-  <description>logback-classic module</description>
+  <description>logback-android-classic module</description>
 
-  <url>http://logback.qos.ch</url>
+  <url>http://logback.qos.ch/android</url>
 
   <licenses>
     <license>
@@ -31,11 +31,16 @@
 
   <dependencies>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
+      <groupId>com.github.tony19</groupId>
+      <artifactId>logback-android-core</artifactId>
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.tony19</groupId>
+      <artifactId>apktool-lib</artifactId>
+    </dependency>
+      
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -64,13 +69,6 @@
       <scope>test</scope>
     </dependency>
 
-
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
@@ -82,20 +80,7 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>test</scope>      
-    </dependency>
-
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.9</version>
-      <scope>test</scope>      
-    </dependency>
-
+    
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
@@ -104,46 +89,17 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.janino</groupId>
-      <artifactId>janino</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
+      <groupId>com.github.tony19</groupId>
+      <artifactId>logback-android-core</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>integration</artifactId>
       <version>${slf4j.version}</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jms_1.1_spec</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>compile</scope>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -153,63 +109,22 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.subethamail</groupId>
-      <artifactId>subethasmtp</artifactId>
-      <version>2.1.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+	<dependency>
+		<groupId>org.apache.directory.studio</groupId>
+		<artifactId>org.dom4j.dom4j</artifactId>
+		<version>1.6.1</version>
+	</dependency>
 
     <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.main</artifactId>
-      <version>2.0.2</version>
-      <scope>test</scope>
+      <groupId>com.google.android</groupId>
+      <artifactId>android</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>org.apache.zookeeper</groupId>-->
-      <!--<artifactId>zookeeper</artifactId>-->
-      <!--<version>3.4.0-SVN</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.apache.zookeeper</groupId>-->
-      <!--<artifactId>zookeeper</artifactId>-->
-      <!--<version>3.4.0-SVN</version>-->
-      <!--<scope>test</scope>-->
-      <!--<classifier>test</classifier>-->
-    <!--</dependency>-->
-
   </dependencies>
 
 
 
   <build>
 
-    <resources>
-      <resource>
-        <directory>src/main/groovy</directory>
-        <includes>
-          <include>**/EvaluatorTemplate.groovy</include>
-        </includes>
-      </resource>
-    </resources>
-
-  
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -217,45 +132,39 @@
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+          <excludes>
+            <exclude>**/classic/boolex/GEvent*.java</exclude>
+            <exclude>**/classic/boolex/Janino*.java</exclude>
+            <exclude>**/classic/gaffer/**/*.java</exclude>
+            <exclude>**/classic/helpers/**/*.java</exclude>
+            <exclude>**/classic/jmx/**/*.java</exclude>
+            <exclude>**/classic/joran/action/EvaluatorAction.java</exclude>
+            <exclude>**/classic/joran/action/InsertFromJNDIAction.java</exclude>
+            <exclude>**/classic/joran/action/JMXConfiguratorAction.java</exclude>
+            <exclude>**/classic/net/JMS*.java</exclude>
+            <exclude>**/classic/selector/servlet/</exclude>
+            <exclude>**/classic/util/EnvUtil.java</exclude>                           
+            <exclude>**/classic/ViewStatusMessagesServlet.java</exclude>
+            <exclude>**/*JNDI*/**/*.java</exclude>
+          </excludes>
+          <testExcludes>
+          	<exclude>**/classic/boolex/ConditionalWithoutJanino.java</exclude>
+            <exclude>**/classic/net/SMTPAppender_GreenTest.java</exclude>
+            <exclude>**/classic/net/SMTPAppender_SubethaSMTPTest.java</exclude>
+            <exclude>**/classic/net/mock/*.java</exclude>
+            <exclude>**/classic/net/JMS*.java</exclude>
+            <exclude>**/classic/jmx/**/*.java</exclude>
+            <exclude>**/classic/boolex/GEventEvaluatorTest.java</exclude>
+            <exclude>**/classic/boolex/JaninoEventEvaluatorTest.java</exclude>
+            <exclude>**/classic/joran/EvaluatorJoranTest.java</exclude>
+          </testExcludes>
         </configuration>
-      </plugin>
-
-      <plugin>
-      <groupId>org.codehaus.groovy.maven</groupId>
-        <artifactId>gmaven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generateStubs</goal>
-              <goal>compile</goal>
-              <goal>generateTestStubs</goal>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-         <groupId>org.scala-tools</groupId>
-         <artifactId>maven-scala-plugin</artifactId>
-         <version>2.14.3</version>
-         <configuration>
-           <testSourceDir>src/test/scala</testSourceDir>
-         </configuration>
-         <executions>
-           <execution>
-             <id>scala-test-compile</id>
-             <phase>process-test-resources</phase>
-             <goals>
-               <goal>testCompile</goal>
-             </goals>
-           </execution>
-        </executions>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+<!--
         <configuration>
           <archive>
             <manifestFile>
@@ -263,6 +172,7 @@
             </manifestFile>
           </archive>
         </configuration>
+-->
         <executions>
           <execution>
             <id>bundle-test-jar</id>
@@ -270,57 +180,6 @@
             <goals>
               <goal>jar</goal>
               <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.4</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant-junit</artifactId>
-            <version>1.8.1</version>
-          </dependency>
-          <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-          </dependency>
-
-        </dependencies>
-        
-        <executions>
-          <execution>
-            <id>ant-osgi-test</id>
-            <phase>package</phase>
-            <configuration>
-              <tasks>      
-                <property name="currentVersion" value="${project.version}" />
-                <property name="slf4j.version" value="${slf4j.version}"/>
-                <property name="basedir" value="${basedir}"/>
-                <ant antfile="${basedir}/osgi-build.xml"/>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-
-          <execution>
-            <id>ant-integration-test</id>
-            <phase>package</phase>
-            <configuration>
-              <tasks>      
-                <property name="slf4j.version" value="${slf4j.version}"/>
-                <ant antfile="${basedir}/integration.xml"/>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
             </goals>
           </execution>
         </executions>
@@ -357,87 +216,7 @@
         </configuration>
       </plugin>
 
-
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <instructions>
-            <Export-Package>ch.qos.logback.classic*, org.slf4j.impl;version=${slf4j.version}</Export-Package>
-            <!-- LB-CLASSIC It is necessary to specify the rolling
-                 file packages as classes are created via IOC (xml
-                 config files). They won't be found by Bnd's analysis
-                 of java code. -->
-
-            <Import-Package>
-              sun.reflect;resolution:=optional, 
-              javax.*;resolution:=optional,
-              org.xml.*;resolution:=optional,
-              org.slf4j,
-              ch.qos.logback.core.rolling,
-              ch.qos.logback.core.rolling.helper,
-              ch.qos.logback.core.util,
-              ch.qos.logback.core.read,
-              org.codehaus.groovy.*;resolution:=optional,
-              groovy.lang.*;resolution:=optional,
-              *
-            </Import-Package>
-
-            <Bundle-RequiredExecutionEnvironment>J2SE-1.5</Bundle-RequiredExecutionEnvironment>
-          </instructions>
-        </configuration>
-      </plugin>
-
     </plugins>
   </build>
-
-  <profiles>
-
-    <profile>
-      <!-- Integration tests require the host-orion profile -->
-      <id>host-orion</id>
-      <dependencies>
-        <!-- locally installed artifact -->
-        <dependency>
-          <groupId>com.microsoft.sqlserver</groupId>
-          <artifactId>sqljdbc4</artifactId>
-          <version>2.0</version>
-          <scope>test</scope>
-        </dependency>
-        <!-- locally installed artifact -->
-        <dependency>
-          <groupId>com.oracle</groupId>
-          <artifactId>ojdbc14</artifactId>
-          <version>10.2.0.1</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-
-    </profile>
-
-    <profile>
-      <!-- Integration tests require the host-hora profile -->
-      <id>host-hora</id>
-      <dependencies>
-        <!-- locally installed artifact -->
-        <dependency>
-          <groupId>com.oracle</groupId>
-          <artifactId>ojdbc14</artifactId>
-          <version>10.2.0.1</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 
 </project>

@@ -23,20 +23,7 @@
 			<outputDirectory>logback-classic/</outputDirectory>
 			<includes>
 				<include>pom.xml</include>
-				<include>osgi-build.xml</include>
 				<include>integration.xml</include>
-			</includes>
-			<excludes>
-				<exclude>*.bak</exclude>
-			</excludes>
-		</fileSet>
-		<fileSet>
-			<directory>logback-access/</directory>
-			<outputDirectory>logback-access/</outputDirectory>
-			<includes>
-				<include>
-					pom.xml
-				</include>
 			</includes>
 			<excludes>
 				<exclude>*.bak</exclude>
@@ -45,18 +32,6 @@
 		<fileSet>
 			<directory>logback-examples/</directory>
 			<outputDirectory>logback-examples/</outputDirectory>
-			<includes>
-				<include>
-					pom.xml
-				</include>
-			</includes>
-			<excludes>
-				<exclude>*.bak</exclude>
-			</excludes>
-		</fileSet>
-		<fileSet>
-			<directory>logback-site/</directory>
-			<outputDirectory>logback-site/</outputDirectory>
 			<includes>
 				<include>
 					pom.xml
@@ -81,10 +56,6 @@
 			<outputDirectory>logback-classic/src/</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>logback-access/src/</directory>
-			<outputDirectory>logback-access/src/</outputDirectory>
-		</fileSet>
-		<fileSet>
 			<directory>logback-examples/src/</directory>
 			<outputDirectory>logback-examples/src/</outputDirectory>
 			<excludes>
@@ -97,16 +68,12 @@
 			<directory>logback-examples/src/main/resources</directory>
 			<outputDirectory>logback-examples/</outputDirectory>
 		</fileSet -->
-		<fileSet>
-			<directory>logback-site/src/</directory>
-			<outputDirectory>logback-site/src/</outputDirectory>
-		</fileSet>
 		<!-- We also include the classes of the examples module -->
 		<fileSet>
 			<directory>logback-examples/target/</directory>
 			<outputDirectory>logback-examples/</outputDirectory>
       <includes>
-				<include>logback-examples-${project.version}.jar</include>
+				<include>logback-android-examples-${project.version}.jar</include>
       </includes>
 		</fileSet>
 		<fileSet>
@@ -127,21 +94,14 @@
 			<directory>logback-core/target/</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>logback-core-${project.version}.jar</include>
+				<include>logback-android-core-${project.version}.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>logback-classic/target/</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>logback-classic-${project.version}.jar</include>
-			</includes>
-		</fileSet>		
-		<fileSet>
-			<directory>logback-access/target/</directory>
-			<outputDirectory>/</outputDirectory>
-			<includes>
-				<include>logback-access-${project.version}.jar</include>
+				<include>logback-android-classic-${project.version}.jar</include>
 			</includes>
 		</fileSet>		
 		<!-- Module Source JARs -->
@@ -149,24 +109,16 @@
 			<directory>logback-core/target/</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>logback-core-${project.version}-sources.jar</include>
+				<include>logback-android-core-${project.version}-sources.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>logback-classic/target/</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>logback-classic-${project.version}-sources.jar</include>
+				<include>logback-android-classic-${project.version}-sources.jar</include>
 			</includes>
 		</fileSet>		
-		<fileSet>
-			<directory>logback-access/target/</directory>
-			<outputDirectory>/</outputDirectory>
-			<includes>
-				<include>logback-access-${project.version}-sources.jar</include>
-			</includes>
-		</fileSet>	
-
 				 
 		<!-- Website -->
 		<fileSet>
