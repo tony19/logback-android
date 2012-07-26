@@ -181,16 +181,13 @@
             <!-- next test requires a running simple server -->
             <exclude>**/SerializationPerfTest.java</exclude>
             
-            <!-- exclude classes not supported in Logback-Android --> 
-            <exclude>**/classic/joran/EvaluatorJoranTest.java</exclude>
-            <exclude>**/classic/joran/conditional/ConditionalTest.java</exclude>
-            <exclude>**/classic/selector/ContextJNDISelectorTest.java</exclude>
-            <exclude>**/classic/selector/ContextDetachingSCLTest.java</exclude>
-            
             <!-- next test is fragile and anyhow will run as part of PackageTest -->
             <exclude>**/LoggerPerfTest.java</exclude>
             <!-- next test is fragile and anyhow will run as part of PackageTest -->
             <exclude>**/LoggingEventSerializationPerfTest.java</exclude>
+            
+            <!-- the async tests are fragile (sometimes fail, other times pass) -->
+            <exclude>**/AsyncAppender*Test.java</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -71,11 +71,13 @@
           <parallel>classes</parallel>
           <trimStackTrace>false</trimStackTrace>
           <excludes>
-            <exclude>**/*.java</exclude>
             <exclude>**/All*Test.java</exclude>
             <exclude>**/PackageTest.java</exclude>
             <exclude>**/ConsoleAppenderTest.java</exclude>
             <exclude>**/TimeBasedRollingTest.java</exclude>
+            
+            <!-- the async tests are fragile (sometimes fail, other times pass) -->
+            <exclude>**/AsyncAppender*Test.java</exclude>
           </excludes>
         </configuration>
       </plugin>
