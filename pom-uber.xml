@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>com.github.tony19</groupId>
-  <artifactId>logback-android-aggregator</artifactId>
+  <artifactId>logback-android</artifactId>
   <version>1.0.6-1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>logback-android-aggregator</name>
-  <description>logback-android aggregator</description>
+  <name>logback-android</name>
+  <description>logback-android uber jar</description>
   
   <url>http://logback.qos.ch/android</url>
   
@@ -53,12 +53,16 @@
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-core</artifactId>
       <version>${project.version}</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/logback-core/target/logback-android-core-${project.version}.jar</systemPath>
     </dependency>
     
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-classic</artifactId>
       <version>${project.version}</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/logback-classic/target/logback-android-classic-${project.version}.jar</systemPath>
     </dependency>
     
   </dependencies>
