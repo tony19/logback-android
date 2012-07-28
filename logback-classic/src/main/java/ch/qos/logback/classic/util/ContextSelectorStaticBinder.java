@@ -18,10 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import ch.qos.logback.classic.ClassicConstants;
 import ch.qos.logback.classic.LoggerContext;
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
-//import ch.qos.logback.classic.selector.ContextJNDISelector;
 import ch.qos.logback.classic.selector.ContextSelector;
 import ch.qos.logback.classic.selector.DefaultContextSelector;
 import ch.qos.logback.core.util.Loader;
@@ -69,12 +65,7 @@ public class ContextSelectorStaticBinder {
     if (contextSelectorStr == null) {
       contextSelector = new DefaultContextSelector(defaultLoggerContext);
     } else if (contextSelectorStr.equals("JNDI")) {
-      // if jndi is specified, let's use the appropriate class
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
-//      contextSelector = new ContextJNDISelector(defaultLoggerContext);
-    	throw new RuntimeException("Not supported");
+      throw new RuntimeException("JNDI not supported");
     } else {
       contextSelector = dynamicalContextSelector(defaultLoggerContext,
           contextSelectorStr);

@@ -16,11 +16,6 @@ package ch.qos.logback.classic.spi;
 import java.net.URL;
 import java.util.HashMap;
 
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
-//import sun.reflect.Reflection;
-
 /**
  * Given a classname locate associated PackageInfo (jar name, version name).
  *
@@ -34,27 +29,6 @@ public class PackagingDataCalculator {
   HashMap<String, ClassPackagingData> cache = new HashMap<String, ClassPackagingData>();
 
   private static boolean GET_CALLER_CLASS_METHOD_AVAILABLE = false; //private static boolean HAS_GET_CLASS_LOADER_PERMISSION = false;
-
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
-//  static {
-//    // if either the Reflection class or the getCallerClass method
-//    // are unavailable, then we won't invoke Reflection.getCallerClass()
-//    // This approach ensures that this class will *run* on JDK's lacking
-//    // sun.reflect.Reflection class. However, this class will *not compile*
-//    // on JDKs lacking sun.reflect.Reflection.
-//    try {
-//      Reflection.getCallerClass(2);
-//      GET_CALLER_CLASS_METHOD_AVAILABLE = true;
-//    } catch (NoClassDefFoundError e) {
-//    } catch (NoSuchMethodError e) {
-//    } catch (Throwable e) {
-//      System.err.println("Unexpected exception");
-//      e.printStackTrace();
-//    }
-//  }
-
 
   public void calculate(IThrowableProxy tp) {
     while (tp != null) {
@@ -82,33 +56,10 @@ public class PackagingDataCalculator {
     ClassLoader lastExactClassLoader = null;
     ClassLoader firsExactClassLoader = null;
 
-//    int missfireCount = 0;
     for (int i = 0; i < commonFrames; i++) {
-//      Class callerClass = null;
-
-// #############################################
-// XXX: Not supported in Logback-Android
-// #############################################
-//      if (GET_CALLER_CLASS_METHOD_AVAILABLE) {
-//        callerClass = Reflection.getCallerClass(localFirstCommon + i
-//            - missfireCount + 1);
-//      }
       StackTraceElementProxy step = stepArray[stepFirstCommon + i];
-//      String stepClassname = step.ste.getClassName();
-
-//      if (callerClass != null && stepClassname.equals(callerClass.getName())) {
-//        // see also LBCLASSIC-263
-//        lastExactClassLoader = callerClass.getClassLoader();
-//        if (firsExactClassLoader == null) {
-//          firsExactClassLoader = lastExactClassLoader;
-//        }
-//        ClassPackagingData pi = calculateByExactType(callerClass);
-//        step.setClassPackagingData(pi);
-//      } else {
-        //missfireCount++;
-        ClassPackagingData pi = computeBySTEP(step, lastExactClassLoader);
-        step.setClassPackagingData(pi);
-//      }
+      ClassPackagingData pi = computeBySTEP(step, lastExactClassLoader);
+      step.setClassPackagingData(pi);
     }
     populateUncommonFrames(commonFrames, stepArray, firsExactClassLoader);
   }

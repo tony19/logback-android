@@ -21,8 +21,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.util.concurrent.ThreadPoolExecutor;
 
-//XXX: NOT SUPPORTED IN ANDROID
-//import ch.qos.logback.classic.gaffer.GafferConfigurator;
 import ch.qos.logback.core.contention.AbstractMultiThreadedHarness;
 import ch.qos.logback.core.contention.MultiThreadedHarness;
 import ch.qos.logback.core.contention.WaitOnExecutionMultiThreadedHarness;
@@ -125,12 +123,6 @@ public class ReconfigureOnChangeTest {
     jc.doConfigure(is);
   }
 
-  void gConfigure(File file) throws JoranException {
-    	// XXX: NOT SUPPORTED IN ANDROID
-//    GafferConfigurator gc = new GafferConfigurator(loggerContext);
-//    gc.run(file);
-  }
-
   RunnableWithCounterAndDone[] buildRunnableArray(File configFile, UpdateType updateType) {
     RunnableWithCounterAndDone[] rArray = new RunnableWithCounterAndDone[THREAD_COUNT];
     rArray[0] = new Updater(configFile, updateType);
@@ -175,7 +167,6 @@ public class ReconfigureOnChangeTest {
     doScanTest(innerFile);
   }
 
-  @Ignore("Not supported in Android")
   @Test(timeout = 4000L)
   public void scanWithResourceInclusion() throws JoranException, IOException, InterruptedException {
     File topLevelFile = new File(INCLUSION_SCAN_TOP_BY_RESOURCE_AS_STR);
@@ -214,20 +205,6 @@ public class ReconfigureOnChangeTest {
     writeToFile(innerFile, "<included><root level=\"ERROR\"/></included> ");
     configure(topLevelFile);
     doScanTest(innerFile, UpdateType.MALFORMED_INNER, REGULAR_RECONFIGURATION, ERRORS_EXPECTED);
-  }
-
-  @Ignore("Not supported in Android")
-  @Test(timeout = 4000L)
-  public void gscan1() throws JoranException, IOException, InterruptedException {
-    File file = new File(G_SCAN1_FILE_AS_STR);
-    gConfigure(file);
-    RunnableWithCounterAndDone[] runnableArray = buildRunnableArray(file, UpdateType.TOUCH);
-    harness.execute(runnableArray);
-
-    loggerContext.getStatusManager().add(
-            new InfoStatus("end of execution ", this));
-
-    verify(expectedResets, MUST_BE_ERROR_FREE);
   }
 
   // check for deadlocks

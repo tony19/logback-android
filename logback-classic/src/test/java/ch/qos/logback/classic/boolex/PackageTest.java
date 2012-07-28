@@ -18,8 +18,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-// XXX: NOT SUPPORTED IN ANDROID
-//@SuiteClasses({JaninoEventEvaluatorTest.class, OnMarkerEvaluatorTest.class})
 @SuiteClasses({OnMarkerEvaluatorTest.class})
 public class PackageTest {
 }

@@ -14,16 +14,6 @@
 // Contributors:  Georg Lundesgaard
 package ch.qos.logback.core.joran.util;
 
-// #############################################
-// XXX: Not supported in Logback-Android
-// Replaced by classes in ch.qos.logback.core.joran.util
-// #############################################
-//import java.beans.BeanInfo;
-//import java.beans.IntrospectionException;
-//import java.beans.Introspector;
-//import java.beans.MethodDescriptor;
-//import java.beans.PropertyDescriptor;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
@@ -80,13 +70,6 @@ public class PropertySetter extends ContextAwareBase {
    */
   protected void introspect() {
     try {
-// #############################################
-// XXX: Not supported in Logback-Android
-// Replaced by classes in ch.qos.logback.core.joran.util
-// #############################################
-//      BeanInfo bi = Introspector.getBeanInfo(obj.getClass());
-//      propertyDescriptors = bi.getPropertyDescriptors();
-//      methodDescriptors = bi.getMethodDescriptors();
       propertyDescriptors = Introspector.getPropertyDescriptors(this.objClass);
       methodDescriptors = Introspector.getMethodDescriptors(this.objClass);
     } catch (IntrospectionException ex) {

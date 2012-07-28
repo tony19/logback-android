@@ -18,14 +18,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 
-// XXX: NOT SUPPORTED IN ANDROID (Where are these files?)
-//@Suite.SuiteClasses({RenameUtilTest.class, SizeBasedRolling_STest.class,
-//	    TimeBasedRolling_STest.class, TimeBasedRollingWithArchiveRemoval_STest.class,
-//        MultiThreadedRollingTest.class,
-//        SizeAndTimeBasedFNATP_STest.class,
-//        RollingFileAppenderTest.class,
-//        ch.qos.logback.core.rolling.helper.PackageTest.class})
-
 @Suite.SuiteClasses({RenameUtilTest.class, 
     MultiThreadedRollingTest.class,
     RollingFileAppenderTest.class,
