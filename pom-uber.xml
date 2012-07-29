@@ -40,7 +40,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <apktool.version>1.4.4-3</apktool.version>
   </properties>
-  
+
   <dependencies>
     
     <dependency>
@@ -53,16 +53,12 @@
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-core</artifactId>
       <version>${project.version}</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/logback-core/target/logback-android-core-${project.version}.jar</systemPath>
     </dependency>
     
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-classic</artifactId>
       <version>${project.version}</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/logback-classic/target/logback-android-classic-${project.version}.jar</systemPath>
     </dependency>
     
   </dependencies>
