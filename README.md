@@ -56,7 +56,7 @@ Build
 logback-android is built with Maven 3.
 
     # Build core and classic components
-    $ mvn package
+    $ mvn install 
 
     # Build logback-android-1.0.6-1.jar
     $ mvn -f pom-uber.xml package
