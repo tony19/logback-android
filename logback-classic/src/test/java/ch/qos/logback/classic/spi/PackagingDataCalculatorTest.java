@@ -87,12 +87,9 @@ public class PackagingDataCalculatorTest {
     double d1 = loop(len, true);
     System.out.println("with    packaging info " + d1 + " microseconds");
 
-    int slackFactor = 8;
-    if (!SystemInfo.getJavaVendor().contains("Sun")) {
-      // be more lenient with other JDKs, esp for logback-android,
-      // which computes packaging info by STEP (slow)
-      slackFactor = 15;
-    }
+    // be more lenient with other JDKs, esp for logback-android,
+    // which computes packaging info by STEP (slow)
+    int slackFactor = 15;
     assertTrue("computing class packaging data (" + d1
         + ") should have been less than " + slackFactor
         + " times the time it takes to process an exception "
