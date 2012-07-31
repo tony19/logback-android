@@ -38,7 +38,7 @@
   <scm>
     <url>https://github.com/tony19/logback-android</url>
     <connection>git@github.com:tony19/logback-android.git</connection> 
-    <developerConnection>scm:git:git@github.com:tony19/apktool-lib.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:tony19/logback-android.git</developerConnection>
   </scm>
   <issueManagement>
     <system>GitHub</system>
