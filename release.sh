@@ -40,14 +40,13 @@ mvn -Dtag=v_${version} release:perform || exit 1
 
 mvn versions:set -DnewVersion=${version}
 mvn clean install -DskipTests
-mvn -f pom-uber package -DskipTests
+mvn -f pom-uber.xml package -DskipTests -Dmy.project.version=${version}
 
 md5 ${outdir}/${outf} && \
 echo "Updating README.md..." && \
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
--e "s/doc\/[0-9]\+\.[0-9]\+\.[0-9]\+\-[0-9]\+/doc\/${version}/" \
--e "s/\*\*[0-9\.\-]*\*\*/\*\*${version}\*\*/" \
--e "s/\(logback-android.*MD5\:\).*/\1 \`$(md5 bin/${outf} | awk '{print $4}')\`)/" ${readme}
+-e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/" \
+-e "s/\(logback-android.*MD5\:\).*/\1 \`$(md5 ${outdir}/${outf} | awk '{print $4}')\`)/" ${readme}
 
 git add ${readme}
 git commit -m "Update README for release ${version}"
@@ -58,12 +57,13 @@ mvn javadoc:javadoc
 # Update the web pages
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
 cd gh-pages
+rm -rf doc/${version}
 mv ${outdir}/site/apidocs doc/${version}
 git add doc/${version}
 
 echo "Updating index.html..."
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/g" \
--e "s/doc\/[0-9]\+\.[0-9]\+\.[0-9]\+\-[0-9]\+/doc\/${version}/g" index.html
+-e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/g" index.html
 git add index.html
 
 insdiv="<div id=\"${version}\" class=\"release\">\n\
@@ -85,4 +85,4 @@ git add changelog.html
 # checkin changes to the web pages
 git commit -m "release ${version}"
 
-echo Done
+echo Done. Push changes to GitHub!!

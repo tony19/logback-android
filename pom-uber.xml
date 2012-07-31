@@ -6,7 +6,7 @@
   
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android</artifactId>
-  <version>1.0.6-1-SNAPSHOT</version>
+  <version>${my.project.version}</version>
   <packaging>jar</packaging>
   <name>logback-android</name>
   <description>logback-android uber jar</description>
@@ -65,6 +65,7 @@
   
   <build>
     <plugins>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -99,12 +100,21 @@
                 <filter>
                   <artifact>*:*</artifact>
                   <excludes>
-                    <exclude>**/META-INF/**</exclude>
                     <exclude>**/asResource/**</exclude>
                   </excludes>
                 </filter>
               </filters>
               
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <manifestEntries>
+                    <Implementation-Title>${project.name}</Implementation-Title>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                    <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+                    <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                  </manifestEntries>
+                </transformer>
+              </transformers>
             </configuration>
           </execution>
         </executions>
