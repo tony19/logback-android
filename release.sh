@@ -14,13 +14,7 @@
 # as published by the Free Software Foundation.
 ##############################################################################
 
-if [ ! $1 ]; then
-	echo "Usage: $0 {version}"
-	exit 1
-fi
-
-readme=../../README.md
-cd build/ant || exit 1
+readme=$PWD/README.md
 
 #
 # Release version "x.x.x-N"
@@ -30,23 +24,26 @@ cd build/ant || exit 1
 # and 
 #	N is the integral release number of logback-android.
 #
-version=$1
+version=$(mvn help:evaluate -Dexpression=project.version | grep '^[^[]')
+version=${version%-SNAPSHOT}
 outf=logback-android-${version}.jar
+outdir=$PWD/target
 
 echo "Starting release process for logback-android ${version}..."
-
-# prompt for keystore password (hide input)
-echo "Enter keystore password to sign JAR: "
-stty -echo
-read password
-stty echo
 
 #
 # Build the JAR and print its MD5. The last line uses GNU sed (gsed)
 # to update the README with the current release version.
 #
-ant clean release -Dkey.store.password=${password} -Dversion=${version} && \
-md5 bin/${outf} && \
+mvn release:clean || exit 1
+mvn release:prepare || exit 1
+mvn release:perform || exit 1
+
+mvn versions:set -DnewVersion=${version}
+mvn clean install
+mvn -f pom-uber package
+
+md5 ${outdir}/${outf} && \
 echo "Updating README.md..." && \
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 -e "s/doc\/[0-9]\+\.[0-9]\+\.[0-9]\+\-[0-9]\+/doc\/${version}/" \
@@ -54,19 +51,7 @@ gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 -e "s/\(logback-android.*MD5\:\).*/\1 \`$(md5 bin/${outf} | awk '{print $4}')\`)/" ${readme}
 
 git add ${readme}
-git commit -m "release ${version}"
-
-echo "Updating snapshot version..."
-gsed -i -e "s/\(version\.default\s*=\s*\)\(.*\)/\1${version}-SNAPSHOT/g" ant.properties
-git add ant.properties
-
-echo "Deleting existing tag if it exists..."
-git tag -l | grep -q v_${version} && git tag -d v_${version}
-echo "Tagging as ${version}..."
-git tag -a v_${version} -m "tagging as ${version}"
-
-echo "Generating javadoc..."
-ant doc -Dversion=${version}
+git commit -m "Update README for release ${version}"
 
 # Update the web pages
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
