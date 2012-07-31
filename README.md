@@ -9,12 +9,12 @@ Overview
 
 [*logback-android*][3] brings the power of *Logback* to Android. [*Logback*][1] is a reliable, generic, fast, and flexible logging library for Java applications. 
 
-The current version is **1.0.6-1**.
+The current version is **1.0.6-2**.
 
 
 Download
 --------
- * [logback-android-1.0.6-1.jar][9] (MD5: `bbda40e50904590c52dc81945824daa2`)
+ * [logback-android-1.0.6-2.jar][9] (MD5: `34c422c0d7c2e857f4e9462168c3ff0e`)
  * [slf4j-api-1.6.4.jar][10] (MD5: `a134d83e0c12a9611824284c855ffb13`)
 
 Quickstart
@@ -65,12 +65,12 @@ To include logback-android in your Maven project, add the following dependencies
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-core</artifactId>
-      <version>1.0.6-1</version>
+      <version>1.0.6-2</version>
     </dependency>
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-classic</artifactId>
-      <version>1.0.6-1</version>
+      <version>1.0.6-2</version>
     </dependency>
 
 
@@ -79,8 +79,8 @@ To include logback-android in your Maven project, add the following dependencies
  [3]: http://tony19.github.com/logback-android
  [4]: http://tony19.github.com/logback-android/changelog.html
  [5]: http://logback.qos.ch/manual/index.html
- [6]: http://tony19.github.com/logback-android/doc/1.0.6-1/
+ [6]: http://tony19.github.com/logback-android/doc/1.0.6-2/
  [7]: mailto:logback-user@qos.ch
- [8]: http://tony19.github.com/logback-android/doc/1.0.6-1/ch/qos/logback/classic/android/LogcatAppender.html
- [9]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.6-1.jar 
+ [8]: http://tony19.github.com/logback-android/doc/1.0.6-2/ch/qos/logback/classic/android/LogcatAppender.html
+ [9]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.6-2.jar 
  [10]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
