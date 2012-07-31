@@ -57,8 +57,10 @@ Build
 logback-android is built with Apache Maven. Use these commands to create the uber JAR.
 
     mvn install 
-    mvn -f pom-uber.xml package
+    mvn -f pom-uber.xml package -Dmy.project.version=1.0.6-2-SNAPSHOT
 
+_**NOTE**: The uber jar contains `logback-android-core`, `logback-android-classic`, and `apktool-lib` (repackaged under `ch.qos.logback.repackage`). The `apktool-lib` will be optional in a future release._
+ 
 
 To include logback-android in your Maven project, add the following dependencies to your project's `pom.xml`:
  
