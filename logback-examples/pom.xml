@@ -13,7 +13,7 @@
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-examples</artifactId>
   <packaging>jar</packaging>
-  <name>Logback Examples Module</name>
+  <name>Logback Android Examples Module</name>
   <description>logback-examples module</description>
   
   <url>http://logback.qos.ch/android</url>

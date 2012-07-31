@@ -12,7 +12,7 @@
   
   <artifactId>logback-android-core</artifactId>
   <packaging>jar</packaging>
-  <name>Logback Core Module</name>
+  <name>Logback Android Core Module</name>
   <description>logback-android-core module</description>
   
   <url>http://logback.qos.ch/android</url>
