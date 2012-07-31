@@ -14,8 +14,6 @@
 # as published by the Free Software Foundation.
 ##############################################################################
 
-readme=$PWD/README.md
-
 #
 # Release version "x.x.x-N"
 #
@@ -28,6 +26,7 @@ version=$(mvn help:evaluate -Dexpression=project.version | grep '^[^[]')
 version=${version%-SNAPSHOT}
 outf=logback-android-${version}.jar
 outdir=$PWD/target
+readme=$PWD/README.md
 
 echo "Starting release process for logback-android ${version}..."
 
@@ -36,12 +35,12 @@ echo "Starting release process for logback-android ${version}..."
 # to update the README with the current release version.
 #
 mvn release:clean || exit 1
-mvn release:prepare || exit 1
-mvn release:perform || exit 1
+mvn -Dtag=v_${version} release:prepare || exit 1
+mvn -Dtag=v_${version} release:perform || exit 1
 
 mvn versions:set -DnewVersion=${version}
-mvn clean install
-mvn -f pom-uber package
+mvn clean install -DskipTests
+mvn -f pom-uber package -DskipTests
 
 md5 ${outdir}/${outf} && \
 echo "Updating README.md..." && \
@@ -53,10 +52,13 @@ gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 git add ${readme}
 git commit -m "Update README for release ${version}"
 
+echo "Generating javadoc..."
+mvn javadoc:javadoc
+
 # Update the web pages
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
 cd gh-pages
-mv ../doc/${version} doc/.
+mv ${outdir}/site/apidocs doc/${version}
 git add doc/${version}
 
 echo "Updating index.html..."
