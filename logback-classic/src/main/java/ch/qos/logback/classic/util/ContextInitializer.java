@@ -54,7 +54,7 @@ public class ContextInitializer {
   final private static String TAG_MANIFEST           = "manifest";
   final private static String TAG_LOGBACK            = "logback";
   final private static String MANIFEST_FILE          = "AndroidManifest.xml";
-  final private static String ASSETS_DIR             = "assets/";
+  final private static String ASSETS_DIR             = "/assets/";
   final private static String SDCARD_DIR             = "/sdcard/logback/";
   
   final LoggerContext loggerContext;
