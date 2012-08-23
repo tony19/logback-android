@@ -82,6 +82,9 @@ public class CoreConstants {
   public static final char COMMA_CHAR = ',';
   public static final char DOUBLE_QUOTE_CHAR = '"';
   public static final char SINGLE_QUOTE_CHAR = '\'';
+  public static final char COLON_CHAR = ':';
+  public static final char DASH_CHAR = '-';
+
 
   /**
    * Number of rows before in an HTML table before,
@@ -145,4 +148,9 @@ public class CoreConstants {
 
 
   public static final String JNDI_COMP_PREFIX = "java:comp/env";
+
+  public static final String UNDEFINED_PROPERTY_SUFFIX = "_IS_UNDEFINED";
+
+  public static final String LEFT_ACCOLADE = new String(new char[] {CURLY_LEFT});
+  public static final String RIGHT_ACCOLADE = new String(new char[] {CURLY_RIGHT});
 }

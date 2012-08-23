@@ -44,6 +44,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
   protected Interpreter interpreter;
 
   public final void doConfigure(URL url) throws JoranException {
+    InputStream in = null;
     try {
       informContextOfURLUsedForConfiguration(getContext(), url);
       URLConnection urlConnection = url.openConnection();
@@ -51,13 +52,22 @@ public abstract class GenericConfigurator extends ContextAwareBase {
       // per http://jira.qos.ch/browse/LBCORE-127
       urlConnection.setUseCaches(false);
 
-      InputStream in = urlConnection.getInputStream();
+      in = urlConnection.getInputStream();
       doConfigure(in);
-      in.close();
     } catch (IOException ioe) {
       String errMsg = "Could not open URL [" + url + "].";
       addError(errMsg, ioe);
       throw new JoranException(errMsg, ioe);
+    } finally {
+      if (in != null) {
+        try {
+          in.close();
+        } catch (IOException ioe) {
+          String errMsg = "Could not close input stream";
+          addError(errMsg, ioe);
+          throw new JoranException(errMsg, ioe);
+        }
+      }
     }
   }
 
@@ -112,10 +122,10 @@ public abstract class GenericConfigurator extends ContextAwareBase {
     RuleStore rs = new SimpleRuleStore(context);
     addInstanceRules(rs);
     this.interpreter = new Interpreter(context, rs, initialPattern());
-    InterpretationContext ec = interpreter.getInterpretationContext();
-    ec.setContext(context);
+    InterpretationContext interpretationContext = interpreter.getInterpretationContext();
+    interpretationContext.setContext(context);
     addImplicitRules(interpreter);
-    addDefaultNestedComponentRegistryRules(ec.getDefaultNestedComponentRegistry());
+    addDefaultNestedComponentRegistryRules(interpretationContext.getDefaultNestedComponentRegistry());
   }
 
   // this is the most inner form of doConfigure whereto other doConfigure
@@ -133,7 +143,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
     doConfigure(recorder.saxEventList);
     // no exceptions a this level
     StatusChecker statusChecker = new StatusChecker(context);
-    if(statusChecker.noXMLParsingErrorsOccurred(threshold)) {
+    if (statusChecker.noXMLParsingErrorsOccurred(threshold)) {
       addInfo("Registering current configuration as safe fallback point");
       registerSafeConfiguration();
     }
