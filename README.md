@@ -15,7 +15,7 @@ The current version is **1.0.7-1**.
 Download
 --------
  * [logback-android-1.0.7-1.jar][9] (MD5: `9daa89599bc7d46a5ce948306a5b4bc5`)
- * [slf4j-api-1.6.4.jar][10] (MD5: `a134d83e0c12a9611824284c855ffb13`)
+ * [slf4j-api-1.6.6.jar][10] (MD5: `9ab3faab3e33793ae3dfceb24540b0a5`)
 
 Quickstart
 ----------
@@ -85,4 +85,4 @@ To include logback-android in your Maven project, add the following dependencies
  [7]: mailto:logback-user@qos.ch
  [8]: http://tony19.github.com/logback-android/doc/1.0.7-1/ch/qos/logback/classic/android/LogcatAppender.html
  [9]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.7-1.jar 
- [10]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.4.jar
+ [10]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.6.jar
