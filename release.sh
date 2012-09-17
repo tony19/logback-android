@@ -53,7 +53,7 @@ md5 ${outdir}/${outf} && \
 echo "Updating README.md..." && \
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 -e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/" \
--e "s/\(logback-android.*MD5\:\).*/\1 \`$(md5 ${outdir}/${outf} | awk '{print $4}')\`)/" ${readme}
+-e "s/\(logback-android.*SHA1\:\).*/\1 \`$(openssl dgst -sha1 ${outdir}/${outf} | awk '{print $2}')\`)/" ${readme}
 
 if [ ! ${dryrun} ]; then
 git add ${readme}
