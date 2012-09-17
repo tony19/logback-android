@@ -14,8 +14,8 @@ The current version is **1.0.7-1**.
 
 Download
 --------
- * [logback-android-1.0.7-1.jar][9] (MD5: `9daa89599bc7d46a5ce948306a5b4bc5`)
- * [slf4j-api-1.6.6.jar][10] (MD5: `9ab3faab3e33793ae3dfceb24540b0a5`)
+ * [logback-android-1.0.7-1.jar][9] (SHA1: `879079a6f5858c3ed40d0fec2e6728e536dd3f1a`)
+ * [slf4j-api-1.7.1.jar][10] (SHA1: `1a508b0ecd360507a39a4dbaedd1aa4750741f6d`)
 
 Quickstart
 ----------
@@ -57,7 +57,7 @@ Build
 logback-android is built with Apache Maven. Use these commands to create the uber JAR.
 
     mvn install 
-    mvn -f pom-uber.xml package -Dmy.project.version=1.0.7-1-SNAPSHOT
+    mvn -f pom-uber.xml package -Dmy.project.version=1.0.7-2-SNAPSHOT
 
 _**NOTE**: The uber jar contains `logback-android-core`, `logback-android-classic`, and `apktool-lib` (repackaged under `ch.qos.logback.repackage`). The `apktool-lib` will be optional in a future release._
  
@@ -85,4 +85,4 @@ To include logback-android in your Maven project, add the following dependencies
  [7]: mailto:logback-user@qos.ch
  [8]: http://tony19.github.com/logback-android/doc/1.0.7-1/ch/qos/logback/classic/android/LogcatAppender.html
  [9]: https://github.com/downloads/tony19/logback-android/logback-android-1.0.7-1.jar 
- [10]: https://github.com/downloads/tony19/logback-android/slf4j-api-1.6.6.jar
+ [10]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.1/slf4j-api-1.7.1.jar
