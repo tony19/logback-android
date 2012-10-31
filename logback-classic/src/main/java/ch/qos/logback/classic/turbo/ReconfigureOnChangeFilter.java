@@ -186,8 +186,6 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
       addInfo(CoreConstants.RESET_MSG_PREFIX + "named [" + context.getName() + "]");
       if (mainConfigurationURL.toString().endsWith("xml")) {
         performXMLConfiguration(lc);
-      } else if (mainConfigurationURL.toString().endsWith("groovy")) {
-    	  addError("Groovy classes are not available. ABORTING INITIALIZATION.");
       }
     }
 

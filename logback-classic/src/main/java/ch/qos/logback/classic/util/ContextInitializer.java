@@ -45,7 +45,6 @@ import ch.qos.logback.core.util.OptionHelper;
  */
 public class ContextInitializer {
 
-  final public static String  GROOVY_AUTOCONFIG_FILE = "logback.groovy";
   final public static String  AUTOCONFIG_FILE        = "logback.xml";
   final public static String  TEST_AUTOCONFIG_FILE   = "logback-test.xml";
   final public static String  CONFIG_FILE_PROPERTY   = "logback.configurationFile";
@@ -136,11 +135,6 @@ public class ContextInitializer {
   public void configureByResource(URL url) throws JoranException {
     if (url == null) {
       throw new IllegalArgumentException("URL argument cannot be null");
-    }
-    if (url.toString().endsWith("groovy")) {
-      StatusManager sm = loggerContext.getStatusManager();
-      sm.add(new ErrorStatus("Groovy classes are not available on the class path. ABORTING INITIALIZATION.",
-              loggerContext));
     }
     if (url.toString().endsWith("xml")) {
     	joranConfigureByResource(url);

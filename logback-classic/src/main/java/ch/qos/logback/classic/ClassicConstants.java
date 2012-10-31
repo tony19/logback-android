@@ -43,7 +43,5 @@ public class ClassicConstants {
   public static final String REQUEST_REQUEST_URL = "req.requestURL";
   public static final String REQUEST_X_FORWARDED_FOR = "req.xForwardedFor";
 
-  public static final String GAFFER_CONFIGURATOR_FQCN = "ch.qos.logback.classic.gaffer.GafferConfigurator";
-
   public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
 }
