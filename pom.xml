@@ -99,7 +99,6 @@
     </dependency>
   </dependencies>
   
-  
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -275,8 +274,6 @@
               <packages>org.slf4j:org.slf4j.*</packages>
             </group>
           </groups>
-          <!-- exclude logback-example code (all in the chapters.* package) -->
-          <excludePackageNames>chapters</excludePackageNames>
         </configuration>
       </plugin>
       
