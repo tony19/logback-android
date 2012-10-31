@@ -213,7 +213,7 @@ public class ContextInitializer {
       if (file.exists()) {
         sm.add(new InfoStatus("Found config in SD card: ["+ file.getAbsolutePath() +"]", loggerContext));
       } else {
-        sm.add(new WarnStatus("No config in SD card", loggerContext));
+        sm.add(new InfoStatus("No config in SD card", loggerContext));
       }
     }
     
