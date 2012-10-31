@@ -37,6 +37,7 @@
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>apktool-lib</artifactId>
+      <scope>compile</scope>
     </dependency>
     
     <dependency>
@@ -122,11 +123,12 @@
     </dependency>
     
     <dependency>
-      <groupId>org.apache.directory.studio</groupId>
-      <artifactId>org.dom4j.dom4j</artifactId>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
       <version>1.6.1</version>
+      <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.google.android</groupId>
       <artifactId>android</artifactId>
