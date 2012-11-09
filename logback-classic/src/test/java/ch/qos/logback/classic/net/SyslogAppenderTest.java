@@ -14,17 +14,21 @@
 package ch.qos.logback.classic.net;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.classic.net.SocketAppenderTest.SocketAppenderFriend;
 import ch.qos.logback.classic.net.mock.MockSyslogServer;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -36,7 +40,7 @@ import ch.qos.logback.core.util.StatusPrinter;
 public class SyslogAppenderTest {
 
   LoggerContext lc = new LoggerContext();
-  SyslogAppender sa = new SyslogAppender();
+  SyslogAppenderFriend sa;// = new SyslogAppenderFriend();
   MockSyslogServer mockServer;
   String loggerName = this.getClass().getName();
   Logger logger = lc.getLogger(loggerName);
@@ -44,6 +48,7 @@ public class SyslogAppenderTest {
   @Before
   public void setUp() throws Exception {
     lc.setName("test");
+    sa = new SyslogAppenderFriend();
     sa.setContext(lc);
   }
 
@@ -51,7 +56,11 @@ public class SyslogAppenderTest {
   public void tearDown() throws Exception {
   }
 
-  public void setMockServerAndConfigure(int expectedCount)
+  public void setMockServerAndConfigure(int expectedCount) throws InterruptedException {
+    setMockServerAndConfigure(expectedCount, true);
+  }
+
+  public void setMockServerAndConfigure(int expectedCount, boolean start)
       throws InterruptedException {
     int port = RandomUtil.getRandomServerPort();
 
@@ -66,9 +75,10 @@ public class SyslogAppenderTest {
     sa.setPort(port);
     sa.setSuffixPattern("[%thread] %logger %msg");
     sa.setStackTracePattern("[%thread] foo "+CoreConstants.TAB);
-    sa.start();
-    assertTrue(sa.isStarted());
-
+    if (start) {
+      sa.start();
+      assertTrue(sa.isStarted());
+    }
     String loggerName = this.getClass().getName();
     Logger logger = lc.getLogger(loggerName);
     logger.addAppender(sa);
@@ -82,7 +92,7 @@ public class SyslogAppenderTest {
     String logMsg = "hello";
     logger.debug(logMsg);
 
-    // wait max 2 seconds for mock server to finish. However, it should
+    // wait max 8 seconds for mock server to finish. However, it should
     // much sooner than that.
     mockServer.join(8000);
 
@@ -189,5 +199,60 @@ public class SyslogAppenderTest {
 
     org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
     logger.info("hello");
+  }
+
+  @Test
+  public void unlazyAppenderIsConnectedAtStart() throws InterruptedException {
+    setMockServerAndConfigure(1, false);
+    sa.setLazy(false);
+    assertFalse(sa.isInitialized());
+    sa.start();
+    assertTrue(sa.isInitialized());
+  }
+
+  @Test
+  public void lazyAppenderIsNotConnectedAtStart() throws InterruptedException {
+    setMockServerAndConfigure(1, false);
+    sa.setLazy(true);
+    assertFalse(sa.isInitialized());
+    sa.start();
+    assertFalse(sa.isInitialized());
+  }
+
+  @Test
+  public void lazyAppenderIsConnectedOnAppend() throws InterruptedException {
+    setMockServerAndConfigure(1, false);
+    sa.setLazy(true);
+    assertFalse(sa.isInitialized());
+    sa.start();
+    assertFalse(sa.isInitialized());
+
+    logger.debug("hello world");
+    mockServer.join(8000);
+
+    assertTrue(sa.isInitialized());
+  }
+
+  @Test
+  public void lazyAppenderMessageIsDelivered() throws InterruptedException {
+    setMockServerAndConfigure(1, false);
+    sa.setLazy(true);
+    sa.start();
+
+    Marker marker = MarkerFactory.getMarker("testMarker");
+    assertFalse(sa.isInitialized());
+    assertTrue(mockServer.getMessageList().isEmpty());
+    logger.debug(marker, "test msg");
+    assertTrue(sa.isInitialized());
+
+    mockServer.join(8000);
+    assertTrue(mockServer.isFinished());
+    assertEquals(1, mockServer.getMessageList().size());
+  }
+
+  class SyslogAppenderFriend extends SyslogAppender {
+    public boolean isInitialized() {
+      return this.sos != null;
+    }
   }
 }

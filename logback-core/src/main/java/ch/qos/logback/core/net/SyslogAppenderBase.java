@@ -39,9 +39,11 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   String facilityStr;
   String syslogHost;
   protected String suffixPattern;
-  SyslogOutputStream sos;
+  protected SyslogOutputStream sos;
   int port = SyslogConstants.SYSLOG_PORT;
-
+  boolean initialized = false;
+  private boolean lazyInit = false;
+  
   public void start() {
     int errorCount = 0;
     if (facilityStr == null) {
@@ -49,15 +51,12 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
       errorCount++;
     }
 
-    try {
-      sos = new SyslogOutputStream(syslogHost, port);
-    } catch (UnknownHostException e) {
-      addError("Could not create SyslogWriter", e);
-      errorCount++;
-    } catch (SocketException e) {
-      addWarn(
-          "Failed to bind to a random datagram socket. Will try to reconnect later.",
-          e);
+    if (!lazyInit) {
+      // this connect() does not retry (unlike the one in SocketAppenderBase)
+      // so account for the error if no connection established
+      if (!connect()) {
+        errorCount++;
+      }
     }
 
     if (layout == null) {
@@ -73,9 +72,31 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
 
   abstract public int getSeverityForEvent(Object eventObject);
 
+  private boolean connect() {
+    try {
+      sos = new SyslogOutputStream(syslogHost, port);
+    } catch (UnknownHostException e) {
+      addError("Could not create SyslogWriter", e);
+    } catch (SocketException e) {
+      addWarn(
+          "Failed to bind to a random datagram socket",
+          e);
+    }
+    // SyslogOutputStream must be non-null to be connected
+    return sos != null;
+  }
+
   @Override
   protected void append(E eventObject) {
     if (!isStarted()) {
+      return;
+    }
+
+    if (!initialized && lazyInit) {
+      initialized = true;
+      connect();
+    }
+    if (sos == null) {
       return;
     }
 
@@ -220,6 +241,26 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
         + SYSLOG_LAYOUT_URL);
   }
 
+  /**
+   * Gets the enable status of lazy initialization of the Syslog output
+   * stream
+   * 
+   * @return true if enabled; false otherwise
+   */
+  public boolean getLazy() {
+    return lazyInit;
+  }
+  
+  /**
+   * Enables/disables lazy initialization of the Syslog output stream.
+   * This defers the connection process until the first outgoing message.
+   * 
+   * @param enabled true to enable lazy initialization; false otherwise
+   */
+  public void setLazy(boolean enable) {
+    lazyInit = enable;
+  }
+  
   @Override
   public void stop() {
     sos.close();
