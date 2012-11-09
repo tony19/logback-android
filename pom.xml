@@ -60,6 +60,7 @@
     <jansi.version>1.9</jansi.version>
     <android.version>2.1.2</android.version>
     <apktool.version>1.4.4-3</apktool.version>
+    <findbugs.version>2.5.2</findbugs.version>
   </properties>
   
   <developers>
