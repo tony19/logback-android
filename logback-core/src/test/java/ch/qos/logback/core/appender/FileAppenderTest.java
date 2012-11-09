@@ -35,7 +35,7 @@ import ch.qos.logback.core.util.FileUtil;
 
 public class FileAppenderTest extends AbstractAppenderTest<Object> {
 
-  int diff = RandomUtil.getPositiveInt();
+  private int diff = RandomUtil.getPositiveInt();
 
   protected Appender<Object> getAppender() {
     return new FileAppender<Object>();
@@ -125,5 +125,67 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     appender.stop();
     assertTrue(file.exists());
     assertTrue("failed to delete " + file.getAbsolutePath(), file.delete());
+  }
+
+  private FileAppenderFriend<Object> getFileAppender(String filename) {
+    FileAppenderFriend<Object> fa = new FileAppenderFriend<Object>();
+    fa.setEncoder(new DummyEncoder<Object>());
+    fa.setFile(filename);
+    fa.setName("testPrudentMode");
+    fa.setContext(context);
+
+    fa.setAppend(false);
+    fa.setPrudent(true);
+    return fa;
+  }
+
+  @Test
+  public void unlazyAppenderOpensFileAtStart() {
+    String filename = CoreTestConstants.OUTPUT_DIR_PREFIX + diff + "testing.txt";
+    File file = new File(filename);
+    if (file.exists()) file.delete();
+    FileAppender<Object> fa = getFileAppender(filename);
+    fa.setLazy(false);
+
+    assertFalse(fa.getOutputStream() != null);
+    fa.start();
+    assertTrue(fa.getOutputStream() != null);
+    assertTrue(file.exists());
+  }
+
+  @Test
+  public void lazyAppenderDoesNotOpenFileAtStart() {
+    String filename = CoreTestConstants.OUTPUT_DIR_PREFIX + diff + "testing.txt";
+    File file = new File(filename);
+    if (file.exists()) file.delete();
+    FileAppender<Object> fa = getFileAppender(filename);
+    fa.setLazy(true);
+
+    assertFalse(fa.getOutputStream() != null);
+    fa.start();
+    assertFalse(fa.getOutputStream() != null);
+    assertFalse(file.exists());
+  }
+
+  @Test
+  public void lazyAppenderOpensFileOnAppend() {
+    String filename = CoreTestConstants.OUTPUT_DIR_PREFIX + diff + "testing.txt";
+    File file = new File(filename);
+    if (file.exists()) file.delete();
+    FileAppenderFriend<Object> fa = getFileAppender(filename);
+    fa.setLazy(true);
+
+    fa.start();
+    assertFalse(fa.getOutputStream() != null);
+    fa.append(new Object());
+    assertTrue(fa.getOutputStream() != null);
+    assertTrue(file.exists());
+  }
+
+  // helper class used to access protected fields
+  class FileAppenderFriend<E> extends FileAppender<E> {
+    public void append(E obj) {
+      this.subAppend(obj);
+    }
   }
 }

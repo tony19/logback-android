@@ -44,6 +44,8 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   protected String fileName = null;
 
   private boolean prudent = false;
+  private boolean initialized = false;
+  private boolean lazyInit = false;
 
   /**
    * The <b>File</b> property takes a string value which should be the name of
@@ -104,11 +106,13 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
         }
       }
 
-      try {
-        openFile(getFile());
-      } catch (java.io.IOException e) {
-        errors++;
-        addError("openFile(" + fileName + "," + append + ") call failed.", e);
+      if (!lazyInit) {
+        try {
+          openFile(getFile());
+        } catch (IOException e) {
+          errors++;
+          addError("openFile(" + fileName + "," + append + ") call failed.", e);
+        }
       }
     } else {
       errors++;
@@ -134,8 +138,11 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    * 
    * @param file_name
    *          The path to the log file.
+   * 
+   * @return true if successful; false otherwise
    */
-  public void openFile(String file_name) throws IOException {
+  public boolean openFile(String file_name) throws IOException {
+    boolean successful = false;
     synchronized (lock) {
       File file = new File(file_name);
       if (FileUtil.isParentDirectoryCreationRequired(file)) {
@@ -150,7 +157,9 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
           file, append);
       resilientFos.setContext(context);
       setOutputStream(resilientFos);
+      successful = true;
     }
+    return successful;
   }
 
   /**
@@ -174,6 +183,26 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
   public void setAppend(boolean append) {
     this.append = append;
+  }
+
+  /**
+   * Gets the enable status of lazy initialization of the file output
+   * stream
+   * 
+   * @return true if enabled; false otherwise
+   */
+  public boolean getLazy() {
+    return lazyInit;
+  }
+
+  /**
+   * Enables/disables lazy initialization of the file output stream.
+   * This defers the file creation until the first outgoing message.
+   * 
+   * @param enabled true to enable lazy initialization; false otherwise
+   */
+  public void setLazy(boolean enable) {
+    lazyInit = enable;
   }
 
   private void safeWrite(E event) throws IOException {
@@ -205,5 +234,20 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     } else {
       super.writeOut(event);
     }
+  }
+
+  @Override
+  protected void subAppend(E event) {
+    if (!initialized && lazyInit) {
+      initialized = true;
+      try {
+        openFile(getFile());
+      } catch (IOException e) {
+        this.started = false;
+        addError("openFile(" + fileName + "," + append + ") call failed.", e);
+      }
+    }
+
+    super.subAppend(event);
   }
 }
