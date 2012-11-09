@@ -53,10 +53,12 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
   protected InetAddress address;
   protected int port = DEFAULT_PORT;
   protected ObjectOutputStream oos;
+  protected Socket socket;
   protected int reconnectionDelay = DEFAULT_RECONNECTION_DELAY;
 
   private Connector connector;
-
+  private boolean initialized = false;
+  private boolean lazyInit = false;
   protected int counter = 0;
 
   /**
@@ -78,7 +80,11 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
           + " For more information, please visit http://logback.qos.ch/codes.html#socket_no_host");
     }
 
-    connect(address, port);
+    if (!lazyInit) {
+      // it's ok if a connection couldn't be established since
+      // connect() will just fire off a retry thread
+      connect(address, port);
+    }
 
     if (errorCount == 0) {
       this.started = true;
@@ -142,7 +148,6 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
 
   @Override
   protected void append(E event) {
-
     if (event == null)
       return;
 
@@ -151,6 +156,11 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
           + this.name
           + "\". For more information, please visit http://logback.qos.ch/codes.html#socket_no_host");
       return;
+    }
+
+    if (!initialized && lazyInit) {
+      initialized = true;
+      connect(address, port);
     }
 
     if (oos != null) {
@@ -255,7 +265,26 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
     return reconnectionDelay;
   }
 
+  /**
+   * Gets the enable status of lazy initialization of the socket
+   * connection
+   *
+   * @return true if enabled; false otherwise
+   */
+  public boolean getLazy() {
+    return lazyInit;
+  }
   
+  /**
+   * Enables/disables lazy initialization of the socket connection.
+   * This defers the connection process until the first outgoing message.
+   *
+   * @param enabled true to enable lazy initialization; false otherwise
+   */
+  public void setLazy(boolean enable) {
+    lazyInit = enable;
+  }
+
   /**
    * The Connector will reconnect when the server becomes available again. It
    * does this by attempting to open a new connection every
@@ -290,7 +319,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
           return;
         } catch (java.net.ConnectException e) {
           addInfo("Remote host " + address.getHostName()
-              + " refused connection.");
+              + " refused connection. " + e.getMessage());
         } catch (IOException e) {
           addInfo("Could not connect to " + address.getHostName()
               + ". Exception is " + e);

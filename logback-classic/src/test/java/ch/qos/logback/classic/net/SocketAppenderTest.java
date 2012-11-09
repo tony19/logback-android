@@ -17,6 +17,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.assertFalse;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -231,6 +232,41 @@ public class SocketAppenderTest {
     assertEquals(Level.DEBUG, remoteEvent.getLevel());
   }
 
+  @Test
+  public void unlazyAppenderIsConnectedAtStart() {
+    SocketAppenderFriend sa = new SocketAppenderFriend();
+    configureClientWithoutStart(sa);
+    sa.setLazy(false);
+    assertFalse(sa.isInitialized());
+    sa.start();
+    assertTrue(sa.isInitialized());
+  }
+
+  @Test
+  public void lazyAppenderIsNotConnectedAtStart() {
+    SocketAppenderFriend sa = new SocketAppenderFriend();
+    configureClientWithoutStart(sa);
+    sa.setLazy(true);
+    assertFalse(sa.isInitialized());
+    sa.start();
+    assertFalse(sa.isInitialized());
+  }
+
+  @Test
+  public void lazyAppenderIsConnectedOnAppend() {
+    SocketAppenderFriend sa = new SocketAppenderFriend();
+    configureClientWithoutStart(sa);
+    sa.setLazy(true);
+    assertFalse(sa.isInitialized());
+    sa.start();
+    assertFalse(sa.isInitialized());
+
+    Logger logger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+    logger.debug("hello world");
+    waitForListAppenderLatch();
+    assertTrue(sa.isInitialized());
+  }
+
   private static void waitForServerToStart() throws InterruptedException {
     SIMPLE_SOCKET_SERVER.getLatch().await(100, TimeUnit.MILLISECONDS);
   }
@@ -263,18 +299,23 @@ public class SocketAppenderTest {
       throw new RuntimeException("problem while waiting for barrier", e);
     }
   }
+
   private void configureClient() {
+    configureClientWithoutStart(socketAppender);
+    socketAppender.start();
+  }
+
+  private void configureClientWithoutStart(SocketAppender client) {
     loggerContext = new LoggerContext();
     loggerContext.setName("test");
     loggerContext.putProperty("testKey", "testValue");
     Logger root = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
-    socketAppender.setContext(loggerContext);
-    socketAppender.setName("socket");
-    socketAppender.setPort(PORT);
-    socketAppender.setRemoteHost("localhost");
-    socketAppender.setIncludeCallerData(includeCallerData);
-    root.addAppender(socketAppender);
-    socketAppender.start();
+    client.setContext(loggerContext);
+    client.setName("socket");
+    client.setPort(PORT);
+    client.setRemoteHost("localhost");
+    client.setIncludeCallerData(includeCallerData);
+    root.addAppender(client);
   }
 
   public static class ListAppenderWithLatch<E> extends ListAppender<E> {
@@ -290,4 +331,14 @@ public class SocketAppenderTest {
     }
   }
 
+  class SocketAppenderFriend extends SocketAppender {
+    /**
+     * Determines whether the socket appender has a socket
+     */
+    public boolean isInitialized() {
+      // the ObjectOutputStream is only not null
+      // when the socket exists
+      return socket != null;
+    }
+  }
 }
