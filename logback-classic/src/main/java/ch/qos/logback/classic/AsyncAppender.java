@@ -27,7 +27,6 @@ import ch.qos.logback.core.AsyncAppenderBase;
  */
 public class AsyncAppender extends AsyncAppenderBase<ILoggingEvent> {
 
-
   boolean includeCallerData = false;
 
 

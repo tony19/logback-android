@@ -39,10 +39,7 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
   // value "%logger{20} - %m" is referenced in the docs!
   static final String DEFAULT_SUBJECT_PATTERN = "%logger{20} - %m";
   
-  private int bufferSize = 512;
   private boolean includeCallerData = false;
-
-
 
   /**
    * The default constructor will instantiate the appender with a
@@ -52,14 +49,14 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
   public SMTPAppender() {
 
   }
-  
+
   public void start() {    
     if (eventEvaluator == null) {
       OnErrorEvaluator onError = new OnErrorEvaluator();
       onError.setContext(getContext());
       onError.setName("onError");
       onError.start();
-      this.eventEvaluator = onError;      
+      this.eventEvaluator = onError;
     }
     super.start();
   }
@@ -117,7 +114,6 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
     pl.start();
     return pl;
   }
-
 
   protected PatternLayout makeNewToPatternLayout(String toPattern) {
     PatternLayout pl = new PatternLayout();

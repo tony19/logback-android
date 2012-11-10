@@ -65,7 +65,6 @@ public class AsyncAppenderTest {
     assertFalse(e.hasCallerData());
   }
 
-
   @Test
   public void settingIncludeCallerDataPropertyCausedCallerDataToBeIncluded() {
     asyncAppender.addAppender(listAppender);

@@ -229,7 +229,7 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> implemen
         }
       }
 
-      addInfo("Worker thread will flush remaining events before exiting. ");
+      addInfo("Worker thread will flush remaining events before exiting.");
       for (E e : parent.blockingQueue) {
         aai.appendLoopOnAppenders(e);
       }
