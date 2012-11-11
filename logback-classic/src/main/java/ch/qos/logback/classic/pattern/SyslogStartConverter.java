@@ -13,8 +13,6 @@
  */
 package ch.qos.logback.classic.pattern;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,7 +27,7 @@ public class SyslogStartConverter extends ClassicConverter {
   long lastTimestamp = -1;
   String timesmapStr = null;
   SimpleDateFormat simpleFormat;
-  String localHostName;
+  final String localHostName = "localhost";
   int facility;
 
   public void start() {
@@ -42,8 +40,7 @@ public class SyslogStartConverter extends ClassicConverter {
     }
 
     facility = SyslogAppenderBase.facilityStringToint(facilityStr);
-  
-    localHostName = getLocalHostname();
+
     try {
       // hours should be in 0-23, see also http://jira.qos.ch/browse/LBCLASSIC-48
       simpleFormat = new SimpleDateFormat("MMM dd HH:mm:ss", new DateFormatSymbols(Locale.US));
@@ -71,22 +68,6 @@ public class SyslogStartConverter extends ClassicConverter {
     sb.append(' ');
 
     return sb.toString();
-  }
-
-  /**
-   * This method gets the network name of the machine we are running on.
-   * Returns "UNKNOWN_LOCALHOST" in the unlikely case where the host name 
-   * cannot be found.
-   * @return String the name of the local host
-   */
-  public String getLocalHostname() {
-    try {
-      InetAddress addr = InetAddress.getLocalHost();
-      return addr.getHostName();
-    } catch (UnknownHostException uhe) {
-      addError("Could not determine local host name", uhe);
-      return "UNKNOWN_LOCALHOST";
-    }
   }
 
   String computeTimeStampString(long now) {
