@@ -133,7 +133,8 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
     try {
       // First, close the previous connection if any.
       cleanUp();
-      oos = new ObjectOutputStream(new Socket(address, port).getOutputStream());
+      socket = new Socket(address, port);
+      oos = new ObjectOutputStream(socket.getOutputStream());
     } catch (IOException e) {
 
       String msg = "Could not connect to remote logback server at ["
