@@ -20,10 +20,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.turbo.ReconfigureOnChangeFilter;
 import ch.qos.logback.core.joran.action.Action;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
-import ch.qos.logback.core.util.ContextUtil;
 import ch.qos.logback.core.util.Duration;
 import ch.qos.logback.core.util.OptionHelper;
-import ch.qos.logback.core.util.StatusPrinter;
 
 public class ConfigurationAction extends Action {
   static final String INTERNAL_DEBUG_ATTR = "debug";
@@ -33,6 +31,7 @@ public class ConfigurationAction extends Action {
 
   long threshold = 0;
 
+  @Override
   public void begin(InterpretationContext ic, String name, Attributes attributes) {
     threshold = System.currentTimeMillis();
 
@@ -54,15 +53,15 @@ public class ConfigurationAction extends Action {
     processScanAttrib(ic, attributes);
 
   	/* http://developer.android.com/reference/java/net/InetAddress.html#getLocalHost()
-  	 * 
+  	 *
   	 * addHostNameasProperty() leads to InetAddress.getLocalHost(), which performs
-  	 * a DNS query and thus causes an android.os.NetworkOnMainThreadException if 
+  	 * a DNS query and thus causes an android.os.NetworkOnMainThreadException if
   	 * this logger configuration originated from the main thread (Issue #3). It
   	 * turns out the hostname is atypical in Android devices, and the DNS query
   	 * is normally fruitless. The end result is a hostname of "localhost" (the
-  	 * default) at the cost of a DNS query. 
-  	 * 
-  	 * The reason the hostname is added to the context's properties is for the 
+  	 * default) at the cost of a DNS query.
+  	 *
+  	 * The reason the hostname is added to the context's properties is for the
   	 * variable-lookup of ${HOSTNAME} in configuration XML, but the context is only
   	 * one of the sources. If the context doesn't have the variable, the OS environment
   	 * is searched next. We can safely omit this next call.
@@ -98,6 +97,7 @@ public class ConfigurationAction extends Action {
     }
   }
 
+  @Override
   public void end(InterpretationContext ec, String name) {
     addInfo("End of configuration.");
     ec.popObject();
