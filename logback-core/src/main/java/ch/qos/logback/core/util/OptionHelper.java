@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.android.SystemPropertiesProxy;
 import ch.qos.logback.core.spi.ContextAware;
 import ch.qos.logback.core.spi.PropertyContainer;
 import ch.qos.logback.core.spi.ScanException;
@@ -177,17 +178,32 @@ public class OptionHelper {
     }
   }
 
+  /**
+   * Gets an Android system property
+   *
+   * @param key The key to search for
+   * @return the string value of the system property
+   */
+  public static String getAndroidSystemProperty(String key) {
+    try {
+      return SystemPropertiesProxy.getInstance().get(key, null);
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
+  }
 
   /**
    * Very similar to <code>System.getProperty</code> except that the
-   * {@link SecurityException} is absorbed.
+   * {@link SecurityException} is absorbed. Also checks Android
+   * system properties as a fallback.
    *
    * @param key The key to search for.
    * @return the string value of the system property.
    */
   public static String getSystemProperty(String key) {
     try {
-      return System.getProperty(key);
+      String prop = System.getProperty(key);
+      return (prop == null) ? getAndroidSystemProperty(key) : prop;
     } catch (SecurityException e) {
       return null;
     }

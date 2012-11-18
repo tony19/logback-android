@@ -20,6 +20,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.turbo.ReconfigureOnChangeFilter;
 import ch.qos.logback.core.joran.action.Action;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
+import ch.qos.logback.core.util.ContextUtil;
 import ch.qos.logback.core.util.Duration;
 import ch.qos.logback.core.util.OptionHelper;
 
@@ -38,7 +39,7 @@ public class ConfigurationAction extends Action {
     // See LBCLASSIC-225 (the system property is looked up first. Thus, it overrides
     // the equivalent property in the config file. This reversal of scope priority is justified
     // by the use case: the admin trying to chase rogue config file
-    String debugAttrib = System.getProperty(DEBUG_SYSTEM_PROPERTY_KEY);
+    String debugAttrib = OptionHelper.getSystemProperty(DEBUG_SYSTEM_PROPERTY_KEY);
     if (debugAttrib == null) {
       debugAttrib = ic.subst(attributes.getValue(INTERNAL_DEBUG_ATTR));
     }
@@ -51,22 +52,7 @@ public class ConfigurationAction extends Action {
     }
 
     processScanAttrib(ic, attributes);
-
-  	/* http://developer.android.com/reference/java/net/InetAddress.html#getLocalHost()
-  	 *
-  	 * addHostNameasProperty() leads to InetAddress.getLocalHost(), which performs
-  	 * a DNS query and thus causes an android.os.NetworkOnMainThreadException if
-  	 * this logger configuration originated from the main thread (Issue #3). It
-  	 * turns out the hostname is atypical in Android devices, and the DNS query
-  	 * is normally fruitless. The end result is a hostname of "localhost" (the
-  	 * default) at the cost of a DNS query.
-  	 *
-  	 * The reason the hostname is added to the context's properties is for the
-  	 * variable-lookup of ${HOSTNAME} in configuration XML, but the context is only
-  	 * one of the sources. If the context doesn't have the variable, the OS environment
-  	 * is searched next. We can safely omit this next call.
-  	 */
-    //new ContextUtil(context).addHostNameAsProperty();
+    new ContextUtil(context).addHostNameAsProperty();
 
     // the context is turbo filter attachable, so it is pushed on top of the
     // stack

@@ -13,8 +13,6 @@
  */
 package ch.qos.logback.core.util;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -28,26 +26,14 @@ public class ContextUtil extends ContextAwareBase {
     setContext(context);
   }
 
-  static String getLocalHostName() throws UnknownHostException {
-    InetAddress localhost = InetAddress.getLocalHost();
-    return localhost.getHostName();
-  }
-
   /**
    * Add the local host's name as a property
    */
   public void addHostNameAsProperty() {
-    try {
-      String localhostName =  getLocalHostName();
-      context.putProperty(CoreConstants.HOSTNAME_KEY, localhostName);
-    } catch (UnknownHostException e) {
-      addError("Failed to get local hostname", e);
-    } catch (SecurityException e) {
-      addError("Failed to get local hostname", e);
-    }
+    context.putProperty(CoreConstants.HOSTNAME_KEY, "localhost");
   }
 
-   public void addProperties(Properties props) {
+  public void addProperties(Properties props) {
     if (props == null) {
       return;
     }
