@@ -75,15 +75,16 @@ public class RegularEscapeUtil implements IEscapeUtil {
           c = '\t';
         } else if (c == 'f') {
           c = '\f';
-        } else if (c == '\b') {
-          c = '\b';
-        } else if (c == '\"') {
-          c = '\"';
-        } else if (c == '\'') {
-          c = '\'';
-        } else if (c == '\\') {
-          c = '\\';
         }
+//        } else if (c == '\b') {
+//          c = '\b';
+//        } else if (c == '\"') {
+//          c = '\"';
+//        } else if (c == '\'') {
+//          c = '\'';
+//        } else if (c == '\\') {
+//          c = '\\';
+//        }
       }
       sbuf.append(c);
     }
