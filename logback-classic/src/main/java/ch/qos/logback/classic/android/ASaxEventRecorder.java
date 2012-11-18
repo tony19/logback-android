@@ -30,18 +30,21 @@ import ch.qos.logback.core.joran.spi.JoranException;
 
 /**
  * SAX event recorder for compressed Android XML resource files.
- * Supports filtering to capture only the sub-events of an event 
+ * Supports filtering to capture only the sub-events of an event
  * of interest in order to conserve memory usage.
- * 
+ *
  * @author Anthony Trinh
  */
 public class ASaxEventRecorder extends SaxEventRecorder {
   private int holderForStartAndLength[] = new int[2];
   private StatePassFilter filter = new StatePassFilter();
+  private String attrNameToWatch = null;
+  private String elemNameToWatch = null;
+  private String attrWatchValue = null;
 
   /**
    * Constructor
-   * 
+   *
    * @param context logger context
    */
   public ASaxEventRecorder(Context context) {
@@ -50,22 +53,22 @@ public class ASaxEventRecorder extends SaxEventRecorder {
   }
 
   /**
-   * Sets a filter so that only sub-elements of a specific element 
+   * Sets a filter so that only sub-elements of a specific element
    * are captured
-   * 
+   *
    * <p>
    * For example, if the desired elements were inside
    * <br>
-   * <blockquote>{@code <x><y>}</blockquote> 
-   * and the input were 
+   * <blockquote>{@code <x><y>}</blockquote>
+   * and the input were
    * <br>
    * <blockquote>{@code <x><y><a/><b/><c/></x></y>}</blockquote>
    * the filter would pass
    * <br>
    * <blockquote>{@code <a/><b/><c/>}</blockquote>
-   * 
+   *
    * The call in this example would be: {@code setFilter("x", "y")}.
-   * 
+   *
    * @param names names of elements leading to the target elements;
    * use {@code null} to disable filtering (capture all events)
    */
@@ -74,8 +77,33 @@ public class ASaxEventRecorder extends SaxEventRecorder {
   }
 
   /**
+   * Sets a "watch" for an element's attribute, which can be retrieved
+   * with {@link #getAttributeWatchValue()}. During the parsing of the SAX
+   * events, the START-elements are searched for the target attribute.
+   * If found, the attribute's value is stored. This checks all START-
+   * elements, regardless of filtering.
+   *
+   * @param elemName name of the element that contains the attribute
+   * @param attrName name of the attribute
+   */
+  public void setAttributeWatch(String elemName, String attrName) {
+    elemNameToWatch = elemName;
+    attrNameToWatch = attrName;
+  }
+
+  /**
+   * Gets the value of the attribute set by {@link #setAttributeWatch(String, String)}
+   *
+   * @return the string value of the attribute; if the attribute was
+   * not encountered, this returns null
+   */
+  public String getAttributeWatchValue() {
+    return attrWatchValue;
+  }
+
+  /**
    * Parses SAX events from a compressed Android XML resource
-   * 
+   *
    * @param src input source pointing to a compressed Android XML resource
    */
   @Override
@@ -89,6 +117,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
     try {
       AXmlResourceParser xpp = new AXmlResourceParser(stream);
 
+      attrWatchValue = null;
       int eventType = -1;
       while ((eventType = xpp.next()) > -1) {
         if (XmlPullParser.START_DOCUMENT == eventType) {
@@ -118,7 +147,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
   /**
    * Processes the START_DOCUMENT event
-   *  
+   *
    * @param xpp parser that contains the event
    */
   private void startDocument(XmlPullParser xpp) {
@@ -128,7 +157,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
   /**
    * Processes the TEXT event
-   * 
+   *
    * @param xpp parser that contains the event
    */
   private void characters(XmlPullParser xpp) {
@@ -142,7 +171,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
   /**
    * Process the END_ELEMENT event
-   * 
+   *
    * @param xpp parser that contains the event
    */
   private void endElement(XmlPullParser xpp) {
@@ -154,7 +183,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
   /**
    * Processes the START_ELEMENT event
-   *  
+   *
    * @param xpp parser that contains the event
    */
   private void startElement(XmlPullParser xpp) {
@@ -168,28 +197,49 @@ public class ASaxEventRecorder extends SaxEventRecorder {
       }
       startElement(xpp.getNamespace(), name, name, atts);
     }
+    // check for attributes (and ignore filter)
+    checkForWatchedAttribute(xpp);
+  }
+
+  /**
+   * Checks a START-element for the watched attribute, set by
+   * {@link #setAttributeWatch(String, String)}. If the attribute
+   * was already found, this does nothing.
+   *
+   * @param xpp parser that contains the START_ELEMENT event
+   */
+  private void checkForWatchedAttribute(XmlPullParser xpp) {
+    if (elemNameToWatch != null &&
+        attrWatchValue == null &&
+        xpp.getName().equals(elemNameToWatch)) {
+      for (int i = 0; i < xpp.getAttributeCount(); i++) {
+        if (xpp.getAttributeName(i).equals(attrNameToWatch)) {
+            attrWatchValue = xpp.getAttributeValue(i);
+        }
+      }
+    }
   }
 
   /**
    * Filter that passes start-tags and end-tags within a specific
-   * set of tags. 
-   * 
+   * set of tags.
+   *
    * <p>
-   * This is useful in an XML pull parser for capturing XML sub-elements 
-   * of a specific element. For example, if the desired elements were in 
+   * This is useful in an XML pull parser for capturing XML sub-elements
+   * of a specific element. For example, if the desired elements were in
    * <br>
-   * <blockquote>{@code <x><y>}</blockquote> 
-   * and the input were 
+   * <blockquote>{@code <x><y>}</blockquote>
+   * and the input were
    * <br>
    * <blockquote>{@code <x><y><a/><b/><c/></x></y>}</blockquote>
    * the filter would pass
    * <br>
    * <blockquote>{@code <a/><b/><c/>}</blockquote>
-   * 
+   *
    * The initialization in this example would be: {@code new StatePassFilter("x", "y")}.
    */
   class StatePassFilter {
-    private String[] _states;
+    private final String[] _states;
     private int _depth = 0;
 
     public StatePassFilter(String... states) {
@@ -200,7 +250,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
      * Checks if a start-tag element name passes the filter. If the
      * name matches the filter's current state, the filter depth
      * is advanced.
-     *  
+     *
      * @param name element name to check
      * @return {@true code} if passed; {@code false} otherwise
      */
@@ -217,7 +267,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
      * Checks if an end-tag element name passes the filter. If the
      * name matches the filter's current state, the filter depth
      * is decremented.
-     * 
+     *
      * @param name element name to check
      * @return {@true code} if passed; {@code false} otherwise
      */
@@ -231,7 +281,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
     /**
      * Gets the number of states in the filter
-     * 
+     *
      * @return state count
      */
     public int size() {
@@ -240,7 +290,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
     /**
      * Gets the current depth (state) into the filter
-     * 
+     *
      * @return depth
      */
     public int depth() {
@@ -256,7 +306,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
     /**
      * Gets the pass state. Equivalent to {@code depth() == size()}.
-     * 
+     *
      * @return {@code true} if passed; {@code false} otherwise
      */
     public boolean passed() {

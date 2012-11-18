@@ -19,6 +19,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +29,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.android.ASaxEventRecorder;
 import ch.qos.logback.classic.android.BasicLogcatConfigurator;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.android.CommonPathUtil;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.ErrorStatus;
@@ -52,19 +57,21 @@ public class ContextInitializer {
   final public static String  SYSOUT                 = "SYSOUT";
   final private static String TAG_MANIFEST           = "manifest";
   final private static String TAG_LOGBACK            = "logback";
+  final private static String ATTR_PACKAGE_NAME      = "package";
   final private static String MANIFEST_FILE          = "AndroidManifest.xml";
-  final private static String ASSETS_DIR             = "assets/";
-  final private static String SDCARD_DIR             = "/sdcard/logback/";
-  
+  final private static String ASSETS_DIR             = CommonPathUtil.getAssetsDirectoryPath();
+  final private static String SDCARD_DIR = CommonPathUtil.getExternalStorageDirectoryPath() + "/logback";
+
   final LoggerContext loggerContext;
 
   public ContextInitializer(LoggerContext loggerContext) {
     this.loggerContext = loggerContext;
   }
-  
-  private InputStream openManifest(ClassLoader classLoader, boolean updateStatus) {
-    StatusManager sm = loggerContext.getStatusManager();
 
+  /**
+   * Gets an input stream to the application's AndroidManifest.xml
+   */
+  private InputStream openManifest(ClassLoader classLoader, boolean updateStatus) {
     // fetch the URL to AndroidManifest.xml
     URL url = getResource(MANIFEST_FILE, classLoader, updateStatus);
     if (url == null) {
@@ -78,22 +85,28 @@ public class ContextInitializer {
       // per http://jira.qos.ch/browse/LBCORE-105
       // per http://jira.qos.ch/browse/LBCORE-127
       conn.setUseCaches(false);
-
       stream = conn.getInputStream();
     } catch (IOException e) {
+      StatusManager sm = loggerContext.getStatusManager();
       sm.add(new ErrorStatus("Could not open URL [" + url + "].", e));
     }
     return stream;
   }
-  
+
   /**
-   * Configures Logback by reading the configuration from the
-   * AndroidManifest.xml
-   * 
-   * @return {@code true} if successfully processed config from manifest;
-   *         {@code false} otherwise
+   * Parses the logback SAX events and the app's package name
+   * from the manifest
+   *
+   * @param eventList the list to populate with the SAX events
+   * @param packageName the string buffer to populate with the package name
+   * @return {@code true} if manifest was parsed; {@code false} otherwise
    */
-  public boolean configureByManifest() {
+  private boolean parseManifest(List<SaxEvent> eventList, StringBuffer packageName) {
+    // don't try to parse the manifest if not on Android (the classloader
+    // will end up grabbing the manifest from the android SDK jar itself)
+    if (!CommonPathUtil.isAndroidOS()) {
+      return false;
+    }
 
     ClassLoader classLoader = Loader.getClassLoaderOfObject(this);
     InputStream stream = openManifest(classLoader, true);
@@ -107,49 +120,43 @@ public class ContextInitializer {
     ASaxEventRecorder recorder = new ASaxEventRecorder(loggerContext);
     recorder.setFilter(TAG_MANIFEST, TAG_LOGBACK);
 
-    boolean ok = false;
-    try {
-      // begin parsing...
-      recorder.recordEvents(stream);
+    // Since reading the manifest is relatively expensive, we set a
+    // watch point in the recorder so that it will catch the package
+    // name while parsing SAX events. This saves us from having to
+    // re-parse the manifest just for the package name. Two birds...
+    recorder.setAttributeWatch(TAG_MANIFEST, ATTR_PACKAGE_NAME);
 
+    // begin parsing...
+    try {
+      recorder.recordEvents(stream);
+    } catch (JoranException e) {
+      StatusManager sm = loggerContext.getStatusManager();
+      sm.add(new ErrorStatus("Could not parse AndroidManifest.xml", e));
+    } finally {
       try {
         stream.close();
       } catch (IOException e) {
       }
+    }
 
-      // ...and get the results to pass to Joran
-      List<SaxEvent> events = recorder.getSaxEventList();
-      if ((events != null) && (events.size() > 0)) {
-        JoranConfigurator joran = new JoranConfigurator();
-        joran.setContext(loggerContext);
-        joran.doConfigure(events);
-        ok = true;
-      }
-    } catch (JoranException e) {
-      StatusManager sm = loggerContext.getStatusManager();
-      sm.add(new ErrorStatus("Could not configure by AndroidManifest.xml", e));
+    // return the event list and the package name
+    List<SaxEvent> events = recorder.getSaxEventList();
+    if (events != null) {
+      eventList.addAll(events);
     }
-    return ok;
-  }
-  
-  public void configureByResource(URL url) throws JoranException {
-    if (url == null) {
-      throw new IllegalArgumentException("URL argument cannot be null");
-    }
-    if (url.toString().endsWith("xml")) {
-    	joranConfigureByResource(url);
-    }
+    packageName.append(recorder.getAttributeWatchValue());
+
+    return true;
   }
 
-  void joranConfigureByResource(URL url) throws JoranException {
-    JoranConfigurator configurator = new JoranConfigurator();
-    configurator.setContext(loggerContext);
-    configurator.doConfigure(url);
-  }
-
-  private URL findConfigFileURLFromSystemProperties(ClassLoader classLoader, boolean updateStatus) {
+  /**
+   * Finds a configuration file by system property
+   * @return the URL to the file; or {@code null} if not found
+   */
+  private URL findConfigFileURLFromSystemProperties(boolean updateStatus) {
     String logbackConfigFile = OptionHelper.getSystemProperty(CONFIG_FILE_PROPERTY);
     if (logbackConfigFile != null) {
+      ClassLoader classLoader = Loader.getClassLoaderOfObject(this);
       URL result = null;
       try {
         result = new URL(logbackConfigFile);
@@ -178,21 +185,23 @@ public class ContextInitializer {
     return null;
   }
 
-  public URL findURLOfDefaultConfigurationFile(boolean updateStatus, String dir) {
+  /**
+   * Finds a configuration file in the application's assets directory
+   * @return the URL to the file; or {@code null} if not found
+   */
+  private URL findConfigFileURLFromAssets(boolean updateStatus) {
     ClassLoader myClassLoader = Loader.getClassLoaderOfObject(this);
-    URL url = findConfigFileURLFromSystemProperties(myClassLoader, updateStatus);
+    URL url = getResource(ASSETS_DIR + "/" + TEST_AUTOCONFIG_FILE, myClassLoader, updateStatus);
     if (url != null) {
       return url;
     }
-
-    url = getResource(dir + TEST_AUTOCONFIG_FILE, myClassLoader, updateStatus);
-    if (url != null) {
-      return url;
-    }
-
-    return getResource(dir + AUTOCONFIG_FILE, myClassLoader, updateStatus);
+    return getResource(ASSETS_DIR + "/" + AUTOCONFIG_FILE, myClassLoader, updateStatus);
   }
-  
+
+  /**
+   * Uses the given classloader to search for a resource
+   * @return the URL to the resource; or {@code null} if not found
+   */
   private URL getResource(String filename, ClassLoader myClassLoader, boolean updateStatus) {
     URL url = Loader.getResource(filename, myClassLoader);
     if (updateStatus) {
@@ -201,53 +210,122 @@ public class ContextInitializer {
     return url;
   }
 
-  private File findSDConfigFile(boolean updateStatus) {
-    
-    File file = new File(SDCARD_DIR + TEST_AUTOCONFIG_FILE);
-    if (!file.exists()) {
-      file = new File(SDCARD_DIR + AUTOCONFIG_FILE);
+  /**
+   * Finds a configuration file on the SD card
+   * @return the configuration file
+   */
+  private File findConfigFileFromSD(boolean updateStatus, String packageName) {
+    List<String> sdSearchPaths =
+        new LinkedList<String>(Arrays.asList(
+            SDCARD_DIR + "/" + TEST_AUTOCONFIG_FILE,
+            SDCARD_DIR + "/" + AUTOCONFIG_FILE
+        ));
+
+    if (packageName != null && !packageName.isEmpty()) {
+      // make sure test config is first in list
+      sdSearchPaths.add(0, SDCARD_DIR + "/" + packageName + "/" + AUTOCONFIG_FILE);
+      sdSearchPaths.add(0, SDCARD_DIR + "/" + packageName + "/" + TEST_AUTOCONFIG_FILE);
     }
-    
+
+    // get first config file found in search path
+    File file = null;
+    for (String path : sdSearchPaths) {
+      File f = new File(path);
+      if (!f.exists() && f.isFile()) {
+        file = f;
+        break;
+      }
+    }
+
     if (updateStatus) {
       StatusManager sm = loggerContext.getStatusManager();
-      if (file.exists()) {
+      if (file != null) {
         sm.add(new InfoStatus("Found config in SD card: ["+ file.getAbsolutePath() +"]", loggerContext));
       } else {
         sm.add(new InfoStatus("No config in SD card", loggerContext));
       }
     }
-    
-    return file.exists() ? file : null;
+
+    return file;
   }
-  
+
+  /**
+   * Configures logback with the first configuration found in the following search path.
+   * If not found, configuration defaults to {@link BasicLogcatConfigurator}.
+   *
+   * <ol>
+   *    <li>/sdcard/${PACKAGE}/logback-test.xml</li>
+   *    <li>/sdcard/${PACKAGE}/logback.xml</li>
+   *    <li>/sdcard/logback-test.xml</li>
+   *    <li>/sdcard/logback.xml</li>
+   *    <li>jar:file://AndroidManifest.xml</li>
+   *    <li>${logback.configurationFile}</li>
+   *    <li>jar:file://assets/logback-test.xml</li>
+   *    <li>jar:file://assets/logback.xml</li>
+   * </ol>
+   */
   public void autoConfig() throws JoranException {
     StatusListenerConfigHelper.installIfAsked(loggerContext);
-    
-    /* Search for configuration from:
-     *   1. SD card
-     *   2. Android Manifest
-     *   3. assets directory
-     *   
-     * If not found, fall back to simple LogcatAppender.
-     */
-    File file = findSDConfigFile(true);
+
+    // parse the manifest early so we can get the package name
+    // for the SD-card search
+    List<SaxEvent> saxEvents = new ArrayList<SaxEvent>();
+    StringBuffer packageNameBuf = new StringBuffer();
+    boolean hasManifestInfo = parseManifest(saxEvents, packageNameBuf);
+    String packageName = packageNameBuf.toString();
+
+    // set context properties
+    if (hasManifestInfo) {
+      loggerContext.putProperty(CoreConstants.PACKAGE_KEY, packageName);
+      loggerContext.putProperty(CoreConstants.DATA_DIR_KEY, CommonPathUtil.getFilesDirectoryPath(packageName));
+    }
+    loggerContext.putProperty(CoreConstants.EXT_DIR_KEY, CommonPathUtil.getMountedExternalStorageDirectoryPath());
+
+    JoranConfigurator configurator = new JoranConfigurator();
+    configurator.setContext(loggerContext);
+
+    // search SD card for config
+    boolean verbose = true;
+    boolean configured = false;
+    File file = findConfigFileFromSD(verbose, packageName);
     if (file != null) {
-      JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(loggerContext);
       configurator.doConfigure(file);
-      
-    } else if (!configureByManifest()) {
-    	
-      URL url = findURLOfDefaultConfigurationFile(true, ASSETS_DIR);
+      configured = true;
+    }
+
+    // search manifest
+    if (!configured && hasManifestInfo) {
+      configurator.doConfigure(saxEvents);
+      configured = true;
+    }
+
+    // search system property
+    if (!configured) {
+      URL url = findConfigFileURLFromSystemProperties(verbose);
       if (url != null) {
-        configureByResource(url);
-        
-      } else {	
-      	BasicLogcatConfigurator.configure(loggerContext);
+        configurator.doConfigure(url);
+        configured = true;
       }
+    }
+
+    // search assets
+    if (!configured) {
+      URL url = findConfigFileURLFromAssets(verbose);
+      if (url != null) {
+        configurator.doConfigure(url);
+        configured = true;
+      }
+    }
+
+    // fall back to BasicLogcatConfigurator
+    if (!configured) {
+      BasicLogcatConfigurator.configure(loggerContext);
     }
   }
 
+  /**
+   * Adds a status message to flag resources that occur multiple times on classpath
+   */
   private void multiplicityWarning(String resourceName, ClassLoader classLoader) {
     Set<URL> urlSet = null;
     StatusManager sm = loggerContext.getStatusManager();
@@ -267,6 +345,9 @@ public class ContextInitializer {
     }
   }
 
+  /**
+   * Adds a status message for the result of the resource search
+   */
   private void statusOnResourceSearch(String resourceName, ClassLoader classLoader, URL url) {
     StatusManager sm = loggerContext.getStatusManager();
     if (url == null) {
