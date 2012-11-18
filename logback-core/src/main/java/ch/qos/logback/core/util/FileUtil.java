@@ -17,14 +17,12 @@ import ch.qos.logback.core.spi.ContextAware;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
 public class FileUtil {
-
 
   public static URL fileToURL(File file) {
     try {
@@ -53,7 +51,6 @@ public class FileUtil {
     }
     return parent.mkdirs();
   }
-
 
   static public String resourceAsString(ContextAware ca, ClassLoader classLoader, String resourceName) {
     URL url = classLoader.getResource(resourceName);
@@ -86,5 +83,23 @@ public class FileUtil {
       }
     }
     return null;
+  }
+
+  /**
+   * Prepends a string to a path if the path is relative. If the path
+   * is already absolute, the same path is returned (nothing changed).
+   * This is useful for converting relative paths to absolute ones,
+   * given the absolute directory path as a prefix.
+   *
+   * @param prefix string to prepend to the evaluated path if it's not
+   * already absolute
+   * @param path path to evaluate
+   * @return path (prefixed if relative)
+   */
+  public static String prefixRelativePath(String prefix, String path) {
+    if (prefix != null && !prefix.trim().isEmpty() && !new File(path).isAbsolute()) {
+      path = prefix + "/" + path;
+    }
+    return path;
   }
 }

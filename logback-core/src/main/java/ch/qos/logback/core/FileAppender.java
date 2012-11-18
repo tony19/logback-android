@@ -96,8 +96,15 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    */
   public void start() {
     int errors = 0;
-    if (getFile() != null) {
-      addInfo("File property is set to [" + fileName + "]");
+
+    // Use getFile() instead of direct access to fileName because
+    // the function is overridden in RollingFileAppender, which
+    // returns a value that doesn't necessarily match fileName.
+    String file = getFile();
+
+    if (file != null) {
+      file = getAbsoluteFilePath(file);
+      addInfo("File property is set to [" + file + "]");
 
       if (prudent) {
         if (!isAppend()) {
@@ -108,7 +115,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
       if (!lazyInit) {
         try {
-          openFile(getFile());
+          openFile(file);
         } catch (IOException e) {
           errors++;
           addError("openFile(" + fileName + "," + append + ") call failed.", e);
@@ -136,15 +143,16 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    * <b>Do not use this method directly. To configure a FileAppender or one of
    * its subclasses, set its properties one by one and then call start().</b>
    * 
-   * @param file_name
+   * @param filename
    *          The path to the log file.
    * 
    * @return true if successful; false otherwise
    */
-  public boolean openFile(String file_name) throws IOException {
+  protected boolean openFile(String filename) throws IOException {
     boolean successful = false;
+    filename = getAbsoluteFilePath(filename);
     synchronized (lock) {
-      File file = new File(file_name);
+      File file = new File(filename);
       if (FileUtil.isParentDirectoryCreationRequired(file)) {
         boolean result = FileUtil.createMissingParentDirectories(file);
         if (!result) {
@@ -244,10 +252,25 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
         openFile(getFile());
       } catch (IOException e) {
         this.started = false;
-        addError("openFile(" + fileName + "," + append + ") call failed.", e);
+        addError("openFile(" + fileName + "," + append + ") failed", e);
       }
     }
 
     super.subAppend(event);
+  }
+
+  /**
+   * Gets the absolute path to the filename, starting from the app's
+   * "files" directory
+   *
+   * @param filename filename to evaluate
+   * @return absolute path to the filename
+   */
+  private String getAbsoluteFilePath(String filename) {
+    // In Android, relative paths created with File() are relative
+    // to root, so fix it by prefixing the path to the app's "files"
+    // directory.
+    String dataDir = context.getProperty(CoreConstants.DATA_DIR_KEY);
+    return FileUtil.prefixRelativePath(dataDir, filename);
   }
 }
