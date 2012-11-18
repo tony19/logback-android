@@ -23,10 +23,10 @@ import ch.qos.logback.core.rolling.helper.CompressionMode;
  * <code>RollingFileAppender</code> extends {@link FileAppender} to backup the
  * log files depending on {@link RollingPolicy} and {@link TriggeringPolicy}.
  * <p>
- * 
+ *
  * For more information about this appender, please refer to the online manual
  * at http://logback.qos.ch/manual/appenders.html#RollingFileAppender
- * 
+ *
  * @author Heinz Richter
  * @author Ceki G&uuml;lc&uuml;
  */
@@ -110,21 +110,22 @@ public class RollingFileAppender<E> extends FileAppender<E> {
       try {
         rollingPolicy.rollover();
       } catch (RolloverFailure rf) {
-        addWarn("RolloverFailure occurred. Deferring roll-over.");
+        addWarn("RolloverFailure occurred. Deferring rollover");
         // we failed to roll-over, let us not truncate and risk data loss
         this.append = true;
       }
 
+      String filename = rollingPolicy.getActiveFileName();
       try {
         // update the currentlyActiveFile
         // http://jira.qos.ch/browse/LBCORE-90
-        currentlyActiveFile = new File(rollingPolicy.getActiveFileName());
+        currentlyActiveFile = new File(filename);
 
         // This will also close the file. This is OK since multiple
         // close operations are safe.
-        this.openFile(rollingPolicy.getActiveFileName());
+        this.openFile(filename);
       } catch (IOException e) {
-        addError("setFile(" + fileName + ", false) call failed.", e);
+        addError("openFile(" + filename + ") failed", e);
       }
     }
   }
@@ -160,7 +161,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
    * Sets the rolling policy. In case the 'policy' argument also implements
    * {@link TriggeringPolicy}, then the triggering policy for this appender is
    * automatically set to be the policy argument.
-   * 
+   *
    * @param policy
    */
   @SuppressWarnings("unchecked")

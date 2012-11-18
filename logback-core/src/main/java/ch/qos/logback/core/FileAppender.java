@@ -23,10 +23,10 @@ import ch.qos.logback.core.util.FileUtil;
 
 /**
  * FileAppender appends log events to a file.
- * 
+ *
  * For more information about this appender, please refer to the online manual
  * at http://logback.qos.ch/manual/appenders.html#FileAppender
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 public class FileAppender<E> extends OutputStreamAppender<E> {
@@ -53,7 +53,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    */
   public void setFile(String file) {
     if (file == null) {
-      fileName = file;
+      fileName = null;
     } else {
       // Trim spaces from both ends. The users probably does not want
       // trailing spaces in file names.
@@ -70,8 +70,9 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
   /**
    * This method is used by derived classes to obtain the raw file property.
-   * Regular users should not be calling this method.
-   * 
+   * Regular users should not be calling this method. Note that RollingFilePolicyBase
+   * requires public getter for this property.
+   *
    * @return the value of the file property
    */
   final public String rawFileProperty() {
@@ -80,10 +81,10 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
   /**
    * Returns the value of the <b>File</b> property.
-   * 
+   *
    * <p>
    * This method may be overridden by derived classes.
-   * 
+   *
    */
   public String getFile() {
     return fileName;
@@ -118,12 +119,12 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
           openFile(file);
         } catch (IOException e) {
           errors++;
-          addError("openFile(" + fileName + "," + append + ") call failed.", e);
+          addError("openFile(" + file + "," + append + ") failed", e);
         }
       }
     } else {
       errors++;
-      addError("\"File\" property not set for appender named [" + name + "].");
+      addError("\"File\" property not set for appender named [" + name + "]");
     }
     if (errors == 0) {
       super.start();
@@ -134,18 +135,18 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    * <p>
    * Sets and <i>opens</i> the file where the log output will go. The specified
    * file must be writable.
-   * 
+   *
    * <p>
    * If there was already an opened file, then the previous file is closed
    * first.
-   * 
+   *
    * <p>
    * <b>Do not use this method directly. To configure a FileAppender or one of
    * its subclasses, set its properties one by one and then call start().</b>
-   * 
+   *
    * @param filename
    *          The path to the log file.
-   * 
+   *
    * @return true if successful; false otherwise
    */
   protected boolean openFile(String filename) throws IOException {
@@ -172,7 +173,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
   /**
    * @see #setPrudent(boolean)
-   * 
+   *
    * @return true if in prudent mode
    */
   public boolean isPrudent() {
@@ -182,7 +183,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   /**
    * When prudent is set to true, file appenders from multiple JVMs can safely
    * write to the same file.
-   * 
+   *
    * @param prudent
    */
   public void setPrudent(boolean prudent) {
@@ -196,7 +197,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   /**
    * Gets the enable status of lazy initialization of the file output
    * stream
-   * 
+   *
    * @return true if enabled; false otherwise
    */
   public boolean getLazy() {
@@ -206,7 +207,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   /**
    * Enables/disables lazy initialization of the file output stream.
    * This defers the file creation until the first outgoing message.
-   * 
+   *
    * @param enabled true to enable lazy initialization; false otherwise
    */
   public void setLazy(boolean enable) {
