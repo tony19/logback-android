@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   
   <modelVersion>4.0.0</modelVersion>
-    
+
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -37,7 +37,7 @@
   
   <scm>
     <url>https://github.com/tony19/logback-android</url>
-    <connection>git@github.com:tony19/logback-android.git</connection> 
+    <connection>scm:git@github.com:tony19/logback-android.git</connection>
     <developerConnection>scm:git:git@github.com:tony19/logback-android.git</developerConnection>
   </scm>
   <issueManagement>
@@ -53,14 +53,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- slf4j.version property is used below, in
-         logback-classic/pom.xml and in setClasspath.cmd -->
-    <slf4j.version>1.6.5</slf4j.version>
-    <junit.version>4.10</junit.version>
-    <jansi.version>1.9</jansi.version>
-    <android.version>2.1.2</android.version>
-    <apktool.version>1.4.4-3</apktool.version>
-    <findbugs.version>2.5.2</findbugs.version>
+    <slf4j.version>1.7.2</slf4j.version>
   </properties>
   
   <developers>
@@ -89,7 +82,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
+      <version>4.10</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -105,13 +98,13 @@
       <dependency>
         <groupId>com.google.android</groupId>
         <artifactId>android</artifactId>
-        <version>${android.version}</version>
+        <version>2.1.2</version>
       </dependency>
       
       <dependency>
         <groupId>com.github.tony19</groupId>
         <artifactId>apktool-lib</artifactId>
-        <version>${apktool.version}</version>
+        <version>1.4.4-3</version>
       </dependency>
       
       <dependency>
@@ -136,13 +129,13 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
+        <version>1.7.2</version>
       </dependency>
       
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
         <artifactId>jansi</artifactId>
-        <version>${jansi.version}</version>
+        <version>1.9</version>
       </dependency>
       
       <dependency>
@@ -164,7 +157,6 @@
       
     </dependencies>
   </dependencyManagement>
-  
   
   <build>
     <plugins>
@@ -222,7 +214,7 @@
           </archive>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -250,6 +242,55 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <reportPlugins>
+
+            <!-- JXR (source code reference generator) -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jxr-plugin</artifactId>
+              <version>2.3</version>
+              <!--
+              <configuration>
+                <aggregate>true</aggregate>
+                <javadocDir>target/site/apidocs/</javadocDir>
+                <linkJavadoc>true</linkJavadoc>
+              </configuration>
+              -->
+            </plugin>
+
+            <!-- FindBugs (static code analysis tool) -->
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>findbugs-maven-plugin</artifactId>
+              <version>2.5.2</version>
+              <configuration>
+                <threshold>Low</threshold>
+                <effort>Max</effort>
+              </configuration>
+            </plugin>
+
+            <!-- PMD (static code analysis tool) -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-pmd-plugin</artifactId>
+              <version>2.7.1</version>
+              <configuration>
+                <linkXref>true</linkXref>
+                <sourceEncoding>utf-8</sourceEncoding>
+                <minimumTokens>100</minimumTokens>
+                <targetJdk>1.5</targetJdk>
+              </configuration>
+            </plugin>
+
+          </reportPlugins>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -370,5 +411,4 @@
     </profile>
     
   </profiles>
-  
 </project>
