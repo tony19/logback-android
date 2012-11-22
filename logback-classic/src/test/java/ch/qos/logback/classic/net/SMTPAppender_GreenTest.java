@@ -123,7 +123,8 @@ public class SMTPAppender_GreenTest {
   }
 
   private MimeMultipart verify(String subject) throws MessagingException,
-          IOException {
+          IOException, InterruptedException {
+    waitUntilEmailIsReceived();
     MimeMessage[] mma = GREEN_MAIL_SERVER.getReceivedMessages();
     assertNotNull(mma);
     assertEquals(oldCount + 1, mma.length);
@@ -136,6 +137,10 @@ public class SMTPAppender_GreenTest {
   void waitUntilEmailIsSent() throws InterruptedException {
     lc.getExecutorService().shutdown();
     lc.getExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS);
+  }
+
+  void waitUntilEmailIsReceived() throws InterruptedException {
+    GREEN_MAIL_SERVER.waitForIncomingEmail(1);
   }
 
   @Test
