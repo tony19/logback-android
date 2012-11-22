@@ -262,6 +262,7 @@ public class SocketAppenderTest {
     assertFalse(sa.isInitialized());
 
     Logger logger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+    updateListAppenderLatch(1);
     logger.debug("hello world");
     waitForListAppenderLatch();
     assertTrue(sa.isInitialized());
@@ -294,7 +295,7 @@ public class SocketAppenderTest {
 
   private void waitForListAppenderLatch() {
     try {
-      LIST_APPENDER_COUNTDOWN_LATCH.await(100, TimeUnit.MILLISECONDS);
+      LIST_APPENDER_COUNTDOWN_LATCH.await(2000, TimeUnit.MILLISECONDS);
     } catch (Exception e) {
       throw new RuntimeException("problem while waiting for barrier", e);
     }
