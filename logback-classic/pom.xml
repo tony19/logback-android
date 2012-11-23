@@ -1,58 +1,65 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>com.github.tony19</groupId>
     <artifactId>logback-android-parent</artifactId>
     <version>1.0.7-2-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>logback-android-classic</artifactId>
   <packaging>jar</packaging>
   <name>Logback Android Classic Module</name>
   <description>logback-android-classic module</description>
-  
+
   <url>http://logback.qos.ch/android</url>
-  
+
   <licenses>
     <license>
       <name>Eclipse Public License - v 1.0</name>
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
-    
+
     <license>
       <name>GNU Lesser General Public License</name>
       <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
     </license>
   </licenses>
-  
+
   <dependencies>
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-core</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>apktool-lib</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>integration</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-ext</artifactId>
       <version>${slf4j.version}</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -60,26 +67,26 @@
       <version>${slf4j.version}</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
       <version>${slf4j.version}</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- FIXME: Use the Android javamail JAR -->
     <dependency>
       <groupId>javax.mail</groupId>
@@ -87,28 +94,21 @@
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>com.github.tony19</groupId>
       <artifactId>logback-android-core</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>integration</artifactId>
-      <version>${slf4j.version}</version>
-      <scope>test</scope>
-    </dependency>
-    
+
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
       <version>1.3</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.subethamail</groupId>
       <artifactId>subethasmtp</artifactId>
@@ -121,7 +121,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
@@ -134,9 +134,7 @@
       <artifactId>android</artifactId>
     </dependency>
   </dependencies>
-  
-  
-  
+
   <build>
     <plugins>
       <plugin>
@@ -162,7 +160,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -179,19 +177,22 @@
             <exclude>**/ch/qos/logback/classic/util/InitializationIntegrationTest.java</exclude>
             <!-- next test requires a running simple server -->
             <exclude>**/SerializationPerfTest.java</exclude>
-            
+
             <!-- next test is fragile and anyhow will run as part of PackageTest -->
             <exclude>**/LoggerPerfTest.java</exclude>
             <!-- next test is fragile and anyhow will run as part of PackageTest -->
             <exclude>**/LoggingEventSerializationPerfTest.java</exclude>
-            
+
             <!-- the async tests are fragile (sometimes fail, other times pass) -->
             <exclude>**/AsyncAppender*Test.java</exclude>
+
+            <!-- exclude any tests specified by 'analyze' profile -->
+            <exclude>${exclude.tests}</exclude>
           </excludes>
         </configuration>
       </plugin>
 
     </plugins>
   </build>
-  
+
 </project>

@@ -1,40 +1,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>com.github.tony19</groupId>
     <artifactId>logback-android-parent</artifactId>
     <version>1.0.7-2-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>logback-android-core</artifactId>
   <packaging>jar</packaging>
   <name>Logback Android Core Module</name>
   <description>logback-android-core module</description>
-  
+
   <url>http://logback.qos.ch/android</url>
-  
-  
+
   <licenses>
     <license>
       <name>Eclipse Public License - v 1.0</name>
       <url>http://www.eclipse.org/legal/epl-v10.html</url>
     </license>
-    
+
     <license>
       <name>GNU Lesser General Public License</name>
       <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
     </license>
   </licenses>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
-      <optional>true</optional>      
+      <optional>true</optional>
     </dependency>
-    
+
     <!-- FIXME: Use the Android javamail JAR -->
     <dependency>
       <groupId>javax.mail</groupId>
@@ -42,22 +41,21 @@
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
       <version>2.4</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.google.android</groupId>
       <artifactId>android</artifactId>
       <scope>compile</scope>
     </dependency>
   </dependencies>
-  
-  
+
   <build>
     <plugins>
       <plugin>
@@ -73,13 +71,13 @@
             <exclude>**/PackageTest.java</exclude>
             <exclude>**/ConsoleAppenderTest.java</exclude>
             <exclude>**/TimeBasedRollingTest.java</exclude>
-            
+
             <!-- the async tests are fragile (sometimes fail, other times pass) -->
             <exclude>**/AsyncAppender*Test.java</exclude>
           </excludes>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -105,5 +103,5 @@
 
     </plugins>
   </build>
-  
+
 </project>
