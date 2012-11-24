@@ -295,7 +295,8 @@ public class SocketAppenderTest {
 
   private void waitForListAppenderLatch() {
     try {
-      LIST_APPENDER_COUNTDOWN_LATCH.await(2000, TimeUnit.MILLISECONDS);
+      boolean latched = LIST_APPENDER_COUNTDOWN_LATCH.await(2000, TimeUnit.MILLISECONDS);
+      assertTrue("timed out waiting for appender", latched);
     } catch (Exception e) {
       throw new RuntimeException("problem while waiting for barrier", e);
     }
