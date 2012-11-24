@@ -122,13 +122,37 @@ public class SMTPAppender_GreenTest {
     return mma.length;
   }
 
+  private void printEmails(MimeMessage[] mma, boolean printBody) {
+    System.out.println("Subjects; oldCount=" + oldCount);
+    for (int i = 0; i < mma.length; i++) {
+      MimeMessage mm = mma[i];
+      try {
+        if (printBody) {
+          MimeMultipart mp = (MimeMultipart)mm.getContent();
+          String body = GreenMailUtil.getBody(mp.getBodyPart(0));
+          System.out.println("[" + i + "]=" + mm.getSubject() + " : " + body);
+        } else {
+          System.out.println("[" + i + "]=" + mm.getSubject());
+        }
+      } catch (MessagingException e) {
+      } catch (IOException e) {
+      }
+    }
+  }
+
   private MimeMultipart verify(String subject) throws MessagingException,
+    IOException, InterruptedException {
+    return verify(subject, false);
+  }
+
+  private MimeMultipart verify(String subject, boolean verbose) throws MessagingException,
           IOException, InterruptedException {
     waitUntilEmailIsReceived();
     MimeMessage[] mma = GREEN_MAIL_SERVER.getReceivedMessages();
     assertNotNull(mma);
     assertEquals(oldCount + 1, mma.length);
     MimeMessage mm = mma[oldCount];
+    printEmails(mma, verbose);
     // http://jira.qos.ch/browse/LBCLASSIC-67
     assertEquals(subject, mm.getSubject());
     return (MimeMultipart) mm.getContent();
@@ -140,6 +164,7 @@ public class SMTPAppender_GreenTest {
   }
 
   void waitUntilEmailIsReceived() throws InterruptedException {
+    System.out.println("Waiting for message [" + oldCount + "]");
     GREEN_MAIL_SERVER.waitForIncomingEmail(oldCount + 1);
   }
 
@@ -204,11 +229,11 @@ public class SMTPAppender_GreenTest {
     MDC.clear();
     logger.error("en error", new Exception("an exception"));
 
-    MimeMultipart mp = verify(TEST_SUBJECT);
+    MimeMultipart mp = verify(TEST_SUBJECT, true);
     String body = GreenMailUtil.getBody(mp.getBodyPart(0));
-    assertTrue(body.startsWith(HEADER.trim()));
-    assertTrue(body.contains("key=val"));
-    assertTrue(body.endsWith(FOOTER.trim()));
+    assertTrue("missing HEADER in body", body.startsWith(HEADER.trim()));
+    assertTrue("missing MDC in body", body.contains("key=val"));
+    assertTrue("missing FOOTER in body", body.endsWith(FOOTER.trim()));
   }
 
   @Test
