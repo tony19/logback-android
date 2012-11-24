@@ -140,7 +140,7 @@ public class SMTPAppender_GreenTest {
   }
 
   void waitUntilEmailIsReceived() throws InterruptedException {
-    GREEN_MAIL_SERVER.waitForIncomingEmail(1);
+    GREEN_MAIL_SERVER.waitForIncomingEmail(oldCount + 1);
   }
 
   @Test
@@ -234,7 +234,7 @@ public class SMTPAppender_GreenTest {
   private void configure(String file) throws JoranException {
     JoranConfigurator jc = new JoranConfigurator();
     jc.setContext(lc);
-    System.out.println("port=" + port);
+    //System.out.println("port=" + port);
     lc.putProperty("port", "" + port);
     jc.doConfigure(file);
   }
