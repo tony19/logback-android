@@ -165,7 +165,7 @@ public class SMTPAppender_GreenTest {
 
   void waitUntilEmailIsReceived() throws InterruptedException {
     System.out.println("Waiting for message [" + oldCount + "]");
-    GREEN_MAIL_SERVER.waitForIncomingEmail(30000, oldCount + 1);
+    GREEN_MAIL_SERVER.waitForIncomingEmail(oldCount + 1);
   }
 
   @Test
