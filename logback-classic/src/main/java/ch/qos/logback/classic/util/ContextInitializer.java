@@ -254,10 +254,10 @@ public class ContextInitializer {
    * If not found, configuration defaults to {@link BasicLogcatConfigurator}.
    *
    * <ol>
-   *    <li>/sdcard/${PACKAGE}/logback-test.xml</li>
-   *    <li>/sdcard/${PACKAGE}/logback.xml</li>
-   *    <li>/sdcard/logback-test.xml</li>
-   *    <li>/sdcard/logback.xml</li>
+   *    <li>/sdcard/logback/${PACKAGE}/logback-test.xml</li>
+   *    <li>/sdcard/logback/${PACKAGE}/logback.xml</li>
+   *    <li>/sdcard/logback/logback-test.xml</li>
+   *    <li>/sdcard/logback/logback.xml</li>
    *    <li>jar:file://AndroidManifest.xml</li>
    *    <li>${logback.configurationFile}</li>
    *    <li>jar:file://assets/logback-test.xml</li>
