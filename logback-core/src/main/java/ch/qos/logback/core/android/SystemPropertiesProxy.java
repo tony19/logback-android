@@ -61,13 +61,13 @@ public class SystemPropertiesProxy {
     String ret = null;
     try {
       ret = (String) getString.invoke(SystemProperties, new Object[]{ key, def });
-    } catch (IllegalArgumentException iAE) {
-      throw iAE;
+    } catch (IllegalArgumentException e) {
+      throw e;
     } catch (Exception e) {
     }
     // if return value is null or empty, use the default
     // since neither of those are valid values
-    if (ret != null && ret.isEmpty()) {
+    if (ret == null || ret.length() == 0) {
       ret = def;
     }
     return ret;
@@ -99,8 +99,8 @@ public class SystemPropertiesProxy {
     Boolean ret = def;
     try {
       ret = (Boolean) getBoolean.invoke(SystemProperties, new Object[]{ key, def });
-    } catch (IllegalArgumentException iAE) {
-      throw iAE;
+    } catch (IllegalArgumentException e) {
+      throw e;
     } catch (Exception e) {
     }
     return ret;

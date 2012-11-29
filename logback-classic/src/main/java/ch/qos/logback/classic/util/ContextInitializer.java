@@ -221,7 +221,7 @@ public class ContextInitializer {
             SDCARD_DIR + "/" + AUTOCONFIG_FILE
         ));
 
-    if (packageName != null && !packageName.isEmpty()) {
+    if (!OptionHelper.isEmpty(packageName)) {
       // make sure test config is first in list
       sdSearchPaths.add(0, SDCARD_DIR + "/" + packageName + "/" + AUTOCONFIG_FILE);
       sdSearchPaths.add(0, SDCARD_DIR + "/" + packageName + "/" + TEST_AUTOCONFIG_FILE);
