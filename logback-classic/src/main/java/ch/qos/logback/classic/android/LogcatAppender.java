@@ -14,6 +14,8 @@
  */
 package ch.qos.logback.classic.android;
 
+import ch.qos.logback.classic.android.encoder.TagPatternLayoutEncoder;
+
 import android.util.Log;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
@@ -42,7 +44,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 */
 	private static final int MAX_TAG_LENGTH = 23;
 	private PatternLayoutEncoder encoder = null;
-	private PatternLayoutEncoder tagEncoder = null;
+	private TagPatternLayoutEncoder tagEncoder = null;
 	private boolean checkLoggable = false;
 	
 	/**
@@ -148,7 +150,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 * 
 	 * @return the pattern encoder
 	 */
-	public PatternLayoutEncoder getTagEncoder() {
+	public TagPatternLayoutEncoder getTagEncoder() {
 		return this.tagEncoder;
 	}
 
@@ -172,7 +174,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 *            the pattern-layout encoder; specify {@code null} to
 	 *            automatically use the logger's name as the tag
 	 */
-	public void setTagEncoder(PatternLayoutEncoder encoder) {
+	public void setTagEncoder(TagPatternLayoutEncoder encoder) {
 		this.tagEncoder = encoder;
 	}
 
