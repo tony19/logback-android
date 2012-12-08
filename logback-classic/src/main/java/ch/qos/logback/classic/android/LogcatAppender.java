@@ -14,19 +14,16 @@
  */
 package ch.qos.logback.classic.android;
 
-import ch.qos.logback.classic.pattern.NopThrowableInformationConverter;
-
-import ch.qos.logback.classic.pattern.ExtendedThrowableProxyConverter;
-import ch.qos.logback.core.pattern.ConverterUtil;
-
 import android.util.Log;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.pattern.NopThrowableInformationConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.pattern.Converter;
+import ch.qos.logback.core.pattern.ConverterUtil;
 import ch.qos.logback.core.pattern.PostCompileProcessor;
 
 /**
