@@ -14,13 +14,20 @@
  */
 package ch.qos.logback.classic.android;
 
-import ch.qos.logback.classic.android.encoder.TagPatternLayoutEncoder;
+import ch.qos.logback.classic.pattern.NopThrowableInformationConverter;
+
+import ch.qos.logback.classic.pattern.ExtendedThrowableProxyConverter;
+import ch.qos.logback.core.pattern.ConverterUtil;
 
 import android.util.Log;
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.Layout;
+import ch.qos.logback.core.pattern.Converter;
+import ch.qos.logback.core.pattern.PostCompileProcessor;
 
 /**
  * An appender that wraps the native Android logging mechanism (<i>logcat</i>);
@@ -44,7 +51,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 */
 	private static final int MAX_TAG_LENGTH = 23;
 	private PatternLayoutEncoder encoder = null;
-	private TagPatternLayoutEncoder tagEncoder = null;
+	private PatternLayoutEncoder tagEncoder = null;
 	private boolean checkLoggable = false;
 	
 	/**
@@ -65,11 +72,30 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 		}
 		
 		// tag encoder is optional but needs a layout
-		if ((this.tagEncoder != null) && (this.tagEncoder.getLayout() == null)) {
-			addError("No tag layout set for the appender named [" + name + "].");
-			return;
+		if (this.tagEncoder != null) {
+			final Layout<?> layout = this.tagEncoder.getLayout();
+			
+			if (layout == null) {
+				addError("No tag layout set for the appender named [" + name + "].");
+				return;
+			}
+			
+			if (!(layout instanceof PatternLayout)) {
+				addWarn("The tag layout set for the appender named [" + name +
+						"] isn't a [" + PatternLayout.class.getName() +"].");
+			}
+			else {
+				final PatternLayout tagLayout = (PatternLayout) layout;
+				tagLayout.setPostCompileProcessor(new PostCompileProcessor<ILoggingEvent>() {
+					public void process(Converter<ILoggingEvent> head) {
+						Converter<ILoggingEvent> tail = ConverterUtil.findTail(head);
+						Converter<ILoggingEvent> exConverter = new NopThrowableInformationConverter();
+						tail.setNext(exConverter);
+					}		
+				});
+			}
 		}
-		
+
 		super.start();
 	}
 
@@ -150,7 +176,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 * 
 	 * @return the pattern encoder
 	 */
-	public TagPatternLayoutEncoder getTagEncoder() {
+	public PatternLayoutEncoder getTagEncoder() {
 		return this.tagEncoder;
 	}
 
@@ -174,7 +200,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 	 *            the pattern-layout encoder; specify {@code null} to
 	 *            automatically use the logger's name as the tag
 	 */
-	public void setTagEncoder(TagPatternLayoutEncoder encoder) {
+	public void setTagEncoder(PatternLayoutEncoder encoder) {
 		this.tagEncoder = encoder;
 	}
 
