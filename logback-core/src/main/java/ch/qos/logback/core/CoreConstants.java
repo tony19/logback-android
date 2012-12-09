@@ -154,7 +154,7 @@ public class CoreConstants {
    */
   public static final String EXT_DIR_KEY = "EXT_DIR";
 
-  public static int BYTES_PER_INT = 4;
+  public static final int BYTES_PER_INT = 4;
   public static final int MILLIS_IN_ONE_SECOND = 1000;
   public static final int MILLIS_IN_ONE_MINUTE = MILLIS_IN_ONE_SECOND*60;
   public static final int MILLIS_IN_ONE_HOUR = MILLIS_IN_ONE_MINUTE*60;
