@@ -16,9 +16,11 @@ package ch.qos.logback.classic.android;
 
 import android.util.Log;
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.Layout;
 
 /**
  * An appender that wraps the native Android logging mechanism (<i>logcat</i>);
@@ -61,13 +63,22 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 			addError("No layout set for the appender named [" + name + "].");
 			return;
 		}
-		
+
 		// tag encoder is optional but needs a layout
-		if ((this.tagEncoder != null) && (this.tagEncoder.getLayout() == null)) {
-			addError("No tag layout set for the appender named [" + name + "].");
-			return;
+		if (this.tagEncoder != null) {
+			final Layout<?> layout = this.tagEncoder.getLayout();
+
+			if (layout == null) {
+				addError("No tag layout set for the appender named [" + name + "].");
+				return;
+			}
+
+			if (layout instanceof PatternLayout) {
+				final PatternLayout tagLayout = (PatternLayout) layout;
+				tagLayout.setPostCompileProcessor(null);
+			}
 		}
-		
+
 		super.start();
 	}
 
