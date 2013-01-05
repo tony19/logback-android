@@ -28,8 +28,6 @@ public class PackagingDataCalculator {
 
   HashMap<String, ClassPackagingData> cache = new HashMap<String, ClassPackagingData>();
 
-  private static boolean GET_CALLER_CLASS_METHOD_AVAILABLE = false; //private static boolean HAS_GET_CLASS_LOADER_PERMISSION = false;
-
   public void calculate(IThrowableProxy tp) {
     while (tp != null) {
       populateFrames(tp.getStackTraceElementProxyArray());
@@ -50,7 +48,6 @@ public class PackagingDataCalculator {
     final StackTraceElement[] localteSTEArray = t.getStackTrace();
     final int commonFrames = STEUtil.findNumberOfCommonFrames(localteSTEArray,
             stepArray);
-    final int localFirstCommon = localteSTEArray.length - commonFrames;
     final int stepFirstCommon = stepArray.length - commonFrames;
 
     ClassLoader lastExactClassLoader = null;
@@ -72,19 +69,6 @@ public class PackagingDataCalculator {
       ClassPackagingData pi = computeBySTEP(step, firstExactClassLoader);
       step.setClassPackagingData(pi);
     }
-  }
-
-  private ClassPackagingData calculateByExactType(Class type) {
-    String className = type.getName();
-    ClassPackagingData cpd = cache.get(className);
-    if (cpd != null) {
-      return cpd;
-    }
-    String version = getImplementationVersion(type);
-    String codeLocation = getCodeLocation(type);
-    cpd = new ClassPackagingData(codeLocation, version);
-    cache.put(className, cpd);
-    return cpd;
   }
 
   private ClassPackagingData computeBySTEP(StackTraceElementProxy step,
