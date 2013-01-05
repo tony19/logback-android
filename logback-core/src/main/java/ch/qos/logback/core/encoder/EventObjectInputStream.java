@@ -128,8 +128,8 @@ public class EventObjectInputStream<E> extends InputStream {
   void readFooter(int count) throws IOException {
     byte[] headerBA = new byte[2 * BYTES_PER_INT];
     if (ncis.read(headerBA) == -1) {
-      // nothing left to read
-      return;
+      throw new IllegalStateException(
+          "Looks like a corrupt stream");
     }
 
     int offset = 0;
