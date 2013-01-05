@@ -29,16 +29,16 @@ import ch.qos.logback.core.helpers.Transform;
 // See also http://tinyurl.com/dch9mr
 
 /**
- * 
+ *
  * Generates log4j.dtd compliant XML documents.
- * 
- * 
+ *
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 public class XMLLayout extends LayoutBase<ILoggingEvent> {
 
-  private final int DEFAULT_SIZE = 256;
-  private final int UPPER_LIMIT = 2048;
+  static private final int DEFAULT_SIZE = 256;
+  static private final int UPPER_LIMIT = 2048;
 
   private StringBuilder buf = new StringBuilder(DEFAULT_SIZE);
   private boolean locationInfo = false;
@@ -54,7 +54,7 @@ public class XMLLayout extends LayoutBase<ILoggingEvent> {
    * set to false which means there will be no location information output by
    * this layout. If the the option is set to true, then the file name and line
    * number of the statement at the origin of the log statement will be output.
-   * 
+   *
    * <p>If you are embedding this layout within an {@link
    * org.apache.log4j.net.SMTPAppender} then make sure to set the
    * <b>LocationInfo</b> option of that appender as well.
@@ -72,7 +72,7 @@ public class XMLLayout extends LayoutBase<ILoggingEvent> {
 
   /**
    * Sets whether MDC key-value pairs should be output, default false.
-   * 
+   *
    * @param flag
    *                new value.
    * @since 1.2.15
@@ -83,7 +83,7 @@ public class XMLLayout extends LayoutBase<ILoggingEvent> {
 
   /**
    * Gets whether MDC key-value pairs should be output.
-   * 
+   *
    * @return true if MDC key-value pairs are output.
    * @since 1.2.15
    */
