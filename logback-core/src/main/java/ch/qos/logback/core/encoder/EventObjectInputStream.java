@@ -127,7 +127,10 @@ public class EventObjectInputStream<E> extends InputStream {
 
   void readFooter(int count) throws IOException {
     byte[] headerBA = new byte[2 * BYTES_PER_INT];
-    ncis.read(headerBA);
+    if (ncis.read(headerBA) == -1) {
+      // nothing left to read
+      return;
+    }
 
     int offset = 0;
     int stopPebble = ByteArrayUtil.readInt(headerBA, offset);
