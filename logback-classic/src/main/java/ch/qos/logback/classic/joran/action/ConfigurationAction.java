@@ -30,13 +30,9 @@ public class ConfigurationAction extends Action {
   static final String SCAN_PERIOD_ATTR = "scanPeriod";
   static final String DEBUG_SYSTEM_PROPERTY_KEY = "logback.debug";
 
-  long threshold = 0;
-
   @Override
   public void begin(InterpretationContext ic, String name, Attributes attributes) {
-    threshold = System.currentTimeMillis();
-
-    // See LOGBACK-527 (the system property is looked up first. Thus, it overrides
+    // See LBCLASSIC-225 (the system property is looked up first. Thus, it overrides
     // the equivalent property in the config file. This reversal of scope priority is justified
     // by the use case: the admin trying to chase rogue config file
     String debugAttrib = OptionHelper.getSystemProperty(DEBUG_SYSTEM_PROPERTY_KEY);
