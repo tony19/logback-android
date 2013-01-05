@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Restitute the contents of an input stream as java objects.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  *
  * @param <E>
@@ -75,7 +75,7 @@ public class EventObjectInputStream<E> extends InputStream {
     index = 0;
     buffer.clear();
   }
-  
+
   E getFromBuffer() {
     if (index >= buffer.size()) {
       return null;
@@ -91,9 +91,9 @@ public class EventObjectInputStream<E> extends InputStream {
       return -1;
     }
     //System.out.println("**bytesRead="+bytesRead);
-    
+
     //System.out.println(ByteArrayUtil.toHexString(headerBA));
-    
+
     int offset = 0;
     int startPebble = ByteArrayUtil.readInt(headerBA, offset);
     if (startPebble != START_PEBBLE) {
@@ -103,7 +103,7 @@ public class EventObjectInputStream<E> extends InputStream {
     offset += BYTES_PER_INT;
     int count = ByteArrayUtil.readInt(headerBA, offset);
     offset += BYTES_PER_INT;
-    int endPointer = ByteArrayUtil.readInt(headerBA, offset);
+    //int endPointer = ByteArrayUtil.readInt(headerBA, offset);
     offset += BYTES_PER_INT;
     int checksum = ByteArrayUtil.readInt(headerBA, offset);
     if (checksum != (START_PEBBLE ^ count)) {
@@ -128,7 +128,7 @@ public class EventObjectInputStream<E> extends InputStream {
   void readFooter(int count) throws IOException {
     byte[] headerBA = new byte[2 * BYTES_PER_INT];
     ncis.read(headerBA);
-    
+
     int offset = 0;
     int stopPebble = ByteArrayUtil.readInt(headerBA, offset);
     if (stopPebble != STOP_PEBBLE) {
@@ -141,7 +141,7 @@ public class EventObjectInputStream<E> extends InputStream {
       throw new IllegalStateException("Invalid checksum");
     }
   }
-  
+
   void readPayload(int count) throws IOException {
     List<E> eventList = new ArrayList<E>(count);
     ObjectInputStream ois = new ObjectInputStream(ncis);
