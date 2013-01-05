@@ -13,11 +13,14 @@
  */
 package ch.qos.logback.classic.spi;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import ch.qos.logback.classic.Logger;
 
-public class LoggerComparator implements Comparator<Logger> {
+public class LoggerComparator implements Comparator<Logger>, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   public int compare(Logger l1, Logger l2) {
     if (l1.getName().equals(l2.getName())) {
