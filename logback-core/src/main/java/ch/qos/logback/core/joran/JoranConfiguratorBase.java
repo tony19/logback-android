@@ -20,7 +20,6 @@ import java.util.Map;
 import ch.qos.logback.core.joran.action.ActionConst;
 import ch.qos.logback.core.joran.action.AppenderAction;
 import ch.qos.logback.core.joran.action.AppenderRefAction;
-import ch.qos.logback.core.joran.action.ContextPropertyAction;
 import ch.qos.logback.core.joran.action.ConversionRuleAction;
 import ch.qos.logback.core.joran.action.DefinePropertyAction;
 import ch.qos.logback.core.joran.action.NestedBasicPropertyIA;
@@ -57,7 +56,6 @@ abstract public class JoranConfiguratorBase extends GenericConfigurator {
   @Override
   protected void addInstanceRules(RuleStore rs) {
 
-    rs.addRule(new Pattern("configuration/variable"), new PropertyAction());
     rs.addRule(new Pattern("configuration/property"), new PropertyAction());
 
     rs.addRule(new Pattern("configuration/substitutionProperty"),
@@ -66,11 +64,6 @@ abstract public class JoranConfiguratorBase extends GenericConfigurator {
     rs.addRule(new Pattern("configuration/timestamp"), new TimestampAction());
 
     rs.addRule(new Pattern("configuration/define"), new DefinePropertyAction());
-
-    // the contextProperty pattern is deprecated. It is undocumented
-    // and will be dropped in future versions of logback
-    rs.addRule(new Pattern("configuration/contextProperty"),
-        new ContextPropertyAction());
 
     rs.addRule(new Pattern("configuration/conversionRule"),
         new ConversionRuleAction());
