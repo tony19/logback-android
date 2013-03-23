@@ -13,130 +13,82 @@
  */
 package ch.qos.logback.core.joran.action;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
-import org.xml.sax.Attributes;
-
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.event.SaxEventRecorder;
-import ch.qos.logback.core.joran.spi.ActionException;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
 import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.Loader;
-import ch.qos.logback.core.util.OptionHelper;
+import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 
-public class IncludeAction extends Action {
+public class IncludeAction extends AbstractIncludeAction {
 
   private static final String INCLUDED_TAG = "included";
-  private static final String FILE_ATTR = "file";
-  private static final String URL_ATTR = "url";
-  private static final String RESOURCE_ATTR = "resource";
+  private static final String CONFIG_TAG = "configuration";
+  private int eventOffset = 2;
 
-  private String attributeInUse;
+  /**
+   * Sets the list index into the event player's list, where the events
+   * from the processed include will be inserted
+   * @param offset the array index
+   */
+  protected void setEventOffset(int offset) {
+    this.eventOffset = offset;
+  }
 
+  /**
+   * Creates a SAX event recorder based on given parameters. Subclasses
+   * should override this as necessary.
+   * @param in input stream
+   * @param url URL to opened file/resource
+   * @return the newly created recorder
+   */
+  protected SaxEventRecorder createRecorder(InputStream in, URL url) {
+    return new SaxEventRecorder();
+  }
+
+  /**
+   * Processes an include
+   * @param ic context
+   * @param url URL to file/resource being included
+   */
   @Override
-  public void begin(InterpretationContext ec, String name, Attributes attributes)
-          throws ActionException {
+  protected void processInclude(InterpretationContext ic, URL url) throws JoranException {
 
-    SaxEventRecorder recorder = new SaxEventRecorder();
-
-    this.attributeInUse = null;
-
-    if (!checkAttributes(attributes)) {
-      return;
-    }
-
-    InputStream in = getInputStream(ec, attributes);
+    InputStream in = openURL(url);
 
     try {
       if (in != null) {
-        parseAndRecord(in, recorder);
-        // remove the <included> tag from the beginning and </included> from the end
+        // add URL to watch list in case the "scan" flag is true, in
+        // which case this URL is periodically checked for changes
+        ConfigurationWatchListUtil.addToWatchList(getContext(), url);
+
+        // parse the include
+        SaxEventRecorder recorder = createRecorder(in, url);
+        recorder.setContext(getContext());
+        recorder.recordEvents(in);
+
+        // remove the leading/trailing tags (<included> or <configuration>)
         trimHeadAndTail(recorder);
 
-        // offset = 2, because we need to get past this element as well as the end element
-        ec.getJoranInterpreter().getEventPlayer().addEventsDynamically(recorder.saxEventList, 2);
+        ic.getJoranInterpreter().getEventPlayer().addEventsDynamically(recorder.getSaxEventList(), this.eventOffset);
       }
     } catch (JoranException e) {
-      addError("Error while parsing  " + attributeInUse, e);
+      addError("Failed processing [" + url.toString() + "]", e);
     } finally {
       close(in);
     }
-
   }
 
-  void close(InputStream in) {
-    if (in != null) {
-      try {
-        in.close();
-      } catch (IOException e) {
-      }
-    }
-  }
-
-  private boolean checkAttributes(Attributes attributes) {
-    String fileAttribute = attributes.getValue(FILE_ATTR);
-    String urlAttribute = attributes.getValue(URL_ATTR);
-    String resourceAttribute = attributes.getValue(RESOURCE_ATTR);
-
-    int count = 0;
-
-    if (!OptionHelper.isEmpty(fileAttribute)) {
-      count++;
-    }
-    if (!OptionHelper.isEmpty(urlAttribute)) {
-      count++;
-    }
-    if (!OptionHelper.isEmpty(resourceAttribute)) {
-      count++;
-    }
-
-    if (count == 0) {
-      addError("One of \"path\", \"resource\" or \"url\" attributes must be set.");
-      return false;
-    } else if (count > 1) {
-      addError("Only one of \"file\", \"url\" or \"resource\" attributes should be set.");
-      return false;
-    } else if (count == 1) {
-      return true;
-    }
-    throw new IllegalStateException("Count value [" + count
-            + "] is not expected");
-  }
-
-  private InputStream getInputStreamByFilePath(String pathToFile) {
-    try {
-      return new FileInputStream(pathToFile);
-    } catch (IOException ioe) {
-      String errMsg = "File [" + pathToFile + "] does not exist.";
-      addError(errMsg, ioe);
-      return null;
-    }
-  }
-
-  URL attributeToURL(String urlAttribute) {
-    try {
-      return new URL(urlAttribute);
-    } catch (MalformedURLException mue) {
-      String errMsg = "URL [" + urlAttribute + "] is not well formed.";
-      addError(errMsg, mue);
-      return null;
-    }
-  }
-
-  private InputStream getInputStreamByUrl(URL url) {
-    return openURL(url);
-  }
-
-  InputStream openURL(URL url) {
+  /**
+   * Opens the given URL, logging any exceptions
+   * @param url URL of file/resource to open
+   * @return an input stream to the URL; or {@code null} if the URL could not be opened
+   */
+  private InputStream openURL(URL url) {
     try {
       return url.openStream();
     } catch (IOException e) {
@@ -146,95 +98,43 @@ public class IncludeAction extends Action {
     }
   }
 
-  URL resourceAsURL(String resourceAttribute) {
-    URL url = Loader.getResourceBySelfClassLoader(resourceAttribute);
-    if (url == null) {
-      String errMsg = "Could not find resource corresponding to ["
-              + resourceAttribute + "]";
-      addError(errMsg);
-      return null;
-    } else
-      return url;
-  }
-
-  URL filePathAsURL(String path) {
-    URI uri = new File(path).toURI();
-    try {
-      return uri.toURL();
-    } catch (MalformedURLException e) {
-      // impossible to get here
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  private InputStream getInputStreamByResource(URL url) {
-    return openURL(url);
-  }
-
-  URL getInputURL(InterpretationContext ec, Attributes attributes) {
-    String fileAttribute = attributes.getValue(FILE_ATTR);
-    String urlAttribute = attributes.getValue(URL_ATTR);
-    String resourceAttribute = attributes.getValue(RESOURCE_ATTR);
-
-    if (!OptionHelper.isEmpty(fileAttribute)) {
-      this.attributeInUse = ec.subst(fileAttribute);
-      return filePathAsURL(attributeInUse);
-    }
-
-    if (!OptionHelper.isEmpty(urlAttribute)) {
-      this.attributeInUse = ec.subst(urlAttribute);
-      return attributeToURL(attributeInUse);
-    }
-
-    if (!OptionHelper.isEmpty(resourceAttribute)) {
-      this.attributeInUse = ec.subst(resourceAttribute);
-      return resourceAsURL(attributeInUse);
-    }
-    // given previous checkAttributes() check we cannot reach this line
-    throw new IllegalStateException("A URL stream should have been returned");
-
-  }
-
-  InputStream getInputStream(InterpretationContext ec, Attributes attributes) {
-    URL inputURL = getInputURL(ec, attributes);
-    if (inputURL == null)
-      return null;
-
-    ConfigurationWatchListUtil.addToWatchList(context, inputURL);
-    return openURL(inputURL);
-  }
-
+  /**
+   * Removes the head tag and tail tag if they are named either
+   * "included" or "configuration"
+   * @param recorder the SAX Event recorder containing the tags
+   */
   private void trimHeadAndTail(SaxEventRecorder recorder) {
-    // Let's remove the two <included> events before
-    // adding the events to the player.
-
-    List<SaxEvent> saxEventList = recorder.saxEventList;
-
+    List<SaxEvent> saxEventList = recorder.getSaxEventList();
     if (saxEventList.size() == 0) {
       return;
     }
 
+    boolean includedTagFound = false;
+    boolean configTagFound = false;
+
+    // find opening element
     SaxEvent first = saxEventList.get(0);
-    if (first != null && first.qName.equalsIgnoreCase(INCLUDED_TAG)) {
+    if (first != null) {
+      includedTagFound = INCLUDED_TAG.equalsIgnoreCase(first.qName);
+      configTagFound = CONFIG_TAG.equalsIgnoreCase(first.qName);
+    }
+
+    // if opening element found, remove it, and then remove the closing element
+    if (includedTagFound || configTagFound) {
       saxEventList.remove(0);
+
+      final int listSize = saxEventList.size();
+      if (listSize == 0) {
+        return;
+      }
+
+      final int lastIndex = listSize - 1;
+      SaxEvent last = saxEventList.get(lastIndex);
+      if ((last != null) &&
+          (includedTagFound && INCLUDED_TAG.equalsIgnoreCase(last.qName)) ||
+          (configTagFound && CONFIG_TAG.equalsIgnoreCase(last.qName))) {
+        saxEventList.remove(lastIndex);
+      }
     }
-
-    SaxEvent last = saxEventList.get(recorder.saxEventList.size() - 1);
-    if (last != null && last.qName.equalsIgnoreCase(INCLUDED_TAG)) {
-      saxEventList.remove(recorder.saxEventList.size() - 1);
-    }
   }
-
-  private void parseAndRecord(InputStream inputSource, SaxEventRecorder recorder)
-          throws JoranException {
-    recorder.setContext(context);
-    recorder.recordEvents(inputSource);
-  }
-
-  @Override
-  public void end(InterpretationContext ec, String name) throws ActionException {
-    // do nothing
-  }
-
 }

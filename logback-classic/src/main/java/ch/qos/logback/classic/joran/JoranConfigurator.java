@@ -16,6 +16,8 @@ package ch.qos.logback.classic.joran;
 import ch.qos.logback.classic.joran.action.*;
 import ch.qos.logback.classic.sift.SiftAction;
 import ch.qos.logback.classic.util.DefaultNestedComponentRules;
+import ch.qos.logback.classic.joran.action.ConditionalIncludeAction;
+import ch.qos.logback.classic.joran.action.FindIncludeAction;
 import ch.qos.logback.core.joran.JoranConfiguratorBase;
 import ch.qos.logback.core.joran.action.AppenderRefAction;
 import ch.qos.logback.core.joran.action.IncludeAction;
@@ -40,7 +42,7 @@ public class JoranConfigurator extends JoranConfiguratorBase {
 
     rs.addRule(new Pattern("configuration/contextName"),
         new ContextNameAction());
-      rs.addRule(new Pattern("configuration/contextListener"),
+    rs.addRule(new Pattern("configuration/contextListener"),
         new LoggerContextListenerAction());
 
     rs.addRule(new Pattern("configuration/appender/sift"), new SiftAction());
@@ -55,11 +57,14 @@ public class JoranConfigurator extends JoranConfiguratorBase {
         new AppenderRefAction());
     rs.addRule(new Pattern("configuration/root/appender-ref"),
         new AppenderRefAction());
-  
+
     rs.addRule(new Pattern("configuration/include"), new IncludeAction());
 
     rs.addRule(new Pattern("configuration/consolePlugin"),
         new ConsolePluginAction());
+
+    rs.addRule(new Pattern("configuration/findInclude"), new FindIncludeAction());
+    rs.addRule(new Pattern("configuration/findInclude/include"), new ConditionalIncludeAction());
   }
 
   @Override
