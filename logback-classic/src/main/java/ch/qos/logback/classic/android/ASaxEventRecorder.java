@@ -44,12 +44,9 @@ public class ASaxEventRecorder extends SaxEventRecorder {
 
   /**
    * Constructor
-   *
-   * @param context logger context
    */
-  public ASaxEventRecorder(Context context) {
+  public ASaxEventRecorder() {
     super();
-    setContext(context);
   }
 
   /**
