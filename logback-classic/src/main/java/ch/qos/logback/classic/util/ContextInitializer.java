@@ -101,7 +101,7 @@ public class ContextInitializer {
    * @return the input stream to the resource; or {@code null} if not found
    */
   private InputStream getResource(String filename, ClassLoader myClassLoader, boolean updateStatus) {
-    InputStream stream = Loader.getResourceAsStream(filename, myClassLoader);
+    InputStream stream = myClassLoader.getResourceAsStream(filename);
     if (updateStatus) {
       String resourcePath = null;
       if (stream != null) {

@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -40,7 +45,7 @@ public class ASaxEventRecorderTest {
 
   @Before
   public void before() {
-    stream = Loader.getResourceAsStream("asResource/AndroidManifest.xml", classLoader);
+    stream = classLoader.getResourceAsStream("asResource/AndroidManifest.xml");
   }
 
   @After

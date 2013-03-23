@@ -32,7 +32,7 @@ public class StackAction extends Action {
     }
 
     public void begin(InterpretationContext ec, String name, Attributes attributes) {
-        stack.push(attributes.getValue("name"));
+        stack.push(ec.subst(attributes.getValue("name")));
     }
 
     public void end(InterpretationContext ec, String name) {

@@ -65,6 +65,8 @@ public class JoranConfigurator extends JoranConfiguratorBase {
 
     rs.addRule(new Pattern("configuration/findInclude"), new FindIncludeAction());
     rs.addRule(new Pattern("configuration/findInclude/include"), new ConditionalIncludeAction());
+
+    rs.addRule(new Pattern("configuration/appProps"), new AppPropertiesAction());
   }
 
   @Override
