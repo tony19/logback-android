@@ -22,8 +22,8 @@ import ch.qos.logback.core.joran.util.PropertySetter;
 
 
 public class ParamAction extends Action {
-  static String NO_NAME = "No name attribute in <param> element";
-  static String NO_VALUE = "No name attribute in <param> element";
+  static String NO_NAME = "No "+NAME_ATTRIBUTE+" attribute in <param> element";
+  static String NO_VALUE = "No "+VALUE_ATTRIBUTE+" attribute in <param> element";
   boolean inError = false;
 
   public void begin(
