@@ -18,7 +18,6 @@ import static junit.framework.Assert.assertEquals;
 import ch.qos.logback.core.status.StatusChecker;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.StatusPrinter;
 
-@Ignore("logback.configurationFile not yet supported in Android")
 public class RecursiveInitializationTest {
 
   int diff = RandomUtil.getPositiveInt();

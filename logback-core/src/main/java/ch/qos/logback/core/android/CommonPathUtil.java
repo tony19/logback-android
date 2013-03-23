@@ -21,7 +21,7 @@ import android.os.Environment;
  * on the Android filessytem.
  *
  * @author Anthony Trinh
- * @since 1.0.7-2
+ * @since 1.0.8-1
  */
 public abstract class CommonPathUtil {
   private static final String ASSETS_DIRECTORY = "assets";
@@ -29,7 +29,7 @@ public abstract class CommonPathUtil {
   /**
    * Heuristically determines whether the current OS is Android
    */
-  public static boolean isAndroidOS() {
+  private static boolean isAndroidOS() {
     String osname = OptionHelper.getSystemProperty("os.name");
     String root = OptionHelper.getEnv("ANDROID_ROOT");
     String data = OptionHelper.getEnv("ANDROID_DATA");
@@ -69,7 +69,7 @@ public abstract class CommonPathUtil {
     if (isAndroidOS()) {
       return Environment.getExternalStorageDirectory().getAbsolutePath();
     } else {
-      String extDir = System.getenv("EXTERNAL_STORAGE");
+      String extDir = OptionHelper.getEnv("EXTERNAL_STORAGE");
       return (extDir == null) ? "/sdcard" : extDir;
     }
   }
