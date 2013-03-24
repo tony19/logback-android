@@ -17,32 +17,42 @@ import static ch.qos.logback.core.BasicStatusManager.MAX_HEADER_COUNT;
 import static ch.qos.logback.core.BasicStatusManager.TAIL_SIZE;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.status.ErrorStatus;
+import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.Status;
+import ch.qos.logback.core.status.StatusListener;
 
 
 public class BasicStatusManagerTest {
 
-  
+
   BasicStatusManager bsm = new BasicStatusManager();
-  
+  Context context = new ContextBase();
+
+  @Before
+  public void before() {
+    bsm.clear();
+  }
+
   @Test
   public void smoke() {
     bsm.add(new ErrorStatus("hello", this));
     assertEquals(Status.ERROR, bsm.getLevel());
-    
+
     List<Status> statusList = bsm.getCopyOfStatusList();
     assertNotNull(statusList);
     assertEquals(1, statusList.size());
     assertEquals("hello", statusList.get(0).getMessage());
   }
-  
+
   @Test
   public void many() {
     int margin = 300;
@@ -50,7 +60,7 @@ public class BasicStatusManagerTest {
     for(int i = 0; i < len; i++) {
       bsm.add(new ErrorStatus(""+i, this));
     }
-    
+
     List<Status> statusList = bsm.getCopyOfStatusList();
     assertNotNull(statusList);
     assertEquals(MAX_HEADER_COUNT+TAIL_SIZE, statusList.size());
@@ -62,5 +72,38 @@ public class BasicStatusManagerTest {
       witness.add(new ErrorStatus(""+(MAX_HEADER_COUNT+margin+i), this));
     }
     assertEquals(witness, statusList);
+  }
+
+  @Test
+  public void returnsNewlyAddedConsoleListener() {
+    OnConsoleStatusListener csl = bsm.addConsoleStatusListenerIfAbsent(context);
+    assertEquals(csl, bsm.getCopyOfStatusListenerList().get(0));
+
+    List<StatusListener> statusList = bsm.getCopyOfStatusListenerList();
+    assertEquals(1, statusList.size());
+  }
+
+  @Test
+  public void returnsNullWhenNoConsoleListenerAdded() {
+    bsm.addConsoleStatusListenerIfAbsent(context);
+    assertNull(bsm.addConsoleStatusListenerIfAbsent(context));
+
+    List<StatusListener> statusList = bsm.getCopyOfStatusListenerList();
+    assertEquals(1, statusList.size());
+  }
+
+  @Test
+  public void addsConsoleStatusListenerOnlyIfAbsent() {
+    OnConsoleStatusListener csl = bsm.addConsoleStatusListenerIfAbsent(context);
+
+    List<StatusListener> statusList = bsm.getCopyOfStatusListenerList();
+    assertEquals(1, statusList.size());
+    assertEquals(csl, statusList.get(0));
+
+    bsm.addConsoleStatusListenerIfAbsent(context);
+
+    statusList = bsm.getCopyOfStatusListenerList();
+    assertEquals(1, statusList.size());
+    assertEquals(csl, statusList.get(0));
   }
 }

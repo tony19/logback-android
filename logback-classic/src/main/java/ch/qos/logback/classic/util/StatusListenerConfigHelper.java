@@ -30,26 +30,25 @@ public class StatusListenerConfigHelper {
     }
   }
 
-  static void addStatusListener(LoggerContext loggerContext,
-      String listenerClass) {
-    StatusListener listener = null;
+  static void addStatusListener(LoggerContext loggerContext, String listenerClass) {
     if (ContextInitializer.SYSOUT.equalsIgnoreCase(listenerClass)) {
-      listener = new OnConsoleStatusListener();
+      OnConsoleStatusListener.addNewInstanceToContext(loggerContext);
     } else {
       try {
-        listener = (StatusListener) OptionHelper.instantiateByClassName(
+        StatusListener listener = (StatusListener) OptionHelper.instantiateByClassName(
             listenerClass, StatusListener.class, loggerContext);
         if(listener instanceof ContextAware) // LOGBACK-767
           ((ContextAware) listener).setContext(loggerContext);
         if(listener instanceof LifeCycle)  // LOGBACK-767
           ((LifeCycle) listener).start();
+
+        if (listener != null) {
+          loggerContext.getStatusManager().add(listener);
+        }
       } catch (Exception e) {
         // printing on the console is the best we can do
         e.printStackTrace();
       }
-    }
-    if (listener != null) {
-      loggerContext.getStatusManager().add(listener);
     }
   }
 }

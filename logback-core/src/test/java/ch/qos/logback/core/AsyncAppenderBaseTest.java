@@ -38,14 +38,11 @@ public class AsyncAppenderBaseTest {
   LossyAsyncAppender lossyAsyncAppender = new LossyAsyncAppender();
   DelayingListAppender<Integer> delayingListAppender = new DelayingListAppender<Integer>();
   ListAppender<Integer> listAppender = new ListAppender<Integer>();
-  OnConsoleStatusListener onConsoleStatusListener = new OnConsoleStatusListener();
   StatusChecker statusChecker = new StatusChecker(context);
 
   @Before
   public void setUp() {
-    onConsoleStatusListener.setContext(context);
-    context.getStatusManager().add(onConsoleStatusListener);
-    onConsoleStatusListener.start();
+    OnConsoleStatusListener.addNewInstanceToContext(context);
 
     asyncAppenderBase.setContext(context);
     lossyAsyncAppender.setContext(context);

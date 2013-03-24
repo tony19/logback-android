@@ -18,6 +18,7 @@ import java.util.List;
 
 import ch.qos.logback.core.helpers.CyclicBuffer;
 import ch.qos.logback.core.spi.LogbackLock;
+import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusListener;
 import ch.qos.logback.core.status.StatusManager;
@@ -50,7 +51,7 @@ public class BasicStatusManager implements StatusManager {
 
   /**
    * Add a new status object.
-   * 
+   *
    * @param newStatus
    *                the status message to add
    */
@@ -115,6 +116,29 @@ public class BasicStatusManager implements StatusManager {
     synchronized (statusListenerListLock) {
       statusListenerList.remove(listener);
     }
+  }
+
+  public OnConsoleStatusListener addConsoleStatusListenerIfAbsent(Context context) {
+    OnConsoleStatusListener listener = null;
+    synchronized (statusListenerListLock) {
+      if (!containsConsoleStatusListener()) {
+        listener = new OnConsoleStatusListener();
+        listener.setContext(context);
+        statusListenerList.add(listener);
+      }
+    }
+    return listener;
+  }
+
+  private boolean containsConsoleStatusListener() {
+    boolean exists = false;
+    for (StatusListener sl : statusListenerList) {
+      if (sl instanceof OnConsoleStatusListener) {
+        exists = true;
+        break;
+      }
+    }
+    return exists;
   }
 
   public List<StatusListener> getCopyOfStatusListenerList() {

@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.core.status;
 
+import ch.qos.logback.core.BasicStatusManager;
 import ch.qos.logback.core.Context;
 
 import java.io.PrintStream;
@@ -30,17 +31,29 @@ public class OnConsoleStatusListener extends OnPrintStreamStatusListenerBase {
   }
 
   /**
-   * This utility method adds a new OnConsoleStatusListener to the context
-   * passed as parameter.
+   * This utility method adds a new OnConsoleStatusListener to a context.
+   * If the context's status manager is a {#link BasicStatusManager}, the
+   * listener is added only if an OnConsoleStatusListener does not already
+   * exist in the context.
    *
    * @param context
    * @since 1.0.1
    */
   static public void addNewInstanceToContext(Context context) {
-    OnConsoleStatusListener onConsoleStatusListener = new OnConsoleStatusListener();
-    onConsoleStatusListener.setContext(context);
-    onConsoleStatusListener.start();
-    context.getStatusManager().add(onConsoleStatusListener);
+    OnConsoleStatusListener onConsoleStatusListener = null;
+
+    StatusManager sm = context.getStatusManager();
+    if (sm instanceof BasicStatusManager) {
+      onConsoleStatusListener = ((BasicStatusManager) sm).addConsoleStatusListenerIfAbsent(context);
+    } else {
+      onConsoleStatusListener = new OnConsoleStatusListener();
+      onConsoleStatusListener.setContext(context);
+      sm.add(onConsoleStatusListener);
+    }
+
+    if (onConsoleStatusListener != null) {
+      onConsoleStatusListener.start();
+    }
   }
 
 

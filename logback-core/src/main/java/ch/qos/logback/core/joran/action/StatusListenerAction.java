@@ -19,6 +19,7 @@ import org.xml.sax.Attributes;
 import ch.qos.logback.core.joran.spi.ActionException;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
 import ch.qos.logback.core.spi.LifeCycle;
+import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.StatusListener;
 import ch.qos.logback.core.util.OptionHelper;
 
@@ -40,11 +41,15 @@ public class StatusListenerAction extends Action {
     }
 
     try {
-      statusListener = (StatusListener) OptionHelper.instantiateByClassName(
-              className, StatusListener.class, context);
-      ec.getContext().getStatusManager().add(statusListener);
-      if (statusListener instanceof ContextAware) {
-        ((ContextAware) statusListener).setContext(context);
+      if (OnConsoleStatusListener.class.getName().equals(className)) {
+        OnConsoleStatusListener.addNewInstanceToContext(context);
+      } else {
+        statusListener = (StatusListener) OptionHelper.instantiateByClassName(
+                className, StatusListener.class, context);
+        ec.getContext().getStatusManager().add(statusListener);
+        if (statusListener instanceof ContextAware) {
+          ((ContextAware) statusListener).setContext(context);
+        }
       }
       addInfo("Added status listener of type [" + className + "]");
       ec.pushObject(statusListener);

@@ -46,7 +46,7 @@ public class FileAppenderResilienceTest {
   @Before
   public void setUp() throws InterruptedException {
 
-    context.getStatusManager().add(new OnConsoleStatusListener());
+    OnConsoleStatusListener.addNewInstanceToContext(context);
 
     File outputDir = new File(outputDirStr);
     outputDir.mkdirs();
