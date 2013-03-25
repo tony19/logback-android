@@ -1,7 +1,6 @@
 package ch.qos.logback.classic;
 
 import ch.qos.logback.classic.net.testObjectBuilders.LoggingEventBuilderInContext;
-import ch.qos.logback.classic.net.testObjectBuilders.LoggingEventWithParametersBuilder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.read.ListAppender;

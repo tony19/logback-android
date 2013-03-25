@@ -13,7 +13,6 @@
  */
 package ch.qos.logback.core.status;
 
-import ch.qos.logback.core.BasicStatusManager;
 import ch.qos.logback.core.Context;
 
 import java.io.PrintStream;
@@ -31,29 +30,22 @@ public class OnConsoleStatusListener extends OnPrintStreamStatusListenerBase {
   }
 
   /**
-   * This utility method adds a new OnConsoleStatusListener to a context.
-   * If the context's status manager is a {#link BasicStatusManager}, the
-   * listener is added only if an OnConsoleStatusListener does not already
-   * exist in the context.
+   * This utility method adds a new OnConsoleStatusListener to the context of
+   * the contextAware object passed as parameter.
    *
-   * @param context
+   * @param loggerContext
    * @since 1.0.1
    */
-  static public void addNewInstanceToContext(Context context) {
-    OnConsoleStatusListener onConsoleStatusListener = null;
+  static public void addNewInstanceToContext(Context loggerContext) {
 
-    StatusManager sm = context.getStatusManager();
-    if (sm instanceof BasicStatusManager) {
-      onConsoleStatusListener = ((BasicStatusManager) sm).addConsoleStatusListenerIfAbsent(context);
-    } else {
-      onConsoleStatusListener = new OnConsoleStatusListener();
-      onConsoleStatusListener.setContext(context);
-      sm.add(onConsoleStatusListener);
-    }
+    OnConsoleStatusListener onConsoleStatusListener = new OnConsoleStatusListener();
+    onConsoleStatusListener.setContext(loggerContext);
+    boolean result = loggerContext.getStatusManager().addUniquely(onConsoleStatusListener, loggerContext);
 
-    if (onConsoleStatusListener != null) {
+    // start only if registered successfully. This check avoids superfluous
+    // printing on the console.
+    if (result)
       onConsoleStatusListener.start();
-    }
   }
 
 

@@ -17,7 +17,8 @@ import static ch.qos.logback.core.BasicStatusManager.MAX_HEADER_COUNT;
 import static ch.qos.logback.core.BasicStatusManager.TAIL_SIZE;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import ch.qos.logback.core.spi.ContextAware;
+import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.Status;
@@ -36,9 +39,13 @@ public class BasicStatusManagerTest {
 
   BasicStatusManager bsm = new BasicStatusManager();
   Context context = new ContextBase();
+  ContextAware contextAware = new ContextAwareBase(this);
+  OnConsoleStatusListener csl = new OnConsoleStatusListener();
 
   @Before
   public void before() {
+    contextAware.setContext(context);
+    csl.setContext(context);
     bsm.clear();
   }
 
@@ -75,18 +82,18 @@ public class BasicStatusManagerTest {
   }
 
   @Test
-  public void returnsNewlyAddedConsoleListener() {
-    OnConsoleStatusListener csl = bsm.addConsoleStatusListenerIfAbsent(context);
-    assertEquals(csl, bsm.getCopyOfStatusListenerList().get(0));
+  public void returnsTrueForNewlyAddedConsoleListener() {
+    assertTrue(bsm.addUniquely(csl, contextAware));
+    assertEquals(OnConsoleStatusListener.class, bsm.getCopyOfStatusListenerList().get(0).getClass());
 
     List<StatusListener> statusList = bsm.getCopyOfStatusListenerList();
     assertEquals(1, statusList.size());
   }
 
   @Test
-  public void returnsNullWhenNoConsoleListenerAdded() {
-    bsm.addConsoleStatusListenerIfAbsent(context);
-    assertNull(bsm.addConsoleStatusListenerIfAbsent(context));
+  public void returnsFalseWhenNoConsoleListenerAdded() {
+    bsm.addUniquely(csl, contextAware);
+    assertFalse(bsm.addUniquely(csl, contextAware));
 
     List<StatusListener> statusList = bsm.getCopyOfStatusListenerList();
     assertEquals(1, statusList.size());
@@ -94,13 +101,13 @@ public class BasicStatusManagerTest {
 
   @Test
   public void addsConsoleStatusListenerOnlyIfAbsent() {
-    OnConsoleStatusListener csl = bsm.addConsoleStatusListenerIfAbsent(context);
+    bsm.addUniquely(csl, contextAware);
 
     List<StatusListener> statusList = bsm.getCopyOfStatusListenerList();
     assertEquals(1, statusList.size());
     assertEquals(csl, statusList.get(0));
 
-    bsm.addConsoleStatusListenerIfAbsent(context);
+    bsm.addUniquely(csl, contextAware);
 
     statusList = bsm.getCopyOfStatusListenerList();
     assertEquals(1, statusList.size());

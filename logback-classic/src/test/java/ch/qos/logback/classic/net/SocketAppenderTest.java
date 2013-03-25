@@ -22,6 +22,8 @@ import static junit.framework.Assert.assertFalse;
 import java.util.Map;
 import java.util.concurrent.*;
 
+import ch.qos.logback.core.spi.ContextAware;
+import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import org.junit.*;
@@ -54,6 +56,7 @@ public class SocketAppenderTest {
 
   String mdcKey = "key" + diff;
   LoggerContext loggerContext = new LoggerContext();
+  ContextAware contextAware = new ContextAwareBase(this);
   SocketAppender socketAppender = new SocketAppender();
   private boolean includeCallerData = false;
 
@@ -72,6 +75,7 @@ public class SocketAppenderTest {
 
   @Before
   public void setUp() {
+    contextAware.setContext(loggerContext);
   }
 
   @After
