@@ -23,6 +23,7 @@ import org.xml.sax.helpers.LocatorImpl;
 import org.xmlpull.v1.XmlPullParser;
 
 import brut.androlib.res.decoder.AXmlResourceParser;
+import ch.qos.logback.core.Context;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.event.SaxEventRecorder;
 import ch.qos.logback.core.joran.spi.JoranException;

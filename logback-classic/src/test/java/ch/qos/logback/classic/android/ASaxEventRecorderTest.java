@@ -15,14 +15,14 @@ package ch.qos.logback.classic.android;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.event.SaxEvent;
