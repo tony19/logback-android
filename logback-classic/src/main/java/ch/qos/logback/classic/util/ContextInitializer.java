@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.android.BasicLogcatConfigurator;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.android.CommonPathUtil;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -114,10 +113,10 @@ public class ContextInitializer {
 
   /**
    * Configures logback with the first configuration found in the following search path.
-   * If not found, configuration defaults to {@link BasicLogcatConfigurator}.
+   * If no configuration found, nothing is done and logging is disabled.
    *
    * <ol>
-   *    <li>${logback.configurationFile}</li>
+   *    <li>${logback.configurationFile} (a system property)</li>
    *    <li>jar:file://assets/logback.xml</li>
    * </ol>
    */
@@ -144,11 +143,6 @@ public class ContextInitializer {
         configurator.doConfigure(assetsConfigXml);
         configured = true;
       }
-    }
-
-    // fall back to BasicLogcatConfigurator
-    if (!configured) {
-      BasicLogcatConfigurator.configure(loggerContext);
     }
   }
 
