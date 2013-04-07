@@ -7,12 +7,10 @@
 
     <link rel="stylesheet" type="text/css" href="css/museo/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
-    <link rel="stylesheet" type="text/css" href="js/fancybox/jquery.fancybox-1.3.4.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="css/tomorrow-night.css">
 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
     <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-    <script type="text/javascript" src="js/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
-    <script type="text/javascript" src="js/jquery.expander.min.js"></script>
     <script type="text/javascript" src="js/jquery.google-analytics.js"></script>
     <script type="text/javascript" src="js/custom.js"></script>
 </head>
@@ -35,227 +33,40 @@
         The reliable, generic, fast and flexible logging framework for Java on Android.
     </div>
 
-    <p>logback-android brings the power of logback to Android. logback is a reliable, generic, fast, and flexible
-        logging library for Java applications.
-    </p>
-
     <h2>Quick Start</h2>
     <ol>
         <li class="pad">
-            Add <a href="https://github.com/downloads/tony19/logback-android/logback-android-1.0.7-1.jar">logback-android</a> and <a
-                href="http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.1/slf4j-api-1.7.1.jar">SLF4J</a> to your project classpath.
+            Add <a href="https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.0.8-1.jar">logback-android</a> and <a
+                href="http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar">slf4j-api</a> to your project classpath.
 
         </li>
+
+        <li class="pad">Configure logback-android using an <a href="https://github.com/tony19/logback-android/wiki#configuration-via-xml">XML file</a> or <a href="https://github.com/tony19/logback-android/wiki#configuration-in-code">in-code statements</a>. Otherwise, logging is silently disabled.</li>
 
         <li class="pad">
-            Pick one of the configuration methods:
-            <ul>
-                <li><b>Default</b>
-                    <div class="block">
-                        No action necessary! If no configuration is specified, logback-android uses the default
-                        appender (<a
-                                href="http://tony19.github.com/logback-android/doc/1.0.7-1/ch/qos/logback/classic/android/LogcatAppender.html"><code>LogcatAppender</code></a>) set to the <code>DEBUG</code> level.
-                    </div>
-                </li>
-
-                <li><b>AndroidManifest.xml</b>
-                    <div class="block">
-                        Put a <code>&lt;logback>&lt;configuration></code> element in your application's <i>AndroidManifest.xml</i>.
-                        logback-android reads the manifest <i>automatically</i> (no need to code).
-                        <div class="expander">
-                            <span class="read-more"><a href="#">[Example]</a></span>
-                            <div class="details">
-<!--
-#######################################################
-# SAMPLE ANDROID MANIFEST
-#######################################################
--->
-<pre><code class="snippet">&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example"
-    android:versionCode="1"
-    android:versionName="1.0" >
-
-    &lt;!-- {...} -->
-    <span class="hilite">
-    &lt;logback>
-        &lt;configuration>
-            &lt;appender
-                name="LOGCAT"
-                class="ch.qos.logback.classic.android.LogcatAppender" >
-                &lt;tagEncoder>
-                    &lt;pattern>%logger{0}&lt;/pattern>
-                &lt;/tagEncoder>
-                &lt;encoder>
-                    &lt;pattern>[%method] > %msg%n&lt;/pattern>
-                &lt;/encoder>
-            &lt;/appender>
-
-            &lt;root level="TRACE" >
-                &lt;appender-ref ref="LOGCAT" />
-            &lt;/root>
-        &lt;/configuration>
-    &lt;/logback>
-    </span>
-&lt;/manifest></code></pre>
-<!--
-#######################################################
-# END OF SAMPLE ANDROID MANIFEST
-#######################################################
--->
-                            </div>
-                        </div>
-                    </div>
-                </li>
-
-
-                <li><b>/sdcard/logback/logback.xml</b>  or  <b>assets/logback.xml</b>
-                    <div class="block">
-                        Put <i>logback.xml</i> in the <i>assets</i> directory in your application's root directory or in <i>/sdcard/logback</i> (the SD card is searched first).
-                        logback-android searches for this file <i>automatically</i> (no need to code).
-                    </div>
-                </li>
-
-                <li><b>Code configuration</b>
-                    <div class="block">
-                        Configure logback-android in code before making log statements.
-
-                        <div class="expander">
-                            <span class="read-more"><a href="#">[Example]</a></span>
-                            <div class="details">
-<!--
-#######################################################
-# SAMPLE CODE CONFIG
-#######################################################
--->
-<pre><code class='snippet'>package com.example;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.StatusPrinter;
-
-public class ExampleCodeConfig {
-    static final String LOGBACK_XML =
-    "&lt;configuration debug='true'>" +
-    "  &lt;appender name='FILE' class='ch.qos.logback.core.FileAppender'>" +
-    "    &lt;file>foo.log&lt;/file>" +
-    "    &lt;append>true&lt;/append>" +
-    "    &lt;encoder>" +
-    "      &lt;pattern>%-4r [%t] %-5p %c{35} - %m%n&lt;/pattern>" +
-    "    &lt;/encoder>" +
-    "  &lt;/appender>" +
-    "  &lt;logger name='com.example.foo' level='DEBUG' />" +
-    "  &lt;root level='DEBUG'>" +
-    "    &lt;appender-ref ref='FILE' />" +
-    "  &lt;/root>" +
-    "&lt;/configuration>"
-    ;
-
-    static public void init() {
-        <span class="hilite">LoggerContext lc = (LoggerContext)LoggerFactory.getILoggerFactory();
-        try {
-            // load a specific logback.xml
-            JoranConfigurator configurator = new JoranConfigurator();
-            configurator.setContext(lc);
-            lc.reset(); // override default configuration
-            configurator.doConfigure("/path/to/logback.xml");
-
-            // hard-coded config
-            configurator.doConfigure(
-                new ByteArrayInputStream(LOGBACK_XML.getBytes())
-            );
-            
-        } catch (JoranException je) {
-            // StatusPrinter will handle this
-        }
-        StatusPrinter.printInCaseOfErrorsOrWarnings(lc);</span>
-    }
-
-    // ...
-}</code></pre>
-<!--
-#######################################################
-# END OF SAMPLE CODE CONFIG
-#######################################################
--->
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </li>
-
-        <li class="pad">
-            Create a class-level static logger in your application where logging is desired, and enter log statements.
-            <div class="expander">
-                <span class="read-more"><a href="#">[Example]</a></span>
-                <div class="details">
-<!--
-#######################################################
-# SAMPLE ACTIVITY
-#######################################################
--->
-<pre><code class='snippet'>package com.example;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.example.R;
-import android.app.Activity;
-import android.os.Bundle;
-
-public class HelloAndroidActivity extends Activity {
-    <span class='hilite'>static private final Logger LOG =
-                       LoggerFactory.getLogger(HelloAndroidActivity.class);</span>
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.main);
-       <span class='hilite'>
-       LOG.info("Hello Android!");
-       LOG.debug("reply: {}", Example.hello());</span>
-    }
-}
-
-class Example {
-    <span class='hilite'>static private final Logger LOG =
-                     LoggerFactory.getLogger(Example.class);</span>
-
-    static public String hello() {
-        <span class='hilite'>LOG.trace("entered hello()");</span>
-        return "Hi there!";
-    }
-}</code></pre>
-<!--
-#######################################################
-# END OF SAMPLE ACTIVITY
-#######################################################
--->
-                </div>
-            </div>
-        </li>
-
-        <li>
             <div>
                 <p>
-                    Run the application, and open your log. For the example above, open Logcat from your machine
-                    (e.g., with
-                    <a href="http://jsharkey.org/blog/2009/04/22/modifying-the-android-logcat-stream-for-full-color-debugging/">
-                        <i>coloredlogcat</i>
-                    </a>
-                    ) OR from your Android device (e.g., with
-                    <a href="https://market.android.com/details?id=com.nolanlawson.logcat"><i>CatLog</i></a> ):
-                </p>
+                  Use slf4j-api in your application to write logging statements as shown in the example below.
+<pre><code data-language="java">package com.example;
 
-                <p>
-                    <a class="zoom" href="img/shot_hello-android.png">
-                        <img src="img/shot_hello-android_thumb.png"/>
-                    </a>
-                </p>
-                <p>
-                    Also check out the other available <a href="http://logback.qos.ch/manual/appenders.html">appenders</a>!
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import android.os.Bundle;
+import android.app.Activity;
+
+public class MainActivity extends Activity {
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    // SLF4J
+    Logger LOG = LoggerFactory.getLogger(MainActivity.class);
+    LOG.info("hello world");
+  }
+}
+</code></pre>
                 </p>
             </div>
         </li>
@@ -264,12 +75,40 @@ class Example {
 
     <h2>Documentation</h2>
     <ul>
-        <li><a href="http://tony19.github.com/logback-android/doc/1.0.7-1/">logback-android Javadoc</a></li>
+        <li><a href="http://tony19.github.com/logback-android/doc/1.0.8-1/">logback-android Javadoc</a></li>
         <li><a href="http://logback.qos.ch/manual/">logback manual</a></li>
         <li><a href="http://logback.qos.ch/reasonsToSwitch.html">Why switch from log4j?</a></li>
-        <li><a href="./changelog.html">Changelog</a></li>
-        <li><a href="./faq.html">FAQ</a></li>
+        <li><a href="https://github.com/tony19/logback-android/wiki/Changelog">Changelog</a></li>
+        <li><a href="https://github.com/tony19/logback-android/wiki/FAQ">FAQ</a></li>
     </ul>
+
+    <h2>Download</h2>
+    <ul>
+        <li><code><a href="https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.0.8-1.jar">logback-android-1.0.8-1.jar</a></code>
+        </li>
+        <li><code><a href="http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar">slf4j-api-1.7.5.jar</a></code>
+        </li>
+    </ul>
+
+    <p>OR Maven users can simply add these dependencies to <code>pom.xml</code>:
+
+<pre><code data-language="xml">&lt;dependency>
+  &lt;groupId>com.github.tony19&lt;/groupId>
+  &lt;artifactId>logback-android-core&lt;/artifactId>
+  &lt;version>1.0.8-1&lt;/version>
+&lt;/dependency>
+&lt;dependency>
+  &lt;groupId>com.github.tony19&lt;/groupId>
+  &lt;artifactId>logback-android-classic&lt;/artifactId>
+  &lt;version>1.0.8-1&lt;/version>
+&lt;/dependency>
+&lt;dependency>
+  &lt;groupId>org.slf4j&lt;/groupId>
+  &lt;artifactId>slf4j-api&lt;/artifactId>
+  &lt;version>1.7.5&lt;/version>
+&lt;/dependency>
+</code></pre>
+    </p>
 
     <h2>License</h2>
     <p>
@@ -278,34 +117,6 @@ class Example {
         <a href="http://www.gnu.org/licenses/lgpl-2.1.html">LGPL v2.1</a>
     </p>
 
-    <h2>Features Supported</h2>
-	<ul>
-		<li>Android 2.1+</li>
-		<li>Auto-config from Android Manifest or local XML</li>
-		<li>Write to Logcat, files, or sockets</li>
-		<li>Most original logback features <b>except</b>:
-			<ul>
-				<li><i>logback-access</i></li>
-				<li>Groovy config</li>
-				<li>Conditionals in the configuration XML</li>
-				<li>JMS, JMX, JNDI, and Servlets</li>
-			</ul>
-		</li>
-	</ul>
-	
-    <h2>Download</h2>
-    <ul>
-        <li><code><a href="https://github.com/downloads/tony19/logback-android/logback-android-1.0.7-1.jar">logback-android-1.0.7-1.jar</a></code>
-        </li>
-        <li><code><a href="http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.1/slf4j-api-1.7.1.jar">slf4j-api-1.7.1.jar</a></code>
-        </li>
-    </ul>
-
-    <h2>Contact</h2>
-
-    <p>Tony Trinh (tony19 AT gmail com)
-        <br/></p>
-        
     <div class="footer">
         get the source code on GitHub : <a href="https://github.com/tony19/logback-android">tony19/logback-android</a>
     </div>
