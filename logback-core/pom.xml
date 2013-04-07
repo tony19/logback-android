@@ -34,7 +34,6 @@
       <artifactId>android</artifactId>
     </dependency>
 
-    <!-- FIXME: Use the Android javamail JAR -->
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
@@ -78,7 +77,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <!--
+<!--
         <configuration>
           <archive>
             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF
@@ -98,35 +97,6 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <instructions>
-            <Export-Package>ch.qos.logback.core.*</Export-Package>
-            <Import-Package>
-              javax.*;resolution:=optional,
-              org.xml.*;resolution:=optional,
-              org.fusesource.jansi;resolution:=optional,
-              org.codehaus.janino;resolution:=optional,
-              org.codehaus.commons.compiler;resolution:=optional,
-              *
-            </Import-Package>
-            <Bundle-RequiredExecutionEnvironment>J2SE-1.5
-            </Bundle-RequiredExecutionEnvironment>
-          </instructions>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 

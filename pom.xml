@@ -152,7 +152,6 @@
         <scope>provided</scope>
       </dependency>
 
-      <!-- FIXME: Use the Android javamail JAR -->
       <dependency>
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>

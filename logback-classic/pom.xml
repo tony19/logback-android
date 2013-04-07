@@ -70,7 +70,6 @@
       <artifactId>hsqldb</artifactId>
     </dependency>
 
-    <!-- FIXME: Use the Android javamail JAR -->
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
@@ -119,7 +118,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <!--
+<!--
         <configuration>
           <archive>
             <manifestFile>
