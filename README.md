@@ -98,7 +98,7 @@ Configuration via XML
   <property name="LOG_DIR" value="/data/data/com.example/files" />
 
   <!-- Create a logcat appender -->
-  <appender name="logcat" class="ch.qos.logback.classic.LogcatAppender">
+  <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
     <encoder>
       <pattern>%msg</pattern>
     </encoder>
