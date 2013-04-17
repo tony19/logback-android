@@ -70,7 +70,7 @@ OR Maven users can simply add these dependencies to `pom.xml`:
 Configuration via XML
 ---------------------
 
-`logback-android` can be configured simply by creating `assets/logback.xml`, containing [configuration XML](http://logback.qos.ch/manual/configuration.html#syntax). This file is read automatically upon loading the first logger from your code.
+`logback-android` can be configured simply by creating `assets/logback.xml`, containing [configuration XML](http://logback.qos.ch/manual/configuration.html#syntax). This file is read automatically upon loading the first logger from your code. Additional code configuration is *not* necessary.
 
 *Example 1: Basic configuration (single destination)*
 
@@ -241,7 +241,7 @@ Prior to `v1.0.8-1`, the initialization search path was hard-coded, and that can
 Configuration in Code
 ---------------------
 
-You can use the `logback` classes directly to initialize `logback-android` as shown in the following examples. Note the direct usage of `logback` classes removes the advantage of the facade provided by SLF4J.
+If you prefer code-based configuration instead of the XML method above, you can use the `logback` classes directly to initialize `logback-android` as shown in the following examples. Note the direct usage of `logback` classes removes the advantage of the facade provided by SLF4J.
 
 *Example: Configures appenders directly*
 
