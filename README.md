@@ -40,6 +40,7 @@ public class MainActivity extends Activity {
 }
 ```
 
+
 Download
 --------
 
@@ -65,6 +66,18 @@ OR Maven users can simply add these dependencies to `pom.xml`:
   <version>1.7.5</version>
 </dependency>
 ```
+
+
+Contents
+--------
+ * [Configuration via XML](#configuration-via-xml)
+  * [AndroidManifest.xml](#androidmanifestxml)
+  * [Initialization search path](#initialization-search-path)
+ * [Configuration in code](#configuration-in-code)
+ * [ProGuard](#proguard)
+ * [Other Documentation](#other-documentation)
+ * [Build](#build)
+
 
 
 Configuration via XML
@@ -341,17 +354,17 @@ private void configureLogbackByFilePath() {
 // snip…
 
 static final String LOGBACK_XML =
-    "<configuration>"
-      "<appender name='FILE' class='ch.qos.logback.core.FileAppender'>"
-         "<file>foo.log</file>"
-         "<append>false</append>"
-         "<encoder>"
-           "<pattern>%-4r [%t] %-5p %c{35} - %m%n</pattern>"
-         "</encoder>"
-       "</appender>"
-       "<root level='DEBUG'>"
-         "<appender-ref ref='FILE' />"
-       "</root>"
+    "<configuration>" +
+      "<appender name='FILE' class='ch.qos.logback.core.FileAppender'>" +
+         "<file>foo.log</file>" +
+         "<append>false</append>" +
+         "<encoder>" +
+           "<pattern>%-4r [%t] %-5p %c{35} - %m%n</pattern>" +
+         "</encoder>" +
+       "</appender>" +
+       "<root level='DEBUG'>" +
+         "<appender-ref ref='FILE' />" +
+       "</root>" +
     "</configuration>"
     ;
 
@@ -371,7 +384,9 @@ private void configureLogbackByString() {
     e.printStackTrace();
   }
 }
+** Initialization search path
 ```
+
 
 ProGuard
 --------
@@ -382,6 +397,7 @@ When optimizing your application with [ProGuard](http://developer.android.com/to
 -keep class org.slf4j.** { *; }
 -keepattributes *Annotation*
 ```
+
 
 Other Documentation
 -------------------
@@ -394,7 +410,7 @@ Other Documentation
   * [`DBAppender`][17]
 * [Changelog][4]
 * [FAQ][12]
-
+ 
 For help with using **logback-android**, ask the mailing list: [logback-user@qos.ch](mailto:logback-user@qos.ch).
 
 
