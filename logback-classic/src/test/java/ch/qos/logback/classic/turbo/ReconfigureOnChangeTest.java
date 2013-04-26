@@ -281,6 +281,7 @@ public class ReconfigureOnChangeTest {
     return (end - start) / (1.0d * LOOP_LEN);
   }
 
+  @Ignore
   @Test
   public void indirectPerfTest() throws MalformedURLException {
     if (Env.isLinux()) {

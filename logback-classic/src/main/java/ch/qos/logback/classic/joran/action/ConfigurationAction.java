@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.classic.joran.action;
 
+import ch.qos.logback.core.util.EnvUtil;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
 import org.xml.sax.Attributes;
 
@@ -48,7 +49,8 @@ public class ConfigurationAction extends Action {
     }
 
     processScanAttrib(ic, attributes);
-    new ContextUtil(context).addHostNameAsProperty();
+    ContextUtil contextUtil = new ContextUtil(context);
+    contextUtil.addHostNameAsProperty();
 
     // the context is turbo filter attachable, so it is pushed on top of the
     // stack
