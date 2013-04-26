@@ -20,7 +20,6 @@ import java.util.Iterator;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.qos.logback.core.Context;
@@ -123,7 +122,6 @@ public class PropertyActionTest  {
     assertEquals("toto", ec.getProperty("v2"));
   }
 
-  @Ignore("Not supported in Android")
   @Test
   public void testLoadResource() {
     atts.setValue("resource", "asResource/joran/propertyActionTest.properties");
@@ -132,7 +130,6 @@ public class PropertyActionTest  {
     assertEquals("toto", ec.getProperty("r2"));
   }
   
-  @Ignore("Not supported in Android")
   @Test
   public void testLoadResourceWithPrerequisiteSubsitution() {
     context.putProperty("STEM", "asResource/joran");

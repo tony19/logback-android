@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@org.junit.Ignore
 public class LoggerContextPerfTest {
 
   static int THREAD_COUNT = 10000;

@@ -31,7 +31,6 @@ import ch.qos.logback.core.testUtil.FileTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.xml.sax.SAXParseException;
 
 import ch.qos.logback.core.Context;
@@ -116,7 +115,6 @@ public class IncludeActionTest {
     verifyConfig(new String[] { "IA", "IB" });
   }
 
-  @Ignore("Not supported in Android")
   @Test
   public void basicResource() throws JoranException {
     System.setProperty(INCLUDE_KEY, INCLUDED_AS_RESOURCE);
