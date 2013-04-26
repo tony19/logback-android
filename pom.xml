@@ -57,6 +57,9 @@
     <!-- initialize to dummy value to avoid NPE in SureFire plugin -->
     <exclude.tests>dummy</exclude.tests>
     <surefire.version>2.12.4</surefire.version>
+
+    <!-- redirect test output to a file in order to reduce noise -->
+    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
   </properties>
 
   <developers>
