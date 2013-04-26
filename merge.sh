@@ -26,7 +26,7 @@ git remote add upstream https://github.com/qos-ch/logback.git
 git fetch upstream
 
 echo "Merging with logback ${version%-*}..."
-git merge tags/v_${version%-*}
+git merge tags/${version%-*}
 git rm -rf logback-access logback-site
 
 # Delete all tags from upstream that don't belong to logback-android
