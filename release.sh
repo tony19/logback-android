@@ -14,7 +14,22 @@
 # as published by the Free Software Foundation.
 ##############################################################################
 
+# This script performs a logback-android release:
+#  * sets the version (removes SNAPSHOT suffix from current version,
+#    and bumps to the next SNAPSHOT version when release is finished)
+#  * tags the source in GitHub (e.g., with "v_1.0.2")
+#  * deploys the signed jars to Sonatype
+#  * updates the README.md with the current version info
+#  * updates GitHub pages with javadocs and current version info
+#  * generates the javadoc and uploads it to GitHub pages
 #
+# To run this script, simply run:
+#   $ ./release.sh
+#
+# For a dryrun, enter:
+#   $ ./release.sh dryrun
+#
+
 # Release version "x.x.x-N"
 #
 # where 
@@ -75,25 +90,9 @@ echo "Updating index.html..."
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/g" \
 -e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/g" index.html
 
-insdiv="<div id=\"${version}\" class=\"release\">\n\
-\t\t<div class=\"version\">${version}</div>\n\
-\t\t<div class=\"reldate\">Released on $(date +'%m-%d-%Y')</div>\n\
-\t\t<ul>\n\
-\t\t\t<li>Sync with Logback <a href=\"http://logback.qos.ch/news.html\">${version%-*}</a></li>\n\
-\t\t</ul>\n\
-\t</div>"
-
-# insert the release div if not already present (it shouldn't be present)
-grep -q "id=\"${version}\" class=\"release\"" changelog.html
-if [ $? -gt 0 ]; then
-	echo "Updating changelog.html..."
-	gsed -i -e "s@<div id=[\"\']notes[\"\']>@&\n\t${insdiv}@" changelog.html
-fi
-
 if [ ! ${dryrun} ]; then
 git add index.html
 git add doc/${version}
-git add changelog.html
 
 # checkin changes to the web pages
 git commit -m "release ${version}"
