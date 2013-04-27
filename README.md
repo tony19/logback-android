@@ -1,8 +1,8 @@
 <h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/gh-pages/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android</h1>
 *Advanced logging library for Android*
 
-([![Build Status](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-RELEASE/badge/icon)](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-RELEASE/) (RELEASE)
-[![Build Status](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-ANALYZE/badge/icon)](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-ANALYZE/) (SNAPSHOT)
+[![Release](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-RELEASE/badge/icon)](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-RELEASE/)
+[![Snapshot](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-ANALYZE/badge/icon)](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-ANALYZE/)
 
 Overview
 --------
@@ -10,7 +10,7 @@ Overview
 
 Runs on Android 2.1 or higher.
 
-The current version is **1.0.8-1**.
+The current version is **1.0.10-1**.
 
 Quick Start
 -----------
@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
 Download
 --------
 
- * [logback-android-1.0.8-1.jar][9]
+ * [logback-android-1.0.10-1.jar][9]
  * [slf4j-api-1.7.5.jar][10]
 
 OR Maven users can simply add these dependencies to `pom.xml`:
@@ -55,12 +55,12 @@ OR Maven users can simply add these dependencies to `pom.xml`:
 <dependency>
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-core</artifactId>
-  <version>1.0.8-1</version>
+  <version>1.0.10-1</version>
 </dependency>
 <dependency>
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-classic</artifactId>
-  <version>1.0.8-1</version>
+  <version>1.0.10-1</version>
 </dependency>
 <dependency>
   <groupId>org.slf4j</groupId>
@@ -238,7 +238,7 @@ Even though `assets/logback.xml` is the first configuration loaded, this file co
 </configuration>
 ```
 
-Prior to `v1.0.8-1`, the initialization search path was hard-coded, and that can be recreated with this configuration:
+Prior to `v1.0.10-1`, the initialization search path was hard-coded, and that can be recreated with this configuration:
 
 ```xml
 <configuration>
@@ -423,15 +423,15 @@ Build
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
     mvn -P debug clean install
-    mvn -f pom-uber.xml package -Dmy.project.version=1.0.8-1-SNAPSHOT
+    mvn -f pom-uber.xml package -Dmy.project.version=1.0.10-1-SNAPSHOT
 
 
  [1]: http://logback.qos.ch
  [3]: http://tony19.github.com/logback-android
  [4]: https://github.com/tony19/logback-android/wiki/Changelog
  [5]: http://logback.qos.ch/manual/index.html
- [6]: http://tony19.github.com/logback-android/doc/1.0.8-1/
- [9]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.0.8-1.jar
+ [6]: http://tony19.github.com/logback-android/doc/1.0.10-1/
+ [9]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.0.10-1.jar
  [10]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar
  [11]: https://github.com/tony19/logback-android/wiki/Appender-Notes
  [12]: https://github.com/tony19/logback-android/wiki/FAQ
