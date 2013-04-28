@@ -422,9 +422,9 @@ Build
 
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
-    mvn -P debug clean install
-    mvn -f pom-uber.xml package -Dmy.project.version=1.0.10-1-SNAPSHOT
+    ./makejar.sh
 
+The jar would be in: `./target/logback-android-<version>.jar`
 
  [1]: http://logback.qos.ch
  [3]: http://tony19.github.com/logback-android
