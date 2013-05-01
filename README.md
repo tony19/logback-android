@@ -101,7 +101,7 @@ Configuration via XML
 
   <!-- Write INFO (and higher-level) messages to the log file -->
   <root level="INFO">
-    <appender-ref name="file" />
+    <appender-ref ref="file" />
   </root>
 </configuration>
 ```
