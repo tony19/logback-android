@@ -184,6 +184,7 @@ public class TrivialConfiguratorTest {
     // configure an empty stream, which will cause a JoranException that
     // we can ignore...we're only interested in the stream being closed
     TrivialConfigurator trivialConfigurator = new TrivialConfigurator(rulesMap);
+    trivialConfigurator.setContext(context);
     try {
       trivialConfigurator.doConfigure(stream);
     } catch (JoranException e) {
