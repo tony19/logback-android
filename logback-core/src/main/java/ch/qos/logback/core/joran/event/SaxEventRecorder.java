@@ -39,15 +39,15 @@ import ch.qos.logback.core.status.Status;
 
 public class SaxEventRecorder extends DefaultHandler implements ContextAware {
 
-  final ContextAwareImpl cai;
+  private final ContextAwareImpl cai;
 
   public SaxEventRecorder() {
     cai = new ContextAwareImpl(this);
   }
 
-  public List<SaxEvent> saxEventList = new ArrayList<SaxEvent>();
-  Locator locator;
-  Pattern globalPattern = new Pattern();
+  private List<SaxEvent> saxEventList = new ArrayList<SaxEvent>();
+  private Locator locator;
+  private Pattern globalPattern = new Pattern();
 
   final public void recordEvents(InputStream inputStream) throws JoranException {
     recordEvents(new InputSource(inputStream));
@@ -55,14 +55,14 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
 
   public List<SaxEvent> recordEvents(InputSource inputSource)
       throws JoranException {
-  	Driver parser = buildPullParser(); 
+    Driver parser = buildPullParser();
     try {
       parser.setContentHandler((ContentHandler) this);
       parser.setErrorHandler(this);
       parser.parse(inputSource);
       return saxEventList;
     } catch (EOFException eof) {
-      handleError(eof.getLocalizedMessage(), 
+      handleError(eof.getLocalizedMessage(),
           new SAXParseException(eof.getLocalizedMessage(), locator, eof));
     } catch (IOException ie) {
       handleError("I/O error occurred while parsing xml file", ie);
@@ -79,7 +79,7 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
     addError(errMsg, t);
     throw new JoranException(errMsg, t);
   }
-  
+
   private Driver buildPullParser() throws JoranException {
     try {
       Driver driver = new Driver();
@@ -97,7 +97,7 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
       throw new JoranException(errMsg, pce);
     }
   }
-  
+
   public void startDocument() {
   }
 
