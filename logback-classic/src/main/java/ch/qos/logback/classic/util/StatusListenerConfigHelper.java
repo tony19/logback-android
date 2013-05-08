@@ -16,7 +16,6 @@ package ch.qos.logback.classic.util;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.spi.ContextAware;
 import ch.qos.logback.core.spi.LifeCycle;
-import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.StatusListener;
 import ch.qos.logback.core.util.OptionHelper;
 
@@ -31,24 +30,20 @@ public class StatusListenerConfigHelper {
   }
 
   static void addStatusListener(LoggerContext loggerContext, String listenerClass) {
-    if (ContextInitializer.SYSOUT.equalsIgnoreCase(listenerClass)) {
-      OnConsoleStatusListener.addNewInstanceToContext(loggerContext);
-    } else {
-      try {
-        StatusListener listener = (StatusListener) OptionHelper.instantiateByClassName(
-            listenerClass, StatusListener.class, loggerContext);
-        if(listener instanceof ContextAware) // LOGBACK-767
-          ((ContextAware) listener).setContext(loggerContext);
-        if(listener instanceof LifeCycle)  // LOGBACK-767
-          ((LifeCycle) listener).start();
+    try {
+      StatusListener listener = (StatusListener) OptionHelper.instantiateByClassName(
+          listenerClass, StatusListener.class, loggerContext);
+      if(listener instanceof ContextAware) // LOGBACK-767
+        ((ContextAware) listener).setContext(loggerContext);
+      if(listener instanceof LifeCycle)  // LOGBACK-767
+        ((LifeCycle) listener).start();
 
-        if (listener != null) {
-          loggerContext.getStatusManager().add(listener);
-        }
-      } catch (Exception e) {
-        // printing on the console is the best we can do
-        e.printStackTrace();
+      if (listener != null) {
+        loggerContext.getStatusManager().add(listener);
       }
+    } catch (Exception e) {
+      // printing on the console is the best we can do
+      e.printStackTrace();
     }
   }
 }
