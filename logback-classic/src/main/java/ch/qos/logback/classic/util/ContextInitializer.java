@@ -33,6 +33,7 @@ import ch.qos.logback.core.util.OptionHelper;
 /**
  * This class contains logback's logic for automatic configuration
  *
+ * @author Anthony Trinh
  * @author Ceki Gulcu
  */
 public class ContextInitializer {
@@ -120,8 +121,10 @@ public class ContextInitializer {
    */
   public void autoConfig() throws JoranException {
     StatusListenerConfigHelper.installIfAsked(loggerContext);
+
     boolean verbose = true;
     boolean configured = false;
+
     JoranConfigurator configurator = new JoranConfigurator();
     configurator.setContext(loggerContext);
 

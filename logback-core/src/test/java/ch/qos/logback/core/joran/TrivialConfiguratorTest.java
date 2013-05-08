@@ -13,14 +13,12 @@
  */
 package ch.qos.logback.core.joran;
 
-//import static junit.framework.Assert.assertEquals;
-//import static junit.framework.Assert.assertFalse;
-//import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +41,8 @@ import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.TrivialStatusListener;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
+
+import static org.mockito.Mockito.*;
 
 public class TrivialConfiguratorTest {
 
@@ -177,4 +177,20 @@ public class TrivialConfiguratorTest {
     return new URL("jar:" + innerURL + "!/" + jarEntryName);
   }
 
+  @Test
+  public void closesInputStreamAfterward() throws IOException, JoranException {
+    // mock an input stream to verify that close() gets called
+    InputStream stream = mock(InputStream.class);
+
+    // configure an empty stream, which will cause a JoranException that
+    // we can ignore...we're only interested in the stream being closed
+    TrivialConfigurator trivialConfigurator = new TrivialConfigurator(rulesMap);
+    try {
+      trivialConfigurator.doConfigure(stream);
+    } catch (JoranException e) {
+      // ignore
+    }
+
+    verify(stream, atLeastOnce()).close();
+  }
 }

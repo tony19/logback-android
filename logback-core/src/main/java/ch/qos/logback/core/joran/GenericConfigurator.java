@@ -43,6 +43,13 @@ public abstract class GenericConfigurator extends ContextAwareBase {
 
   protected Interpreter interpreter;
 
+  /**
+   * Configures logback with the configuration XML read from a file,
+   * located at the given URL
+   *
+   * @param url URL to the file, containing the configuration XML
+   * @throws JoranException
+   */
   public final void doConfigure(URL url) throws JoranException {
     InputStream in = null;
     try {
@@ -52,58 +59,79 @@ public abstract class GenericConfigurator extends ContextAwareBase {
       // per http://jira.qos.ch/browse/LBCORE-127
       urlConnection.setUseCaches(false);
 
+      // this closes the stream for us
       in = urlConnection.getInputStream();
       doConfigure(in);
     } catch (IOException ioe) {
       String errMsg = "Could not open URL [" + url + "].";
       addError(errMsg, ioe);
       throw new JoranException(errMsg, ioe);
-    } finally {
-      if (in != null) {
-        try {
-          in.close();
-        } catch (IOException ioe) {
-          String errMsg = "Could not close input stream";
-          addError(errMsg, ioe);
-          throw new JoranException(errMsg, ioe);
-        }
-      }
     }
   }
 
+  /**
+   * Configures logback with the configuration XML read from a file,
+   * located at the given path on the host filesystem
+   *
+   * @param filename path to the file, containing the configuration XML
+   * @throws JoranException
+   */
   public final void doConfigure(String filename) throws JoranException {
     doConfigure(new File(filename));
   }
 
+  /**
+   * Configures logback with the configuration XML read from a given file
+   *
+   * @param file the file, containing the configuration XML
+   * @throws JoranException
+   */
   public final void doConfigure(File file) throws JoranException {
     FileInputStream fis = null;
     try {
       informContextOfURLUsedForConfiguration(getContext(), file.toURI().toURL());
       fis = new FileInputStream(file);
+
+      // this closes the stream for us
       doConfigure(fis);
     } catch (IOException ioe) {
       String errMsg = "Could not open [" + file.getPath() + "].";
       addError(errMsg, ioe);
       throw new JoranException(errMsg, ioe);
-    } finally {
-      if (fis != null) {
-        try {
-          fis.close();
-        } catch (java.io.IOException ioe) {
-          String errMsg = "Could not close [" + file.getName() + "].";
-          addError(errMsg, ioe);
-          throw new JoranException(errMsg, ioe);
-        }
-      }
     }
   }
 
+  /**
+   * Adds the URL of the used configuration file to the watch list, which is
+   * periodically scanned for changes when the "scan" flag is set in logback.xml
+   * ({@code <configuration scan="true" ...>}).
+   *
+   * @param context the logger context to modify
+   * @param url the URL to add
+   */
   public static void informContextOfURLUsedForConfiguration(Context context, URL url) {
     ConfigurationWatchListUtil.setMainWatchURL(context, url);
   }
 
+  /**
+   * Configures logback with the configuraiton XML read from an input stream,
+   * and then closes the stream
+   *
+   * @param inputStream stream to contents of configuration XML
+   * @throws JoranException
+   */
   public final void doConfigure(InputStream inputStream) throws JoranException {
-    doConfigure(new InputSource(inputStream));
+    try {
+      doConfigure(new InputSource(inputStream));
+    } finally {
+      try {
+        inputStream.close();
+      } catch (IOException ioe) {
+        String errMsg = "Could not close the stream";
+        addError(errMsg, ioe);
+        throw new JoranException(errMsg, ioe);
+      }
+    }
   }
 
   protected abstract void addInstanceRules(RuleStore rs);
@@ -114,10 +142,17 @@ public abstract class GenericConfigurator extends ContextAwareBase {
 
   }
 
+  /**
+   * Gets the initial pattern
+   * @return a newly created {@link Pattern}
+   */
   protected Pattern initialPattern() {
     return new Pattern();
   }
 
+  /**
+   * Builds a generic configuration-XML interpreter
+   */
   protected void buildInterpreter() {
     RuleStore rs = new SimpleRuleStore(context);
     addInstanceRules(rs);
@@ -128,9 +163,13 @@ public abstract class GenericConfigurator extends ContextAwareBase {
     addDefaultNestedComponentRegistryRules(interpretationContext.getDefaultNestedComponentRegistry());
   }
 
-  // this is the most inner form of doConfigure whereto other doConfigure
-  // methods ultimately delegate
-  public final void doConfigure(final InputSource inputSource)
+  /**
+   * Configures logback with the configuration XML read from an input source.
+   *
+   * @param inputSource the input source, containing the configuration XML
+   * @throws JoranException
+   */
+  private final void doConfigure(final InputSource inputSource)
           throws JoranException {
 
     long threshold = System.currentTimeMillis();
@@ -140,8 +179,8 @@ public abstract class GenericConfigurator extends ContextAwareBase {
     SaxEventRecorder recorder = new SaxEventRecorder();
     recorder.setContext(context);
     recorder.recordEvents(inputSource);
-    doConfigure(recorder.saxEventList);
-    // no exceptions a this level
+    doConfigure(recorder.getSaxEventList());
+    // no exceptions at this level
     StatusChecker statusChecker = new StatusChecker(context);
     if (statusChecker.noXMLParsingErrorsOccurred(threshold)) {
       addInfo("Registering current configuration as safe fallback point");
@@ -149,6 +188,12 @@ public abstract class GenericConfigurator extends ContextAwareBase {
     }
   }
 
+  /**
+   * Configures logback with SAX events of configuration XML
+   *
+   * @param eventList list of SAX events
+   * @throws JoranException
+   */
   public void doConfigure(final List<SaxEvent> eventList)
           throws JoranException {
     buildInterpreter();
@@ -159,7 +204,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
   }
 
   /**
-   * Register the current event list in currently in the interpreter as a safe
+   * Register the current event list in the interpreter as a safe
    * configuration point.
    *
    * @since 0.9.30
