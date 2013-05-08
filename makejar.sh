@@ -21,5 +21,9 @@ fi
 
 set -e
 
+# set the uber jar's version to match the one in core/classic
+version=$(mvn help:evaluate -Dexpression=project.version | grep '^[^[]')
+mvn -f pom-uber.xml versions:set -DnewVersion=${version}
+
 mvn -P $profile clean install -DskipTests=true
 mvn -f pom-uber.xml package
