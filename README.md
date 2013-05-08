@@ -386,7 +386,6 @@ private void configureLogbackByString() {
     e.printStackTrace();
   }
 }
-** Initialization search path
 ```
 
 
