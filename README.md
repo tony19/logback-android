@@ -412,7 +412,7 @@ Other Documentation
 * [Changelog][4]
 * [FAQ][12]
  
-For help with using **logback-android**, ask the mailing list: [logback-user@qos.ch](mailto:logback-user@qos.ch).
+For help with using **logback-android**, ask the [Logback User mailing list](http://logback.qos.ch/mailinglist.html).
 
 
 Build
