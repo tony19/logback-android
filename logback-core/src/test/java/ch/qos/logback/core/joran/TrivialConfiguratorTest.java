@@ -18,7 +18,6 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +71,7 @@ public class TrivialConfiguratorTest {
   }
 
   @Test
-  public void inexistentFile() {
+  public void nonexistentFile() {
     TrivialStatusListener tsl = new TrivialStatusListener();
     tsl.start();
     String filename = CoreTestConstants.TEST_DIR_PREFIX + "input/joran/"
