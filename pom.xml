@@ -10,7 +10,7 @@
 
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-parent</artifactId>
-  <version>1.0.10-2</version>
+  <version>1.0.10-3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Logback Android Parent</name>
   <description>logback-android project pom.xml file</description>
