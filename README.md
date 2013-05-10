@@ -10,7 +10,7 @@ Overview
 
 Runs on Android 2.1 or higher.
 
-The current version is **1.0.10-1**.
+The current version is **1.0.10-2**.
 
 Quick Start
 -----------
@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
 Download
 --------
 
- * [logback-android-1.0.10-1.jar][9]
+ * [logback-android-1.0.10-2.jar][9]
  * [slf4j-api-1.7.5.jar][10]
 
 OR Maven users can simply add these dependencies to `pom.xml`:
@@ -55,12 +55,12 @@ OR Maven users can simply add these dependencies to `pom.xml`:
 <dependency>
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-core</artifactId>
-  <version>1.0.10-1</version>
+  <version>1.0.10-2</version>
 </dependency>
 <dependency>
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-classic</artifactId>
-  <version>1.0.10-1</version>
+  <version>1.0.10-2</version>
 </dependency>
 <dependency>
   <groupId>org.slf4j</groupId>
@@ -429,8 +429,8 @@ The jar would be in: `./target/logback-android-<version>.jar`
  [3]: http://tony19.github.com/logback-android
  [4]: https://github.com/tony19/logback-android/wiki/Changelog
  [5]: http://logback.qos.ch/manual/index.html
- [6]: http://tony19.github.com/logback-android/doc/1.0.10-1/
- [9]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.0.10-1.jar
+ [6]: http://tony19.github.com/logback-android/doc/1.0.10-2/
+ [9]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.0.10-2.jar
  [10]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar
  [11]: https://github.com/tony19/logback-android/wiki/Appender-Notes
  [12]: https://github.com/tony19/logback-android/wiki/FAQ
