@@ -60,9 +60,6 @@ public class JoranConfigurator extends JoranConfiguratorBase {
 
     rs.addRule(new Pattern("configuration/include"), new IncludeAction());
 
-    rs.addRule(new Pattern("configuration/consolePlugin"),
-        new ConsolePluginAction());
-
     rs.addRule(new Pattern("configuration/includes"), new FindIncludeAction());
     rs.addRule(new Pattern("configuration/includes/include"), new ConditionalIncludeAction());
   }
