@@ -28,7 +28,7 @@ import org.slf4j.Marker;
  * </code>
  * <p/>
  * <b>Note</b>:
- * Do not forget to configure LOGBack before use.
+ * Do not forget to configure logback before use.
  *
  * @author Pavel Stepanov
  */
@@ -70,7 +70,7 @@ public class Log {
   }
 
   /**
-   * Return a logger named corresponding to the class called this method,
+   * Returns a logger named corresponding to the class that called this method,
    * using the statically bound {@link org.slf4j.ILoggerFactory} instance.
    *
    * @return logger
@@ -84,14 +84,14 @@ public class Log {
   /**
    * Is the logger instance enabled for the VERBOSE level?
    *
-   * @return {@code true} if this Logger is enabled for the VERBOSE level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the VERBOSE level, {@code false} otherwise.
    */
   public static boolean isVerboseEnabled() {
     return getLogger().isTraceEnabled();
   }
 
   /**
-   * Log a message at the VERBOSE level.
+   * Logs a message at the VERBOSE level.
    *
    * @param msg the message string to be logged.
    */
@@ -100,7 +100,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the VERBOSE level according to the specified format and argument.
+   * Logs a message at the VERBOSE level according to the specified format and argument.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the VERBOSE level.
    *
@@ -112,7 +112,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the VERBOSE level according to the specified format and arguments.
+   * Logs a message at the VERBOSE level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the VERBOSE level.
    *
@@ -125,7 +125,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the VERBOSE level according to the specified format and arguments.
+   * Logs a message at the VERBOSE level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous string concatenation when the logger is disabled for the VERBOSE level.
    * However, this variant incurs the hidden (and relatively small) cost of creating an Object[] before
@@ -154,7 +154,7 @@ public class Log {
    * method except that the marker data is also taken into consideration.
    *
    * @param marker the marker specific to this log statement.
-   * @return {@code true} if this Logger is enabled for the VERBOSE level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the VERBOSE level, {@code false} otherwise.
    */
   public static boolean isVerboseEnabled(Marker marker) {
     return getLogger().isTraceEnabled(marker);
@@ -225,14 +225,14 @@ public class Log {
   /**
    * Is the logger instance enabled for the DEBUG level?
    *
-   * @return {@code true} if this Logger is enabled for the DEBUG level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the DEBUG level, {@code false} otherwise.
    */
   public static boolean isDebugEnabled() {
     return getLogger().isDebugEnabled();
   }
 
   /**
-   * Log a message at the DEBUG level.
+   * Logs a message at the DEBUG level.
    *
    * @param msg the message string to be logged.
    */
@@ -241,7 +241,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the DEBUG level according to the specified format and argument.
+   * Logs a message at the DEBUG level according to the specified format and argument.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the DEBUG level.
    *
@@ -253,7 +253,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the DEBUG level according to the specified format and arguments.
+   * Logs a message at the DEBUG level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the DEBUG level.
    *
@@ -266,7 +266,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the DEBUG level according to the specified format and arguments.
+   * Logs a message at the DEBUG level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous string concatenation when the logger is disabled for the DEBUG level.
    * However, this variant incurs the hidden (and relatively small) cost of creating an Object[] before
@@ -295,7 +295,7 @@ public class Log {
    * method except that the marker data is also taken into consideration.
    *
    * @param marker the marker specific to this log statement.
-   * @return {@code true} if this Logger is enabled for the DEBUG level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the DEBUG level, {@code false} otherwise.
    */
   public static boolean isDebugEnabled(Marker marker) {
     return getLogger().isDebugEnabled(marker);
@@ -366,14 +366,14 @@ public class Log {
   /**
    * Is the logger instance enabled for the INFO level?
    *
-   * @return {@code true} if this Logger is enabled for the INFO level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the INFO level, {@code false} otherwise.
    */
   public static boolean isInfoEnabled() {
     return getLogger().isInfoEnabled();
   }
 
   /**
-   * Log a message at the INFO level.
+   * Logs a message at the INFO level.
    *
    * @param msg the message string to be logged.
    */
@@ -382,7 +382,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the INFO level according to the specified format and argument.
+   * Logs a message at the INFO level according to the specified format and argument.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the INFO level.
    *
@@ -394,7 +394,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the INFO level according to the specified format and arguments.
+   * Logs a message at the INFO level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the INFO level.
    *
@@ -407,7 +407,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the INFO level according to the specified format and arguments.
+   * Logs a message at the INFO level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous string concatenation when the logger is disabled for the INFO level.
    * However, this variant incurs the hidden (and relatively small) cost of creating an Object[] before
@@ -436,7 +436,7 @@ public class Log {
    * method except that the marker data is also taken into consideration.
    *
    * @param marker the marker specific to this log statement.
-   * @return {@code true} if this Logger is enabled for the INFO level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the INFO level, {@code false} otherwise.
    */
   public static boolean isInfoEnabled(Marker marker) {
     return getLogger().isInfoEnabled(marker);
@@ -507,14 +507,14 @@ public class Log {
   /**
    * Is the logger instance enabled for the WARN level?
    *
-   * @return {@code true} if this Logger is enabled for the WARN level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the WARN level, {@code false} otherwise.
    */
   public static boolean isWarnEnabled() {
     return getLogger().isWarnEnabled();
   }
 
   /**
-   * Log a message at the WARN level.
+   * Logs a message at the WARN level.
    *
    * @param msg the message string to be logged.
    */
@@ -523,7 +523,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the WARN level according to the specified format and argument.
+   * Logs a message at the WARN level according to the specified format and argument.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the WARN level.
    *
@@ -535,7 +535,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the WARN level according to the specified format and arguments.
+   * Logs a message at the WARN level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the WARN level.
    *
@@ -548,7 +548,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the WARN level according to the specified format and arguments.
+   * Logs a message at the WARN level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous string concatenation when the logger is disabled for the WARN level.
    * However, this variant incurs the hidden (and relatively small) cost of creating an Object[] before
@@ -577,7 +577,7 @@ public class Log {
    * method except that the marker data is also taken into consideration.
    *
    * @param marker the marker specific to this log statement.
-   * @return {@code true} if this Logger is enabled for the WARN level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the WARN level, {@code false} otherwise.
    */
   public static boolean isWarnEnabled(Marker marker) {
     return getLogger().isWarnEnabled(marker);
@@ -648,14 +648,14 @@ public class Log {
   /**
    * Is the logger instance enabled for the ERROR level?
    *
-   * @return {@code true} if this Logger is enabled for the ERROR level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the ERROR level, {@code false} otherwise.
    */
   public static boolean isErrorEnabled() {
     return getLogger().isErrorEnabled();
   }
 
   /**
-   * Log a message at the ERROR level.
+   * Logs a message at the ERROR level.
    *
    * @param msg the message string to be logged.
    */
@@ -664,7 +664,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the ERROR level according to the specified format and argument.
+   * Logs a message at the ERROR level according to the specified format and argument.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the ERROR level.
    *
@@ -676,7 +676,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the ERROR level according to the specified format and arguments.
+   * Logs a message at the ERROR level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous object creation when the logger is disabled for the ERROR level.
    *
@@ -689,7 +689,7 @@ public class Log {
   }
 
   /**
-   * Log a message at the ERROR level according to the specified format and arguments.
+   * Logs a message at the ERROR level according to the specified format and arguments.
    * <p/>
    * This form avoids superfluous string concatenation when the logger is disabled for the ERROR level.
    * However, this variant incurs the hidden (and relatively small) cost of creating an Object[] before
@@ -718,7 +718,7 @@ public class Log {
    * method except that the marker data is also taken into consideration.
    *
    * @param marker the marker specific to this log statement.
-   * @return {@code true} if this Logger is enabled for the ERROR level, false otherwise.
+   * @return {@code true} if this Logger is enabled for the ERROR level, {@code false} otherwise.
    */
   public static boolean isErrorEnabled(Marker marker) {
     return getLogger().isErrorEnabled(marker);
