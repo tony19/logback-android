@@ -399,6 +399,12 @@ When optimizing your application with [ProGuard](http://developer.android.com/to
 -keepattributes *Annotation*
 ```
 
+If you don't use the mailing features of Logback, you might encounter error while exporting your app with ProGuard. You can add this last rule:
+
+```
+-dontwarn ch.qos.logback.core.net.*
+```
+
 
 Other Documentation
 -------------------
