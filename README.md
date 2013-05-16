@@ -399,7 +399,7 @@ When optimizing your application with [ProGuard](http://developer.android.com/to
 -keepattributes *Annotation*
 ```
 
-If you don't use the mailing features of `logback`, you might encounter an error while exporting your app with ProGuard. To resolve this, add the following rule:
+If you don't use the mailing features of `logback` (i.e., the `SMTPAppender`), you might encounter an error while exporting your app with ProGuard. To resolve this, add the following rule:
 
 ```
 -dontwarn ch.qos.logback.core.net.*
