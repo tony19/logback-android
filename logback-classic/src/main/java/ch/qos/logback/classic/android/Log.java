@@ -30,6 +30,7 @@ import org.slf4j.Marker;
  * <b>Note</b>:
  * Do not forget to configure logback before use.
  *
+ * @author NoveoGroup
  * @author Pavel Stepanov
  */
 public class Log {
