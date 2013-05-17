@@ -35,13 +35,47 @@ import org.slf4j.Marker;
  */
 public class Log {
 
+  private static final class CallerResolver extends SecurityManager {
+    public Class<?> getCaller(Class<?> aClass) {
+      boolean classFound = false;
+      Class[] classContext = CALLER_RESOLVER.getClassContext();
+      if (classContext == null) {
+        return null; // sometimes class context is null
+      }
+      for (Class callerClass : classContext) {
+        if (!classFound) {
+          if (callerClass == aClass) {
+            classFound = true;
+          }
+        } else {
+          if (callerClass != aClass) {
+            return callerClass;
+          }
+        }
+      }
+      return classContext[classContext.length - 1];
+    }
+  }
+
+  private static final CallerResolver CALLER_RESOLVER = new CallerResolver();
+
+  /**
+   * Returns caller's {@link StackTraceElement}.
+   *
+   * @param aClass a class used as starting point to find a caller.
+   * @return the caller class or null is {@link SecurityManager} doesn't allow to get class context.
+   */
+  private static Class<?> getCallerClass(Class<?> aClass) {
+    return CALLER_RESOLVER.getCaller(aClass);
+  }
+
   /**
    * Returns caller's {@link StackTraceElement}.
    *
    * @param aClass a class used as starting point to find a caller.
    * @return the caller stack trace element.
    */
-  private static StackTraceElement getCaller(Class<?> aClass) {
+  private static StackTraceElement getCallerStackTrace(Class<?> aClass) {
     String className = aClass.getName();
 
     boolean packageFound = false;
@@ -67,7 +101,12 @@ public class Log {
    * @return the class name of a caller.
    */
   private static String getCallerClassName(Class<?> aClass) {
-    return getCaller(aClass).getClassName();
+    Class<?> callerClass = getCallerClass(aClass);
+    if (callerClass != null) {
+      return callerClass.getName();
+    } else {
+      return getCallerStackTrace(aClass).getClassName();
+    }
   }
 
   /**
