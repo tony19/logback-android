@@ -258,6 +258,36 @@ Configuration in Code
 
 If you prefer code-based configuration instead of the XML method above, you can use the `logback` classes directly to initialize `logback-android` as shown in the following examples. Note the direct usage of `logback` classes removes the advantage of the facade provided by SLF4J.
 
+*Example: Uses BasicLogcatConfigurator*
+
+```java
+package com.example;
+
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.android.BasicLogcatConfigurator;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class MainActivity extends Activity {
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    BasicLogcatConfigurator.configureDefaultContext();
+
+    org.slf4j.Logger log = LoggerFactory.getLogger(MainActivity.class);
+    for (int i = 0; i < 10; i++) {
+      log.info("hello world");
+    }
+  }
+
+}
+```
+
 *Example: Configures appenders directly*
 
 ```java
