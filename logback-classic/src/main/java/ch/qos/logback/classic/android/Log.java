@@ -78,12 +78,12 @@ public class Log {
   private static StackTraceElement getCallerStackTrace(Class<?> aClass) {
     String className = aClass.getName();
 
-    boolean packageFound = false;
+    boolean classFound = false;
     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
     for (StackTraceElement stackTraceElement : stackTrace) {
-      if (!packageFound) {
+      if (!classFound) {
         if (stackTraceElement.getClassName().equals(className)) {
-          packageFound = true;
+          classFound = true;
         }
       } else {
         if (!stackTraceElement.getClassName().equals(className)) {
