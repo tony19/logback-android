@@ -258,7 +258,7 @@ Configuration in Code
 
 If you prefer code-based configuration instead of the XML method above, you can use the `logback` classes directly to initialize `logback-android` as shown in the following examples. Note the direct usage of `logback` classes removes the advantage of the facade provided by SLF4J.
 
-*Example: Uses BasicLogcatConfigurator*
+*Example: Uses `BasicLogcatConfigurator`*
 
 ```java
 package com.example;
