@@ -27,7 +27,7 @@ import ch.qos.logback.core.status.StatusManager;
  * BasicLogcatConfigurator configures logback-classic by attaching a
  * {@link LogcatAppender} to the root logger. The appender's layout is set to a
  * {@link PatternLayout} with the pattern "%msg".
- * 
+ *
  * The equivalent default configuration in XML would be:
  * <pre>
  * &lt;configuration>
@@ -43,40 +43,38 @@ import ch.qos.logback.core.status.StatusManager;
  *  &lt;/root>
  * &lt;/configuration>
  * </pre>
- * 
+ *
  * @author Anthony Trinh
  */
 public class BasicLogcatConfigurator {
 
-	final static BasicLogcatConfigurator hiddenSingleton = new BasicLogcatConfigurator();
+  private BasicLogcatConfigurator() {
+  }
 
-	private BasicLogcatConfigurator() {
-	}
+  public static void configure(LoggerContext lc) {
+    StatusManager sm = lc.getStatusManager();
+    if (sm != null) {
+      sm.add(new InfoStatus("Setting up default configuration.", lc));
+    }
+    LogcatAppender appender = new LogcatAppender();
+    appender.setContext(lc);
+    appender.setName("logcat");
 
-	public static void configure(LoggerContext lc) {
-		StatusManager sm = lc.getStatusManager();
-		if (sm != null) {
-			sm.add(new InfoStatus("Setting up default configuration.", lc));
-		}
-		LogcatAppender appender = new LogcatAppender();
-		appender.setContext(lc);
-		appender.setName("logcat");
+    // We don't need a trailing new-line character in the pattern
+    // because logcat automatically appends one for us.
+    PatternLayoutEncoder pl = new PatternLayoutEncoder();
+    pl.setContext(lc);
+    pl.setPattern("%msg");
+    pl.start();
 
-		// We don't need a trailing new-line character in the pattern
-		// because logcat automatically appends one for us.
-		PatternLayoutEncoder pl = new PatternLayoutEncoder();
-		pl.setContext(lc);
-		pl.setPattern("%msg");
-		pl.start();
+    appender.setEncoder(pl);
+    appender.start();
+    Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+    rootLogger.addAppender(appender);
+  }
 
-		appender.setEncoder(pl);
-		appender.start();
-		Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
-		rootLogger.addAppender(appender);
-	}
-
-	public static void configureDefaultContext() {
-		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-		configure(lc);
-	}
+  public static void configureDefaultContext() {
+    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    configure(lc);
+  }
 }
