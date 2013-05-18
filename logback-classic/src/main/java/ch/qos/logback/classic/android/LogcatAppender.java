@@ -73,8 +73,17 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
         return;
       }
 
+      // prevent stack traces from showing up in the tag
+      // (which could lead to very confusing error messages)
       if (layout instanceof PatternLayout) {
-        final PatternLayout tagLayout = (PatternLayout) layout;
+        String pattern = this.tagEncoder.getPattern();
+        if (!pattern.contains("%nopex")) {
+          this.tagEncoder.stop();
+          this.tagEncoder.setPattern(pattern + "%nopex");
+          this.tagEncoder.start();
+        }
+
+        PatternLayout tagLayout = (PatternLayout) layout;
         tagLayout.setPostCompileProcessor(null);
       }
     }
@@ -94,14 +103,7 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
       return;
     }
 
-    // format tag based on encoder layout; truncate if max length
-    // exceeded (only necessary for isLoggable(), which throws
-    // IllegalArgumentException)
-    String tag = (this.tagEncoder != null) ? this.tagEncoder.getLayout().doLayout(event) : event.getLoggerName();
-    if (checkLoggable && (tag.length() > MAX_TAG_LENGTH)) {
-      // addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
-      tag = tag.substring(0, MAX_TAG_LENGTH - 1) + "*";
-    }
+    String tag = getTag(event);
 
     switch (event.getLevel().levelInt) {
     case Level.ALL_INT:
@@ -110,26 +112,31 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
         Log.v(tag, this.encoder.getLayout().doLayout(event));
       }
       break;
+
     case Level.DEBUG_INT:
       if (!checkLoggable || Log.isLoggable(tag, Log.DEBUG)) {
         Log.d(tag, this.encoder.getLayout().doLayout(event));
       }
       break;
+
     case Level.INFO_INT:
       if (!checkLoggable || Log.isLoggable(tag, Log.INFO)) {
         Log.i(tag, this.encoder.getLayout().doLayout(event));
       }
       break;
+
     case Level.WARN_INT:
       if (!checkLoggable || Log.isLoggable(tag, Log.WARN)) {
         Log.w(tag, this.encoder.getLayout().doLayout(event));
       }
       break;
+
     case Level.ERROR_INT:
       if (!checkLoggable || Log.isLoggable(tag, Log.ERROR)) {
         Log.e(tag, this.encoder.getLayout().doLayout(event));
       }
       break;
+
     case Level.OFF_INT:
     default:
       break;
@@ -206,6 +213,23 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
    */
   public boolean getCheckLoggable() {
     return this.checkLoggable;
+  }
+
+  /**
+   * Gets the tag message of a logging event
+   * @param event logging event to evaluate
+   * @return the tag message string, truncated if max length exceeded
+   */
+  public String getTag(ILoggingEvent event) {
+    // format tag based on encoder layout; truncate if max length
+    // exceeded (only necessary for isLoggable(), which throws
+    // IllegalArgumentException)
+    String tag = (this.tagEncoder != null) ? this.tagEncoder.getLayout().doLayout(event) : event.getLoggerName();
+    if (checkLoggable && (tag.length() > MAX_TAG_LENGTH)) {
+      // addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
+      tag = tag.substring(0, MAX_TAG_LENGTH - 1) + "*";
+    }
+    return tag;
   }
 }
 

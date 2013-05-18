@@ -13,11 +13,15 @@
  */
 package ch.qos.logback.classic.android;
 
-import org.junit.BeforeClass;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 
 /**
  * Tests the {@link LogcatAppender} class
@@ -39,19 +43,49 @@ public class LogcatAppenderTest {
 
       PatternLayoutEncoder encoder = new PatternLayoutEncoder();
       encoder.setContext(context);
+      encoder.setPattern("%msg");
       encoder.start();
 
+      PatternLayoutEncoder tagEncoder = new PatternLayoutEncoder();
+      tagEncoder.setContext(context);
+      tagEncoder.setPattern("%msg");
+      tagEncoder.start();
+
+      logcatAppender.setTagEncoder(tagEncoder);
       logcatAppender.setEncoder(encoder);
+      logcatAppender.start();
     }
   }
 
-  @BeforeClass
-  static public void beforeClass() {
+  @Before
+  public void before() {
     params = new Params();
   }
 
   @Test
-  public void testTagLengthLimit() {
-    params.logcatAppender.addError("test error msg");
+  public void tagTruncatedWhenTagLimitExceeded() {
+    LoggingEvent event = new LoggingEvent();
+    final String TAG = "123456789012345678901234567890";
+    final String EXPECTED_TAG = "1234567890123456789012*";
+    event.setMessage(TAG);
+
+    params.logcatAppender.setCheckLoggable(true);
+    String actualTag = params.logcatAppender.getTag(event);
+    assertEquals("tag was not truncated", EXPECTED_TAG, actualTag);
+  }
+
+  // Issue #34
+  @Test
+  public void tagExcludesStackTraces () {
+    LoggingEvent event = new LoggingEvent();
+    Throwable throwable = new Throwable("throwable message");
+    ThrowableProxy tp = new ThrowableProxy(throwable);
+    event.setThrowableProxy(tp);
+
+    final String TAG = "test message";
+    event.setMessage(TAG);
+
+    String actualTag = params.logcatAppender.getTagEncoder().getLayout().doLayout(event);
+    assertEquals(TAG, actualTag);
   }
 }
