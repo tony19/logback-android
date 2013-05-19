@@ -295,6 +295,10 @@
             <excludes>
               <!-- SerializationPerfTest requires a running server -->
               <exclude>**/SerializationPerfTest.java</exclude>
+
+              <!--  Disable fragile tests to be refactored later -->
+              <exclude>**/SocketAppenderTest.java</exclude>
+              <exclude>**/SyslogAppenderTest.java</exclude>
             </excludes>
         </configuration>
         </plugin>
