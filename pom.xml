@@ -285,9 +285,9 @@
           <version>2.14.1</version>
           <configuration>
 
-            <!-- Use forkCount=1 and reuseForks=false to isolate each test in its own JVM -->
-            <forkCount>1</forkCount>
-            <reuseForks>false</reuseForks>
+            <forkCount>2</forkCount>
+            <reuseForks>true</reuseForks>
+            <parallel>classes</parallel>
 
             <reportFormat>plain</reportFormat>
             <trimStackTrace>false</trimStackTrace>
@@ -489,6 +489,7 @@
                 the timing checks, causing false-positive test failures -->
                 <exclude>**/*PerfTest.java</exclude>
                 <exclude>**/ReconfigureOnChangeTest.java</exclude>
+                <exclude>**/PackageDataCalculatorTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
