@@ -216,46 +216,18 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
   }
 
   /**
-   * Gets the tag message of a logging event
+   * Gets the logcat tag string of a logging event
    * @param event logging event to evaluate
-   * @return the tag message string, truncated if max length exceeded
+   * @return the tag string, truncated if max length exceeded
    */
-  public String getTag(ILoggingEvent event) {
+  protected String getTag(ILoggingEvent event) {
     // format tag based on encoder layout; truncate if max length
     // exceeded (only necessary for isLoggable(), which throws
     // IllegalArgumentException)
     String tag = (this.tagEncoder != null) ? this.tagEncoder.getLayout().doLayout(event) : event.getLoggerName();
     if (checkLoggable && (tag.length() > MAX_TAG_LENGTH)) {
-      // addWarn("Truncating tag to " + MAX_TAG_LENGTH + " chars");
       tag = tag.substring(0, MAX_TAG_LENGTH - 1) + "*";
     }
     return tag;
   }
 }
-
-/**
- * Stub class to run unit tests from command line
- */
-/*
-class Log {
-  static public final int INFO = 1;
-  static public final int WARN = 2;
-  static public final int ERROR = 3;
-  static public final int DEBUG = 4;
-  static public final int VERBOSE = 5;
-
-  static void v(String tag, String msg) {
-  }
-  static void d(String tag, String msg) {
-  }
-  static void i(String tag, String msg) {
-  }
-  static void w(String tag, String msg) {
-  }
-  static void e(String tag, String msg) {
-  }
-  static boolean isLoggable(String tag, int level) {
-    return true;
-  }
-}
-*/

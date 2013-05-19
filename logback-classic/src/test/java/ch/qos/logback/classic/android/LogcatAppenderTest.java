@@ -13,7 +13,8 @@
  */
 package ch.qos.logback.classic.android;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,63 +30,86 @@ import ch.qos.logback.classic.spi.ThrowableProxy;
  * @author Anthony Trinh
  */
 public class LogcatAppenderTest {
-  static private Params params;
+  static private final int MAX_TAG_LENGTH = 23; // for android.util.Log.isLoggable()
+  static private final String TAG = "123456789012345678901234567890";
+  static private final String TRUNCATED_TAG = TAG.substring(0, MAX_TAG_LENGTH - 1) + "*";
 
-  static class Params {
-    LogcatAppender logcatAppender;
-    LoggerContext context;
-
-    Params() {
-      logcatAppender = new LogcatAppender();
-      context = new LoggerContext();
-      logcatAppender.setContext(context);
-      logcatAppender.setName("LOGCAT");
-
-      PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-      encoder.setContext(context);
-      encoder.setPattern("%msg");
-      encoder.start();
-
-      PatternLayoutEncoder tagEncoder = new PatternLayoutEncoder();
-      tagEncoder.setContext(context);
-      tagEncoder.setPattern("%msg");
-      tagEncoder.start();
-
-      logcatAppender.setTagEncoder(tagEncoder);
-      logcatAppender.setEncoder(encoder);
-      logcatAppender.start();
-    }
-  }
+  private LogcatAppender logcatAppender;
+  private LoggerContext context;
 
   @Before
   public void before() {
-    params = new Params();
+    configureAppenderDirectly();
   }
 
   @Test
-  public void tagTruncatedWhenTagLimitExceeded() {
+  public void longTagAllowedIfNotCheckLoggable() {
     LoggingEvent event = new LoggingEvent();
-    final String TAG = "123456789012345678901234567890";
-    final String EXPECTED_TAG = "1234567890123456789012*";
     event.setMessage(TAG);
 
-    params.logcatAppender.setCheckLoggable(true);
-    String actualTag = params.logcatAppender.getTag(event);
-    assertEquals("tag was not truncated", EXPECTED_TAG, actualTag);
+    boolean checkLoggable = false;
+    setTagPattern(TAG, checkLoggable);
+    String actualTag = logcatAppender.getTag(event);
+
+    assertThat(TRUNCATED_TAG, is(not(actualTag)));
+    assertThat(TAG, is(actualTag));
+  }
+
+  @Test
+  public void longTagTruncatedIfCheckLoggable() {
+    LoggingEvent event = new LoggingEvent();
+    event.setMessage(TAG);
+
+    boolean checkLoggable = true;
+    setTagPattern(TAG, checkLoggable);
+    String actualTag = logcatAppender.getTag(event);
+
+    assertThat(TRUNCATED_TAG, is(actualTag));
+    assertThat(TAG, is(not(actualTag)));
   }
 
   // Issue #34
   @Test
-  public void tagExcludesStackTraces () {
+  public void tagExcludesStackTraces() {
+    // create logging event with throwable
     LoggingEvent event = new LoggingEvent();
-    Throwable throwable = new Throwable("throwable message");
+    Throwable throwable = new Throwable("throwable");
     ThrowableProxy tp = new ThrowableProxy(throwable);
     event.setThrowableProxy(tp);
-
-    final String TAG = "test message";
     event.setMessage(TAG);
 
-    String actualTag = params.logcatAppender.getTagEncoder().getLayout().doLayout(event);
-    assertEquals(TAG, actualTag);
+    setTagPattern(TAG, true);
+
+    // if the tags match, it does not include the stack trace
+    String actualTag = logcatAppender.getTagEncoder().getLayout().doLayout(event);
+    assertThat(TAG, is(actualTag));
+  }
+
+  private void setTagPattern(String tag, boolean checkLoggable) {
+    logcatAppender.stop();
+    logcatAppender.setCheckLoggable(checkLoggable);
+    logcatAppender.getTagEncoder().setPattern(tag);
+    logcatAppender.start();
+  }
+
+  private void configureAppenderDirectly() {
+    context = new LoggerContext();
+    logcatAppender = new LogcatAppender();
+    logcatAppender.setContext(context);
+    logcatAppender.setName("LOGCAT");
+
+    PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+    encoder.setContext(context);
+    encoder.setPattern("%msg");
+    encoder.start();
+
+    PatternLayoutEncoder tagEncoder = new PatternLayoutEncoder();
+    tagEncoder.setContext(context);
+    tagEncoder.setPattern(TAG);
+    tagEncoder.start();
+
+    logcatAppender.setTagEncoder(tagEncoder);
+    logcatAppender.setEncoder(encoder);
+    logcatAppender.start();
   }
 }
