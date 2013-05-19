@@ -398,7 +398,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.google.code.maven-license-plugin</groupId>
+            <groupId>com.mycila.maven-license-plugin</groupId>
             <artifactId>maven-license-plugin</artifactId>
             <version>1.9.0</version>
             <configuration>
@@ -412,7 +412,7 @@
               <useDefaultExcludes>true</useDefaultExcludes>
               <useDefaultMapping>true</useDefaultMapping>
               <properties>
-                <year>1999</year>
+                <year>2013</year>
               </properties>
               <headerDefinitions>
                 <headerDefinition>src/main/javadocHeaders.xml</headerDefinition>
