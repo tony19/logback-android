@@ -39,7 +39,7 @@ public class Introspector {
     } else {
       String nm = name.substring(0, 1).toLowerCase();
       if (name.length() > 1) {
-    	  nm += name.substring(1);
+        nm += name.substring(1);
       }
       return nm;
     }

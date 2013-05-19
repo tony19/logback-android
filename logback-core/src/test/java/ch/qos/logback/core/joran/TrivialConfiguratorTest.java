@@ -95,7 +95,7 @@ public class TrivialConfiguratorTest {
     String filename = CoreTestConstants.TEST_DIR_PREFIX + "input/joran/" + "illformed.xml";
     context.getStatusManager().add(tsl);
     try {
-    	doTest(filename);
+      doTest(filename);
     } catch (Exception e) {
     }
     assertTrue(tsl.list.size() >= 1);

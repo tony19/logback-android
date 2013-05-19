@@ -55,7 +55,7 @@ public class MockSyslogServer extends Thread {
       se.printStackTrace();
     } finally {
       if(socket != null) {
-	  try {socket.close();} catch(Exception e) {}
+    try {socket.close();} catch(Exception e) {}
       }
     }
     finished = true;

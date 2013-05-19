@@ -40,7 +40,7 @@ public class FileToBufferUtil {
   }
 
   private static void zipFileReadIntoList(File file, List<String> stringList) throws IOException {
-	System.out.println("Reading zip file ["+file+"]");
+  System.out.println("Reading zip file ["+file+"]");
     ZipFile zipFile = new ZipFile(file);
     Enumeration entries = zipFile.entries();
     ZipEntry entry = (ZipEntry) entries.nextElement();

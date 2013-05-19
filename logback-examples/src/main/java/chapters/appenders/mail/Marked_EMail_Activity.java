@@ -35,30 +35,30 @@ import android.widget.Button;
  * Example logback configuration:
  * <pre>
  * &lt;configuration>
- * 	&lt;appender name="SMTP" class="ch.qos.logback.classic.net.SMTPAppender">
- * 		&lt;evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
- * 			&lt;marker>TOO_BIG_ACCELERATION&lt;/marker>
- * 		&lt;/evaluator>
- * 		&lt;cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTrackerImpl">
- * 			&lt;!-- send just one log entry per email -->
- * 			&lt;bufferSize>1&lt;/bufferSize>
- * 		&lt;/cyclicBufferTracker>
- * 		&lt;smtpHost>smtp.gmail.com&lt;/smtpHost>
- * 		&lt;smtpPort>465&lt;/smtpPort>
- * 		&lt;SSL>true&lt;/SSL>
- * 		&lt;username>foo@gmail.com&lt;/username>
- * 		&lt;password>foo123&lt;/password>
- * 		&lt;to>tony19@gmail.com&lt;/to>
- * 		&lt;from>anyone@gmail.com&lt;/from>
- * 		&lt;subject>%date{yyyyMMdd'T'HH:mm:ss.SSS}; %-5level; %msg&lt;/subject>
- * 		&lt;layout class="ch.qos.logback.classic.PatternLayout">
- * 			&lt;pattern>%date{yyyyMMdd'T'HH:mm:ss.SSS}; %-5level; %msg%n&lt;/pattern>
- * 		&lt;/layout>
- * 	&lt;/appender>
+ *   &lt;appender name="SMTP" class="ch.qos.logback.classic.net.SMTPAppender">
+ *     &lt;evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+ *       &lt;marker>TOO_BIG_ACCELERATION&lt;/marker>
+ *     &lt;/evaluator>
+ *     &lt;cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTrackerImpl">
+ *       &lt;!-- send just one log entry per email -->
+ *       &lt;bufferSize>1&lt;/bufferSize>
+ *     &lt;/cyclicBufferTracker>
+ *     &lt;smtpHost>smtp.gmail.com&lt;/smtpHost>
+ *     &lt;smtpPort>465&lt;/smtpPort>
+ *     &lt;SSL>true&lt;/SSL>
+ *     &lt;username>foo@gmail.com&lt;/username>
+ *     &lt;password>foo123&lt;/password>
+ *     &lt;to>tony19@gmail.com&lt;/to>
+ *     &lt;from>anyone@gmail.com&lt;/from>
+ *     &lt;subject>%date{yyyyMMdd'T'HH:mm:ss.SSS}; %-5level; %msg&lt;/subject>
+ *     &lt;layout class="ch.qos.logback.classic.PatternLayout">
+ *       &lt;pattern>%date{yyyyMMdd'T'HH:mm:ss.SSS}; %-5level; %msg%n&lt;/pattern>
+ *     &lt;/layout>
+ *   &lt;/appender>
  * 
- * 	&lt;root level="INFO">
- * 		&lt;appender-ref ref="SMTP" />
- * 	&lt;/root>
+ *   &lt;root level="INFO">
+ *     &lt;appender-ref ref="SMTP" />
+ *   &lt;/root>
  * &lt;/configuration>
  * </pre>
  * </p>
@@ -66,7 +66,7 @@ import android.widget.Button;
  * @author Enrico Spinielli
  */
 public class Marked_EMail_Activity extends Activity {
-	
+  
     static private final Logger LOG = LoggerFactory.getLogger(Marked_EMail_Activity.class);
     private static final Marker MARKER = MarkerFactory.getMarker("TOO_BIG_ACCELERATION");
 
@@ -83,9 +83,9 @@ public class Marked_EMail_Activity extends Activity {
         final Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	LOG.info(MARKER, "on marker email");
+              LOG.info(MARKER, "on marker email");
             }
-    	});
+      });
 
         LOG.info("end of onCreate");        
     }

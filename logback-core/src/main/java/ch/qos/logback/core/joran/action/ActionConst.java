@@ -21,7 +21,7 @@ package ch.qos.logback.core.joran.action;
  *
  */
 public abstract class ActionConst {
-	
+  
   public static final String APPENDER_TAG = "appender";
   public static final String REF_ATTRIBUTE = "ref";
   public static final String ADDITIVITY_ATTRIBUTE = "additivity";

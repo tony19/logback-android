@@ -14,33 +14,33 @@
 package ch.qos.logback.core.pattern.parser;
 
 public class CompositeNode extends SimpleKeywordNode {
-	Node childNode;
+  Node childNode;
 
-	CompositeNode(String keyword) {
-		super(Node.COMPOSITE_KEYWORD, keyword);
+  CompositeNode(String keyword) {
+    super(Node.COMPOSITE_KEYWORD, keyword);
 
-	}
+  }
 
-	public Node getChildNode() {
-		return childNode;
-	}
+  public Node getChildNode() {
+    return childNode;
+  }
 
-	public void setChildNode(Node childNode) {
-		this.childNode = childNode;
-	}
+  public void setChildNode(Node childNode) {
+    this.childNode = childNode;
+  }
 
-	public boolean equals(Object o) {
+  public boolean equals(Object o) {
     if(!super.equals(o)) {
       return false;
     }
     if (!(o instanceof CompositeNode)) {
-			return false;
-		}
-		CompositeNode r = (CompositeNode) o;
+      return false;
+    }
+    CompositeNode r = (CompositeNode) o;
 
-		return (childNode != null) ? childNode.equals(r.childNode)
-						: (r.childNode == null);
-	}
+    return (childNode != null) ? childNode.equals(r.childNode)
+            : (r.childNode == null);
+  }
 
   @Override
   public int hashCode() {
@@ -48,13 +48,13 @@ public class CompositeNode extends SimpleKeywordNode {
   }
 
   public String toString() {
-		StringBuffer buf = new StringBuffer();
-		if(childNode != null) {
-		 buf.append("CompositeNode("+childNode+")");
-		} else {
-			buf.append("CompositeNode(no child)");
-		}
-		buf.append(printNext());
-		return buf.toString();
-	}
+    StringBuffer buf = new StringBuffer();
+    if(childNode != null) {
+     buf.append("CompositeNode("+childNode+")");
+    } else {
+      buf.append("CompositeNode(no child)");
+    }
+    buf.append(printNext());
+    return buf.toString();
+  }
 }

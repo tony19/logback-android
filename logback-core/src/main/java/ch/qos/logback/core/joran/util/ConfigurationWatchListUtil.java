@@ -34,7 +34,7 @@ public class ConfigurationWatchListUtil {
   }
 
   public static void setMainWatchURL(Context context, URL url) {
-	if (context == null) return;
+  if (context == null) return;
 
     ConfigurationWatchList cwl = getConfigurationWatchList(context);
     if (cwl == null) {
@@ -68,7 +68,7 @@ public class ConfigurationWatchListUtil {
   }
 
   public static boolean wasConfigurationWatchListReset(Context context) {
-	if (context == null) return false;
+  if (context == null) return false;
 
     Object o = context.getObject(CoreConstants.CONFIGURATION_WATCH_LIST_RESET);
     if (o == null)
@@ -83,7 +83,7 @@ public class ConfigurationWatchListUtil {
   }
 
   public static ConfigurationWatchList getConfigurationWatchList(Context context) {
-	if (context == null) return null;
+  if (context == null) return null;
     return (ConfigurationWatchList) context.getObject(CoreConstants.CONFIGURATION_WATCH_LIST);
   }
 
