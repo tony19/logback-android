@@ -13,9 +13,12 @@
  */
 package ch.qos.logback.core.status;
 
+import java.util.List;
+
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.CoreConstants;
+
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -26,18 +29,18 @@ import static junit.framework.Assert.assertTrue;
  */
 public class StatusCheckerTest {
 
-  Context context = new ContextBase();
-  StatusChecker checker = new StatusChecker(context);
+  private Context context = new ContextBase();
+  private StatusChecker checker = new StatusChecker(context);
 
   @Test
   public void emptyStatusListShouldResultInNotFound() {
-    assertEquals(-1, checker.timeOfLastReset());
+    assertEquals(-1, timeOfLastReset());
   }
 
   @Test
   public void withoutResetsCheckerShouldReturnNotFound() {
     context.getStatusManager().add(new InfoStatus("test", this));
-    assertEquals(-1, checker.timeOfLastReset());
+    assertEquals(-1, timeOfLastReset());
   }
 
   @Test
@@ -46,8 +49,25 @@ public class StatusCheckerTest {
     long resetTime = System.currentTimeMillis();
     context.getStatusManager().add(new InfoStatus(CoreConstants.RESET_MSG_PREFIX, this));
     context.getStatusManager().add(new InfoStatus("bla", this));
-    assertTrue(resetTime <= checker.timeOfLastReset());
+    assertTrue(resetTime <= timeOfLastReset());
   }
 
+  /**
+   * Return the time of last reset. -1 if last reset time could not be found
+   * @return  time of last reset or -1
+   */
+  private long timeOfLastReset() {
+    List<Status> statusList = checker.sm.getCopyOfStatusList();
+    if (statusList == null)
+      return -1;
 
+    int len = statusList.size();
+    for (int i = len-1; i >= 0; i--) {
+      Status s = statusList.get(i);
+      if (CoreConstants.RESET_MSG_PREFIX.equals(s.getMessage())) {
+        return s.getDate();
+      }
+    }
+    return -1;
+  }
 }
