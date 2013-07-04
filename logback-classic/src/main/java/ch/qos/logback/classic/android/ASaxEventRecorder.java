@@ -14,7 +14,9 @@
 package ch.qos.logback.classic.android;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
@@ -22,7 +24,6 @@ import org.xml.sax.helpers.LocatorImpl;
 import org.xmlpull.v1.XmlPullParser;
 
 import brut.androlib.res.decoder.AXmlResourceParser;
-import ch.qos.logback.core.Context;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.event.SaxEventRecorder;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -37,9 +38,8 @@ import ch.qos.logback.core.joran.spi.JoranException;
 public class ASaxEventRecorder extends SaxEventRecorder {
   private int holderForStartAndLength[] = new int[2];
   private StatePassFilter filter = new StatePassFilter();
-  private String attrNameToWatch = null;
   private String elemNameToWatch = null;
-  private String attrWatchValue = null;
+  private Map<String,String> elemAttrs = null;
 
   /**
    * Constructor
@@ -73,28 +73,26 @@ public class ASaxEventRecorder extends SaxEventRecorder {
   }
 
   /**
-   * Sets a "watch" for an element's attribute, which can be retrieved
-   * with {@link #getAttributeWatchValue()}. During the parsing of the SAX
-   * events, the START-elements are searched for the target attribute.
-   * If found, the attribute's value is stored. This checks all START-
+   * Sets a "watch" for an element's attributes, which can be retrieved
+   * with {@link #getAttributeWatchValues()}. During the parsing of the SAX
+   * events, the START-elements are searched for the target element name.
+   * If found, the element's attributes are stored. This checks all START-
    * elements, regardless of filtering.
    *
-   * @param elemName name of the element that contains the attribute
-   * @param attrName name of the attribute
+   * @param elemName name of the element
    */
-  public void setAttributeWatch(String elemName, String attrName) {
+  public void setAttributeWatch(String elemName) {
     elemNameToWatch = elemName;
-    attrNameToWatch = attrName;
   }
 
   /**
-   * Gets the value of the attribute set by {@link #setAttributeWatch(String, String)}
+   * Gets the attributes set by {@link #setAttributeWatch(String)}
    *
-   * @return the string value of the attribute; if the attribute was
-   * not encountered, this returns null
+   * @return attributes (name to value) of the watched element; if the element
+   * was not encountered, this returns null
    */
-  public String getAttributeWatchValue() {
-    return attrWatchValue;
+  public Map<String,String> getAttributeWatchValues() {
+    return elemAttrs;
   }
 
   /**
@@ -113,7 +111,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
     try {
       AXmlResourceParser xpp = new AXmlResourceParser(stream);
 
-      attrWatchValue = null;
+      elemAttrs = null;
       int eventType = -1;
       while ((eventType = xpp.next()) > -1) {
         if (XmlPullParser.START_DOCUMENT == eventType) {
@@ -198,21 +196,31 @@ public class ASaxEventRecorder extends SaxEventRecorder {
   }
 
   /**
-   * Checks a START-element for the watched attribute, set by
-   * {@link #setAttributeWatch(String, String)}. If the attribute
+   * Checks a START-element for the watched element, set by
+   * {@link #setAttributeWatch(String)}. If the element
    * was already found, this does nothing.
    *
    * @param xpp parser that contains the START_ELEMENT event
    */
   private void checkForWatchedAttribute(XmlPullParser xpp) {
     if (elemNameToWatch != null &&
-        attrWatchValue == null &&
+        elemAttrs == null &&
         xpp.getName().equals(elemNameToWatch)) {
+
+      Map<String,String> map = new HashMap<String,String>();
       for (int i = 0; i < xpp.getAttributeCount(); i++) {
-        if (xpp.getAttributeName(i).equals(attrNameToWatch)) {
-            attrWatchValue = xpp.getAttributeValue(i);
+
+        // prefix namespace to element name
+        String key = "";
+        String ns = xpp.getAttributeNamespace(i);
+        if (ns.length() > 0) {
+          key = ns + ":";
         }
+        key += xpp.getAttributeName(i);
+
+        map.put(key, xpp.getAttributeValue(i));
       }
+      elemAttrs = map;
     }
   }
 
