@@ -29,8 +29,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.CoreConstants;
@@ -79,9 +77,6 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   private int smtpPort = 25;
   private boolean starttls = false;
   private boolean ssl = false;
-  private boolean sessionViaJNDI = false;
-  private String jndiLocation = CoreConstants.JNDI_COMP_PREFIX + "/mail/Session";
-
 
   String username;
   String password;
@@ -119,11 +114,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       cbTracker = new CyclicBufferTrackerImpl<E>();
     }
 
-    Session session = null;
-    if (sessionViaJNDI)
-      session = lookupSessionInJNDI();
-    else
-      session = buildSessionFromProperties();
+    Session session = buildSessionFromProperties();
 
     if (session == null) {
       addError("Failed to obtain javax.mail.Session. Cannot start.");
@@ -144,18 +135,6 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
     } catch (MessagingException e) {
       addError("Could not activate SMTPAppender options.", e);
-    }
-  }
-
-  private Session lookupSessionInJNDI() {
-    addInfo("Looking up javax.mail.Session at JNDI location [" + jndiLocation + "]");
-    try {
-      Context initialContext = new InitialContext();
-      Object obj = initialContext.lookup(jndiLocation);
-      return (Session) obj;
-    } catch (Exception e) {
-      addError("Failed to obtain javax.mail.Session from JNDI location [" + jndiLocation+"]");
-      return null;
     }
   }
 
@@ -626,36 +605,6 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
    */
   public String getCharsetEncoding() {
     return charsetEncoding;
-  }
-
-
-  public String getJndiLocation() {
-    return jndiLocation;
-  }
-
-  /**
-   * Set the location where a {@link javax.mail.Session} resource is located in JNDI. Default value is
-   * "java:comp/env/mail/Session".
-   *
-   * @param jndiLocation
-   * @since 1.0.6
-   */
-  public void setJndiLocation(String jndiLocation) {
-    this.jndiLocation = jndiLocation;
-  }
-
-  public boolean isSessionViaJNDI() {
-    return sessionViaJNDI;
-  }
-
-  /**
-   * If set to true, a {@link javax.mail.Session} resource will be retrieved from JNDI. Default is false.
-   *
-   * @param sessionViaJNDI whether to obtain a javax.mail.Session by JNDI
-   * @since 1.0.6
-   */
-  public void setSessionViaJNDI(boolean sessionViaJNDI) {
-    this.sessionViaJNDI = sessionViaJNDI;
   }
 
   /**
