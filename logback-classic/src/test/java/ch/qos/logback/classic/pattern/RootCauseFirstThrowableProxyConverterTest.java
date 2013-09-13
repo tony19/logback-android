@@ -71,7 +71,7 @@ public class RootCauseFirstThrowableProxyConverterTest {
 
     //then
     // make sure that at least some package data was output
-    Pattern p = Pattern.compile(this.getClass().getName() + "\\.integration");
+    Pattern p = Pattern.compile("\\s*at .*?\\[.*?\\]");
     Matcher m = p.matcher(result);
     int i = 0;
     while(m.find()) {
