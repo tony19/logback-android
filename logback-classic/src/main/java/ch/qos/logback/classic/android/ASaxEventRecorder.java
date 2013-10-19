@@ -192,7 +192,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
       startElement(xpp.getNamespace(), name, name, atts);
     }
     // check for attributes (and ignore filter)
-    checkForWatchedAttribute(xpp);
+    checkForWatchedAttributes(xpp);
   }
 
   /**
@@ -202,7 +202,7 @@ public class ASaxEventRecorder extends SaxEventRecorder {
    *
    * @param xpp parser that contains the START_ELEMENT event
    */
-  private void checkForWatchedAttribute(XmlPullParser xpp) {
+  private void checkForWatchedAttributes(XmlPullParser xpp) {
     if (elemNameToWatch != null &&
         elemAttrs == null &&
         xpp.getName().equals(elemNameToWatch)) {
@@ -214,10 +214,15 @@ public class ASaxEventRecorder extends SaxEventRecorder {
         String key = "";
         String ns = xpp.getAttributeNamespace(i);
         if (ns.length() > 0) {
+          // if namespace is a URL, get the last element
+          int pos = ns.lastIndexOf("/");
+          if (pos > -1 && pos + 1 < ns.length()) {
+            ns = ns.substring(pos+1);
+          }
+
           key = ns + ":";
         }
         key += xpp.getAttributeName(i);
-
         map.put(key, xpp.getAttributeValue(i));
       }
       elemAttrs = map;

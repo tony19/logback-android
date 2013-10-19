@@ -135,12 +135,6 @@ public class CoreConstants {
   public static final String CONTEXT_NAME_KEY = "CONTEXT_NAME";
 
   /**
-   * The key under which the application package name is registered in the
-   * logger context. This is normally parsed from AndroidManifest.xml.
-   */
-  public static final String PACKAGE_KEY = "PACKAGE_NAME";
-
-  /**
    * The key under which the application files directory is registered in
    * the logger context. The value is typically something like:
    * "/data/data/com.example/files"
@@ -153,6 +147,24 @@ public class CoreConstants {
    * storage is not mounted.
    */
   public static final String EXT_DIR_KEY = "EXT_DIR";
+
+  /**
+   * The key under which the application package name is registered
+   * in the logger context.
+   */
+  public static final String PACKAGE_NAME_KEY = "PACKAGE_NAME";
+
+  /**
+   * The key under which the application version name is registered
+   * in the logger context.
+   */
+  public static final String VERSION_NAME_KEY = "VERSION_NAME";
+
+  /**
+   * The key under which the application version code is registered
+   * in the logger context.
+   */
+  public static final String VERSION_CODE_KEY = "VERSION_CODE";
 
   public static final int BYTES_PER_INT = 4;
   public static final int MILLIS_IN_ONE_SECOND = 1000;
