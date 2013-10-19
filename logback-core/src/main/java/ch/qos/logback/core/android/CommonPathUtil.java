@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.core.android;
 
+import ch.qos.logback.core.util.EnvUtil;
 import ch.qos.logback.core.util.OptionHelper;
 import android.os.Environment;
 
@@ -27,19 +28,6 @@ public abstract class CommonPathUtil {
   private static final String ASSETS_DIRECTORY = "assets";
 
   /**
-   * Heuristically determines whether the current OS is Android
-   */
-  private static boolean isAndroidOS() {
-    String osname = OptionHelper.getSystemProperty("os.name");
-    String root = OptionHelper.getEnv("ANDROID_ROOT");
-    String data = OptionHelper.getEnv("ANDROID_DATA");
-
-    return osname != null && osname.contains("Linux") &&
-        root != null && root.contains("/system") &&
-        data != null && data.contains("/data");
-  }
-
-  /**
    * Gets the path to the external storage directory only if
    * mounted.
    *
@@ -47,7 +35,7 @@ public abstract class CommonPathUtil {
    * or {@code null} if not mounted.
    */
   public static String getMountedExternalStorageDirectoryPath() {
-    if (isAndroidOS()) {
+    if (EnvUtil.isAndroidOS()) {
       String path = null;
       String state = Environment.getExternalStorageState();
       if (state.equals(Environment.MEDIA_MOUNTED) ||
@@ -66,7 +54,7 @@ public abstract class CommonPathUtil {
    * @return the absolute path to the external storage directory
    */
   public static String getExternalStorageDirectoryPath() {
-    if (isAndroidOS()) {
+    if (EnvUtil.isAndroidOS()) {
       return Environment.getExternalStorageDirectory().getAbsolutePath();
     } else {
       String extDir = OptionHelper.getEnv("EXTERNAL_STORAGE");
@@ -85,7 +73,7 @@ public abstract class CommonPathUtil {
    * (example: "/data/data/com.example/files")
    */
   public static String getFilesDirectoryPath(String packageName) {
-    String dataDir = isAndroidOS() ?
+    String dataDir = EnvUtil.isAndroidOS() ?
             Environment.getDataDirectory().getAbsolutePath() : "/data";
     return dataDir + "/data/" + packageName + "/files";
   }

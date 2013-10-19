@@ -19,6 +19,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
+import ch.qos.logback.core.util.EnvUtil;
 import ch.qos.logback.core.util.FileUtil;
 
 /**
@@ -271,7 +272,10 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     // In Android, relative paths created with File() are relative
     // to root, so fix it by prefixing the path to the app's "files"
     // directory.
-    String dataDir = context.getProperty(CoreConstants.DATA_DIR_KEY);
-    return FileUtil.prefixRelativePath(dataDir, filename);
+    if (EnvUtil.isAndroidOS()) {
+      String dataDir = context.getProperty(CoreConstants.DATA_DIR_KEY);
+      filename = FileUtil.prefixRelativePath(dataDir, filename);
+    }
+    return filename;
   }
 }

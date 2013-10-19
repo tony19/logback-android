@@ -13,7 +13,6 @@
  */
 package ch.qos.logback.classic.joran.action;
 
-import ch.qos.logback.core.util.EnvUtil;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
 import org.xml.sax.Attributes;
 

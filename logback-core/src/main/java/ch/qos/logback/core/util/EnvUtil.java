@@ -18,6 +18,18 @@ package ch.qos.logback.core.util;
  */
 public class EnvUtil {
 
+  /**
+   * Heuristically determines whether the current OS is Android
+   */
+  static public boolean isAndroidOS() {
+    String osname = OptionHelper.getSystemProperty("os.name");
+    String root = OptionHelper.getEnv("ANDROID_ROOT");
+    String data = OptionHelper.getEnv("ANDROID_DATA");
+
+    return osname != null && osname.contains("Linux") &&
+        root != null && root.contains("/system") &&
+        data != null && data.contains("/data");
+  }
 
   static public boolean isJDK5() {
     String javaVersion = System.getProperty("java.version");
@@ -34,7 +46,7 @@ public class EnvUtil {
   static public boolean isJaninoAvailable() {
     ClassLoader classLoader = EnvUtil.class.getClassLoader();
     try {
-      Class bindingClass = classLoader.loadClass("org.codehaus.janino.ScriptEvaluator");
+      Class<?> bindingClass = classLoader.loadClass("org.codehaus.janino.ScriptEvaluator");
       return (bindingClass != null);
     } catch (ClassNotFoundException e) {
       return false;
