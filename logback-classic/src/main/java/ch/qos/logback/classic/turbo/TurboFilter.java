@@ -22,26 +22,26 @@ import ch.qos.logback.core.spi.FilterReply;
 import ch.qos.logback.core.spi.LifeCycle;
 
 /**
- * TurboFilter is a specialized filter with a decide method that takes a bunch 
- * of parameters instead of a single event object. The latter is cleaner but 
- * the latter is much more performant.
+ * TurboFilter is a specialized filter with a decide method that takes a bunch
+ * of parameters instead of a single event object. The latter is cleaner but
+ * the former is much more performant.
  * <p>
  * For more information about turbo filters, please refer to the online manual at
  * http://logback.qos.ch/manual/filters.html#TurboFilter
- * 
+ *
  * @author Ceki Gulcu
  */
 public abstract class TurboFilter extends ContextAwareBase implements LifeCycle {
 
   private String name;
-  boolean start = false;  
- 
- 
+  boolean start = false;
+
+
   /**
    * Make a decision based on the multiple parameters passed as arguments.
-   * The returned value should be one of <code>{@link FilterReply#DENY}</code>, 
+   * The returned value should be one of <code>{@link FilterReply#DENY}</code>,
    * <code>{@link FilterReply#NEUTRAL}</code>, or <code>{@link FilterReply#ACCEPT}</code>.
-  
+
    * @param marker
    * @param logger
    * @param level
@@ -56,11 +56,11 @@ public abstract class TurboFilter extends ContextAwareBase implements LifeCycle 
   public void start() {
     this.start = true;
   }
-  
+
   public boolean isStarted() {
     return this.start;
   }
- 
+
   public void stop() {
     this.start = false;
   }
