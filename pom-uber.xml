@@ -78,7 +78,6 @@
             </goals>
             <configuration>
               <finalName>logback-android-${project.version}</finalName>
-              <minimizeJar>true</minimizeJar>
               <artifactSet>
                 <includes>
                   <include>com.github.tony19:logback-android-core</include>
