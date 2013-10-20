@@ -42,20 +42,4 @@ public class EnvUtil {
       return false;
     }
   }
-
-  static public boolean isJaninoAvailable() {
-    ClassLoader classLoader = EnvUtil.class.getClassLoader();
-    try {
-      Class<?> bindingClass = classLoader.loadClass("org.codehaus.janino.ScriptEvaluator");
-      return (bindingClass != null);
-    } catch (ClassNotFoundException e) {
-      return false;
-    }
-  }
-
-  public static boolean isWindows() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Windows");
-  }
-
 }
