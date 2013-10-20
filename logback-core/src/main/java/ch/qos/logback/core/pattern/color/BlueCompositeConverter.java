@@ -19,6 +19,7 @@ package ch.qos.logback.core.pattern.color;
  * @author  Ceki G&uuml;lc&uuml;
  * @sincee 1.0.5
  */
+@Deprecated
 public class BlueCompositeConverter<E> extends ForegroundCompositeConverterBase<E> {
 
   @Override

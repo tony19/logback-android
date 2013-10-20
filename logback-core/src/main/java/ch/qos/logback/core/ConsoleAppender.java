@@ -31,8 +31,9 @@ import ch.qos.logback.core.status.WarnStatus;
  * @author Ceki G&uuml;lc&uuml;
  * @author Tom SH Liu
  * @author Ruediger Dohna
+ * @deprecated This appender has been deprecated for {@link ch.qos.logback.classic.android.LogcatAppender}.
  */
-
+@Deprecated
 public class ConsoleAppender<E> extends OutputStreamAppender<E> {
 
   protected ConsoleTarget target = ConsoleTarget.SystemOut;

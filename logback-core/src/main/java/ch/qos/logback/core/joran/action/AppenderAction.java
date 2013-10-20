@@ -29,7 +29,7 @@ public class AppenderAction<E> extends Action {
 
   /**
    * Instantiates an appender of the given class and sets its name.
-   * 
+   *
    * The appender thus generated is placed in the {@link InterpretationContext}'s
    * appender bag.
    */
@@ -50,6 +50,7 @@ public class AppenderAction<E> extends Action {
 
     try {
       addInfo("About to instantiate appender of type [" + className + "]");
+      warnDeprecated(className);
 
       appender = (Appender) OptionHelper.instantiateByClassName(className,
           ch.qos.logback.core.Appender.class, context);
@@ -80,6 +81,12 @@ public class AppenderAction<E> extends Action {
       addError("Could not create an Appender of type [" + className + "].",
           oops);
       throw new ActionException(oops);
+    }
+  }
+
+  private void warnDeprecated(String className) {
+    if (className.equals("ch.qos.logback.core.ConsoleAppender")) {
+      addWarn("ConsoleAppender is deprecated for LogcatAppender");
     }
   }
 

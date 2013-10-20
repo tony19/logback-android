@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.core.pattern.color;
 
+@Deprecated
 public class ANSIConstants {
 
   public final static String ESC_START = "\033[";

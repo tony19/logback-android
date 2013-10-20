@@ -23,6 +23,7 @@ import static ch.qos.logback.core.pattern.color.ANSIConstants.WHITE_FG;
  * @author Ceki G&uuml;lc&uuml;
  * @sincee 1.0.5
  */
+@Deprecated
 public class BoldWhiteCompositeConverter<E> extends ForegroundCompositeConverterBase<E> {
 
   @Override

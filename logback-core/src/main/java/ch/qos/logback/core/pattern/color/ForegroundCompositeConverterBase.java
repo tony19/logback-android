@@ -22,6 +22,7 @@ import static ch.qos.logback.core.pattern.color.ANSIConstants.*;
  * @param <E>
  * @since 1.0.5
  */
+@Deprecated
 abstract public class ForegroundCompositeConverterBase<E> extends CompositeConverter<E> {
 
   final private static String SET_DEFAULT_COLOR = ESC_START+"0;"+DEFAULT_FG+ESC_END;

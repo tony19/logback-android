@@ -54,7 +54,7 @@ import ch.qos.logback.core.pattern.parser.Parser;
  * <p>
  * For more information about this layout, please refer to the online manual at
  * http://logback.qos.ch/manual/layouts.html#PatternLayout
- * 
+ *
  */
 
 public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
@@ -122,7 +122,7 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
 
     defaultConverterMap.put("cn", ContextNameAction.class.getName());
     defaultConverterMap.put("contextName", ContextNameConverter.class.getName());
-    
+
     defaultConverterMap.put("caller", CallerDataConverter.class.getName());
 
     defaultConverterMap.put("marker", MarkerConverter.class.getName());
@@ -131,6 +131,8 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
 
     defaultConverterMap.put("n", LineSeparatorConverter.class.getName());
 
+    // All color converters are deprecated and will be removed in a future release.
+    // They only apply to ConsoleAppender, which is deprecated for LogcatAppender.
     defaultConverterMap.put("black", BlackCompositeConverter.class.getName());
     defaultConverterMap.put("red", RedCompositeConverter.class.getName());
     defaultConverterMap.put("green", GreenCompositeConverter.class.getName());
