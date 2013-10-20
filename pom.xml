@@ -274,9 +274,8 @@
               <!-- Ignore performance tests. They're run as part of the 'perf' profile. -->
               <exclude>**/*PerfTest.java</exclude>
 
-              <!--  Disable fragile tests to be refactored later -->
-              <exclude>**/SocketAppenderTest.java</exclude>
-              <exclude>**/SyslogAppenderTest.java</exclude>
+              <!--  Disable fragile network tests to be refactored later -->
+              <exclude>**/net/*.java</exclude>
             </excludes>
         </configuration>
         </plugin>
@@ -473,9 +472,8 @@
                 <exclude>**/ReconfigureOnChangeTest.java</exclude>
                 <exclude>**/PackageDataCalculatorTest.java</exclude>
 
-                <!--  Disable fragile tests to be refactored later -->
-                <exclude>**/SocketAppenderTest.java</exclude>
-                <exclude>**/SyslogAppenderTest.java</exclude>
+                <!--  Disable fragile network tests to be refactored later -->
+                <exclude>**/net/*.java</exclude>
               </excludes>
             </configuration>
           </plugin>
