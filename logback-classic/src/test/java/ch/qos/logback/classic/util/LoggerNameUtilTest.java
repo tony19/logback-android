@@ -29,7 +29,7 @@ public class LoggerNameUtilTest {
     witnessList.add("a");
     witnessList.add("b");
     witnessList.add("c");
-    List<String> partList = LoggerNameUtil.computeNameParts("a.b.c");
+    List<String> partList = computeNameParts("a.b.c");
     assertEquals(witnessList, partList);
   }
 
@@ -39,7 +39,7 @@ public class LoggerNameUtilTest {
     witnessList.add("com");
     witnessList.add("foo");
     witnessList.add("Bar");
-    List<String> partList = LoggerNameUtil.computeNameParts("com.foo.Bar");
+    List<String> partList = computeNameParts("com.foo.Bar");
     assertEquals(witnessList, partList);
   }
 
@@ -47,7 +47,7 @@ public class LoggerNameUtilTest {
   public void emptyStringShouldReturnAListContainingOneEmptyString() {
     List<String> witnessList = new ArrayList<String>();
     witnessList.add("");
-    List<String> partList = LoggerNameUtil.computeNameParts("");
+    List<String> partList = computeNameParts("");
     assertEquals(witnessList, partList);
   }
 
@@ -58,7 +58,7 @@ public class LoggerNameUtilTest {
     witnessList.add("foo");
     witnessList.add("");
 
-    List<String> partList = LoggerNameUtil.computeNameParts("com.foo.");
+    List<String> partList = computeNameParts("com.foo.");
     assertEquals(witnessList, partList);
   }
 
@@ -70,9 +70,23 @@ public class LoggerNameUtilTest {
     witnessList.add("Bar");
     witnessList.add("Nested");
 
-    List<String> partList = LoggerNameUtil.computeNameParts("com.foo.Bar$Nested");
+    List<String> partList = computeNameParts("com.foo.Bar$Nested");
     assertEquals(witnessList, partList);
   }
 
+  private List<String> computeNameParts(String loggerName) {
+    List<String> partList = new ArrayList<String>();
 
+    int fromIndex = 0;
+    while(true) {
+      int index = LoggerNameUtil.getSeparatorIndexOf(loggerName, fromIndex);
+      if(index == -1) {
+       partList.add(loggerName.substring(fromIndex));
+       break;
+      }
+      partList.add(loggerName.substring(fromIndex, index));
+      fromIndex = index+1;
+    }
+    return partList;
+  }
 }

@@ -15,9 +15,6 @@ package ch.qos.logback.classic.util;
 
 import ch.qos.logback.core.CoreConstants;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Utility class for analysing logger names.
  */
@@ -45,19 +42,4 @@ public class LoggerNameUtil {
     }
   }
 
-  public static List<String> computeNameParts(String loggerName) {
-    List<String> partList = new ArrayList<String>();
-
-    int fromIndex = 0;
-    while(true) {
-      int index = getSeparatorIndexOf(loggerName, fromIndex);
-      if(index == -1) {
-       partList.add(loggerName.substring(fromIndex));
-       break;
-      }
-      partList.add(loggerName.substring(fromIndex, index));
-      fromIndex = index+1;
-    }
-    return partList;
-  }
 }
