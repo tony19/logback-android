@@ -25,7 +25,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
-import ch.qos.logback.core.util.SystemInfo;
+import ch.qos.logback.core.util.OptionHelper;
 
 public class MDCConverterTest {
 
@@ -62,11 +62,15 @@ public class MDCConverterTest {
     MDC.put("testKey2", "testValue2");
     ILoggingEvent le = createLoggingEvent();
     String result = converter.convert(le);
-    if (SystemInfo.getJavaVendor().contains("IBM")) {
+    if (getJavaVendor().contains("IBM")) {
       assertEquals("testKey2=testValue2, testKey=testValue", result);
     } else {
       assertEquals("testKey=testValue, testKey2=testValue2", result);
     }
+  }
+
+  private String getJavaVendor() {
+    return OptionHelper.getSystemProperty("java.vendor", null);
   }
 
   private ILoggingEvent createLoggingEvent() {

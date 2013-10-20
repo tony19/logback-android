@@ -23,7 +23,6 @@ import java.net.URLClassLoader;
 import org.junit.Test;
 
 import ch.qos.logback.classic.util.TeztHelper;
-import ch.qos.logback.core.util.SystemInfo;
 
 public class PackagingDataCalculatorTest {
 
@@ -90,7 +89,7 @@ public class PackagingDataCalculatorTest {
     // be more lenient with other JDKs, esp for logback-android,
     // which computes packaging info by STEP (slow)
     int slackFactor = 15;
-    
+
     assertTrue("computing class packaging data (" + d1
         + ") should have been less than " + slackFactor
         + " times the time it takes to process an exception "
