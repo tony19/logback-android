@@ -1,8 +1,6 @@
-<h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/gh-pages/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android</h1>
+<h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/gh-pages/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android <a href='https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-SNAPSHOT/'><img src='https://tony19.ci.cloudbees.com/buildStatus/icon?job=logback-android/logback-android-SNAPSHOT'></a></h1>
 *Advanced logging library for Android*
 
-[![Release](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-RELEASE/badge/icon)](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-RELEASE/)
-[![Snapshot](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-ANALYZE/badge/icon)](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-ANALYZE/)
 
 Overview
 --------
