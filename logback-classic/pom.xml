@@ -51,11 +51,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
     </dependency>
@@ -63,11 +58,6 @@
     <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
     </dependency>
 
     <dependency>
