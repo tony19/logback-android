@@ -13,18 +13,12 @@
  */
 package ch.qos.logback.core;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
 import ch.qos.logback.core.joran.spi.ConsoleTarget;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.WarnStatus;
-import ch.qos.logback.core.util.DynamicClassLoadingException;
-import ch.qos.logback.core.util.EnvUtil;
-import ch.qos.logback.core.util.IncompatibleClassException;
-import ch.qos.logback.core.util.OptionHelper;
-import org.fusesource.jansi.WindowsAnsiOutputStream;
 
 /**
  * ConsoleAppender appends log events to <code>System.out</code> or
@@ -42,9 +36,6 @@ import org.fusesource.jansi.WindowsAnsiOutputStream;
 public class ConsoleAppender<E> extends OutputStreamAppender<E> {
 
   protected ConsoleTarget target = ConsoleTarget.SystemOut;
-  protected boolean withJansi = false;
-
-  private final static String WindowsAnsiOutputStream_CLASS_NAME = "org.fusesource.jansi.WindowsAnsiOutputStream";
 
   /**
    * Sets the value of the <b>Target</b> option. Recognized values are
@@ -80,41 +71,8 @@ public class ConsoleAppender<E> extends OutputStreamAppender<E> {
   @Override
   public void start() {
     OutputStream targetStream = target.getStream();
-    // enable jansi only on Windows and only if withJansi set to true
-    if (EnvUtil.isWindows() && withJansi) {
-      targetStream = getTargetStreamForWindows(targetStream);
-    }
     setOutputStream(targetStream);
     super.start();
-  }
-
-  private OutputStream getTargetStreamForWindows(OutputStream targetStream) {
-    try {
-      addInfo("Enabling JANSI WindowsAnsiOutputStream for the console.");
-      Object windowsAnsiOutputStream = OptionHelper.instantiateByClassNameAndParameter(WindowsAnsiOutputStream_CLASS_NAME, Object.class, context,
-              OutputStream.class, targetStream);
-      return (OutputStream) windowsAnsiOutputStream;
-    } catch (Exception e) {
-      addWarn("Failed to create WindowsAnsiOutputStream. Falling back on the default stream.", e);
-    }
-    return targetStream;
-  }
-
-  /**
-   * @return
-   */
-  public boolean isWithJansi() {
-    return withJansi;
-  }
-
-  /**
-   * If true, this appender will output to a stream which
-   *
-   * @param withJansi
-   * @since 1.0.5
-   */
-  public void setWithJansi(boolean withJansi) {
-    this.withJansi = withJansi;
   }
 
 }
