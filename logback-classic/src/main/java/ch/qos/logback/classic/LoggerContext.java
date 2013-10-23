@@ -95,7 +95,8 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
   }
 
   private boolean isSpecialKey(String key) {
-    return key.equals(CoreConstants.VERSION_NAME_KEY)
+    return key.equals(CoreConstants.PACKAGE_NAME_KEY)
+        || key.equals(CoreConstants.VERSION_NAME_KEY)
         || key.equals(CoreConstants.VERSION_CODE_KEY)
         || key.equals(CoreConstants.EXT_DIR_KEY)
         || key.equals(CoreConstants.DATA_DIR_KEY);

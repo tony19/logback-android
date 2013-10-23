@@ -86,4 +86,19 @@ public abstract class CommonPathUtil {
   public static String getAssetsDirectoryPath() {
     return ASSETS_DIRECTORY;
   }
+
+  /**
+   * Returns the absolute path to the directory on the Android
+   * filesystem where databases are stored for the current application.
+   *
+   * @param packageName name of the application package
+   * @return the absolute path to the databases directory
+   * (example: "/data/data/com.example/databases")
+   */
+  public static String getDatabaseDirectoryPath(String packageName) {
+    String dataDir = EnvUtil.isAndroidOS() ?
+            Environment.getDataDirectory().getAbsolutePath() : "/data";
+    return dataDir + "/data/" + packageName + "/databases";
+  }
+
 }

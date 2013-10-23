@@ -38,4 +38,14 @@ public class CommonPathUtilTest {
   public void testGetAssetsDirectoryPathIsNotEmpty() {
     assertEquals("assets", CommonPathUtil.getAssetsDirectoryPath());
   }
+
+  @Test
+  public void testGetFilesDirectoryPathIsNotEmpty() {
+    assertEquals("/data/data/android/files", CommonPathUtil.getFilesDirectoryPath("android"));
+  }
+
+  @Test
+  public void testGetDatabaseDirectoryPathIsNotEmpty() {
+    assertEquals("/data/data/android/databases", CommonPathUtil.getDatabaseDirectoryPath("android"));
+  }
 }
