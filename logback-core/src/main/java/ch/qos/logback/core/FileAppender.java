@@ -122,6 +122,10 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
           errors++;
           addError("openFile(" + file + "," + append + ") failed", e);
         }
+      } else {
+        // We'll initialize the file output stream later. Use a dummy for now
+        // to satisfy OutputStreamAppender.start().
+        setOutputStream(new NOPOutputStream());
       }
     } else {
       errors++;
