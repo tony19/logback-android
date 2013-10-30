@@ -16,15 +16,19 @@ package ch.qos.logback.core.appender;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.util.List;
 
+import ch.qos.logback.core.recovery.ResilientFileOutputStream;
 import ch.qos.logback.core.status.StatusChecker;
+
 import org.junit.Test;
 
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
+import ch.qos.logback.core.NOPOutputStream;
 import ch.qos.logback.core.encoder.DummyEncoder;
 import ch.qos.logback.core.encoder.NopEncoder;
 import ch.qos.logback.core.status.Status;
@@ -120,7 +124,7 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
 
     assertTrue("Got message [" + msg1 + "]", msg1
         .startsWith("Setting \"Append\" property"));
-    
+
     appender.doAppend(new Object());
     appender.stop();
     assertTrue(file.exists());
@@ -147,10 +151,10 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     FileAppender<Object> fa = getFileAppender(filename);
     fa.setLazy(false);
 
-    assertFalse(fa.getOutputStream() != null);
+    assertNull("stream is not null", fa.getOutputStream());
     fa.start();
-    assertTrue(fa.getOutputStream() != null);
-    assertTrue(file.exists());
+    assertTrue("expected ResilientFileOutputStream; actual " + fa.getOutputStream().getClass().getSimpleName(), fa.getOutputStream() instanceof ResilientFileOutputStream);
+    assertTrue("file does not exist", file.exists());
   }
 
   @Test
@@ -161,10 +165,10 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     FileAppender<Object> fa = getFileAppender(filename);
     fa.setLazy(true);
 
-    assertFalse(fa.getOutputStream() != null);
+    assertNull("stream is not null", fa.getOutputStream());
     fa.start();
-    assertFalse(fa.getOutputStream() != null);
-    assertFalse(file.exists());
+    assertTrue("expected NOPOutputStream; actual " + fa.getOutputStream().getClass().getSimpleName(), fa.getOutputStream() instanceof NOPOutputStream);
+    assertFalse("file does not exist", file.exists());
   }
 
   @Test
@@ -176,10 +180,10 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     fa.setLazy(true);
 
     fa.start();
-    assertFalse(fa.getOutputStream() != null);
+    assertTrue("expected NOPOutputStream; actual " + fa.getOutputStream().getClass().getSimpleName(), fa.getOutputStream() instanceof NOPOutputStream);
     fa.append(new Object());
-    assertTrue(fa.getOutputStream() != null);
-    assertTrue(file.exists());
+    assertTrue("expected ResilientFileOutputStream; actual " + fa.getOutputStream().getClass().getSimpleName(), fa.getOutputStream() instanceof ResilientFileOutputStream);
+    assertTrue("file does not exist", file.exists());
   }
 
   // helper class used to access protected fields
