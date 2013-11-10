@@ -48,7 +48,6 @@
   <modules>
     <module>logback-core</module>
     <module>logback-classic</module>
-    <module>logback-examples</module>
   </modules>
 
   <properties>
@@ -167,14 +166,6 @@
         <artifactId>hamcrest-library</artifactId>
         <version>1.3</version>
         <scope>test</scope>
-      </dependency>
-
-      <!-- for examples/test only! -->
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.14</version>
-        <scope>provided</scope>
       </dependency>
 
       <dependency>
