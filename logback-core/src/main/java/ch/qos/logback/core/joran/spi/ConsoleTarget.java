@@ -23,7 +23,10 @@ import java.io.OutputStream;
  * @author Ceki G&uuml;lc&uuml;
  * @author Tom SH Liu
  * @author David Roussel
+ *
+ * @deprecated This will be removed along with ConsoleAppender in an upcoming release.
  */
+@Deprecated
 public enum ConsoleTarget {
 
   SystemOut("System.out", new OutputStream() {
