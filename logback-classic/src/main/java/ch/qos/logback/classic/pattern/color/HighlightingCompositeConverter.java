@@ -22,6 +22,7 @@ import ch.qos.logback.core.pattern.color.ForegroundCompositeConverterBase;
 /**
  * Highlights inner-text depending on the level, in bold red for events of level ERROR, in red for WARN,
  * in BLUE for INFO, and in the default color for other levels.
+ * @deprecated
  */
 @Deprecated
 public class HighlightingCompositeConverter extends ForegroundCompositeConverterBase<ILoggingEvent> {

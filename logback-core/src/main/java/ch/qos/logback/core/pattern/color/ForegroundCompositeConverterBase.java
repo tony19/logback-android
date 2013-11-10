@@ -21,6 +21,7 @@ import static ch.qos.logback.core.pattern.color.ANSIConstants.*;
  *
  * @param <E>
  * @since 1.0.5
+ * @deprecated
  */
 @Deprecated
 abstract public class ForegroundCompositeConverterBase<E> extends CompositeConverter<E> {

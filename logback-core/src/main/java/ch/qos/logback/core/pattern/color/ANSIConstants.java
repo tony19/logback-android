@@ -13,6 +13,9 @@
  */
 package ch.qos.logback.core.pattern.color;
 
+/**
+ * @deprecated
+ */
 @Deprecated
 public class ANSIConstants {
 

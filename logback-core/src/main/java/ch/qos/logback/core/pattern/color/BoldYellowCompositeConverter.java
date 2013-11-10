@@ -21,7 +21,8 @@ import static ch.qos.logback.core.pattern.color.ANSIConstants.YELLOW_FG;
  *
  * @param <E>
  * @author Ceki G&uuml;lc&uuml;
- * @sincee 1.0.5
+ * @since 1.0.5
+ * @deprecated
  */
 @Deprecated
 public class BoldYellowCompositeConverter<E> extends ForegroundCompositeConverterBase<E> {
