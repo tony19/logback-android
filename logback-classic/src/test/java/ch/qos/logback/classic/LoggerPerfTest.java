@@ -21,10 +21,10 @@ import org.slf4j.helpers.BogoPerf;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.turbo.NOPTurboFilter;
-import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.testUtil.Env;
+import ch.qos.logback.core.util.CoreTestConstants;
 
 
 public class LoggerPerfTest {
@@ -49,7 +49,7 @@ public class LoggerPerfTest {
     System.out.println("durationOfDisabledLogsWith_1_NOPFilter=" + avg);
     long referencePerf = 60;
 
-    BogoPerf.assertDuration(avg, referencePerf, CoreConstants.REFERENCE_BIPS);
+    BogoPerf.assertDuration(avg, referencePerf, CoreTestConstants.REFERENCE_BIPS);
   }
 
   double computeDurationOfDisabledLogsWith_1_NOPFilter(int numOfFilters,
@@ -75,7 +75,7 @@ public class LoggerPerfTest {
     System.out.println("durationOfIsDebugEnabled=" + avg);
 
     long referencePerf = 15;
-    BogoPerf.assertDuration(avg, referencePerf, CoreConstants.REFERENCE_BIPS);
+    BogoPerf.assertDuration(avg, referencePerf, CoreTestConstants.REFERENCE_BIPS);
   }
 
   double computedurationOfIsDebugEnabled(final long len) {
@@ -99,7 +99,7 @@ public class LoggerPerfTest {
     System.out.println("durationOfDisabledLog_NoParameters=" + avg);
 
     long referencePerf = 18;
-    BogoPerf.assertDuration(avg, referencePerf, CoreConstants.REFERENCE_BIPS);
+    BogoPerf.assertDuration(avg, referencePerf, CoreTestConstants.REFERENCE_BIPS);
   }
 
   double computeDurationOfDisabledLog_NoParameters(final long len) {
@@ -126,7 +126,7 @@ public class LoggerPerfTest {
 
     long referencePerf = 30;
     BogoPerf.assertDuration(avgDuration, referencePerf,
-            CoreConstants.REFERENCE_BIPS);
+            CoreTestConstants.REFERENCE_BIPS);
   }
 
   double computeDurationOfDisabledLog_1_Parameter(long len) {
@@ -156,7 +156,7 @@ public class LoggerPerfTest {
 
     long referencePerf = 800;
     BogoPerf.assertDuration(avgDuration, referencePerf,
-            CoreConstants.REFERENCE_BIPS);
+            CoreTestConstants.REFERENCE_BIPS);
   }
 
   double computeDurationOfEnabledLog(long len) {

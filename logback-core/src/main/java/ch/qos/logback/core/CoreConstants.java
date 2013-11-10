@@ -38,11 +38,6 @@ public class CoreConstants {
   public static final String DAILY_DATE_PATTERN = "yyyy-MM-dd";
 
   /**
-   * Time format used in Common Log Format
-   */
-  public static final String CLF_DATE_PATTERN = "dd/MM/yyyy:HH:mm:ss Z";
-
-  /**
    * The key used in locating the evaluator map in context's object map.
    */
   public static final String EVALUATOR_MAP = "EVALUATOR_MAP";
@@ -59,15 +54,6 @@ public class CoreConstants {
    */
   public static final String EMPTY_STRING = "";
 
-  /**
-   * An empty string array.
-   */
-  public static final String[] EMPTY_STRING_ARRAY = new String[]{};
-
-  /**
-   * An empty Class array.
-   */
-  public static final Class<?>[] EMPTY_CLASS_ARRAY = new Class[]{};
   public static final String CAUSED_BY = "Caused by: ";
   public static final String SUPPRESSED = "\tSuppressed: ";
   public static final String WRAPPED_BY = "Wrapped by: ";
@@ -96,13 +82,6 @@ public class CoreConstants {
   // reset the ObjectOutputStream every OOS_RESET_FREQUENCY calls
   // this avoid serious memory leaks
   public static final int OOS_RESET_FREQUENCY = 70;
-
-  /**
-   * The reference bogo instructions per second on
-   * Ceki's machine (Orion)
-   */
-  public static long REFERENCE_BIPS = 9000;
-
 
   // the max number of times an error should be reported
   public static final int MAX_ERROR_COUNT = 4;
@@ -172,8 +151,6 @@ public class CoreConstants {
   public static final int MILLIS_IN_ONE_HOUR = MILLIS_IN_ONE_MINUTE*60;
   public static final int MILLIS_IN_ONE_DAY = MILLIS_IN_ONE_HOUR*24;
   public static final int MILLIS_IN_ONE_WEEK = MILLIS_IN_ONE_DAY*7;
-
-  public static final String CONTEXT_SCOPE_VALUE = "context";
 
   public static final String RESET_MSG_PREFIX = "Will reset and reconfigure context ";
 

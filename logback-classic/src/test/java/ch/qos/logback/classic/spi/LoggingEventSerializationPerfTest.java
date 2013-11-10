@@ -31,6 +31,7 @@ import ch.qos.logback.classic.net.testObjectBuilders.LoggingEventWithParametersB
 import ch.qos.logback.classic.net.testObjectBuilders.TrivialLoggingEventBuilder;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.testUtil.Env;
+import ch.qos.logback.core.util.CoreTestConstants;
 
 // As of logback 0.9.15,
 //   average time  per logging event: 3979 nanoseconds
@@ -109,7 +110,7 @@ public class LoggingEventSerializationPerfTest {
 
     // the reference was computed on Orion (Ceki's computer)
     long referencePerf = 5000;
-    BogoPerf.assertDuration(rt, referencePerf, CoreConstants.REFERENCE_BIPS);
+    BogoPerf.assertDuration(rt, referencePerf, CoreTestConstants.REFERENCE_BIPS);
   }
 
   @Test
@@ -136,6 +137,6 @@ public class LoggingEventSerializationPerfTest {
 
     // the reference was computed on Orion (Ceki's computer)
     long referencePerf = 8000;
-    BogoPerf.assertDuration(rt, referencePerf, CoreConstants.REFERENCE_BIPS);
+    BogoPerf.assertDuration(rt, referencePerf, CoreTestConstants.REFERENCE_BIPS);
   }
 }

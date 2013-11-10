@@ -269,7 +269,7 @@ public class ReconfigureOnChangeTest {
     System.out.println("directPerfTest: " + avg);
     // the reference was computed on Orion (Ceki's computer)
     long referencePerf = 18;
-    BogoPerf.assertDuration(avg, referencePerf, CoreConstants.REFERENCE_BIPS);
+    BogoPerf.assertDuration(avg, referencePerf, CoreTestConstants.REFERENCE_BIPS);
   }
 
   public double directLoop(ReconfigureOnChangeFilter rocf) {
@@ -301,7 +301,7 @@ public class ReconfigureOnChangeTest {
     System.out.println(avg);
     // the reference was computed on Orion (Ceki's computer)
     long referencePerf = 68;
-    BogoPerf.assertDuration(avg, referencePerf, CoreConstants.REFERENCE_BIPS);
+    BogoPerf.assertDuration(avg, referencePerf, CoreTestConstants.REFERENCE_BIPS);
   }
 
   void addInfo(String msg, Object o) {

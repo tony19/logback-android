@@ -14,6 +14,11 @@
 package ch.qos.logback.core.util;
 
 public class CoreTestConstants {
+  /**
+   * The reference bogo instructions per second on
+   * Ceki's machine (Orion)
+   */
+  public static long REFERENCE_BIPS = 9000;
 
   public static final String BASE_DIR = "";
 
