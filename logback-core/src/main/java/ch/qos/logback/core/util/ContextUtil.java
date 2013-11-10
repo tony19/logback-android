@@ -14,7 +14,6 @@
 package ch.qos.logback.core.util;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 
 import ch.qos.logback.core.Context;
@@ -44,18 +43,4 @@ public class ContextUtil extends ContextAwareBase {
       context.putProperty(key, props.getProperty(key));
     }
   }
-
-
-  public void addGroovyPackages(List<String> frameworkPackages) {
-    //addFrameworkPackage(frameworkPackages, "groovy.lang");
-    addFrameworkPackage(frameworkPackages, "org.codehaus.groovy.runtime");
-  }
-
-  public void addFrameworkPackage(List<String> frameworkPackages, String packageName) {
-    if(!frameworkPackages.contains(packageName)) {
-      frameworkPackages.add(packageName);
-    }
-  }
-
-
 }
