@@ -29,7 +29,9 @@ import java.util.logging.LogManager;
 
 /**
  * Propagate level changes made to a logback logger into the equivalent logger in j.u.l.
+ * @deprecated
  */
+@Deprecated
 public class LevelChangePropagator extends ContextAwareBase implements LoggerContextListener, LifeCycle {
 
   private Set julLoggerSet = new HashSet();
@@ -39,7 +41,7 @@ public class LevelChangePropagator extends ContextAwareBase implements LoggerCon
   public void setResetJUL(boolean resetJUL) {
     this.resetJUL = resetJUL;
   }
-  
+
   public boolean isResetResistant() {
     return false;
   }
