@@ -239,43 +239,6 @@ public class OptionHelper {
     }
   }
 
-  @Deprecated
-  static public String[] extractDefaultReplacement(String key) {
-    String[] result = new String[2];
-    result[0] = key;
-    int d = key.indexOf(DELIM_DEFAULT);
-    if (d != -1) {
-      result[0] = key.substring(0, d);
-      result[1] = key.substring(d + DELIM_DEFAULT_LEN);
-    }
-    return result;
-  }
-
-  /**
-   * If <code>value</code> is "true", then <code>true</code> is returned. If
-   * <code>value</code> is "false", then <code>true</code> is returned.
-   * Otherwise, <code>default</code> is returned.
-   * <p/>
-   * <p> Case of value is unimportant.
-   */
-  public static boolean toBoolean(String value, boolean dEfault) {
-    if (value == null) {
-      return dEfault;
-    }
-
-    String trimmedVal = value.trim();
-
-    if ("true".equalsIgnoreCase(trimmedVal)) {
-      return true;
-    }
-
-    if ("false".equalsIgnoreCase(trimmedVal)) {
-      return false;
-    }
-
-    return dEfault;
-  }
-
   public static boolean isEmpty(String str) {
     return ((str == null) || CoreConstants.EMPTY_STRING.equals(str));
   }

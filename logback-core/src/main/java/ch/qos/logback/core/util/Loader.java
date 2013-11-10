@@ -41,7 +41,7 @@ public class Loader {
             IGNORE_TCL_PROPERTY_NAME, null);
 
     if (ignoreTCLProp != null) {
-      ignoreTCL = OptionHelper.toBoolean(ignoreTCLProp, true);
+      ignoreTCL = Boolean.valueOf(ignoreTCLProp);
     }
 
     HAS_GET_CLASS_LOADER_PERMISSION =

@@ -25,7 +25,7 @@ import ch.qos.logback.core.util.OptionHelper;
 
 /**
  * Action which handles <logger> elements in configuration files.
- * 
+ *
  * @author Ceki Gulcu
  */
 public class LoggerAction extends Action {
@@ -37,7 +37,7 @@ public class LoggerAction extends Action {
     // Let us forget about previous errors (in this object)
     inError = false;
     logger = null;
-    
+
     LoggerContext loggerContext = (LoggerContext) this.context;
 
     String loggerName = ec.subst(attributes.getValue(NAME_ATTRIBUTE));
@@ -53,7 +53,7 @@ public class LoggerAction extends Action {
     logger = loggerContext.getLogger(loggerName);
 
     String levelStr =  ec.subst(attributes.getValue(LEVEL_ATTRIBUTE));
-    
+
     if (!OptionHelper.isEmpty(levelStr)) {
       if (ActionConst.INHERITED.equalsIgnoreCase(levelStr)
           || ActionConst.NULL.equalsIgnoreCase(levelStr)) {
@@ -69,7 +69,7 @@ public class LoggerAction extends Action {
 
     String additivityStr =  ec.subst(attributes.getValue(ActionConst.ADDITIVITY_ATTRIBUTE));
     if (!OptionHelper.isEmpty(additivityStr)) {
-      boolean additive = OptionHelper.toBoolean(additivityStr, true);
+      boolean additive = Boolean.valueOf(additivityStr);
       addInfo("Setting additivity of logger [" + loggerName + "] to "
           + additive);
       logger.setAdditive(additive);
