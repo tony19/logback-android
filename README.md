@@ -1,19 +1,23 @@
 <h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/gh-pages/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android <a href='https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-SNAPSHOT/'><img src='https://tony19.ci.cloudbees.com/buildStatus/icon?job=logback-android/logback-android-SNAPSHOT'></a></h1>
-*Advanced logging library for Android*
-
+<sup>v1.0.10-2</sup>
 
 Overview
 --------
-[`logback-android`][3] brings the power of *logback* to Android. [`logback`][1] is a reliable, generic, fast, and flexible logging library for Java applications.
+[`logback-android`][3] brings the power of [`logback`][1] to Android. This library provides a highly configurable logging framework for Android apps, supporting multiple log destinations simultaneously:
+
+ * files
+ * SQLite databases
+ * logcat
+ * sockets
+ * syslog
+ * email
 
 Runs on Android 2.1 or higher.
-
-The current version is **1.0.10-2**.
 
 Quick Start
 -----------
 1. Add [`logback-android`][9] and [`slf4j-api`][10] to your project class path.
-2. Configure `logback-android` using an [XML file](#configuration-via-xml) or [in-code statements](#configuration-in-code). Otherwise, logging is silently disabled.
+2. Configure `logback-android` using either [`${project-root}/assets/logback.xml`](#configuration-via-xml) or [in-code statements](#configuration-in-code). Otherwise, logging is silently disabled.
 3. Use `slf4j-api` in your application to write logging statements as shown in the example below.
 
 *Example:*
@@ -34,8 +38,8 @@ public class MainActivity extends Activity {
     setContentView(R.layout.activity_main);
 
     // SLF4J
-    Logger LOG = LoggerFactory.getLogger(MainActivity.class);
-    LOG.info("hello world");
+    Logger log = LoggerFactory.getLogger(MainActivity.class);
+    log.info("hello world");
   }
 }
 ```
@@ -256,7 +260,7 @@ Configuration in Code
 
 If you prefer code-based configuration instead of the XML method above, you can use the `logback` classes directly to initialize `logback-android` as shown in the following examples. Note the direct usage of `logback` classes removes the advantage of the facade provided by SLF4J.
 
-*Example: Uses `BasicLogcatConfigurator`*
+*Example: Uses `BasicLogcatConfigurator` to redirect to logcat*
 
 ```java
 package com.example;
@@ -445,7 +449,7 @@ Other Documentation
   * [`DBAppender`][17]
 * [Changelog][4]
 * [FAQ][12]
- 
+
 For help with using **logback-android**, ask the [Logback User mailing list](http://logback.qos.ch/mailinglist.html).
 
 
@@ -473,3 +477,4 @@ The jar would be in: `./target/logback-android-<version>.jar`
  [15]: https://github.com/tony19/logback-android/wiki/Appender-Notes#socketappender-syslogappender
  [16]: https://github.com/tony19/logback-android/wiki/Appender-Notes#socketappender-syslogappender
  [17]: https://github.com/tony19/logback-android/wiki/Appender-Notes#dbappender
+ [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/tony19/logback-android/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
