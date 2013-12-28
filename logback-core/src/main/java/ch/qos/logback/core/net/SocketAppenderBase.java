@@ -127,6 +127,16 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
     }
   }
 
+  /**
+   * This method indicates if a connection process is in progress. However, when this method
+   * returns false, it does not mean that there is an active and valid connection.
+   *
+   * @return true when this appender is in the process of establishing a socket connection
+   */
+  public boolean isConnecting() {
+    return connector != null;
+  }
+
   void connect(InetAddress address, int port) {
     if (this.address == null)
       return;
@@ -149,14 +159,25 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
 
   @Override
   protected void append(E event) {
+    tryAppend(event);
+  }
+
+  /**
+   * Tries to append the given event to the socket. This might fail for several reasons like
+   * missing configuration, broken connection or an error during the transmission.
+   *
+   * @param event the event to append
+   * @return true when the event was successfully transmitted, false otherwise
+   */
+  public boolean tryAppend(E event) {
     if (event == null)
-      return;
+      return false;
 
     if (address == null) {
       addError("No remote host is set for SocketAppender named \""
           + this.name
           + "\". For more information, please visit http://logback.qos.ch/codes.html#socket_no_host");
-      return;
+      return false;
     }
 
     if (!initialized && lazyInit) {
@@ -177,6 +198,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
           // System.err.println("Doing oos.reset()");
           oos.reset();
         }
+        return true;
       } catch (IOException e) {
         if (oos != null) {
           try {
@@ -192,6 +214,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
         }
       }
     }
+    return false;
   }
 
   protected abstract void postProcessEvent(E event);
@@ -280,7 +303,7 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
    * Enables/disables lazy initialization of the socket connection.
    * This defers the connection process until the first outgoing message.
    *
-   * @param enabled true to enable lazy initialization; false otherwise
+   * @param enable true to enable lazy initialization; false otherwise
    */
   public void setLazy(boolean enable) {
     lazyInit = enable;

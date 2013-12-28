@@ -231,6 +231,18 @@
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>15.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.3</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
