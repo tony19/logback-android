@@ -478,3 +478,7 @@ The jar would be in: `./target/logback-android-<version>.jar`
  [16]: https://github.com/tony19/logback-android/wiki/Appender-Notes#socketappender-syslogappender
  [17]: https://github.com/tony19/logback-android/wiki/Appender-Notes#dbappender
  [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/tony19/logback-android/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/tony19/logback-android/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
