@@ -23,8 +23,8 @@ public class CoreTestConstants {
   public static final String BASE_DIR = "";
 
   public static final String TEST_DIR_PREFIX      = BASE_DIR + "src/test/";
-  public static final String JORAN_INPUT_PREFIX   = TEST_DIR_PREFIX
-                                                      + "input/joran/";
+  public static final String TEST_INPUT_PREFIX    = TEST_DIR_PREFIX + "input/";
+  public static final String JORAN_INPUT_PREFIX   = TEST_INPUT_PREFIX + "joran/";
 
   public static final String TARGET_DIR           = BASE_DIR + "target/";
   public static final String OUTPUT_DIR_PREFIX    = TARGET_DIR + "test-output/";

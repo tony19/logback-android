@@ -14,18 +14,13 @@
 package ch.qos.logback.classic;
 
 
-import ch.qos.logback.classic.corpus.Corpus;
 import ch.qos.logback.classic.corpus.CorpusModel;
-import ch.qos.logback.classic.corpus.LogStatement;
 import ch.qos.logback.core.contention.*;
-import ch.qos.logback.core.util.EnvUtil;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import static org.junit.Assert.fail;
 
 @org.junit.Ignore
 public class LoggerContextPerfTest {

@@ -14,8 +14,28 @@
 package ch.qos.logback.core.util;
 
 import java.io.File;
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.rolling.RolloverFailure;
+import ch.qos.logback.core.spi.ContextAwareBase;
 
-public class FileUtil {
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+public class FileUtil extends ContextAwareBase {
+
+  public FileUtil(Context context) {
+    setContext(context);
+  }
+
+  public static URL fileToURL(File file) {
+    try {
+      return file.toURI().toURL();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException("Unexpected exception on file [" + file + "]", e);
+    }
+  }
 
   static public boolean isParentDirectoryCreationRequired(File file) {
     File parent = file.getParentFile();
@@ -50,4 +70,45 @@ public class FileUtil {
     }
     return path;
   }
+
+   static final int BUF_SIZE = 32 * 1024;
+
+   public void copy(String src, String destination) throws RolloverFailure {
+     BufferedInputStream bis = null;
+     BufferedOutputStream bos = null;
+     try {
+       bis = new BufferedInputStream(new FileInputStream(src));
+       bos = new BufferedOutputStream(new FileOutputStream(destination));
+       byte[] inbuf = new byte[BUF_SIZE];
+       int n;
+
+       while ((n = bis.read(inbuf)) != -1) {
+         bos.write(inbuf, 0, n);
+       }
+
+       bis.close();
+       bis = null;
+       bos.close();
+       bos = null;
+     } catch (IOException ioe) {
+       String msg = "Failed to copy [" + src + "] to [" + destination + "]";
+       addError(msg, ioe);
+       throw new RolloverFailure(msg);
+     } finally {
+       if (bis != null) {
+         try {
+           bis.close();
+         } catch (IOException e) {
+           // ignore
+         }
+       }
+       if (bos != null) {
+         try {
+           bos.close();
+         } catch (IOException e) {
+           // ignore
+         }
+       }
+     }
+   }
 }

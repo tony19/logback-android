@@ -15,7 +15,9 @@ package ch.qos.logback.classic;
 
 import static junit.framework.Assert.assertTrue;
 
+import ch.qos.logback.core.testUtil.EnvUtilForTests;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.helpers.BogoPerf;
 
@@ -23,10 +25,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.turbo.NOPTurboFilter;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.helpers.NOPAppender;
-import ch.qos.logback.core.testUtil.Env;
 import ch.qos.logback.core.util.CoreTestConstants;
 
-
+@Ignore
 public class LoggerPerfTest {
 
   static final long NANOS_IN_ONE_SEC = 1000 * 1000 * 1000L;
@@ -147,7 +148,7 @@ public class LoggerPerfTest {
 
   @Test
   public void durationOfEnabledLog() {
-    if (Env.isLinux()) {
+    if (EnvUtilForTests.isLinux()) {
       // the JIT on Linux behaves very differently
       return;
     }
