@@ -47,7 +47,7 @@ public class IncludeAction extends AbstractIncludeAction {
    * @return the newly created recorder
    */
   protected SaxEventRecorder createRecorder(InputStream in, URL url) {
-    return new SaxEventRecorder();
+    return new SaxEventRecorder(getContext());
   }
 
   /**
@@ -92,8 +92,10 @@ public class IncludeAction extends AbstractIncludeAction {
     try {
       return url.openStream();
     } catch (IOException e) {
-      String errMsg = "Failed to open [" + url.toString() + "]";
-      addError(errMsg, e);
+      if (!isOptional()) {
+        String errMsg = "Failed to open [" + url.toString() + "]";
+        addError(errMsg, e);
+      }
       return null;
     }
   }

@@ -80,7 +80,7 @@ public class FindIncludeAction extends IncludeAction {
       rec.setFilter("logback");
       recorder = rec;
     } else {
-      recorder = new SaxEventRecorder();
+      recorder = new SaxEventRecorder(getContext());
     }
     return recorder;
   }

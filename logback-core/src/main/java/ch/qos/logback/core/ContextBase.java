@@ -13,15 +13,19 @@
  */
 package ch.qos.logback.core;
 
+import static ch.qos.logback.core.CoreConstants.CONTEXT_NAME_KEY;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.spi.LogbackLock;
 import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.util.EnvUtil;
-
-import static ch.qos.logback.core.CoreConstants.CONTEXT_NAME_KEY;
 
 public class ContextBase implements Context {
 
@@ -37,14 +41,21 @@ public class ContextBase implements Context {
 
   LogbackLock configurationLock = new LogbackLock();
 
-  // CORE_POOL_SIZE must be 1 for JDK 1.5. For JD 1.6 or higher it's set to 0
+  // CORE_POOL_SIZE must be 1 for JDK 1.5. For JDK 1.6 or higher it's set to 0
   // so that there are no idle threads
   private static final int CORE_POOL_SIZE = EnvUtil.isJDK5() ? 1 : 0;
 
-  // 0 (JDK 1,6+) or 1 (JDK 1.5) idle threads, 2 maximum threads, no idle waiting
-  ExecutorService executorService = new ThreadPoolExecutor(CORE_POOL_SIZE, 2,
+  // if you need a different MAX_POOL_SIZE, please file create a jira issue
+  // asking to make MAX_POOL_SIZE a parameter.
+  private static int MAX_POOL_SIZE = 32;
+
+  // 0 (JDK 1,6+) or 1 (JDK 1.5) idle threads, MAX_POOL_SIZE maximum threads,
+  // no idle waiting
+  ExecutorService executorService = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE,
           0L, TimeUnit.MILLISECONDS,
-          new LinkedBlockingQueue<Runnable>());
+          new SynchronousQueue<Runnable>());
+
+  private LifeCycleManager lifeCycleManager;
 
   public StatusManager getStatusManager() {
     return sm;
@@ -106,6 +117,7 @@ public class ContextBase implements Context {
    * Clear the internal objectMap and all properties.
    */
   public void reset() {
+    getLifeCycleManager().reset();
     propertyMap.clear();
     objectMap.clear();
   }
@@ -141,8 +153,32 @@ public class ContextBase implements Context {
     return  executorService;
   }
 
+  public void register(LifeCycle component) {
+    getLifeCycleManager().register(component);
+  }
+
+  /**
+   * Gets the life cycle manager for this context.
+   * <p>
+   * The default implementation lazily initializes an instance of
+   * {@link LifeCycleManager}.  Subclasses may override to provide a custom
+   * manager implementation, but must take care to return the same manager
+   * object for each call to this method.
+   * <p>
+   * This is exposed primarily to support instrumentation for unit testing.
+   *
+   * @return manager object
+   */
+  synchronized LifeCycleManager getLifeCycleManager() {
+    if (lifeCycleManager == null) {
+      lifeCycleManager = new LifeCycleManager();
+    }
+    return lifeCycleManager;
+  }
+
   @Override
   public String toString() {
     return name;
   }
+
 }

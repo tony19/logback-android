@@ -10,7 +10,7 @@
 
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-parent</artifactId>
-  <version>1.0.11-1-SNAPSHOT</version>
+  <version>1.0.12-1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Logback Android Parent</name>
   <description>logback-android project pom.xml file</description>
@@ -51,6 +51,8 @@
   </modules>
 
   <properties>
+    <!-- target JDK version == source JDK version -->
+    <jdk.version>1.5</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- redirect test output to a file in order to reduce noise -->

@@ -29,12 +29,9 @@ import ch.qos.logback.core.sift.SiftingJoranConfiguratorBase;
 
 public class SiftingJoranConfigurator  extends SiftingJoranConfiguratorBase<ILoggingEvent> {
 
-  String key;
-  String value;
-  
-  SiftingJoranConfigurator(String key, String value) {
-    this.key = key;
-    this.value = value;
+
+  SiftingJoranConfigurator(String key, String value, Map<String, String> parentPropertyMap) {
+    super(key, value, parentPropertyMap);
   }
   
   @Override
@@ -44,6 +41,7 @@ public class SiftingJoranConfigurator  extends SiftingJoranConfiguratorBase<ILog
   
   @Override
   protected void addInstanceRules(RuleStore rs) {
+    super.addInstanceRules(rs);
     rs.addRule(new Pattern("configuration/appender"), new AppenderAction());
   }
 
@@ -61,6 +59,7 @@ public class SiftingJoranConfigurator  extends SiftingJoranConfiguratorBase<ILog
     omap.put(ActionConst.APPENDER_BAG, new HashMap());
     omap.put(ActionConst.FILTER_CHAIN_BAG, new HashMap());
     Map<String, String> propertiesMap = new HashMap<String, String>();
+    propertiesMap.putAll(parentPropertyMap);
     propertiesMap.put(key, value);
     interpreter.setInterpretationContextPropertiesMap(propertiesMap);
   }

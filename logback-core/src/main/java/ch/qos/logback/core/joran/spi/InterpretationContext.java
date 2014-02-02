@@ -15,7 +15,6 @@ package ch.qos.logback.core.joran.spi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -32,11 +31,11 @@ import ch.qos.logback.core.spi.PropertyContainer;
 import ch.qos.logback.core.util.OptionHelper;
 
 /**
- * 
+ *
  * An InterpretationContext contains the contextual state of a Joran parsing
  * session. {@link Action} objects depend on this context to exchange and store
  * information.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 public class InterpretationContext extends ContextAwareBase implements
@@ -57,11 +56,15 @@ public class InterpretationContext extends ContextAwareBase implements
     propertiesMap = new HashMap<String, String>(5);
   }
 
-  
+
   public DefaultNestedComponentRegistry getDefaultNestedComponentRegistry() {
     return defaultNestedComponentRegistry;
   }
-  
+
+  public Map<String, String> getCopyOfPropertyMap() {
+    return new HashMap<String, String>(propertiesMap);
+  }
+
   void setPropertiesMap(Map<String, String> propertiesMap) {
     this.propertiesMap = propertiesMap;
   }
@@ -129,9 +132,7 @@ public class InterpretationContext extends ContextAwareBase implements
     if (props == null) {
       return;
     }
-    Iterator i = props.keySet().iterator();
-    while (i.hasNext()) {
-      String key = (String) i.next();
+    for (String key : props.stringPropertyNames()) {
       addSubstitutionProperty(key, props.getProperty(key));
     }
   }
@@ -157,12 +158,12 @@ public class InterpretationContext extends ContextAwareBase implements
   }
 
 
-  
+
 
   public boolean isListenerListEmpty() {
     return listenerList.isEmpty();
   }
-  
+
   public void addInPlayListener(InPlayListener ipl) {
     if (listenerList.contains(ipl)) {
       addWarn("InPlayListener " + ipl + " has been already registered");

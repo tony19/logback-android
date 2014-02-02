@@ -32,5 +32,6 @@ public class ClassicConstants {
    */
   public static final int DEFAULT_MAX_CALLEDER_DATA_DEPTH = 8;
 
-  public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
+  public static final String FINALIZE_SESSION = "FINALIZE_SESSION";
+  public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker(FINALIZE_SESSION);
 }

@@ -38,12 +38,12 @@ public abstract class SocketAppenderBase<E> extends AppenderBase<E> {
   /**
    * The default port number of remote logging server (4560).
    */
-  static final int DEFAULT_PORT = 4560;
+  public static final int DEFAULT_PORT = 4560;
 
   /**
    * The default reconnection delay (30000 milliseconds or 30 seconds).
    */
-  static final int DEFAULT_RECONNECTION_DELAY = 30000;
+  public static final int DEFAULT_RECONNECTION_DELAY = 30000;
 
   /**
    * We remember host name as String in addition to the resolved InetAddress so

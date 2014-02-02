@@ -34,8 +34,10 @@ public abstract class AbstractIncludeAction extends Action {
   private static final String FILE_ATTR = "file";
   private static final String URL_ATTR = "url";
   private static final String RESOURCE_ATTR = "resource";
+  private static final String OPTIONAL_ATTR = "optional";
 
   private String attributeInUse;
+  private boolean optional;
   private URL urlInUse;
 
   public URL getUrl() {
@@ -53,6 +55,7 @@ public abstract class AbstractIncludeAction extends Action {
           throws ActionException {
 
     this.attributeInUse = null;
+    this.optional = OptionHelper.toBoolean(attributes.getValue(OPTIONAL_ATTR), false);
 
     if (!checkAttributes(attributes)) {
       return;
@@ -120,11 +123,15 @@ public abstract class AbstractIncludeAction extends Action {
 
       return url;
     } catch (MalformedURLException mue) {
-      String errMsg = "URL [" + urlAttribute + "] is not well formed.";
-      handleError(errMsg, mue);
+      if (!optional) {
+        String errMsg = "URL [" + urlAttribute + "] is not well formed.";
+        handleError(errMsg, mue);
+      }
     } catch (IOException e) {
-      String errMsg = "URL [" + urlAttribute + "] cannot be opened.";
-      handleError(errMsg, e);
+      if (!optional) {
+        String errMsg = "URL [" + urlAttribute + "] cannot be opened.";
+        handleError(errMsg, e);
+      }
     }
     return null;
   }
@@ -132,9 +139,11 @@ public abstract class AbstractIncludeAction extends Action {
   private URL resourceAsURL(String resourceAttribute) {
     URL url = Loader.getResourceBySelfClassLoader(resourceAttribute);
     if (url == null) {
-      String errMsg = "Could not find resource corresponding to ["
-              + resourceAttribute + "]";
-      handleError(errMsg, null);
+      if (!optional) {
+        String errMsg = "Could not find resource corresponding to ["
+            + resourceAttribute + "]";
+        handleError(errMsg, null);
+      }
       return null;
     } else
       return url;
@@ -143,7 +152,9 @@ public abstract class AbstractIncludeAction extends Action {
   private URL filePathAsURL(String path) {
     File file = new File(path);
     if (!file.exists() || !file.isFile()) {
-      handleError("File does not exist [" + path + "]", new FileNotFoundException(path));
+      if (!optional) {
+        handleError("File does not exist [" + path + "]", new FileNotFoundException(path));
+      }
       return null;
     }
 
@@ -159,6 +170,10 @@ public abstract class AbstractIncludeAction extends Action {
 
   protected String getAttributeInUse() {
     return this.attributeInUse;
+  }
+
+  protected boolean isOptional() {
+    return this.optional;
   }
 
   private URL getInputURL(InterpretationContext ec, Attributes attributes) {

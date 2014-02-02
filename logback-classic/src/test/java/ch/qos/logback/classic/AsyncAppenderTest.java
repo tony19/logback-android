@@ -18,15 +18,12 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.read.ListAppender;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
-import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MDC;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Ceki G&uuml;lc&uuml;
@@ -38,7 +35,6 @@ public class AsyncAppenderTest {
   LoggerContext context = new LoggerContext();
   AsyncAppender asyncAppender = new AsyncAppender();
   ListAppender<ILoggingEvent> listAppender = new ListAppender<ILoggingEvent>();
-  StatusChecker statusChecker = new StatusChecker(context);
   LoggingEventBuilderInContext builder = new LoggingEventBuilderInContext(context, thisClassName, UnsynchronizedAppenderBase.class.getName());
   int diff = RandomUtil.getPositiveInt();
 

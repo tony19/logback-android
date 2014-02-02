@@ -99,7 +99,7 @@ abstract public class JoranConfiguratorBase extends GenericConfigurator {
     omap.put(ActionConst.FILTER_CHAIN_BAG, new HashMap());
   }
 
-  public InterpretationContext getExecutionContext() {
+  public InterpretationContext getInterpretationContext() {
     return interpreter.getInterpretationContext();
   }
 }

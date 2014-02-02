@@ -23,7 +23,9 @@ public class DelayingListAppender<E> extends ListAppender<E> {
   @Override
   public void append(E e) {
     try {
+      Thread.yield();
       Thread.sleep(delay);
+      Thread.yield();
     } catch (InterruptedException ie) {
       interrupted = true;
     }

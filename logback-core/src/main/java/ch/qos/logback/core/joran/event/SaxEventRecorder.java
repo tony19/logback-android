@@ -42,7 +42,11 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
   private final ContextAwareImpl cai;
 
   public SaxEventRecorder() {
-    cai = new ContextAwareImpl(this);
+    cai = new ContextAwareImpl(null, this);
+  }
+
+  public SaxEventRecorder(Context context) {
+    cai = new ContextAwareImpl(context, this);
   }
 
   private List<SaxEvent> saxEventList = new ArrayList<SaxEvent>();

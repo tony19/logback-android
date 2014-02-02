@@ -19,6 +19,7 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.filter.EvaluatorFilter;
 import ch.qos.logback.core.joran.spi.DefaultNestedComponentRegistry;
+import ch.qos.logback.core.net.ssl.SSLNestedComponentRegistryRules;
 
 /**
  * Contains mappings for the default type of nested components in
@@ -37,6 +38,7 @@ public class DefaultNestedComponentRules {
     registry.add(AppenderBase.class, "encoder", PatternLayoutEncoder.class);
     registry.add(UnsynchronizedAppenderBase.class, "encoder", PatternLayoutEncoder.class);
     
+    SSLNestedComponentRegistryRules.addDefaultNestedComponentRegistryRules(registry);
   }
 
 }

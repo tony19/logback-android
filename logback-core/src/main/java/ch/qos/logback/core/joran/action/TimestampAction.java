@@ -16,6 +16,7 @@ package ch.qos.logback.core.joran.action;
 import ch.qos.logback.core.util.CachingDateFormatter;
 import org.xml.sax.Attributes;
 
+import ch.qos.logback.core.joran.action.ActionUtil.Scope;
 import ch.qos.logback.core.joran.spi.ActionException;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
 import ch.qos.logback.core.util.OptionHelper;
@@ -24,9 +25,9 @@ import ch.qos.logback.core.util.OptionHelper;
  * Given a key and a date-and-time pattern, puts a property to the context, with
  * the specified key and value equal to the current time in the format
  * corresponding to the specified date-and-time pattern.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
- * 
+ *
  */
 public class TimestampAction extends Action {
   static String DATE_PATTERN_ATTRIBUTE = "datePattern";
@@ -64,12 +65,15 @@ public class TimestampAction extends Action {
     if (inError)
       return;
 
+    String scopeStr = attributes.getValue(SCOPE_ATTRIBUTE);
+    Scope scope = ActionUtil.stringToScope(scopeStr);
+
     CachingDateFormatter sdf = new CachingDateFormatter(datePatternStr);
     String val = sdf.format(timeReference);
 
     addInfo("Adding property to the context with key=\"" + keyStr
-        + "\" and value=\"" + val + "\" to the context");
-    context.putProperty(keyStr, val);
+        + "\" and value=\"" + val + "\" to the " + scope + " scope");
+    ActionUtil.setProperty(ec, keyStr, val, scope);
   }
 
   @Override

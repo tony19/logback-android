@@ -5,13 +5,14 @@
   <parent>
     <groupId>com.github.tony19</groupId>
     <artifactId>logback-android-parent</artifactId>
-    <version>1.0.11-1-SNAPSHOT</version>
+    <version>1.0.12-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>logback-android-core</artifactId>
   <packaging>jar</packaging>
   <name>Logback Android Core Module</name>
   <description>logback-android-core module</description>
+
 
   <url>http://logback.qos.ch/android</url>
 

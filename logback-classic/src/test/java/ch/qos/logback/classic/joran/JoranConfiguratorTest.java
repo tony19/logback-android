@@ -15,8 +15,9 @@ package ch.qos.logback.classic.joran;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LogManager;
 
 import ch.qos.logback.classic.jul.JULHelper;
 import ch.qos.logback.core.pattern.parser.Parser;
@@ -24,7 +25,6 @@ import ch.qos.logback.core.spi.ScanException;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CachingDateFormatter;
-import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.MDC;
@@ -59,6 +59,7 @@ public class JoranConfiguratorTest {
   void configure(String file) throws JoranException {
     JoranConfigurator jc = new JoranConfigurator();
     jc.setContext(loggerContext);
+    loggerContext.putProperty("diff", "" + diff);
     jc.doConfigure(file);
   }
 
@@ -144,7 +145,6 @@ public class JoranConfiguratorTest {
   @Test
   public void statusListener() throws JoranException {
     configure(ClassicTestConstants.JORAN_INPUT_PREFIX + "statusListener.xml");
-    // StatusPrinter.print(loggerContext);
   }
 
   @Test
@@ -285,10 +285,9 @@ public class JoranConfiguratorTest {
     loggerContext.getExecutorService().shutdown();
     loggerContext.getExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS);
 
-    //StatusPrinter.print(loggerContext);
     StatusChecker checker = new StatusChecker(loggerContext);
-    assertTrue(checker.isErrorFree(0));
-    assertTrue(checker.containsMatch(CoreConstants.RESET_MSG_PREFIX));
+    checker.assertIsErrorFree();
+    checker.assertContainsMatch(CoreConstants.RESET_MSG_PREFIX);
   }
 
   @Test
@@ -296,7 +295,7 @@ public class JoranConfiguratorTest {
           InterruptedException {
 
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
-            + "timestamp.xml";
+            + "timestamp-context.xml";
     configure(configFileAsStr);
 
     String r = loggerContext.getProperty("testTimestamp");
@@ -304,6 +303,30 @@ public class JoranConfiguratorTest {
     CachingDateFormatter sdf = new CachingDateFormatter("yyyy-MM");
     String expected = sdf.format(System.currentTimeMillis());
     assertEquals("expected \"" + expected + "\" but got " + r, expected, r);
+  }
+
+  @Test
+  public void timestampLocal() throws JoranException, IOException,
+          InterruptedException {
+
+    String sysProp = "ch.qos.logback.classic.joran.JoranConfiguratorTest.timestampLocal";
+    System.setProperty(sysProp, "");
+
+    String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
+            + "timestamp-local.xml";
+    configure(configFileAsStr);
+
+    // It's hard to test the local variable has been set, as it's not
+    // visible from here. But instead we test that it's not set in the
+    // context. And check that a system property has been replaced with the
+    // contents of the local variable
+
+    String r = loggerContext.getProperty("testTimestamp");
+    assertNull(r);
+
+    String expected = "today is " + new SimpleDateFormat("yyyy-MM").format(new Date());
+    String sysPropValue = System.getProperty(sysProp);
+    assertEquals(expected, sysPropValue);
   }
 
   @Test
@@ -321,14 +344,11 @@ public class JoranConfiguratorTest {
     assertEquals("UTF-8", encoder.getCharset().displayName());
 
     StatusChecker checker = new StatusChecker(loggerContext);
-    assertTrue(checker.isErrorFree(0));
+    checker.assertIsErrorFree();
   }
 
   void verifyJULLevel(String loggerName, Level expectedLevel) {
-    LogManager lm = LogManager.getLogManager();
-
     java.util.logging.Logger julLogger = JULHelper.asJULLogger(loggerName);
-
     java.util.logging.Level julLevel = julLogger.getLevel();
 
     if (expectedLevel == null) {
@@ -343,33 +363,31 @@ public class JoranConfiguratorTest {
   @Test
   public void levelChangePropagator0() throws JoranException, IOException,
           InterruptedException {
-    String loggerName = "changePropagator0"+diff;
+    String loggerName = "changePropagator0" + diff;
     java.util.logging.Logger.getLogger(loggerName).setLevel(java.util.logging.Level.INFO);
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
             + "/jul/levelChangePropagator0.xml";
     configure(configFileAsStr);
-    StatusPrinter.print(loggerContext);
     StatusChecker checker = new StatusChecker(loggerContext);
-    assertTrue(checker.isErrorFree(0));
+    checker.assertIsErrorFree();
     verifyJULLevel(loggerName, null);
-    verifyJULLevel("a.b.c", Level.WARN);
+    verifyJULLevel("a.b.c." + diff, Level.WARN);
     verifyJULLevel(Logger.ROOT_LOGGER_NAME, Level.TRACE);
   }
 
   @Test
   public void levelChangePropagator1() throws JoranException, IOException,
           InterruptedException {
-    String loggerName = "changePropagator1"+diff;
+    String loggerName = "changePropagator1" + diff;
     java.util.logging.Logger.getLogger(loggerName).setLevel(java.util.logging.Level.INFO);
     verifyJULLevel(loggerName, Level.INFO);
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
             + "/jul/levelChangePropagator1.xml";
     configure(configFileAsStr);
-    StatusPrinter.print(loggerContext);
     StatusChecker checker = new StatusChecker(loggerContext);
-    assertTrue(checker.isErrorFree(0));
+    checker.assertIsErrorFree();
     verifyJULLevel(loggerName, Level.INFO);
-    verifyJULLevel("a.b.c", Level.WARN);
+    verifyJULLevel("a.b.c." + diff, Level.WARN);
     verifyJULLevel(Logger.ROOT_LOGGER_NAME, Level.TRACE);
   }
 
@@ -390,10 +408,9 @@ public class JoranConfiguratorTest {
   public void lbcore193() throws JoranException {
     String configFileAsStr = ClassicTestConstants.ISSUES_PREFIX + "lbcore193.xml";
     configure(configFileAsStr);
-    //StatusPrinter.print(loggerContext);
-    checker.containsException(ScanException.class);
-    checker.containsMatch(Status.ERROR, "Expecting RIGHT_PARENTHESIS token but got null");
-    checker.containsMatch(Status.ERROR, "See also " + Parser.MISSING_RIGHT_PARENTHESIS);
+    checker.asssertContainsException(ScanException.class);
+    checker.assertContainsMatch(Status.ERROR, "Expecting RIGHT_PARENTHESIS token but got null");
+    checker.assertContainsMatch(Status.ERROR, "See also " + Parser.MISSING_RIGHT_PARENTHESIS);
   }
 
 
@@ -412,19 +429,18 @@ public class JoranConfiguratorTest {
     assertEquals("node0", loggerContext.getProperty("nodeId"));
     assertEquals("tem", System.getProperty("sys"));
     assertNotNull(loggerContext.getProperty("path"));
-    assertTrue(checker.isErrorFree(0));
-    StatusPrinter.print(loggerContext);
+    checker.assertIsErrorFree();
   }
 
 
   // see also http://jira.qos.ch/browse/LBCORE-254
   @Test
   public void sysProps() throws JoranException {
-    System.setProperty("k.lbcore254", ClassicTestConstants.ISSUES_PREFIX+"lbcore254");
+    System.setProperty("k.lbcore254", ClassicTestConstants.ISSUES_PREFIX + "lbcore254");
     JoranConfigurator configurator = new JoranConfigurator();
     configurator.setContext(loggerContext);
-    configurator.doConfigure(ClassicTestConstants.ISSUES_PREFIX+"lbcore254.xml");
+    configurator.doConfigure(ClassicTestConstants.ISSUES_PREFIX + "lbcore254.xml");
 
-    checker.isErrorFree(0);
- }
+    checker.assertIsErrorFree();
+  }
 }

@@ -13,12 +13,15 @@
  */
 package ch.qos.logback.core.rolling;
 
+import ch.qos.logback.core.FileAppender;
+import ch.qos.logback.core.rolling.helper.CompressionMode;
+import ch.qos.logback.core.rolling.helper.FileNamePattern;
+
 import java.io.File;
 import java.io.IOException;
 
 import static ch.qos.logback.core.CoreConstants.CODES_URL;
-import ch.qos.logback.core.FileAppender;
-import ch.qos.logback.core.rolling.helper.CompressionMode;
+
 /**
  * <code>RollingFileAppender</code> extends {@link FileAppender} to backup the
  * log files depending on {@link RollingPolicy} and {@link TriggeringPolicy}.
@@ -35,11 +38,15 @@ public class RollingFileAppender<E> extends FileAppender<E> {
   TriggeringPolicy<E> triggeringPolicy;
   RollingPolicy rollingPolicy;
 
+  static private String RFA_NO_TP_URL = CODES_URL + "#rfa_no_tp";
+  static private String RFA_NO_RP_URL = CODES_URL + "#rfa_no_rp";
+  static private String COLLISION_URL = CODES_URL + "#rfa_collision";
+
   public void start() {
     if (triggeringPolicy == null) {
       addWarn("No TriggeringPolicy was set for the RollingFileAppender named "
-          + getName());
-      addWarn("For more information, please visit "+CODES_URL+"#rfa_no_tp");
+              + getName());
+      addWarn("For more information, please visit " + RFA_NO_TP_URL);
       return;
     }
 
@@ -51,8 +58,15 @@ public class RollingFileAppender<E> extends FileAppender<E> {
 
     if (rollingPolicy == null) {
       addError("No RollingPolicy was set for the RollingFileAppender named "
-          + getName());
-      addError("For more information, please visit "+CODES_URL+"rfa_no_rp");
+              + getName());
+      addError("For more information, please visit " + RFA_NO_RP_URL);
+      return;
+    }
+
+    // sanity check for http://jira.qos.ch/browse/LOGBACK-796
+    if (fileAndPatternCollide()) {
+      addError("File property collides with fileNamePattern. Aborting.");
+      addError("For more information, please visit " + COLLISION_URL);
       return;
     }
 
@@ -72,10 +86,23 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     super.start();
   }
 
+  private boolean fileAndPatternCollide() {
+    if (triggeringPolicy instanceof RollingPolicyBase) {
+      final RollingPolicyBase base = (RollingPolicyBase) triggeringPolicy;
+      final FileNamePattern fileNamePattern = base.fileNamePattern;
+      // no use checking if either fileName or  fileNamePattern are null
+      if (fileNamePattern != null && fileName != null) {
+        String regex = fileNamePattern.toRegex();
+        return fileName.matches(regex);
+      }
+    }
+    return false;
+  }
+
   @Override
   public void stop() {
-    if(rollingPolicy != null) rollingPolicy.stop();
-    if(triggeringPolicy != null) triggeringPolicy.stop();
+    if (rollingPolicy != null) rollingPolicy.stop();
+    if (triggeringPolicy != null) triggeringPolicy.stop();
     super.stop();
   }
 
@@ -85,7 +112,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     // allow setting the file name to null if mandated by prudent mode
     if (file != null && ((triggeringPolicy != null) || (rollingPolicy != null))) {
       addError("File property must be set before any triggeringPolicy or rollingPolicy properties");
-      addError("Visit "+CODES_URL+"#rfa_file_after for more information");
+      addError("Visit " + CODES_URL + "#rfa_file_after for more information");
     }
     super.setFile(file);
   }

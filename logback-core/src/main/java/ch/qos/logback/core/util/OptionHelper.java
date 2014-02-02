@@ -30,35 +30,34 @@ import ch.qos.logback.core.subst.NodeToStringTransformer;
 public class OptionHelper {
 
   public static Object instantiateByClassName(String className,
-                                              Class superClass, Context context) throws IncompatibleClassException,
+                                              Class<?> superClass, Context context) throws IncompatibleClassException,
           DynamicClassLoadingException {
     ClassLoader classLoader = Loader.getClassLoaderOfObject(context);
     return instantiateByClassName(className, superClass, classLoader);
   }
 
   public static Object instantiateByClassNameAndParameter(String className,
-                                                          Class superClass, Context context, Class type, Object param) throws IncompatibleClassException,
+                                                          Class<?> superClass, Context context, Class<?> type, Object param) throws IncompatibleClassException,
           DynamicClassLoadingException {
     ClassLoader classLoader = Loader.getClassLoaderOfObject(context);
     return instantiateByClassNameAndParameter(className, superClass, classLoader, type, param);
   }
 
-  @SuppressWarnings("unchecked")
   public static Object instantiateByClassName(String className,
-                                              Class superClass, ClassLoader classLoader)
+                                              Class<?> superClass, ClassLoader classLoader)
           throws IncompatibleClassException, DynamicClassLoadingException {
     return instantiateByClassNameAndParameter(className, superClass, classLoader, null, null);
   }
 
   public static Object instantiateByClassNameAndParameter(String className,
-                                                          Class superClass, ClassLoader classLoader, Class type, Object parameter)
+                                                          Class<?> superClass, ClassLoader classLoader, Class<?> type, Object parameter)
           throws IncompatibleClassException, DynamicClassLoadingException {
 
     if (className == null) {
       throw new NullPointerException();
     }
     try {
-      Class classObj = null;
+      Class<?> classObj = null;
       classObj = classLoader.loadClass(className);
       if (!superClass.isAssignableFrom(classObj)) {
         throw new IncompatibleClassException(superClass, classObj);
@@ -66,7 +65,7 @@ public class OptionHelper {
       if (type == null) {
         return classObj.newInstance();
       } else {
-        Constructor constructor = classObj.getConstructor(type);
+        Constructor<?> constructor = classObj.getConstructor(type);
         return constructor.newInstance(parameter);
       }
     } catch (IncompatibleClassException ice) {
@@ -237,6 +236,53 @@ public class OptionHelper {
     } catch (SecurityException e) {
       return new Properties();
     }
+  }
+
+  /**
+   * Return a String[] of size two. The first item containing the key part and the second item
+   * containing a default value specified by the user. The second item will be null if no default value
+   * is specified.
+   *
+   * @param key
+   * @return
+   */
+  static public String[] extractDefaultReplacement(String key) {
+    String[] result = new String[2];
+    if(key == null)
+      return result;
+
+    result[0] = key;
+    int d = key.indexOf(DELIM_DEFAULT);
+    if (d != -1) {
+      result[0] = key.substring(0, d);
+      result[1] = key.substring(d + DELIM_DEFAULT_LEN);
+    }
+    return result;
+  }
+
+  /**
+   * If <code>value</code> is "true", then <code>true</code> is returned. If
+   * <code>value</code> is "false", then <code>true</code> is returned.
+   * Otherwise, <code>default</code> is returned.
+   * <p/>
+   * <p> Case of value is unimportant.
+   */
+  public static boolean toBoolean(String value, boolean dEfault) {
+    if (value == null) {
+      return dEfault;
+    }
+
+    String trimmedVal = value.trim();
+
+    if ("true".equalsIgnoreCase(trimmedVal)) {
+      return true;
+    }
+
+    if ("false".equalsIgnoreCase(trimmedVal)) {
+      return false;
+    }
+
+    return dEfault;
   }
 
   public static boolean isEmpty(String str) {
