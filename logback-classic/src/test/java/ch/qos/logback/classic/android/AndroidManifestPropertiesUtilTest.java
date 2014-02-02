@@ -31,7 +31,7 @@ import ch.qos.logback.core.joran.action.Action;
 import ch.qos.logback.core.joran.action.NOPAction;
 import ch.qos.logback.core.joran.action.ext.StackAction;
 import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.joran.spi.Pattern;
+import ch.qos.logback.core.joran.spi.ElementSelector;
 
 /**
  * Integration tests for {@link AndroidManifestPropertiesUtil}
@@ -52,11 +52,11 @@ public class AndroidManifestPropertiesUtilTest {
 
   @Before
   public void setup() {
-    HashMap<Pattern, Action> rulesMap = new HashMap<Pattern, Action>();
-    rulesMap.put(new Pattern("x"), new NOPAction());
+    HashMap<ElementSelector, Action> rulesMap = new HashMap<ElementSelector, Action>();
+    rulesMap.put(new ElementSelector("x"), new NOPAction());
 
     stackAction = new StackAction();
-    rulesMap.put(new Pattern("x/stack"), stackAction);
+    rulesMap.put(new ElementSelector("x/stack"), stackAction);
 
     tc = new TrivialConfigurator(rulesMap);
     tc.setContext(context);

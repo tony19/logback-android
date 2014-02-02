@@ -13,13 +13,17 @@
  */
 package ch.qos.logback.core.util;
 
-import java.util.Iterator;
-import java.util.Properties;
-
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.spi.ContextAwareBase;
-import ch.qos.logback.core.util.ContextUtil;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Properties;
 
 public class ContextUtil extends ContextAwareBase {
 

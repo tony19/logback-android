@@ -23,7 +23,7 @@ import java.util.concurrent.Executor;
 import javax.net.ServerSocketFactory;
 
 import ch.qos.logback.core.AppenderBase;
-import ch.qos.logback.core.net.SocketAppenderBase;
+import ch.qos.logback.core.net.AbstractSocketAppender;
 import ch.qos.logback.core.spi.PreSerializationTransformer;
 
 /**
@@ -45,7 +45,7 @@ public abstract class ServerSocketAppenderBase<E> extends AppenderBase<E> {
    */
   public static final int DEFAULT_CLIENT_QUEUE_SIZE = 100;
 
-  private int port = SocketAppenderBase.DEFAULT_PORT;
+  private int port = AbstractSocketAppender.DEFAULT_PORT;
   private int backlog = DEFAULT_BACKLOG;
   private int clientQueueSize = DEFAULT_CLIENT_QUEUE_SIZE;
 

@@ -43,6 +43,13 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.testUtil.StringListAppender;
 import ch.qos.logback.core.util.StatusPrinter;
+import org.junit.Test;
+import org.slf4j.MDC;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.slf4j.MDC;

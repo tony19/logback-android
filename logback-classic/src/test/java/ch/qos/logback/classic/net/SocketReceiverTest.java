@@ -191,7 +191,6 @@ public class SocketReceiverTest {
     Socket socket = serverSocket.accept();
 
     ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-
     logger.setLevel(Level.INFO);
     ILoggingEvent event = new LoggingEvent(logger.getName(), logger,
         Level.DEBUG, "test message", null, new Object[0]);
@@ -244,14 +243,7 @@ public class SocketReceiverTest {
       this.socket = socket;
     }
 
-    public void run() {
-    }
-
-    public Socket awaitConnection() throws InterruptedException {
-      return awaitConnection(Long.MAX_VALUE);
-    }
-
-    public Socket awaitConnection(long delay) throws InterruptedException {
+    public Socket call() throws InterruptedException {
       return socket;
     }
 
@@ -292,5 +284,4 @@ public class SocketReceiverTest {
     }
 
   }
-
 }

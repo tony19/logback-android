@@ -29,7 +29,7 @@ import ch.qos.logback.core.net.ssl.SSLParametersConfiguration;
  * @author Carl Harris
  */
 public abstract class SSLServerSocketAppenderBase<E>
-    extends ServerSocketAppenderBase<E> implements SSLComponent {
+    extends AbstractServerSocketAppender<E> implements SSLComponent {
 
   private SSLConfiguration ssl;
   private ServerSocketFactory socketFactory;
@@ -76,5 +76,4 @@ public abstract class SSLServerSocketAppenderBase<E>
   public void setSsl(SSLConfiguration ssl) {
     this.ssl = ssl;
   }
-
 }

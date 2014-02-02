@@ -29,13 +29,6 @@ import ch.qos.logback.core.pattern.Converter123;
 import ch.qos.logback.core.pattern.ConverterHello;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.util.StatusPrinter;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 public class CompilerTest {
 

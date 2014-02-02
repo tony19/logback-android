@@ -4,4 +4,3 @@
   	name="ch.qos.logback.classic.joran.JoranConfiguratorTest.timestampLocal"
   	value="today is ${testTimestamp}"/>
 </configuration>
-

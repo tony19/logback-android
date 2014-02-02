@@ -26,7 +26,6 @@ import java.net.URL;
  */
 public class LocationUtil {
 
-
   /** Regex pattern for a URL scheme (reference RFC 2396 section 3) */
   public static final String SCHEME_PATTERN =
       "^\\p{Alpha}[\\p{Alnum}+.-]*:.*$";
@@ -71,5 +70,4 @@ public class LocationUtil {
     }
     return url;
   }
-
 }

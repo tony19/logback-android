@@ -16,6 +16,15 @@ package ch.qos.logback.core.rolling;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.encoder.EchoEncoder;
+import ch.qos.logback.core.rolling.helper.FileFilterUtil;
+import ch.qos.logback.core.rolling.helper.FileNamePattern;
+import ch.qos.logback.core.testUtil.FileToBufferUtil;
+import ch.qos.logback.core.testUtil.RandomUtil;
+import ch.qos.logback.core.util.CoreTestConstants;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
@@ -28,15 +37,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import ch.qos.logback.core.Context;
-import ch.qos.logback.core.ContextBase;
-import ch.qos.logback.core.encoder.EchoEncoder;
-import ch.qos.logback.core.rolling.helper.FileFilterUtil;
-import ch.qos.logback.core.rolling.helper.FileNamePattern;
-import ch.qos.logback.core.testUtil.FileToBufferUtil;
-import ch.qos.logback.core.testUtil.RandomUtil;
-import ch.qos.logback.core.util.CoreTestConstants;
 
 /**
  * Scaffolding for various rolling tests. Some assumptions are made: - rollover

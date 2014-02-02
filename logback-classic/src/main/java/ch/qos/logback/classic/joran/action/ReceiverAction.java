@@ -50,7 +50,6 @@ public class ReceiverAction extends Action {
       receiver = (ReceiverBase) OptionHelper.instantiateByClassName(
           className, ReceiverBase.class, context);
       receiver.setContext(context);
-
       ic.pushObject(receiver);
     }
     catch (Exception ex) {

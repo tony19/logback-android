@@ -30,6 +30,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ch.qos.logback.core.net.mock.MockContext;
 
 public class ConcurrentServerRunnerTest {
 

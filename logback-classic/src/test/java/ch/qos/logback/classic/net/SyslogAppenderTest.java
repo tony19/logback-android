@@ -28,7 +28,6 @@ import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.classic.net.SocketAppenderTest.SocketAppenderFriend;
 import ch.qos.logback.classic.net.mock.MockSyslogServer;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.JoranException;

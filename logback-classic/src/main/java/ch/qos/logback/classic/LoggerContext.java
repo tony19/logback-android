@@ -61,8 +61,6 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
 
   private int maxCallerDataDepth = ClassicConstants.DEFAULT_MAX_CALLEDER_DATA_DEPTH;
 
-  boolean started = false;
-
   int resetCount = 0;
   private List<String> frameworkPackages;
 
@@ -359,12 +357,8 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
 
   // === end listeners ==============================================
 
-  public boolean isStarted() {
-    return started;
-  }
-
   public void start() {
-    started = true;
+    super.start();
     fireOnStart();
   }
 
@@ -372,7 +366,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
     reset();
     fireOnStop();
     resetAllListeners();
-    started = false;
+    super.stop();
   }
 
   @Override

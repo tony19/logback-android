@@ -22,7 +22,7 @@ import java.util.concurrent.Executor;
 import javax.net.ServerSocketFactory;
 
 import ch.qos.logback.classic.net.ReceiverBase;
-import ch.qos.logback.core.net.SocketAppenderBase;
+import ch.qos.logback.core.net.AbstractSocketAppender;
 import ch.qos.logback.core.net.server.ServerListener;
 import ch.qos.logback.core.net.server.ServerRunner;
 import ch.qos.logback.core.util.CloseUtil;
@@ -39,9 +39,8 @@ public class ServerSocketReceiver extends ReceiverBase {
    */
   public static final int DEFAULT_BACKLOG = 50;
 
-  private int port = SocketAppenderBase.DEFAULT_PORT;
+  private int port = AbstractSocketAppender.DEFAULT_PORT;
   private int backlog = DEFAULT_BACKLOG;
-
   private String address;
 
   private ServerSocket serverSocket;
@@ -143,7 +142,7 @@ public class ServerSocketReceiver extends ReceiverBase {
    * @return queue depth
    * @see java.net.ServerSocket
    */
-  public Integer getBacklog() {
+  public int getBacklog() {
     return backlog;
   }
 
@@ -155,7 +154,7 @@ public class ServerSocketReceiver extends ReceiverBase {
    * @param backlog the queue depth to set
    * @see java.net.ServerSocket
    */
-  public void setBacklog(Integer backlog) {
+  public void setBacklog(int backlog) {
     this.backlog = backlog;
   }
 

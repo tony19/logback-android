@@ -23,11 +23,11 @@ import ch.qos.logback.core.joran.action.AppenderRefAction;
 import ch.qos.logback.core.joran.action.IncludeAction;
 import ch.qos.logback.core.joran.action.NOPAction;
 import ch.qos.logback.core.joran.spi.DefaultNestedComponentRegistry;
-import ch.qos.logback.core.joran.spi.Pattern;
+import ch.qos.logback.core.joran.spi.ElementSelector;
 import ch.qos.logback.core.joran.spi.RuleStore;
 
 /**
- * This JoranConfiguratorclass adds rules specific to logback-classic.
+ * JoranConfigurator class adds rules specific to logback-classic.
  *
  * @author Ceki G&uuml;lc&uuml;
  */
@@ -38,32 +38,32 @@ public class JoranConfigurator extends JoranConfiguratorBase {
     // parent rules already added
     super.addInstanceRules(rs);
 
-    rs.addRule(new Pattern("configuration"), new ConfigurationAction());
+    rs.addRule(new ElementSelector("configuration"), new ConfigurationAction());
 
-    rs.addRule(new Pattern("configuration/contextName"),
+    rs.addRule(new ElementSelector("configuration/contextName"),
         new ContextNameAction());
-    rs.addRule(new Pattern("configuration/contextListener"),
+      rs.addRule(new ElementSelector("configuration/contextListener"),
         new LoggerContextListenerAction());
 
-    rs.addRule(new Pattern("configuration/appender/sift"), new SiftAction());
-    rs.addRule(new Pattern("configuration/appender/sift/*"), new NOPAction());
+    rs.addRule(new ElementSelector("configuration/appender/sift"), new SiftAction());
+    rs.addRule(new ElementSelector("configuration/appender/sift/*"), new NOPAction());
 
-    rs.addRule(new Pattern("configuration/logger"), new LoggerAction());
-    rs.addRule(new Pattern("configuration/logger/level"), new LevelAction());
+    rs.addRule(new ElementSelector("configuration/logger"), new LoggerAction());
+    rs.addRule(new ElementSelector("configuration/logger/level"), new LevelAction());
 
-    rs.addRule(new Pattern("configuration/root"), new RootLoggerAction());
-    rs.addRule(new Pattern("configuration/root/level"), new LevelAction());
-    rs.addRule(new Pattern("configuration/logger/appender-ref"),
+    rs.addRule(new ElementSelector("configuration/root"), new RootLoggerAction());
+    rs.addRule(new ElementSelector("configuration/root/level"), new LevelAction());
+    rs.addRule(new ElementSelector("configuration/logger/appender-ref"),
         new AppenderRefAction());
-    rs.addRule(new Pattern("configuration/root/appender-ref"),
+    rs.addRule(new ElementSelector("configuration/root/appender-ref"),
         new AppenderRefAction());
 
-    rs.addRule(new Pattern("configuration/include"), new IncludeAction());
+    rs.addRule(new ElementSelector("configuration/include"), new IncludeAction());
 
-    rs.addRule(new Pattern("configuration/includes"), new FindIncludeAction());
-    rs.addRule(new Pattern("configuration/includes/include"), new ConditionalIncludeAction());
+    rs.addRule(new ElementSelector("configuration/includes"), new FindIncludeAction());
+    rs.addRule(new ElementSelector("configuration/includes/include"), new ConditionalIncludeAction());
 
-    rs.addRule(new Pattern("configuration/receiver"),
+    rs.addRule(new ElementSelector("configuration/receiver"),
         new ReceiverAction());
   }
 

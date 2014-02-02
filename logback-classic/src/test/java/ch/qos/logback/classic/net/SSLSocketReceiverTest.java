@@ -47,5 +47,4 @@ public class SSLSocketReceiverTest {
     remote.start();
     assertNotNull(remote.getSocketFactory());
   }
-
 }

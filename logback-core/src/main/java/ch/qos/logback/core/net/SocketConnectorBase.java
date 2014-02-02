@@ -188,4 +188,9 @@ public class SocketConnectorBase implements SocketConnector {
 
   }
 
+  public Socket call() throws InterruptedException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

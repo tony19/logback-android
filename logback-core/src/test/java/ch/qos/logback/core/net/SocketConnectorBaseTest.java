@@ -65,7 +65,7 @@ public class SocketConnectorBaseTest {
 
   @Test
   public void testConnect() throws Exception {
-    Thread thread = new Thread(connector);
+    Thread thread = new Thread();
     thread.start();
     Socket socket = connector.awaitConnection(2 * DELAY);
     assertNotNull(socket);
@@ -77,7 +77,7 @@ public class SocketConnectorBaseTest {
   @Test
   public void testConnectionFails() throws Exception {
     serverSocket.close();
-    Thread thread = new Thread(connector);
+    Thread thread = new Thread();
     thread.start();
     Socket socket = connector.awaitConnection(2 * DELAY);
     assertNull(socket);
@@ -93,7 +93,7 @@ public class SocketConnectorBaseTest {
   public void testConnectEventually() throws Exception {
     serverSocket.close();
 
-    Thread thread = new Thread(connector);
+    Thread thread = new Thread();
     thread.start();
     Socket socket = connector.awaitConnection(2 * DELAY);
     assertNull(socket);

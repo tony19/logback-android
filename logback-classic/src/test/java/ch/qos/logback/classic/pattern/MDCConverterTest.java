@@ -67,10 +67,6 @@ public class MDCConverterTest {
     assertTrue(result + " is not conform", isConform);
   }
 
-  private String getJavaVendor() {
-    return OptionHelper.getSystemProperty("java.vendor", null);
-  }
-
   private ILoggingEvent createLoggingEvent() {
     return new LoggingEvent(this.getClass().getName(), lc
         .getLogger(Logger.ROOT_LOGGER_NAME), Level.DEBUG, "test message", null,

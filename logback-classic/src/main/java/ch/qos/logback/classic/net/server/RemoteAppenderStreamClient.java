@@ -35,7 +35,6 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
   private final String id;
   private final Socket socket;
   private final InputStream inputStream;
-
   private LoggerContext lc;
   private Logger logger;
 

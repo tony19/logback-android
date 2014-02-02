@@ -135,12 +135,8 @@ public abstract class GenericConfigurator extends ContextAwareBase {
 
   }
 
-  /**
-   * Gets the initial pattern
-   * @return a newly created {@link Pattern}
-   */
-  protected Pattern initialPattern() {
-    return new Pattern();
+  protected ElementPath initialElementPath() {
+    return new ElementPath();
   }
 
   /**
@@ -149,7 +145,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
   protected void buildInterpreter() {
     RuleStore rs = new SimpleRuleStore(context);
     addInstanceRules(rs);
-    this.interpreter = new Interpreter(context, rs, initialPattern());
+    this.interpreter = new Interpreter(context, rs, initialElementPath());
     InterpretationContext interpretationContext = interpreter.getInterpretationContext();
     interpretationContext.setContext(context);
     addImplicitRules(interpreter);
@@ -172,9 +168,9 @@ public abstract class GenericConfigurator extends ContextAwareBase {
     SaxEventRecorder recorder = new SaxEventRecorder(context);
     recorder.recordEvents(inputSource);
     doConfigure(recorder.getSaxEventList());
-    // no exceptions at this level
-    StatusUtil statusChecker = new StatusUtil(context);
-    if (statusChecker.noXMLParsingErrorsOccurred(threshold)) {
+    // no exceptions a this level
+    StatusUtil statusUtil = new StatusUtil(context);
+    if (statusUtil.noXMLParsingErrorsOccurred(threshold)) {
       addInfo("Registering current configuration as safe fallback point");
       registerSafeConfiguration();
     }

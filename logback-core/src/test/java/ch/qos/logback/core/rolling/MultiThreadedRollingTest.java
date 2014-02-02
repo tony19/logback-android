@@ -13,8 +13,6 @@
  */
 package ch.qos.logback.core.rolling;
 
-import static ch.qos.logback.core.util.CoreTestConstants.FAILURE_EXIT_CODE;
-import static ch.qos.logback.core.util.CoreTestConstants.SUCCESSFUL_EXIT_CODE;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
@@ -41,7 +39,8 @@ import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
 
 public class MultiThreadedRollingTest {
-
+  final static int SUCCESSFUL_EXIT_CODE = 8;
+  final static int FAILURE_EXIT_CODE = 1;
   final static int NUM_THREADS = 10;
   final static int TOTAL_DURATION = 600;
   RunnableWithCounterAndDone[] runnableArray;

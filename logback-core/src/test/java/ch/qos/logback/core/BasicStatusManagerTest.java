@@ -39,7 +39,7 @@ public class BasicStatusManagerTest {
 
   BasicStatusManager bsm = new BasicStatusManager();
   Context context = new ContextBase();
-  ContextAware contextAware = new ContextAwareBase(this);
+  ContextAware contextAware = new ContextAwareBase();
   OnConsoleStatusListener csl = new OnConsoleStatusListener();
 
   @Before

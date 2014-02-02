@@ -50,5 +50,4 @@ public class KeyManagerFactoryFactoryBeanTest {
     factoryBean.setProvider(factory.getProvider().getName());
     assertNotNull(factoryBean.createKeyManagerFactory());
   }
-
 }

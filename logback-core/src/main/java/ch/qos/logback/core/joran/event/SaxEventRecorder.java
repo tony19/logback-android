@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static ch.qos.logback.core.CoreConstants.XML_PARSING;
+
+import ch.qos.logback.core.joran.spi.ElementPath;
+import ch.qos.logback.core.joran.spi.ElementSelector;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -32,7 +35,6 @@ import org.xmlpull.v1.sax2.Driver;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.joran.spi.Pattern;
 import ch.qos.logback.core.spi.ContextAware;
 import ch.qos.logback.core.spi.ContextAwareImpl;
 import ch.qos.logback.core.status.Status;
@@ -51,7 +53,7 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
 
   private List<SaxEvent> saxEventList = new ArrayList<SaxEvent>();
   private Locator locator;
-  private Pattern globalPattern = new Pattern();
+  ElementPath globalElementPath = new ElementPath();
 
   final public void recordEvents(InputStream inputStream) throws JoranException {
     recordEvents(new InputSource(inputStream));
@@ -118,9 +120,9 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
 
     String q = qName == null || qName.length() == 0 ? localName : qName;
     String tagName = getTagName(localName, qName);
-    globalPattern.push(tagName);
-    Pattern current = (Pattern) globalPattern.clone();
-    saxEventList.add(new StartEvent(current, namespaceURI, localName, q,
+    globalElementPath.push(tagName);
+    ElementPath current = globalElementPath.duplicate();
+    saxEventList.add(new StartEvent(current, namespaceURI, localName, qName,
         atts, getLocator()));
   }
 
@@ -154,8 +156,8 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
   public void endElement(String namespaceURI, String localName, String qName) {
     String q = qName == null || qName.length() == 0 ? localName : qName;
     saxEventList
-        .add(new EndEvent(namespaceURI, localName, q, getLocator()));
-    globalPattern.pop();
+        .add(new EndEvent(namespaceURI, localName, qName, getLocator()));
+    globalElementPath.pop();
   }
 
   String getTagName(String localName, String qName) {

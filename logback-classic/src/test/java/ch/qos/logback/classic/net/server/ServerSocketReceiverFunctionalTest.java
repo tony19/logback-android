@@ -48,7 +48,6 @@ public class ServerSocketReceiverFunctionalTest {
 
   private static final int EVENT_COUNT = 10;
   private static final int SHUTDOWN_DELAY = 10000;
-
   private MockAppender appender;
   private Logger logger;
   private ServerSocket serverSocket;
@@ -66,7 +65,6 @@ public class ServerSocketReceiverFunctionalTest {
     logger.addAppender(appender);
 
     serverSocket = ServerSocketUtil.createServerSocket();
-
     receiver = new InstrumentedServerSocketReceiver(serverSocket);
 
     receiver.setContext(lc);

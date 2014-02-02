@@ -32,5 +32,4 @@ public interface SSL {
 
   /** Default secure random generator algorithm */
   String DEFAULT_SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
-
 }

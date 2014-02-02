@@ -53,5 +53,4 @@ public interface Client extends Runnable, Closeable {
    * the underlying resource(s).
    */
   void close();
-
 }

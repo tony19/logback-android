@@ -23,9 +23,10 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.joran.spi.JoranException;
-
 import ch.qos.logback.core.status.OnConsoleStatusListener;
+import ch.qos.logback.core.testUtil.EnvUtilForTests;
 import ch.qos.logback.core.testUtil.RandomUtil;
+import ch.qos.logback.core.util.CoreTestConstants;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
@@ -33,7 +34,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.MDC;
 
@@ -81,7 +81,11 @@ public class SMTPAppender_GreenTest {
     greenMailServer = new GreenMail(serverSetup);
     greenMailServer.start();
     // give the server a head start
-    Thread.yield();
+    if (EnvUtilForTests.isRunningOnSlowJenkins()) {
+      Thread.currentThread().sleep(2000);
+    } else {
+      Thread.currentThread().sleep(50);
+    }
   }
 
   @After
@@ -142,10 +146,6 @@ public class SMTPAppender_GreenTest {
   private void waitUntilEmailIsSent() throws InterruptedException {
     loggerContext.getExecutorService().shutdown();
     loggerContext.getExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS);
-  }
-
-  private void waitUntilEmailIsReceived(GreenMail testServer, int emailCount) throws InterruptedException {
-    testServer.waitForIncomingEmail(emailCount);
   }
 
   @Test
@@ -301,12 +301,6 @@ public class SMTPAppender_GreenTest {
   // this test fails intermittently on Jenkins.
   @Test
   public void testMultipleTo() throws Exception {
-    // disable.SMTPAppender_GreenTest system property needs to be set manually
-    if(System.getProperty("disable.SMTPAppender_GreenTest") != null)  {
-      System.out.println("SMTPAppender_GreenTest.testMultipleTo disabled");
-      return;
-    }
-
     buildSMTPAppender("testMultipleTo", SYNCHRONOUS);
     smtpAppender.setLayout(buildPatternLayout(DEFAULT_PATTERN));
     // buildSMTPAppender() already added one destination address

@@ -29,7 +29,6 @@ import ch.qos.logback.core.spi.LifeCycle;
 public class LifeCycleManager {
 
   private final Set<LifeCycle> components = new HashSet<LifeCycle>();
-
   /**
    * Registers a component with this manager.
    * <p>
@@ -52,5 +51,4 @@ public class LifeCycleManager {
     }
     components.clear();
   }
-
 }

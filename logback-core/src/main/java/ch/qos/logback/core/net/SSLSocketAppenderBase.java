@@ -27,7 +27,7 @@ import ch.qos.logback.core.net.ssl.SSLParametersConfiguration;
  *
  * @author Carl Harris
  */
-public abstract class SSLSocketAppenderBase<E> extends SocketAppenderBase<E>
+public abstract class SSLSocketAppenderBase<E> extends AbstractSocketAppender<E>
     implements SSLComponent {
 
   private SSLConfiguration ssl;
