@@ -10,7 +10,7 @@
 
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-parent</artifactId>
-  <version>1.0.13-1-SNAPSHOT</version>
+  <version>1.1.0-1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Logback Android Parent</name>
   <description>logback-android project pom.xml file</description>
@@ -187,28 +187,28 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
-        <version>1.7.2</version>
+        <version>1.7.5</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.2</version>
+        <version>1.7.5</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-ext</artifactId>
-        <version>1.7.2</version>
+        <version>1.7.5</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>integration</artifactId>
-        <version>1.7.2</version>
+        <version>1.7.5</version>
         <scope>test</scope>
       </dependency>
 
@@ -216,7 +216,7 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <type>test-jar</type>
-        <version>1.7.2</version>
+        <version>1.7.5</version>
         <scope>test</scope>
       </dependency>
 

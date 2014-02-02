@@ -17,8 +17,9 @@ import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
+import ch.qos.logback.core.util.StatusPrinter;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -34,9 +35,10 @@ public class ResilientOutputStreamTest {
   int diff = RandomUtil.getPositiveInt();
   Context context = new ContextBase();
 
-  @Before
-  public void setup() {
-    new File(CoreTestConstants.OUTPUT_DIR_PREFIX).mkdirs();
+  @BeforeClass
+  public static void setUp() {
+    File file = new File(CoreTestConstants.OUTPUT_DIR_PREFIX);
+    file.mkdirs();
   }
 
   @Test
@@ -57,7 +59,6 @@ public class ResilientOutputStreamTest {
     spy.write("c".getBytes());
     spy.flush();
     verify(spy).openNewOutputStream();
-
-   }
+  }
 
 }

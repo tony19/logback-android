@@ -33,6 +33,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
 
   final static String SYSLOG_LAYOUT_URL = CoreConstants.CODES_URL
       + "#syslog_layout";
+  final static int MAX_MESSAGE_SIZE_LIMIT = 65000;
 
   Layout<E> layout;
   String facilityStr;
@@ -42,7 +43,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   int port = SyslogConstants.SYSLOG_PORT;
   boolean initialized = false;
   private boolean lazyInit = false;
-  int maxMessageSize = 65000;
+  int maxMessageSize;
 
   public void start() {
     int errorCount = 0;
@@ -75,13 +76,23 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   private boolean connect() {
     try {
       sos = new SyslogOutputStream(syslogHost, port);
+
+      final int systemDatagramSize = sos.getSendBufferSize();
+      if (maxMessageSize == 0) {
+        maxMessageSize = Math.min(systemDatagramSize, MAX_MESSAGE_SIZE_LIMIT);
+        addInfo("Defaulting maxMessageSize to [" + maxMessageSize + "]");
+      } else if (maxMessageSize > systemDatagramSize) {
+        addWarn("maxMessageSize of [" + maxMessageSize + "] is larger than the system defined datagram size of [" + systemDatagramSize + "].");
+        addWarn("This may result in dropped logs.");
+      }
     } catch (UnknownHostException e) {
       addError("Could not create SyslogWriter", e);
     } catch (SocketException e) {
       addWarn(
-          "Failed to bind to a random datagram socket",
+          "Failed to bind to a random datagram socket. Will try to reconnect later.",
           e);
     }
+
     // SyslogOutputStream must be non-null to be connected
     return sos != null;
   }
@@ -151,6 +162,14 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
       return SyslogConstants.LOG_AUTHPRIV;
     } else if ("FTP".equalsIgnoreCase(facilityStr)) {
       return SyslogConstants.LOG_FTP;
+    } else if ("NTP".equalsIgnoreCase(facilityStr)) {
+      return SyslogConstants.LOG_NTP;
+    } else if ("AUDIT".equalsIgnoreCase(facilityStr)) {
+      return SyslogConstants.LOG_AUDIT;
+    } else if ("ALERT".equalsIgnoreCase(facilityStr)) {
+      return SyslogConstants.LOG_ALERT;
+    } else if ("CLOCK".equalsIgnoreCase(facilityStr)) {
+      return SyslogConstants.LOG_CLOCK;
     } else if ("LOCAL0".equalsIgnoreCase(facilityStr)) {
       return SyslogConstants.LOG_LOCAL0;
     } else if ("LOCAL1".equalsIgnoreCase(facilityStr)) {

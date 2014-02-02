@@ -18,7 +18,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import org.junit.After;
@@ -32,9 +35,12 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.LogbackException;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.StatusListener;
 import ch.qos.logback.core.status.TrivialStatusListener;
+import ch.qos.logback.core.util.Loader;
 
 public class ContextInitializerTest {
 

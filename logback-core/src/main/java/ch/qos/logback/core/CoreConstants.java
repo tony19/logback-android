@@ -54,6 +54,11 @@ public class CoreConstants {
   public static final String DAILY_DATE_PATTERN = "yyyy-MM-dd";
 
   /**
+   * Time format used in Common Log Format
+   */
+  public static final String CLF_DATE_PATTERN = "dd/MMM/yyyy:HH:mm:ss Z";
+
+  /**
    * The key used in locating the evaluator map in context's object map.
    */
   public static final String EVALUATOR_MAP = "EVALUATOR_MAP";
@@ -71,7 +76,7 @@ public class CoreConstants {
   public static final String EMPTY_STRING = "";
 
   public static final String CAUSED_BY = "Caused by: ";
-  public static final String SUPPRESSED = "\tSuppressed: ";
+  public static final String SUPPRESSED = "Suppressed: ";
   public static final String WRAPPED_BY = "Wrapped by: ";
 
   public static final char PERCENT_CHAR = '%';

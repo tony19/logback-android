@@ -56,6 +56,18 @@ public class ConfigurationAction extends Action {
     ic.pushObject(getContext());
   }
 
+  String getSystemProperty(String name) {
+    /*
+     * LOGBACK-743: accessing a system property in the presence of a
+     * SecurityManager (e.g. applet sandbox) can result in a SecurityException.
+     */
+    try {
+      return System.getProperty(name);
+    } catch (SecurityException ex) {
+      return null;
+    }
+  }
+
   void processScanAttrib(InterpretationContext ic, Attributes attributes) {
     String scanAttrib = ic.subst(attributes.getValue(SCAN_ATTR));
     if (!OptionHelper.isEmpty(scanAttrib)
