@@ -27,7 +27,7 @@ git fetch upstream
 
 echo "Merging with logback ${version%-*}..."
 git merge tags/${version%-*}
-git rm -rf logback-access logback-site
+git rm -rf logback-access logback-site logback-examples
 
 # Delete all tags from upstream that don't belong to logback-android
 echo "Deleting all extraneous tags..."
