@@ -49,7 +49,7 @@ Download
 --------
 
  * [logback-android-1.0.10-2.jar][9]
- * [slf4j-api-1.7.5.jar][10]
+ * [slf4j-api-1.7.6.jar][10]
 
 OR Maven users can simply add these dependencies to `pom.xml`:
 
@@ -67,7 +67,7 @@ OR Maven users can simply add these dependencies to `pom.xml`:
 <dependency>
   <groupId>org.slf4j</groupId>
   <artifactId>slf4j-api</artifactId>
-  <version>1.7.5</version>
+  <version>1.7.6</version>
 </dependency>
 ```
 
@@ -469,7 +469,7 @@ The jar would be in: `./target/logback-android-<version>.jar`
  [5]: http://logback.qos.ch/manual/index.html
  [6]: http://tony19.github.com/logback-android/doc/1.0.10-2/
  [9]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.0.10-2.jar
- [10]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar
+ [10]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.6/slf4j-api-1.7.6.jar
  [11]: https://github.com/tony19/logback-android/wiki/Appender-Notes
  [12]: https://github.com/tony19/logback-android/wiki/FAQ
  [13]: https://github.com/tony19/logback-android/wiki/Appender-Notes#fileappender
