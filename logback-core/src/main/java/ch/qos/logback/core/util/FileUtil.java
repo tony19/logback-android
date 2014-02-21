@@ -65,7 +65,7 @@ public class FileUtil extends ContextAwareBase {
    * @return path (prefixed if relative)
    */
   public static String prefixRelativePath(String prefix, String path) {
-    if (prefix != null && !prefix.trim().isEmpty() && !new File(path).isAbsolute()) {
+    if (prefix != null && !OptionHelper.isEmpty(prefix.trim()) && !new File(path).isAbsolute()) {
       path = prefix + "/" + path;
     }
     return path;
