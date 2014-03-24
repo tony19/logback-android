@@ -265,6 +265,15 @@ public class SyslogAppenderTest {
     assertEquals(1, mockServer.getMessageList().size());
   }
 
+  @Test
+  public void unknownHostShouldNotCauseStopToFail() {
+    // See LOGBACK-960
+    sa.setSyslogHost("unknown.host");
+    sa.setFacility("MAIL");
+    sa.start();
+    sa.stop();
+  }
+
   class SyslogAppenderFriend extends SyslogAppender {
     public boolean isInitialized() {
       return this.sos != null;
