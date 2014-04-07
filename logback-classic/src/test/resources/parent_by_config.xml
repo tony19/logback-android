@@ -1,0 +1,22 @@
+<configuration debug="true">
+
+    <logger name="org.example.test.Tester" level="ERROR" />
+
+    <includes>
+        <include resource="child_by_config_tag.xml" />
+    </includes>
+
+    <appender
+        name="logcat_dflt"
+        class="ch.qos.logback.classic.android.LogcatAppender" >
+        <encoder>
+            <pattern>|%.-1level|[%thread][%method]\t%msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="WARN" >
+        <appender-ref ref="logcat_dflt" />
+    </root>
+
+</configuration>

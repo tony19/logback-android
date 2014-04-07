@@ -1,0 +1,35 @@
+<included>
+
+    <property
+        name="LOG_DIR"
+	value="${OUT_DIR:-.}/sdcard/logs" />
+
+    <appender
+        name="included-logcat"
+        class="ch.qos.logback.classic.android.LogcatAppender" >
+
+        <encoder>
+            <pattern>|%.-1level|[%thread][%method]\t%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender
+        name="included-trace-log"
+        class="ch.qos.logback.core.FileAppender" >
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter" >
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <file>${LOG_DIR}/demo_trace.log</file>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.example.test.Tester" level="INFO" />
+
+</included>
