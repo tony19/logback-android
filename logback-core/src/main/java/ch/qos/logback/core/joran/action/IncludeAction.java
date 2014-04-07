@@ -117,8 +117,9 @@ public class IncludeAction extends AbstractIncludeAction {
     // find opening element
     SaxEvent first = saxEventList.get(0);
     if (first != null) {
-      includedTagFound = INCLUDED_TAG.equalsIgnoreCase(first.qName);
-      configTagFound = CONFIG_TAG.equalsIgnoreCase(first.qName);
+      String elemName = getEventName(first);
+      includedTagFound = INCLUDED_TAG.equalsIgnoreCase(elemName);
+      configTagFound = CONFIG_TAG.equalsIgnoreCase(elemName);
     }
 
     // if opening element found, remove it, and then remove the closing element
@@ -132,11 +133,24 @@ public class IncludeAction extends AbstractIncludeAction {
 
       final int lastIndex = listSize - 1;
       SaxEvent last = saxEventList.get(lastIndex);
-      if ((last != null) &&
-          (includedTagFound && INCLUDED_TAG.equalsIgnoreCase(last.qName)) ||
-          (configTagFound && CONFIG_TAG.equalsIgnoreCase(last.qName))) {
-        saxEventList.remove(lastIndex);
+
+      if (last != null) {
+        String elemName = getEventName(last);
+        if ((includedTagFound && INCLUDED_TAG.equalsIgnoreCase(elemName)) ||
+          (configTagFound && CONFIG_TAG.equalsIgnoreCase(elemName))) {
+
+          saxEventList.remove(lastIndex);
+        }
       }
     }
+  }
+
+  /**
+   * Gets the event name of a {@code SaxEvent}
+   * @param event SaxEvent to evaluate
+   * @return {@code event.qName} is if it's not empty; otherwise, {@code event.localName}
+   */
+  private String getEventName(SaxEvent event) {
+    return event.qName.length() > 0 ? event.qName : event.localName;
   }
 }
