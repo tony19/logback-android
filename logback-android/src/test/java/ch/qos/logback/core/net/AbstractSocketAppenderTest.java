@@ -92,6 +92,9 @@ public class AbstractSocketAppenderTest {
   public void tearDown() throws Exception {
     appender.stop();
     assertFalse(appender.isStarted());
+
+    breakOutSocketReConnectionLoop();
+
     executorService.shutdownNow();
     assertTrue(executorService.awaitTermination(TIMEOUT, TimeUnit.MILLISECONDS));
   }
@@ -414,6 +417,10 @@ public class AbstractSocketAppenderTest {
 
   private void awaitStartOfEventDispatching() throws InterruptedException {
     verify(deque, timeout(TIMEOUT)).takeFirst();
+  }
+
+  private void breakOutSocketReConnectionLoop() throws InterruptedException {
+    when(socketConnector.call()).thenReturn(null);
   }
 
   private static class InstrumentedSocketAppender extends AbstractSocketAppender<String> {
