@@ -112,7 +112,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       cbTracker = new CyclicBufferTracker<E>();
     }
 
-    Session session = buildSessionFromProperties();
+    session = buildSessionFromProperties();
 
     if (session == null) {
       addError("Failed to obtain javax.mail.Session. Cannot start.");

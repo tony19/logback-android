@@ -31,7 +31,6 @@ import org.junit.After;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 import static org.mockito.Matchers.any;
@@ -77,12 +76,11 @@ public class AbstractSocketAppenderTest {
   private InstrumentedSocketAppender appender = spy(new InstrumentedSocketAppender(preSerializationTransformer, queueFactory, objectWriterFactory, socketConnector));
 
   @Before
-  public void setUp() throws Exception {
-    // setup valid appender with mock dependencies
-    when(socket.getOutputStream()).thenReturn(mock(OutputStream.class));
-    when(socketConnector.call()).thenReturn(socket);
-    when(objectWriterFactory.newAutoFlushingObjectWriter(any(OutputStream.class))).thenReturn(objectWriter);
-    when(queueFactory.<String>newLinkedBlockingDeque(anyInt())).thenReturn(deque);
+  public void setupValidAppenderWithMockDependencies() throws Exception {
+    doReturn(mock(OutputStream.class)).when(socket).getOutputStream();
+    doReturn(socket).when(socketConnector).call();
+    doReturn(objectWriter).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
+    doReturn(deque).when(queueFactory).<String>newLinkedBlockingDeque(anyInt());
 
     appender.setContext(mockContext);
     appender.setRemoteHost("localhost");
@@ -244,6 +242,45 @@ public class AbstractSocketAppenderTest {
 
     // then
     verify(appender, timeout(TIMEOUT).atLeastOnce()).addInfo(contains("connection closed"));
+  }
+
+  @Test
+  public void shutsDownOnInterruptWhileWaitingForEvent() throws Exception {
+
+    // given
+    doThrow(new InterruptedException()).when(deque).takeFirst();
+
+    // when
+    appender.start();
+
+    // then
+    verify(deque, timeout(TIMEOUT)).takeFirst();
+  }
+
+  @Test
+  public void shutsDownOnInterruptWhileWaitingForSocketConnection() throws Exception {
+
+    // given
+    doThrow(new InterruptedException()).when(socketConnector).call();
+
+    // when
+    appender.start();
+
+    // then
+    verify(socketConnector, timeout(TIMEOUT)).call();
+  }
+
+  @Test
+  public void addsInfoMessageWhenShuttingDownDueToInterrupt() throws Exception {
+
+    // given
+    doThrow(new InterruptedException()).when(socketConnector).call();
+
+    // when
+    appender.start();
+
+    // then
+    verify(appender, timeout(TIMEOUT)).addInfo(contains("shutting down"));
   }
 
   @Test
@@ -434,7 +471,7 @@ public class AbstractSocketAppenderTest {
   }
 
   private void breakOutSocketReConnectionLoop() throws InterruptedException {
-    when(socketConnector.call()).thenReturn(null);
+    doReturn(null).when(socketConnector).call();
   }
 
   private static class InstrumentedSocketAppender extends AbstractSocketAppender<String> {

@@ -127,7 +127,8 @@ public class SMTPAppender_GreenTest {
   }
 
   private void waitForServerToReceiveEmails(int emailCount) throws InterruptedException {
-    greenMailServer.waitForIncomingEmail(5000, emailCount);
+    assertTrue("no emails received",
+            greenMailServer.waitForIncomingEmail(5000, emailCount));
   }
 
   private MimeMultipart verifyAndExtractMimeMultipart(String subject) throws MessagingException,
@@ -147,7 +148,8 @@ public class SMTPAppender_GreenTest {
 
   private void waitUntilEmailIsSent() throws InterruptedException {
     loggerContext.getExecutorService().shutdown();
-    loggerContext.getExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS);
+    assertTrue("no emails sent",
+            loggerContext.getExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS));
   }
 
   @Test
