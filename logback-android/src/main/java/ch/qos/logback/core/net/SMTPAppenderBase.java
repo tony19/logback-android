@@ -84,7 +84,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   private String charsetEncoding = "UTF-8";
 
-  protected MimeMessage mimeMsg;
+  protected Session session;
 
   protected EventEvaluator<E> eventEvaluator;
 
@@ -118,22 +118,10 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       addError("Failed to obtain javax.mail.Session. Cannot start.");
       return;
     }
-    mimeMsg = new MimeMessage(session);
 
-    try {
-      if (from != null) {
-        mimeMsg.setFrom(getAddress(from));
-      } else {
-        mimeMsg.setFrom();
-      }
+    subjectLayout = makeSubjectLayout(subjectStr);
 
-      subjectLayout = makeSubjectLayout(subjectStr);
-
-      started = true;
-
-    } catch (MessagingException e) {
-      addError("Could not activate SMTPAppender options.", e);
-    }
+    started = true;
   }
 
   private Session buildSessionFromProperties() {
@@ -248,11 +236,6 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       return false;
     }
 
-    if (this.mimeMsg == null) {
-      addError("Message object not configured.");
-      return false;
-    }
-
     if (this.eventEvaluator == null) {
       addError("No EventEvaluator is set for appender [" + name + "].");
       return false;
@@ -355,6 +338,15 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
           subjectStr = subjectStr.substring(0, newLinePos);
         }
       }
+
+      MimeMessage mimeMsg = new MimeMessage(session);
+
+      if (from != null) {
+        mimeMsg.setFrom(getAddress(from));
+      } else {
+        mimeMsg.setFrom();
+      }
+
       mimeMsg.setSubject(subjectStr, charsetEncoding);
 
       List<InternetAddress> destinationAddresses = parseAddress(lastEventObject);
@@ -560,17 +552,6 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       toList.add(plb.getPattern());
     }
     return toList;
-  }
-
-  // for testing purpose only
-  public Message getMessage() {
-    return mimeMsg;
-  }
-
-  // for testing purpose only
-
-  public void setMessage(MimeMessage msg) {
-    this.mimeMsg = msg;
   }
 
   public boolean isSTARTTLS() {
