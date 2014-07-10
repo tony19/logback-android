@@ -273,13 +273,14 @@ import android.app.Activity;
 import android.os.Bundle;
 
 public class MainActivity extends Activity {
+  static {
+    BasicLogcatConfigurator.configureDefaultContext();
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-
-    BasicLogcatConfigurator.configureDefaultContext();
 
     org.slf4j.Logger log = LoggerFactory.getLogger(MainActivity.class);
     for (int i = 0; i < 10; i++) {
