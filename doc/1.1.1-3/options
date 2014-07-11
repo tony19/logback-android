@@ -1,0 +1,32 @@
+-classpath
+'/Users/tony/Developer/src/logback-android_2/target/classes:/Users/tony/Developer/src/logback-android_2/logback-core/target/classes:/Users/tony/Developer/src/logback-android_2/logback-classic/target/classes:/Users/tony/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/Users/tony/.m2/repository/org/khronos/opengl-api/gl1.1-android-2.1_r1/opengl-api-gl1.1-android-2.1_r1.jar:/Users/tony/.m2/repository/commons-codec/commons-codec/1.3/commons-codec-1.3.jar:/Users/tony/.m2/repository/com/github/tony19/apktool-lib/1.4.4-3/apktool-lib-1.4.4-3.jar:/Users/tony/.m2/repository/com/github/tony19/logback-android-core/1.1.1-3/logback-android-core-1.1.1-3.jar:/Users/tony/.m2/repository/javax/mail/mail/1.4/mail-1.4.jar:/Users/tony/.m2/repository/org/json/json/20080701/json-20080701.jar:/Users/tony/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar:/Users/tony/.m2/repository/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.jar:/Users/tony/.m2/repository/org/apache/httpcomponents/httpclient/4.0.1/httpclient-4.0.1.jar:/Users/tony/.m2/repository/xerces/xmlParserAPIs/2.6.2/xmlParserAPIs-2.6.2.jar:/Users/tony/.m2/repository/org/slf4j/slf4j-api/1.7.6/slf4j-api-1.7.6.jar:/Users/tony/.m2/repository/com/google/android/android/2.1.2/android-2.1.2.jar:/Users/tony/.m2/repository/xpp3/xpp3/1.1.4c/xpp3-1.1.4c.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/tony/Developer/src/logback-android_2/logback-core/src/main/java:/Users/tony/Developer/src/logback-android_2/logback-classic/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2005&#x2013;2014 <a href="http://www.qos.ch">QOS.ch</a>. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/tony/Developer/src/logback-android_2/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Logback Android Parent 1.1.1-3 API'
+-group
+'Logback Core' 'ch.qos.logback.core:ch.qos.logback.core.*'
+-group
+'Logback Classic' 'ch.qos.logback:ch.qos.logback.classic:ch.qos.logback.classic.*'
+-group
+'SLF4J' 'org.slf4j:org.slf4j.*'
+-link
+'http://java.sun.com/j2se/1.5.0/docs/api'
+-linkoffline
+'http://docs.oracle.com/javase/7/docs/api' '/Users/tony/Developer/src/logback-android_2/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'Logback Android Parent 1.1.1-3 API'
