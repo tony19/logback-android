@@ -15,7 +15,7 @@ package ch.qos.logback.core.pattern.color;
 
 /**
  * Encloses a given set of converter output in white using the appropriate ANSI escape codes.
- * @param <E>
+ * @param <E> type of log event object
  * @author  Ceki G&uuml;lc&uuml;
  * @since 1.0.5
  * @deprecated

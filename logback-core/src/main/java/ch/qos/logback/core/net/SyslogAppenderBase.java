@@ -27,7 +27,7 @@ import ch.qos.logback.core.Layout;
  *
  * @author Ceki G&uuml;lc&uuml;
  *
- * @param <E>
+ * @param <E> type of log event object
  */
 public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
 
@@ -134,6 +134,8 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   /**
    * Returns the integer value corresponding to the named syslog facility.
    *
+   * @param facilityStr the syslog facility name
+   * @return the syslog facility code
    * @throws IllegalArgumentException
    *           if the facility string is not recognized
    */
@@ -194,6 +196,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * Returns the value of the <b>SyslogHost</b> option.
+   * @return the syslog hostname
    */
   public String getSyslogHost() {
     return syslogHost;
@@ -204,6 +207,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    * output should go.
    *
    * <b>WARNING</b> If the SyslogHost is not set, then this appender will fail.
+   * @param syslogHost the syslog hostname
    */
   public void setSyslogHost(String syslogHost) {
     this.syslogHost = syslogHost;
@@ -213,6 +217,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    * Returns the string value of the <b>Facility</b> option.
    *
    * See {@link #setFacility} for the set of allowed values.
+   * @return the current facility name
    */
   public String getFacility() {
     return facilityStr;
@@ -227,6 +232,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    * <p>
    * See {@link SyslogConstants} and RFC 3164 for more information about the
    * <b>Facility</b> option.
+   * @param facilityStr the name of the desired facility
    */
   public void setFacility(String facilityStr) {
     if (facilityStr != null) {
@@ -236,8 +242,8 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   }
 
   /**
-   *
-   * @return
+   * Gets the syslog port to connect to
+   * @return the syslog port
    */
   public int getPort() {
     return port;
@@ -246,14 +252,15 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   /**
    * The port number on the syslog server to connect to. Normally, you would not
    * want to change the default value, that is 514.
+   * @param port the desired syslog port
    */
   public void setPort(int port) {
     this.port = port;
   }
 
   /**
-   *
-   * @return
+   * Gets the maximum size of a syslog message
+   * @return the max message size (in characters)
    */
   public int getMaxMessageSize() {
     return maxMessageSize;
@@ -265,6 +272,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    * is near the maximum for syslog-over-UDP). Note that the value is
    * characters; the number of bytes may vary if non-ASCII characters
    * are present.
+   * @param maxMessageSize the max message size (in characters)
    */
   public void setMaxMessageSize(int maxMessageSize) {
     this.maxMessageSize = maxMessageSize;
@@ -293,7 +301,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    * Enables/disables lazy initialization of the Syslog output stream.
    * This defers the connection process until the first outgoing message.
    *
-   * @param enabled true to enable lazy initialization; false otherwise
+   * @param enable true to enable lazy initialization; false otherwise
    */
   public void setLazy(boolean enable) {
     lazyInit = enable;
@@ -306,9 +314,9 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   }
 
 /**
-   * See {@link #setSuffixPattern(String).
+   * See {@link #setSuffixPattern(String)}.
    *
-   * @return
+   * @return the suffix pattern
    */
   public String getSuffixPattern() {
     return suffixPattern;
@@ -318,7 +326,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    * The <b>suffixPattern</b> option specifies the format of the
    * non-standardized part of the message sent to the syslog server.
    *
-   * @param suffixPattern
+   * @param suffixPattern the desired suffix pattern
    */
   public void setSuffixPattern(String suffixPattern) {
     this.suffixPattern = suffixPattern;

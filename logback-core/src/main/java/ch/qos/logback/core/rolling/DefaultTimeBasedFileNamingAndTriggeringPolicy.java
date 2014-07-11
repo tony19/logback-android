@@ -19,10 +19,10 @@ import java.util.Date;
 import ch.qos.logback.core.rolling.helper.TimeBasedArchiveRemover;
 
 /**
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
- * 
- * @param <E>
+ *
+ * @param <E> type of log event object
  */
 public class DefaultTimeBasedFileNamingAndTriggeringPolicy<E> extends
     TimeBasedFileNamingAndTriggeringPolicyBase<E> {

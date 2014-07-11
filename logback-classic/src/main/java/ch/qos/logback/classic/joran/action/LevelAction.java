@@ -22,13 +22,15 @@ import ch.qos.logback.core.joran.action.ActionConst;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
 
 /**
- * Action to handle the <level> element nested within <logger> element. 
- * 
+ * Action to handle the &lt;level&gt; element nested within &lt;logger&gt; element.
+ *
  * <p>This action is <b>deprecated</b>. Use the level attribute within the logger
  * element.
- * 
+ *
+ * @deprecated
  * @author Ceki Gulcu
  */
+@Deprecated
 public class LevelAction extends Action {
 
   boolean inError = false;

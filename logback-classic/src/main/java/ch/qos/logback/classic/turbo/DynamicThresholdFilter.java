@@ -26,14 +26,14 @@ import java.util.HashMap;
  * This filter allows for efficient course grained filtering based on criteria
  * such as product name or company name that would be associated with requests
  * as they are processed.
- * 
+ *
  * <p> This filter will allow you to associate threshold levels to a key put in
  * the MDC. This key can be any value specified by the user. Furthermore, you
  * can pass MDC value and level threshold associations, which are then looked up
  * to find the level threshold to apply to the current logging request. If no
  * level threshold could be found, then a 'default' value specified by the user
  * is applied. We call this value 'levelAssociatedWithMDCValue'.
- * 
+ *
  * <p> If 'levelAssociatedWithMDCValue' is higher or equal to the level of the
  * current logger request, the
  * {@link #decide(Marker, Logger, Level, String, Object[], Throwable) decide()}
@@ -45,7 +45,7 @@ import java.util.HashMap;
  * 'levelAssociatedWithMDCValue', then the request is denied, and if it is
  * higher or equal, then this filter decides NEUTRAL letting subsequent filters
  * to make the decision on the fate of the logging request.
- * 
+ *
  * <p> The example below illustrates how logging could be enabled for only
  * individual users. In this example all events for logger names matching
  * "com.mycompany" will be logged if they are for 'user1' and at a level higher
@@ -54,16 +54,16 @@ import java.util.HashMap;
  * higher. Events issued by loggers other than "com.mycompany" will only be
  * logged if they are at level ERROR or higher since that is all the root logger
  * allows.
- * 
+ *
  * <pre>
  * &lt;configuration&gt;
  *   &lt;appender name="STDOUT"
  *             class="ch.qos.logback.core.ConsoleAppender"&gt;
  *     &lt;layout class="ch.qos.logback.classic.PatternLayout"&gt;
- *       &lt;Pattern>TEST %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n&lt;/Pattern>
+ *       &lt;pattern&gt;TEST %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n&lt;/pattern&gt;
  *     &lt;/layout&gt;
  *   &lt;/appender&gt;
- *   
+ *
  *   &lt;turboFilter class=&quot;ch.qos.logback.classic.turbo.DynamicThresholdFilter&quot;&gt;
  *     &lt;Key&gt;userId&lt;/Key&gt;
  *     &lt;DefaultThreshold&gt;ERROR&lt;/DefaultThreshold&gt;
@@ -76,30 +76,30 @@ import java.util.HashMap;
  *       &lt;level&gt;TRACE&lt;/level&gt;
  *     &lt;/MDCValueLevelPair&gt;
  *   &lt;/turboFilter&gt;
- *   
+ *
  *   &lt;logger name="com.mycompany" level="TRACE"/&gt;
- *   
+ *
  *   &lt;root level="ERROR" &gt;
  *     &lt;appender-ref ref="STDOUT" /&gt;
  *   &lt;/root&gt;
  * &lt;/configuration&gt;
  * </pre>
- * 
+ *
  * In the next configuration events from user1 and user2 will be logged
  * regardless of the logger levels. Events for other users and records without a
  * userid in the MDC will be logged if they are ERROR level messages. With this
  * configuration, the root level is never checked since DynamicThresholdFilter
  * will either accept or deny all records.
- * 
+ *
  * <pre>
  * &lt;configuration&gt;
  *   &lt;appender name="STDOUT"
  *             class="ch.qos.logback.core.ConsoleAppender"&gt;
  *     &lt;layout class="ch.qos.logback.classic.PatternLayout"&gt;
- *        &lt;Pattern>TEST %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n&lt;/Pattern>
+ *        &lt;pattern&gt;TEST %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n&lt;/pattern&gt;
  *     &lt;/layout&gt;
  *   &lt;/appender&gt;
- *   
+ *
  *   &lt;turboFilter class=&quot;ch.qos.logback.classic.turbo.DynamicThresholdFilter&quot;&gt;
  *     &lt;Key&gt;userId&lt;/Key&gt;
  *     &lt;DefaultThreshold&gt;ERROR&lt;/DefaultThreshold&gt;
@@ -114,13 +114,13 @@ import java.util.HashMap;
  *       &lt;level&gt;TRACE&lt;/level&gt;
  *     &lt;/MDCValueLevelPair&gt;
  *   &lt;/turboFilter&gt;
- *   
+ *
  *   &lt;root level="DEBUG" &gt;
  *     &lt;appender-ref ref="STDOUT" /&gt;
  *   &lt;/root&gt;
  * &lt;/configuration&gt;
  * </pre>
- * 
+ *
  * @author Raplh Goers
  * @author Ceki G&uuml;lc&uuml;
  */
@@ -134,7 +134,7 @@ public class DynamicThresholdFilter extends TurboFilter {
 
   /**
    * Get the MDC key whose value will be used as a level threshold
-   * 
+   *
    * @return the name of the MDC key.
    */
   public String getKey() {
@@ -150,7 +150,7 @@ public class DynamicThresholdFilter extends TurboFilter {
 
   /**
    * Get the default threshold value when the MDC key is not set.
-   * 
+   *
    * @return the default threshold value in the absence of a set MDC key
    */
   public Level getDefaultThreshold() {
@@ -164,7 +164,7 @@ public class DynamicThresholdFilter extends TurboFilter {
   /**
    * Get the FilterReply when the effective level is higher or equal to the
    * level of current logging request
-   * 
+   *
    * @return FilterReply
    */
   public FilterReply getOnHigherOrEqual() {
@@ -178,7 +178,7 @@ public class DynamicThresholdFilter extends TurboFilter {
   /**
    * Get the FilterReply when the effective level is lower than the level of
    * current logging request
-   * 
+   *
    * @return FilterReply
    */
   public FilterReply getOnLower() {
@@ -202,7 +202,7 @@ public class DynamicThresholdFilter extends TurboFilter {
   }
 
   /**
-   * 
+   *
    */
   @Override
   public void start() {
@@ -217,19 +217,15 @@ public class DynamicThresholdFilter extends TurboFilter {
    * threshold associated with this MDC value from the list of MDCValueLevelPair
    * passed to this filter. This value is stored in a variable called
    * 'levelAssociatedWithMDCValue'. If it null, then it is set to the
-   * 
-   * @{link #defaultThreshold} value.
-   * 
-   * If no such value exists, then
-   * 
-   * 
+   * {@link #defaultThreshold} value.
+   *
    * @param marker
    * @param logger
    * @param level
    * @param s
    * @param objects
    * @param throwable
-   * 
+   *
    * @return FilterReply - this filter's decision
    */
   @Override

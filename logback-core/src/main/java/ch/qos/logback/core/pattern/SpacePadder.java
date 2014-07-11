@@ -45,9 +45,11 @@ public class SpacePadder {
       spacePad(buf, desiredLength - actualLen);
     }
   }
-  
+
   /**
    * Fast space padding method.
+   * @param sbuf buffer to modify
+   * @param length number of spaces to add
    */
   final static public void spacePad(StringBuilder sbuf, int length) {
     while (length >= 32) {

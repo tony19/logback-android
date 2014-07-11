@@ -30,7 +30,6 @@ import java.io.IOException;
  * {@code ServerRunner} cares about; namely, that it is something that has
  * an underlying resource (or resources) that need to be closed before the
  * listener is discarded.
- * </ol>
  */
 public interface ServerListener<T extends Client> extends Closeable {
 
@@ -41,8 +40,8 @@ public interface ServerListener<T extends Client> extends Closeable {
    * and not return until either a client appears or an exception occurs.
    *
    * @return client object
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException socket error occurred
+   * @throws InterruptedException the running thread was cancelled
    */
   T acceptClient() throws IOException, InterruptedException;
 

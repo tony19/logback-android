@@ -23,7 +23,7 @@ import ch.qos.logback.core.util.DatePatternToRegexUtil;
 
 /**
  * Returns a date formatted by SimpleDateFormatter.
- * 
+ *
  * @author Ceki G&uuml;c&uuml;
  */
 public class DateTokenConverter<E> extends DynamicConverter<E> implements MonoTypedConverter {
@@ -66,12 +66,13 @@ public class DateTokenConverter<E> extends DynamicConverter<E> implements MonoTy
     }
     if (o instanceof Date) {
       return convert((Date) o);
-    } 
+    }
     throw new IllegalArgumentException("Cannot convert "+o+" of type"+o.getClass().getName());
   }
 
   /**
    * Return the date pattern.
+   * @return the date pattern
    */
   public String getDatePattern() {
     return datePattern;

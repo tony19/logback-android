@@ -66,9 +66,9 @@ public class FileFilterUtil {
   /**
    * Return the set of files matching the stemRegex as found in 'directory'. A
    * stemRegex does not contain any slash characters or any folder separators.
-   * 
-   * @param file
-   * @param stemRegex
+   *
+   * @param file folder's file object
+   * @param stemRegex regex file pattern to match
    * @return
    */
   public static File[] filesInFolderMatchingStemRegex(File file,

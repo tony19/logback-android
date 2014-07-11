@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * MDCBasedDiscriminator essentially returns the value mapped to an MDC key. If
  * the said value is null, then a default value is returned.
- * <p/>
+ * <p>
  * <p>Both Key and the DefaultValue are user specified properties.
  *
  * @author Ceki G&uuml;lc&uuml;
@@ -86,7 +86,7 @@ public class MDCBasedDiscriminator extends AbstractDiscriminator<ILoggingEvent> 
   /**
    * The default MDC value in case the MDC is not set for
    * {@link #setKey(String) mdcKey}.
-   * <p/>
+   * <p>
    * <p> For example, if {@link #setKey(String) Key} is set to the value
    * "someKey", and the MDC is not set for "someKey", then this appender will
    * use the default value, which you can set with the help of this method.

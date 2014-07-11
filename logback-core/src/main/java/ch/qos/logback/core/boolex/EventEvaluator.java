@@ -18,11 +18,11 @@ import ch.qos.logback.core.spi.LifeCycle;
 
 /**
  * Evaluates whether a given an event matches user-specified criteria.
- * 
+ *
  * <p>
  * Implementations are free to evaluate the event as they see fit. In
  * particular, the evaluation results <em>may</em> depend on previous events.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 
@@ -31,11 +31,11 @@ public interface EventEvaluator<E> extends ContextAware, LifeCycle {
   /**
    * Evaluates whether the event passed as parameter matches some user-specified
    * criteria.
-   * 
+   *
    * <p>
    * The <code>Evaluator</code> is free to evaluate the event as it pleases. In
    * particular, the evaluation results <em>may</em> depend on previous events.
-   * 
+   *
    * @param event
    *          The event to evaluate
    * @return true if there is a match, false otherwise.
@@ -47,14 +47,15 @@ public interface EventEvaluator<E> extends ContextAware, LifeCycle {
   boolean evaluate(E event) throws NullPointerException, EvaluationException;
 
   /**
-   * Evaluators are named entities.
-   * 
+   * Gets this evaluator's name
+   *
    * @return The name of this evaluator.
    */
   String getName();
 
   /**
-   * Evaluators are named entities.
+   * Sets this evaluator's name
+   * @param name the desired name
    */
   void setName(String name);
 }

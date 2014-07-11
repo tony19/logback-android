@@ -46,6 +46,9 @@ public class SystemPropertiesProxy {
    * Sets the classloader to lookup the class for android.os.SystemProperties
    *
    * @param cl desired classloader
+   * @throws ClassNotFoundException android.os.SystemProperties class not found
+   * @throws SecurityException security manager does not allow class loading
+   * @throws NoSuchMethodException get/getBoolean method does not exist
    */
   public void setClassLoader(ClassLoader cl)
       throws ClassNotFoundException, SecurityException, NoSuchMethodException {

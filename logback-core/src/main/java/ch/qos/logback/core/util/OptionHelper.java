@@ -105,6 +105,9 @@ public class OptionHelper {
 
   /**
    * @see #substVars(String, PropertyContainer, PropertyContainer)
+   * @param val string to be evaluated
+   * @param pc1 property container
+   * @return the substituted string
    */
   public static String substVars(String val, PropertyContainer pc1) {
     return substVars(val, pc1, null);
@@ -112,6 +115,10 @@ public class OptionHelper {
 
   /**
    * See  http://logback.qos.ch/manual/configuration.html#variableSubstitution
+   * @param input string to be evaluated
+   * @param pc0 primary property container
+   * @param pc1 secondary property container
+   * @return the substituted string
    */
   public static String substVars(String input, PropertyContainer pc0, PropertyContainer pc1) {
     try {
@@ -161,7 +168,7 @@ public class OptionHelper {
   /**
    * Lookup a key from the environment.
    *
-   * @param key
+   * @param key the environment variable's key
    * @return value corresponding to key from the OS environment
    */
   public static String getEnv(String key) {
@@ -259,12 +266,15 @@ public class OptionHelper {
    * If <code>value</code> is "true", then <code>true</code> is returned. If
    * <code>value</code> is "false", then <code>true</code> is returned.
    * Otherwise, <code>default</code> is returned.
-   * <p/>
-   * <p> Case of value is unimportant.
+   * <p>
+   * Case of value is unimportant.
+   * @param value string to be evaluated
+   * @param defaultValue default value if value could not be converted
+   * @return the equivalent boolean value
    */
-  public static boolean toBoolean(String value, boolean dEfault) {
+  public static boolean toBoolean(String value, boolean defaultValue) {
     if (value == null) {
-      return dEfault;
+      return defaultValue;
     }
 
     String trimmedVal = value.trim();
@@ -277,7 +287,7 @@ public class OptionHelper {
       return false;
     }
 
-    return dEfault;
+    return defaultValue;
   }
 
   public static boolean isEmpty(String str) {

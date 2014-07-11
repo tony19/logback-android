@@ -32,27 +32,27 @@ import ch.qos.logback.core.joran.event.StartEvent;
 import ch.qos.logback.core.spi.ContextAwareImpl;
 
 /**
- * <id>Interpreter</id> is Joran's main driving class. It extends SAX
+ * <code>Interpreter</code> is Joran's main driving class. It extends SAX
  * {@link org.xml.sax.helpers.DefaultHandler DefaultHandler} which invokes
  * various {@link Action actions} according to predefined patterns.
- * 
+ *
  * <p>
  * Patterns are kept in a {@link RuleStore} which is programmed to store and
  * then later produce the applicable actions for a given pattern.
- * 
+ *
  * <p>
  * The pattern corresponding to a top level &lt;a&gt; element is the string
- * <id>"a"</id>.
- * 
+ * <code>"a"</code>.
+ *
  * <p>
  * The pattern corresponding to an element &lt;b&gt; embedded within a top level
- * &lt;a&gt; element is the string <id>"a/b"</id>.
- * 
+ * &lt;a&gt; element is the string <code>"a/b"</code>.
+ *
  * <p>
  * The pattern corresponding to an &lt;b&gt; and any level of nesting is
  * "&#42;/b. Thus, the &#42; character placed at the beginning of a pattern
  * serves as a wildcard for the level of nesting.
- * 
+ *
  * Conceptually, this is very similar to the API of commons-digester. Joran
  * offers several small advantages. First and foremost, it offers support for
  * implicit actions which result in a significant leap in flexibility. Second,
@@ -60,9 +60,9 @@ import ch.qos.logback.core.spi.ContextAwareImpl;
  * It does not depend on other APIs, in particular commons-logging which is too
  * unreliable. Last but not least, Joran is quite tiny and is expected to remain
  * so.
- * 
+ *
  * @author Ceki G&uuml;lcu&uuml;
- * 
+ *
  */
 public class Interpreter {
   private static List<Action> EMPTY_LIST = new Vector<Action>(0);
@@ -76,12 +76,12 @@ public class Interpreter {
   EventPlayer eventPlayer;
 
   /**
-   * The <id>actionListStack</id> contains a list of actions that are executing
+   * The <code>actionListStack</code> contains a list of actions that are executing
    * for the given XML element.
-   * 
+   *
    * A list of actions is pushed by the {link #startElement} and popped by
    * {@link #endElement}.
-   * 
+   *
    */
   Stack<List<Action>> actionListStack;
 
@@ -112,6 +112,7 @@ public class Interpreter {
 
   /**
    * @deprecated replaced by {@link #getInterpretationContext()}
+   * @return the interpretation context of the interpreter
    */
   public InterpretationContext getExecutionContext() {
     return getInterpretationContext();
@@ -335,7 +336,7 @@ public class Interpreter {
  * When {@link Interpreter} class is used as the origin of an
  * {@link ContextAwareImpl} instance, then XML locator information is lost. This
  * class preserves locator information (as a string).
- * 
+ *
  * @author ceki
  */
 class CAI_WithLocatorSupport extends ContextAwareImpl {

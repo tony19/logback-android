@@ -17,8 +17,8 @@ package ch.qos.logback.core.net.ssl;
  * An object that has configurable SSL parameters.
  * <p>
  * This interface allows us o decouple the {@link SSLParametersConfiguration}
- * from {@link SSLSocket} and {@link SSLServerSocket} to facilitate unit
- * testing.
+ * from {@link javax.net.ssl.SSLSocket} and {@link javax.net.ssl.SSLServerSocket}
+ * to facilitate unit testing.
  *
  * @author Carl Harris
  */
@@ -42,7 +42,7 @@ public interface SSLConfigurable {
 
   /**
    * Sets the enabled protocols on the SSL component.
-   * @param cipherSuites the protocols to enable
+   * @param protocols the protocols to enable
    */
   void setEnabledProtocols(String[] protocols);
 

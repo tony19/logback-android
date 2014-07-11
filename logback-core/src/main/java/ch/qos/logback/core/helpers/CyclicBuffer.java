@@ -18,10 +18,10 @@ import java.util.List;
 
 /**
  * CyclicBuffer holds values in a cyclic array.
- * 
+ *
  * <p>It allows read access to any element in the buffer not just the first or
  * last element.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 public class CyclicBuffer<E> {
@@ -34,9 +34,9 @@ public class CyclicBuffer<E> {
 
   /**
    * Instantiate a new CyclicBuffer of at most <code>maxSize</code> events.
-   * 
+   *
    * The <code>maxSize</code> argument must a positive integer.
-   * 
+   *
    * @param maxSize
    *                The maximum number of elements in the buffer.
    */
@@ -75,7 +75,7 @@ public class CyclicBuffer<E> {
 
   /**
    * Add an <code>event</code> as the last event in the buffer.
-   * 
+   * @param event the log event
    */
   public void add(E event) {
     ea[last] = event;
@@ -92,6 +92,8 @@ public class CyclicBuffer<E> {
    * Get the <i>i</i>th oldest event currently in the buffer. If <em>i</em>
    * is outside the range 0 to the number of elements currently in the buffer,
    * then <code>null</code> is returned.
+   * @param i the index of the oldest event to fetch
+   * @return the event
    */
   public E get(int i) {
     if (i < 0 || i >= numElems)
@@ -107,6 +109,7 @@ public class CyclicBuffer<E> {
   /**
    * Get the oldest (first) element in the buffer. The oldest element is removed
    * from the buffer.
+   * @return the element
    */
   public E get() {
     E r = null;
@@ -119,7 +122,7 @@ public class CyclicBuffer<E> {
     }
     return r;
   }
-  
+
   public List<E> asList() {
     List<E> tList = new ArrayList<E>();
     for(int i = 0; i < length(); i++) {
@@ -131,6 +134,7 @@ public class CyclicBuffer<E> {
   /**
    * Get the number of elements in the buffer. This number is guaranteed to be
    * in the range 0 to <code>maxSize</code> (inclusive).
+   * @return the element count
    */
   public int length() {
     return numElems;
@@ -138,7 +142,8 @@ public class CyclicBuffer<E> {
 
   /**
    * Resize the cyclic buffer to <code>newSize</code>.
-   * 
+   *
+   * @param newSize the desired size
    * @throws IllegalArgumentException
    *                 if <code>newSize</code> is negative.
    */
@@ -151,7 +156,7 @@ public class CyclicBuffer<E> {
     if (newSize == numElems)
       return; // nothing to do
 
-    // 
+    //
     E[] temp = (E[]) new Object[newSize];
 
     int loopLen = newSize < numElems ? newSize : numElems;

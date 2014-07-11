@@ -38,7 +38,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   /**
    * Concrete implementations of this class are responsible for elaborating the
    * mapping between pattern words and converters.
-   * 
+   *
    * @return A map associating pattern words to the names of converter classes
    */
   abstract public Map<String, String> getDefaultConverterMap();
@@ -46,6 +46,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   /**
    * Returns a map where the default converter map is merged with the map
    * contained in the context.
+   * @return the effective converter map
    */
   public Map<String, String> getEffectiveConverterMap() {
     Map<String, String> effectiveMap = new HashMap<String, String>();
@@ -76,7 +77,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
       addError("Empty or null pattern.");
       return;
     }
-    try { 
+    try {
       Parser<E> p = new Parser<E>(pattern);
       if (getContext() != null) {
         p.setContext(getContext());
@@ -103,7 +104,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
 
   /**
    *
-   * @param head
+   * @param head the head node of the converter chain
    * @deprecated  Use {@link ConverterUtil#setContextForConverters} instead. This method will
    *  be removed in future releases.
    */
@@ -136,7 +137,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   public Map<String, String> getInstanceConverterMap() {
     return instanceConverterMap;
   }
-  
+
   protected String getPresentationHeaderPrefix() {
     return CoreConstants.EMPTY_STRING;
   }

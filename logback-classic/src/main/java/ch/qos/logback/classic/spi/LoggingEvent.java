@@ -33,7 +33,6 @@ import org.slf4j.spi.MDCAdapter;
  * The internal representation of logging events. When an affirmative decision
  * is made to log then a <code>LoggingEvent</code> instance is created. This
  * instance is passed around to the different logback-classic components.
- * <p/>
  * <p>
  * Writers of logback-classic components such as appenders should be aware of
  * that some of the LoggingEvent fields are initialized lazily. Therefore, an
@@ -199,8 +198,7 @@ public class LoggingEvent implements ILoggingEvent {
   /**
    * This method should be called prior to serializing an event. It should also
    * be called when using asynchronous or deferred logging.
-   * <p/>
-   * <p/>
+   * <p>
    * Note that due to performance concerns, this method does NOT extract caller
    * data. It is the responsibility of the caller to extract caller information.
    */
@@ -251,7 +249,6 @@ public class LoggingEvent implements ILoggingEvent {
    * Get the caller information for this logging event. If caller information is
    * null at the time of its invocation, this method extracts location
    * information. The collected information is cached for future use.
-   * <p/>
    * <p>
    * Note that after serialization it is impossible to correctly extract caller
    * information.

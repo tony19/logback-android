@@ -81,7 +81,7 @@ public abstract class CommonPathUtil {
   /**
    * Gets the relative path to the assets directory within the jar
    *
-   * @return
+   * @return the relative path to the assets directory within the jar
    */
   public static String getAssetsDirectoryPath() {
     return ASSETS_DIRECTORY;

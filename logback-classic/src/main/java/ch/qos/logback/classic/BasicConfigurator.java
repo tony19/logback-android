@@ -28,7 +28,7 @@ import ch.qos.logback.core.status.StatusManager;
  * "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n".
  *
  * @author Ceki Gulcu
- * @deprecated See {@link BasicLogcatConfigurator}.
+ * @deprecated See {@link ch.qos.logback.classic.android.BasicLogcatConfigurator}.
  */
 @Deprecated
 public class BasicConfigurator {

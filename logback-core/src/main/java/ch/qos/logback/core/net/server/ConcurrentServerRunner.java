@@ -27,13 +27,11 @@ import ch.qos.logback.core.spi.ContextAwareBase;
  * A concurrent {@link ServerRunner}.
  * <p>
  * An instance of this object is created with a {@link ServerListener} and
- * an {@link Executor}.  On invocation of the {@link #start()} method, it
- * passes itself to the given {@code Executor} and returns immediately.  On
- * invocation of its {@link #run()} method by the {@link Executor} it begins
- * accepting client connections via its {@code ServerListener}.  As each
- * new {@link Client} is accepted, the client is configured with the
- * runner's {@link LoggingContext} and is then passed to the {@code
- * Executor} for concurrent execution of the client's service loop.
+ * an {@link Executor}. On invocation of its {@link #run()} method by the
+ * {@link Executor} it begins accepting client connections via its {@code ServerListener}.
+ * As each new {@link Client} is accepted, the client is configured with the
+ * runner's {@code ch.qos.logback.classic.LoggerContext} and is then passed
+ * to the {@link Executor} for concurrent execution of the client's service loop.
  * <p>
  * On invocation of the {@link #stop()} method, the runner closes the listener
  * and each of the connected clients (by invoking {@link Client#close()}

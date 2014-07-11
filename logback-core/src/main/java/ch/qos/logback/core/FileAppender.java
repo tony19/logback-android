@@ -51,6 +51,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   /**
    * The <b>File</b> property takes a string value which should be the name of
    * the file to append to.
+   * @param file path to destination log file
    */
   public void setFile(String file) {
     if (file == null) {
@@ -64,6 +65,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
   /**
    * Returns the value of the <b>Append</b> property.
+   * @return true if file should be appended to instead of overwritten
    */
   public boolean isAppend() {
     return append;
@@ -82,10 +84,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
   /**
    * Returns the value of the <b>File</b> property.
-   *
-   * <p>
-   * This method may be overridden by derived classes.
-   *
+   * @return the path to the destination log file
    */
   public String getFile() {
     return fileName;
@@ -153,6 +152,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    *          The path to the log file.
    *
    * @return true if successful; false otherwise
+   * @throws IOException file could not be opened
    */
   protected boolean openFile(String filename) throws IOException {
     boolean successful = false;
@@ -189,7 +189,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    * When prudent is set to true, file appenders from multiple JVMs can safely
    * write to the same file.
    *
-   * @param prudent
+   * @param prudent whether to enable prudent mode
    */
   public void setPrudent(boolean prudent) {
     this.prudent = prudent;
@@ -213,7 +213,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    * Enables/disables lazy initialization of the file output stream.
    * This defers the file creation until the first outgoing message.
    *
-   * @param enabled true to enable lazy initialization; false otherwise
+   * @param enable true to enable lazy initialization; false otherwise
    */
   public void setLazy(boolean enable) {
     lazyInit = enable;

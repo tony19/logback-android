@@ -19,12 +19,13 @@ import ch.qos.logback.core.filter.Filter;
 
 /**
  * Interface for attaching filters to objects.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 public interface FilterAttachable<E> {
   /**
    * Add a filter.
+   * @param newFilter filter to add
    */
   void addFilter(Filter<E> newFilter);
 
@@ -33,7 +34,7 @@ public interface FilterAttachable<E> {
   /**
    * Get a copy of all the filters contained within this FilterAttachable
    * object.
-   * 
+   *
    * @return all attached filters as a list
    */
   List<Filter<E>> getCopyOfAttachedFiltersList();
@@ -42,6 +43,8 @@ public interface FilterAttachable<E> {
    * Loop through the filters in the chain. As soon as a filter decides on
    * ACCEPT or DENY, then that value is returned. If all of the filters return
    * NEUTRAL, then NEUTRAL is returned.
+   * @param event the log event
+   * @return filter result (ACCEPT, DENY, NEUTRAL)
    */
   FilterReply getFilterChainDecision(E event);
 }

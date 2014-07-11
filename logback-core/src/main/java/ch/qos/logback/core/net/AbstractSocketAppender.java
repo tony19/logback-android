@@ -312,6 +312,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
    * Gets the default {@link SocketFactory} for the platform.
    * <p>
    * Subclasses may override to provide a custom socket factory.
+   * @return the socket factory
    */
   protected SocketFactory getSocketFactory() {
     return SocketFactory.getDefault();
@@ -328,7 +329,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
    * testing.
    *
    * @param queueSize size of the queue
-   * @return
+   * @return the blocking queue
    */
   BlockingQueue<E> newBlockingQueue(int queueSize) {
     return queueSize <= 0 ?
@@ -366,6 +367,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   /**
    * The <b>RemoteHost</b> property takes the name of of the host where a corresponding server is running.
+   * @param host the remote hostname
    */
   public void setRemoteHost(String host) {
     remoteHost = host;
@@ -373,6 +375,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   /**
    * Returns value of the <b>RemoteHost</b> property.
+   * @return the RemoteHost value
    */
   public String getRemoteHost() {
     return remoteHost;
@@ -381,6 +384,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   /**
    * The <b>Port</b> property takes a positive integer representing the port
    * where the server is waiting for connections.
+   * @param port the desired port
    */
   public void setPort(int port) {
     this.port = port;
@@ -388,6 +392,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   /**
    * Returns value of the <b>Port</b> property.
+   * @return the Port value
    */
   public int getPort() {
     return port;
@@ -400,6 +405,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
    *
    * <p>
    * Setting this option to zero turns off reconnection capability.
+   * @param delay the desired reconnection delay
    */
   public void setReconnectionDelay(Duration delay) {
     this.reconnectionDelay = delay;
@@ -407,6 +413,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   /**
    * Returns value of the <b>reconnectionDelay</b> property.
+   * @return the reconnection delay
    */
   public Duration getReconnectionDelay() {
     return reconnectionDelay;
@@ -430,6 +437,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   /**
    * Returns the value of the <b>queueSize</b> property.
+   * @return the size of the queue
    */
   public int getQueueSize() {
     return queueSize;
@@ -448,6 +456,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   /**
    * Returns the value of the <b>eventDelayLimit</b> property.
+   * @return the event delay limit in ms
    */
   public Duration getEventDelayLimit() {
     return eventDelayLimit;

@@ -39,7 +39,7 @@ public class PatternLayoutEncoderBase<E> extends LayoutWrappingEncoder<E> {
   /**
    * Print the pattern string as a header in log files
    *
-   * @param outputPatternAsHeader
+   * @param outputPatternAsHeader true to enable pattern header
    * @since 1.0.3
    */
   public void setOutputPatternAsHeader(boolean outputPatternAsHeader) {
@@ -53,6 +53,7 @@ public class PatternLayoutEncoderBase<E> extends LayoutWrappingEncoder<E> {
 
   /**
    * @deprecated replaced by {@link #setOutputPatternAsHeader(boolean)}
+   * @param outputPatternAsHeader true to enable pattern header
    */
   public void setOutputPatternAsPresentationHeader(boolean outputPatternAsHeader) {
     addWarn("[outputPatternAsPresentationHeader] property is deprecated. Please use [outputPatternAsHeader] option instead.");

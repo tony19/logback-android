@@ -19,7 +19,7 @@ import static ch.qos.logback.core.pattern.color.ANSIConstants.*;
 /**
  * Base class for all foreground color setting composite converters.
  *
- * @param <E>
+ * @param <E> type of log event object
  * @since 1.0.5
  * @deprecated
  */
@@ -41,6 +41,7 @@ abstract public class ForegroundCompositeConverterBase<E> extends CompositeConve
 
   /**
    * Derived classes return the foreground color specific to the derived class instance.
+   * @param event the log event
    * @return  the foreground color for this instance
    */
   abstract protected String getForegroundColorCode(E event);

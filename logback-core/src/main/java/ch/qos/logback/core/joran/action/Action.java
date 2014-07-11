@@ -51,15 +51,20 @@ public abstract class Action extends ContextAwareBase {
   /**
    * Called when the parser encounters an element matching a
    * {@link ch.qos.logback.core.joran.spi.ElementSelector Pattern}.
+   *
+   * @param ic interpretation context
+   * @param name name of action
+   * @param attributes attributes of action
+   * @throws ActionException failed to process action
    */
   public abstract void begin(InterpretationContext ic, String name,
       Attributes attributes) throws ActionException;
 
   /**
    * Called to pass the body (as text) contained within an element.
-   * @param ic
-   * @param body
-   * @throws ActionException
+   * @param ic interpretation context
+   * @param body text of the element
+   * @throws ActionException the body could not be parsed
    */
   public void body(InterpretationContext ic, String body)
       throws ActionException {

@@ -29,7 +29,7 @@ import ch.qos.logback.core.spi.ScanException;
 /**
  * This class is a base class for HTMLLayout classes part of
  * other logback modules such as logback-classic and logback-access.
- * 
+ *
  *
  * @author S&eacute;bastien Pennec
  */
@@ -47,11 +47,12 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
 
    // counter keeping track of the rows output
   protected long counter = 0;
-  
+
   /**
-   * Set the <b>ConversionPattern </b> option. This is the string which controls
+   * Set the <b>ConversionPattern</b> option. This is the string which controls
    * formatting and consists of a mix of literal content and conversion
    * specifiers.
+   * @param conversionPattern the desired conversion pattern
    */
   public void setPattern(String conversionPattern) {
     pattern = conversionPattern;
@@ -59,6 +60,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
 
   /**
    * Returns the value of the <b>ConversionPattern </b> option.
+   * @return the conversion pattern
    */
   public String getPattern() {
     return pattern;
@@ -78,7 +80,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
   @Override
   public void start() {
     int errorCount = 0;
-    
+
     try {
       Parser<E> p = new Parser<E>(pattern);
       p.setContext(getContext());
@@ -94,13 +96,14 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
       super.started = true;
     }
   }
-  
+
   protected abstract Map<String, String> getDefaultConverterMap();
 
-  
+
   /**
    * Returns a map where the default converter map is merged with the map
    * contained in the context.
+   * @return the converter map
    */
   public Map<String, String> getEffectiveConverterMap() {
     Map<String, String> effectiveMap = new HashMap<String, String>();
@@ -123,13 +126,14 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
     }
     return effectiveMap;
   }
-  
+
   /**
-   * The <b>Title </b> option takes a String value. This option sets the
+   * The <b>Title</b> option takes a String value. This option sets the
    * document title of the generated HTML document.
-   * 
+   *
    * <p>
    * Defaults to 'Logback Log Messages'.
+   * @param title desired document title
    */
   public void setTitle(String title) {
     this.title = title;
@@ -137,6 +141,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
 
   /**
    * Returns the current value of the <b>Title </b> option.
+   * @return the page/document title
    */
   public String getTitle() {
     return title;
@@ -144,6 +149,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
 
   /**
    * Returns the content type output by this layout, i.e "text/html".
+   * @return the content type
    */
   @Override
   public String getContentType() {
@@ -152,6 +158,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
 
   /**
    * Returns appropriate HTML headers.
+   * @return the headers
    */
   @Override
   public String getFileHeader() {
@@ -167,7 +174,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
     sbuf.append(title);
     sbuf.append("</title>");
     sbuf.append(LINE_SEPARATOR);
-    
+
     cssBuilder.addCss(sbuf);
 
     sbuf.append(LINE_SEPARATOR);
@@ -178,7 +185,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
 
     return sbuf.toString();
   }
-  
+
   public String getPresentationHeader() {
     StringBuilder sbuf = new StringBuilder();
     sbuf.append("<hr/>");
@@ -192,7 +199,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
     sbuf.append(LINE_SEPARATOR);
 
     buildHeaderRowForTable(sbuf);
-    
+
     return sbuf.toString();
   }
 
@@ -219,11 +226,11 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
     sbuf.append("</tr>");
     sbuf.append(LINE_SEPARATOR);
   }
-  
+
   public String getPresentationFooter() {
     StringBuilder sbuf = new StringBuilder();
     sbuf.append("</table>");
-    return sbuf.toString();    
+    return sbuf.toString();
   }
 
   /**
@@ -236,7 +243,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
     sbuf.append("</body></html>");
     return sbuf.toString();
   }
-  
+
   protected void startNewTableIfLimitReached(StringBuilder sbuf) {
     if (this.counter >= CoreConstants.TABLE_ROW_LIMIT) {
       counter = 0;

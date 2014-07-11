@@ -27,21 +27,21 @@ import ch.qos.logback.core.util.PropertySetterException;
  * General purpose Object property setter. Clients repeatedly invokes
  * {@link #setProperty setProperty(name,value)} in order to invoke setters on
  * the Object specified in the constructor.
- * 
+ *
  * <p>
  * Usage:
- * 
+ *
  * <pre>
  * PropertySetter ps = new PropertySetter(anObject);
  * ps.set(&quot;name&quot;, &quot;Joe&quot;);
  * ps.set(&quot;age&quot;, &quot;32&quot;);
  * ps.set(&quot;isMale&quot;, &quot;true&quot;);
  * </pre>
- * 
+ *
  * will cause the invocations anObject.setName("Joe"), anObject.setAge(32), and
  * setMale(true) if such methods exist with those signatures. Otherwise an
  * {@link IntrospectionException} are thrown.
- * 
+ *
  * @author Anders Kristensen
  * @author Ceki Gulcu
  */
@@ -55,7 +55,7 @@ public class PropertySetter extends ContextAwareBase {
   /**
    * Create a new PropertySetter for the specified Object. This is done in
    * preparation for invoking {@link #setProperty} one or more times.
-   * 
+   *
    * @param obj
    *          the object for which to set properties
    */
@@ -85,13 +85,13 @@ public class PropertySetter extends ContextAwareBase {
    * for the specified property name and the value is determined partly from the
    * setter argument type and partly from the value specified in the call to
    * this method.
-   * 
+   *
    * <p>
    * If the setter expects a String no conversion is necessary. If it expects an
    * int, then an attempt is made to convert 'value' to an int using new
    * Integer(value). If the setter expects a boolean, the conversion is by new
    * Boolean(value).
-   * 
+   *
    * @param name
    *          name of the property
    * @param value
@@ -120,7 +120,7 @@ public class PropertySetter extends ContextAwareBase {
 
   /**
    * Set the named property given a {@link PropertyDescriptor}.
-   * 
+   *
    * @param prop
    *          A PropertyDescriptor describing the characteristics of the
    *          property to set.
@@ -128,6 +128,8 @@ public class PropertySetter extends ContextAwareBase {
    *          The named of the property to set.
    * @param value
    *          The value of the property.
+   * @throws PropertySetterException
+   *          No setter for property; setter's argument list is not equal to 1; parameter conversion failure
    */
   public void setProperty(PropertyDescriptor prop, String name, String value)
       throws PropertySetterException {
@@ -231,7 +233,7 @@ public class PropertySetter extends ContextAwareBase {
 
   /**
    * Can the given clazz instantiable with certainty?
-   * 
+   *
    * @param clazz
    *          The class to test for instantiability
    * @return true if clazz can be instantiated, and false otherwise.

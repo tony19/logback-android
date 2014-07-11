@@ -19,17 +19,17 @@ import ch.qos.logback.core.spi.ContextAware;
 /**
  * This interface lists the set of methods that need to be implemented by
  * triggering policies which are nested within a {@link TimeBasedRollingPolicy}.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
- * 
- * @param <E>
+ *
+ * @param <E> type of log event object
  */
 public interface TimeBasedFileNamingAndTriggeringPolicy<E> extends
     TriggeringPolicy<E>, ContextAware {
 
   /**
    * Set the host/parent {@link TimeBasedRollingPolicy}.
-   * 
+   *
    * @param tbrp
    *                parent TimeBasedRollingPolicy
    */
@@ -37,48 +37,38 @@ public interface TimeBasedFileNamingAndTriggeringPolicy<E> extends
 
   /**
    * Return the file name for the elapsed periods file name.
-   * 
-   * @return
+   *
+   * @return the file name
    */
   String getElapsedPeriodsFileName();
 
   /**
    * Return the current periods file name without the compression suffix. This
    * value is equivalent to the active file name.
-   * 
+   *
    * @return current period's file name (without compression suffix)
    */
   String getCurrentPeriodsFileNameWithoutCompressionSuffix();
 
   /**
    * Return the archive remover appropriate for this instance.
+   * @return the archive remover
    */
   ArchiveRemover getArchiveRemover();
-  
+
   /**
    * Return the current time which is usually the value returned by
    * System.currentMillis(). However, for <b>testing</b> purposed this value
    * may be different than the real time.
-   * 
+   *
    * @return current time value
    */
   long getCurrentTime();
 
   /**
    * Set the current time. Only unit tests should invoke this method.
-   * 
-   * @param now
+   *
+   * @param now the current time in ms
    */
   void setCurrentTime(long now);
-
-  /**
-   * Set some date in the current period. Only unit tests should invoke this
-   * method.
-   * 
-   * WARNING: method removed. A unit test should not set the
-   * date in current period. It is the job of the FNATP to compute that.
-   * 
-   * @param date
-   */
-  //void setDateInCurrentPeriod(Date date); 
 }

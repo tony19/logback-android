@@ -41,8 +41,6 @@ import ch.qos.logback.core.joran.spi.JoranException;
  * <em>configFile</em> is an xml configuration file fed to
  * {@link JoranConfigurator}.
  *
- * </pre>
- *
  * @author Ceki G&uuml;lc&uuml;
  * @author S&eacute;bastien Pennec
  *

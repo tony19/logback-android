@@ -22,8 +22,9 @@ public class ElementPath {
 
   /**
    * Build an elementPath from a string.
-   * <p/>
+   * <p>
    * Note that "/x" is considered equivalent to "x" and to "x/"
+   * @param pathStr element path
    */
   public ElementPath(String pathStr) {
     if (pathStr == null) {

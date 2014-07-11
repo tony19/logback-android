@@ -22,10 +22,10 @@ import ch.qos.logback.core.rolling.helper.*;
 /**
  * When rolling over, <code>FixedWindowRollingPolicy</code> renames files
  * according to a fixed window algorithm.
- * 
+ *
  * For more information about this policy, please refer to the online manual at
  * http://logback.qos.ch/manual/appenders.html#FixedWindowRollingPolicy
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 public class FixedWindowRollingPolicy extends RollingPolicyBase {
@@ -51,7 +51,7 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
 
   public void start() {
     util.setContext(this.context);
-   
+
     if (fileNamePatternStr != null) {
       fileNamePattern = new FileNamePattern(fileNamePatternStr, this.context);
       determineCompressionMode();
@@ -66,7 +66,7 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
       addError(PRUDENT_MODE_UNSUPPORTED);
       throw new IllegalStateException("Prudent mode is not supported.");
     }
-    
+
     if (getParentsRawFileProperty() == null) {
       addError("The File name property must be set before using this rolling policy.");
       addError(SEE_PARENT_FN_NOT_SET);
@@ -107,7 +107,7 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
   /**
    * Subclasses can override this method to increase the max window size, if required.  This is to
    * address LOGBACK-266.
-   * @return
+   * @return the max window size for rolling indexes
    */
   protected int getMaxWindowSize() {
     return MAX_WINDOW_SIZE;

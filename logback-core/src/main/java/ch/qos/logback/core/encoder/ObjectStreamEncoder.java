@@ -24,10 +24,10 @@ import ch.qos.logback.core.CoreConstants;
 
 /**
  * Write out events as java objects.
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  *
- * @param <E>
+ * @param <E> type of log event object
  */
 public class ObjectStreamEncoder<E> extends EncoderBase<E> {
 
@@ -51,14 +51,14 @@ public class ObjectStreamEncoder<E> extends EncoderBase<E> {
     ByteArrayUtil.writeInt(baos, 0);
     ByteArrayUtil.writeInt(baos, START_PEBBLE^bufferSize);
   }
-  
+
   void writeFooter(ByteArrayOutputStream baos, int bufferSize) {
     ByteArrayUtil.writeInt(baos, STOP_PEBBLE);
     ByteArrayUtil.writeInt(baos, STOP_PEBBLE ^ bufferSize);
   }
   void writeBuffer() throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
-    
+
     int size = bufferList.size();
     writeHeader(baos, size);
     ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -74,9 +74,9 @@ public class ObjectStreamEncoder<E> extends EncoderBase<E> {
     oos.close();
     writeEndPosition(byteArray);
     outputStream.write(byteArray);
-    
+
   }
-  
+
   void writeEndPosition(byte[] byteArray) {
     int offset = 2*CoreConstants.BYTES_PER_INT;
     ByteArrayUtil.writeInt(byteArray,offset, byteArray.length-offset);

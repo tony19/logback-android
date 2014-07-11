@@ -45,8 +45,8 @@ public class Compressor extends ContextAwareBase {
   }
 
   /**
-   * @param nameOfFile2Compress
-   * @param nameOfCompressedFile
+   * @param nameOfFile2Compress the file to compress
+   * @param nameOfCompressedFile the desired name of the compressed file
    * @param innerEntryName       The name of the file within the zip file. Use for ZIP compression.
    */
   public void compress(String nameOfFile2Compress, String nameOfCompressedFile, String innerEntryName) {

@@ -39,7 +39,7 @@ public class ConfigurationWatchList extends ContextAwareBase {
 
   /**
    * The mainURL for the configuration file. Null values are allowed.
-   * @param mainURL
+   * @param mainURL desired URL
    */
   public void setMainURL(URL mainURL) {
     // main url can be null

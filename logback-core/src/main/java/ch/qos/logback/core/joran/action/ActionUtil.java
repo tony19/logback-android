@@ -26,8 +26,8 @@ public class ActionUtil {
   };
 
   /**
-   * Convert a string into a scope. Scole.LOCAL is returned by default.
-   * @param scopeStr
+   * Convert a string into a scope. Scope.LOCAL is returned by default.
+   * @param scopeStr the string to be converted
    * @return a scope corresponding to the input string;  Scope.LOCAL by default.
    */
   static public Scope stringToScope(String scopeStr) {
@@ -55,6 +55,10 @@ public class ActionUtil {
   /**
    * Add all the properties found in the argument named 'props' to an
    * InterpretationContext.
+   *
+   * @param ic interpretation context
+   * @param props the properties to set in the context
+   * @param scope scope of properties
    */
   static public void setProperties(InterpretationContext ic, Properties props,
       Scope scope) {

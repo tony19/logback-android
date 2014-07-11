@@ -20,12 +20,12 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.spi.FilterReply;
 
 /**
- * 
- * See {@link http://logback.qos.ch/manual/filters.html#DuplicateMessageFilter}
+ *
+ * See http://logback.qos.ch/manual/filters.html#DuplicateMessageFilter
  * for details.
- * 
+ *
  * @author Ceki Gulcu
- * 
+ *
  */
 public class DuplicateMessageFilter extends TurboFilter {
 
@@ -73,7 +73,7 @@ public class DuplicateMessageFilter extends TurboFilter {
 
   /**
    * The allowed number of repetitions before
-   * 
+   *
    * @param allowedRepetitions
    */
   public void setAllowedRepetitions(int allowedRepetitions) {

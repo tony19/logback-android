@@ -76,8 +76,8 @@ abstract public class AbstractEventEvaluatorAction extends Action {
 
   /**
    * Returns a default class name in case the class attribute is not specified
-   * 
-   * @return
+   *
+   * @return the class name
    */
   abstract protected String defaultClassName();
 

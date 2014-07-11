@@ -21,7 +21,8 @@ public class ConverterUtil {
   /**
    * Start converters in the chain of converters.
    *
-   * @param head
+   * @param head head node of converter chain
+   * @param <E> type of log event object
    */
   public static <E> void startConverters(Converter<E> head) {
     Converter<E> c = head;

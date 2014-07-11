@@ -56,7 +56,7 @@ public class SyslogAppender extends SyslogAppenderBase<ILoggingEvent> {
   /*
    * Convert a level to equivalent syslog severity. Only levels for printing
    * methods i.e DEBUG, WARN, INFO and ERROR are converted.
-   * 
+   *
    * @see ch.qos.logback.core.net.SyslogAppenderBase#getSeverityForEvent(java.lang.Object)
    */
   @Override
@@ -151,7 +151,7 @@ public class SyslogAppender extends SyslogAppenderBase<ILoggingEvent> {
   }
 
   /**
-   * See {@link #setStackTracePattern(String).
+   * See {@link #setStackTracePattern(String)}.
    *
    * @return the stackTraceSuffixPattern
    * @since 1.0.4

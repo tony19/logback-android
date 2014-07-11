@@ -48,6 +48,10 @@ public class StringToObjectConverter {
 
   /**
    * Convert <code>val</code> a String parameter to an object of a given type.
+   * @param ca context
+   * @param val string representation of value
+   * @param type target class to convert val into
+   * @return the object created from the string
    */
   @SuppressWarnings("unchecked")
   public static Object convertArg(ContextAware ca, String val, Class<?> type) {

@@ -118,6 +118,8 @@ public class InterpretationContext extends ContextAwareBase implements
   /**
    * Add a property to the properties of this execution context. If the property
    * exists already, it is overwritten.
+   * @param key the property's key
+   * @param value the value associated with the key
    */
   public void addSubstitutionProperty(String key, String value) {
     if (key == null || value == null) {

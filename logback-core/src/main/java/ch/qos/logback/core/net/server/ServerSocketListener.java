@@ -52,7 +52,7 @@ public abstract class ServerSocketListener<T extends Client>
    * @param id identifier string for the client
    * @param socket client's socket connection
    * @return client object
-   * @throws IOException
+   * @throws IOException socket error
    */
   protected abstract T createClient(String id, Socket socket)
       throws IOException;

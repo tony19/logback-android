@@ -18,9 +18,7 @@ import org.slf4j.spi.LocationAwareLogger;
 /**
  * Defines the set of levels recognized by logback-classic, that is {@link #OFF},
  * {@link #ERROR}, {@link #WARN}, {@link #INFO}, {@link #DEBUG},
- * {@link #TRACE} and {@link #ALL}. <p/> The <code>Level</code> class is
- * final and cannot be sub-classed.
- * </p>
+ * {@link #TRACE} and {@link #ALL}.
  */
 public final class Level implements java.io.Serializable {
 
@@ -94,6 +92,7 @@ public final class Level implements java.io.Serializable {
 
   /**
    * Returns the string representation of this Level.
+   * @return the string value of this level
    */
   public String toString() {
     return levelStr;
@@ -101,6 +100,7 @@ public final class Level implements java.io.Serializable {
 
   /**
    * Returns the integer representation of this Level.
+   * @return integer value of the level
    */
   public int toInt() {
     return levelInt;
@@ -136,6 +136,7 @@ public final class Level implements java.io.Serializable {
   /**
    * Returns <code>true</code> if this Level has a higher or equal Level than
    * the Level passed as argument, <code>false</code> otherwise.
+   * @param r level to evaluate
    */
   public boolean isGreaterOrEqual(Level r) {
     return levelInt >= r.levelInt;
@@ -144,6 +145,7 @@ public final class Level implements java.io.Serializable {
   /**
    * Convert the string passed as argument to a Level. If the conversion fails,
    * then this method returns {@link #DEBUG}.
+   * @param sArg string to be converted
    */
   public static Level toLevel(String sArg) {
     return toLevel(sArg, Level.DEBUG);
@@ -153,8 +155,8 @@ public final class Level implements java.io.Serializable {
   /**
    * This method exists in order to comply with Joran's valueOf convention.
    *
-   * @param sArg
-   * @return
+   * @param sArg string to be evaluated
+   * @return the corresponding level
    */
   public static Level valueOf(String sArg) {
     return toLevel(sArg, Level.DEBUG);
@@ -164,6 +166,8 @@ public final class Level implements java.io.Serializable {
   /**
    * Convert an integer passed as argument to a Level. If the conversion fails,
    * then this method returns {@link #DEBUG}.
+   * @param val integer to be evaluated
+   * @return the corresponding level
    */
   public static Level toLevel(int val) {
     return toLevel(val, Level.DEBUG);
@@ -172,6 +176,9 @@ public final class Level implements java.io.Serializable {
   /**
    * Convert an integer passed as argument to a Level. If the conversion fails,
    * then this method returns the specified default.
+   * @param val integer to be evaluated
+   * @param defaultLevel default level if val could not be converted
+   * @return the corresponding level
    */
   public static Level toLevel(int val, Level defaultLevel) {
     switch (val) {
@@ -197,6 +204,9 @@ public final class Level implements java.io.Serializable {
   /**
    * Convert the string passed as argument to a Level. If the conversion fails,
    * then this method returns the value of <code>defaultLevel</code>.
+   * @param sArg string to be evaluated
+   * @param defaultLevel default level if sArg could not be converted
+   * @return the corresponding level
    */
   public static Level toLevel(String sArg, Level defaultLevel) {
     if (sArg == null) {

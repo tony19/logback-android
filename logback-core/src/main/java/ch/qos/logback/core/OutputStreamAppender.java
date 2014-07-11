@@ -27,15 +27,15 @@ import ch.qos.logback.core.status.ErrorStatus;
 /**
  * OutputStreamAppender appends events to a {@link OutputStream}. This class
  * provides basic services that other appenders build upon.
- * 
+ *
  * For more information about this appender, please refer to the online manual
  * at http://logback.qos.ch/manual/appenders.html#OutputStreamAppender
- * 
+ *
  * @author Ceki G&uuml;lc&uuml;
  */
 public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
 
-  
+
   /**
    * It is the encoder which is ultimately responsible for writing the event to
    * an {@link OutputStream}.
@@ -54,8 +54,8 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
 
   /**
    * The underlying output stream used by this appender.
-   * 
-   * @return
+   *
+   * @return the output stream
    */
   public OutputStream getOutputStream() {
     return outputStream;
@@ -106,7 +106,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   /**
    * Stop this appender instance. The underlying stream or writer is also
    * closed.
-   * 
+   *
    * <p>
    * Stopped appenders cannot be reused.
    */
@@ -165,7 +165,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
    * <code>OutputStream</code> must be opened by the user and be writable. The
    * <code>OutputStream</code> will be closed when the appender instance is
    * closed.
-   * 
+   *
    * @param outputStream
    *          An already opened OutputStream.
    */
@@ -193,7 +193,8 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
    * <p>
    * Most subclasses of <code>WriterAppender</code> will need to override this
    * method.
-   * 
+   *
+   * @param event the log event
    * @since 0.9.0
    */
   protected void subAppend(E event) {
@@ -226,5 +227,5 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   public void setEncoder(Encoder<E> encoder) {
     this.encoder = encoder;
   }
-  
+
 }

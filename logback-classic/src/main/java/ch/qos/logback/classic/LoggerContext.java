@@ -232,7 +232,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
    * closes all appenders, removes any turboFilters, fires an OnReset event,
    * removes all status listeners, removes all context listeners
    * (except those which are reset resistant).
-   * <p/>
+   * <p>
    * As mentioned above, internal status messages survive resets.
    */
   @Override
@@ -385,7 +385,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
   /**
    * List of packages considered part of the logging framework such that they are never considered
    * as callers of the logging framework. This list used to compute the caller for logging events.
-   * <p/>
+   * <p>
    * To designate package "com.foo" as well as all its subpackages as being part of the logging framework, simply add
    * "com.foo" to this list.
    *

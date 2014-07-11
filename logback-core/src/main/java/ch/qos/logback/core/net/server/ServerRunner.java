@@ -40,7 +40,7 @@ public interface ServerRunner<T extends Client> extends ContextAware, Runnable {
    * This method must cause all I/O and thread resources associated with
    * the runner to be released.  If the receiver has not been started, this
    * method must have no effect.
-   * @throws IOException
+   * @throws IOException failed to stop runner
    */
   void stop() throws IOException;
 

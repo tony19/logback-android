@@ -24,7 +24,7 @@ import ch.qos.logback.core.joran.spi.InterpretationContext;
 import ch.qos.logback.core.util.OptionHelper;
 
 /**
- * Action which handles <logger> elements in configuration files.
+ * Action which handles &lt;logger&gt; elements in configuration files.
  *
  * @author Ceki Gulcu
  */

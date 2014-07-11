@@ -35,7 +35,7 @@ public class FileStoreUtil {
    * @param a
    * @param b
    * @return
-   * @throws Exception
+   * @throws IllegalArgumentException
    */
   static public boolean areOnSameFileStore(File a, File b) throws RolloverFailure {
     if (!a.exists()) {

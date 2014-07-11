@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Ceki G&uuml;lc&uuml;
  *
- * @param <E>
+ * @param <E> type of log event object
  */
 public class EventObjectInputStream<E> extends InputStream {
 

@@ -26,9 +26,9 @@ public class ResourceExistsPropertyDefiner extends PropertyDefinerBase {
   }
 
   /**
-   * The resource to search for on the class path.
+   * Sets the resource to search for on the class path.
    *
-   * @param resource
+   * @param resource the resource path
    */
   public void setResource(String resource) {
     this.resourceStr = resource;

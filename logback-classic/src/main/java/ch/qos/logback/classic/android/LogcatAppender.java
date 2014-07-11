@@ -30,8 +30,8 @@ import ch.qos.logback.core.Layout;
  * of <i>logcat</i>'s own filter settings (i.e., everything is printed). To disable this
  * behavior and enable filter-checking, use {@link #setCheckLoggable(boolean)}.
  * See the Android Developer Guide for details on adjusting the <i>logcat</i> filter.
- *
- * @see http://developer.android.com/guide/developing/tools/adb.html#filteringoutput
+ * <p>
+ * See http://developer.android.com/guide/developing/tools/adb.html#filteringoutput
  *
  * @author Fred Eisele
  * @author Anthony Trinh
@@ -175,15 +175,14 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
    * The expanded text of the pattern must be less than 23 characters as
    * limited by Android. Layouts that exceed this limit are truncated,
    * and a star is appended to the tag to indicate this.
-   * </p><p>
+   * <p>
    * The <code>tagEncoder</code> result is limited to 22 characters plus a star to
    * indicate truncation (<code>%logger{0}</code> has no length limit in logback,
-   * but <code>LogcatAppender</code></a> limits the length internally). For example,
+   * but <code>LogcatAppender</code> limits the length internally). For example,
    * if the <code>tagEncoder</code> evaluated to <code>foo.foo.foo.foo.foo.bar.Test</code>,
    * the tag seen in Logcat would be: <code>foo.foo.foo.foo.foo.ba*</code>.
    * Note that <code>%logger{23}</code> yields more useful results
    * (in this case: <code>f.f.foo.foo.bar.Test</code>).
-   * </p>
    *
    * @param encoder
    *            the pattern-layout encoder; specify {@code null} to
@@ -195,7 +194,9 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
 
   /**
    * Sets whether to ask Android before logging a message with a specific
-   * tag and priority (i.e., calls <a href="http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)"><code>isLoggable()</code>)</a>.
+   * tag and priority (i.e., calls {@code android.util.Log.html#isLoggable}).
+   * <p>
+   * See http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)
    *
    * @param enable
    *       {@code true} to enable; {@code false} to disable
@@ -205,8 +206,10 @@ public class LogcatAppender extends AppenderBase<ILoggingEvent> {
   }
 
   /**
-   * Gets the enable status of the <a href="http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)"><code>isLoggable()</code></a>-check
+   * Gets the enable status of the <code>isLoggable()</code>-check
    * that is called before logging
+   * <p>
+   * See http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)
    *
    * @return {@code true} if enabled; {@code false} otherwise
    */

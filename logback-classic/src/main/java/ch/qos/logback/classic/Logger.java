@@ -74,7 +74,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
    * the 'aai'ariable is set is within the addAppender method. This method is
    * synchronized on 'this' (Logger) protecting against simultaneous
    * re-configuration of this logger (a very unlikely scenario).
-   * 
+   *
    * <p>
    * It is further assumed that the AppenderAttachableImpl is responsible for
    * its internal synchronization and thread safety. Thus, we can get away with
@@ -179,7 +179,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   /**
    * This method is invoked by parent logger to let this logger know that the
    * prent's levelInt changed.
-   * 
+   *
    * @param newParentLevelInt
    */
   private synchronized void handleParentLevelChange(int newParentLevelInt) {
@@ -201,7 +201,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   /**
    * Remove all previously added appenders from this logger instance.
-   * <p/>
+   * <p>
    * This is useful when re-reading configuration information.
    */
   public void detachAndStopAllAppenders() {
@@ -250,7 +250,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   /**
    * Invoke all the appenders of this logger.
-   * 
+   *
    * @param event
    *          The event to log
    */
@@ -292,11 +292,11 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
    * Create a child of this logger by suffix, that is, the part of the name
    * extending this logger. For example, if this logger is named "x.y" and the
    * lastPart is "z", then the created child logger will be named "x.y.z".
-   * 
+   *
    * <p>
    * IMPORTANT: Calls to this method must be within a synchronized block on this
    * logger.
-   * 
+   *
    * @param lastPart
    *          the suffix (i.e. last part) of the child logger name. This
    *          parameter may not include dots, i.e. the logger separator
@@ -760,11 +760,11 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   /**
    * Method that calls the attached TurboFilter objects based on the logger and
    * the level.
-   * 
+   *
    * It is used by isYYYEnabled() methods.
-   * 
+   *
    * It returns the typical FilterReply values: ACCEPT, NEUTRAL or DENY.
-   * 
+   *
    * @param level
    * @return the reply given by the TurboFilters
    */
@@ -775,7 +775,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   /**
    * Return the context for this logger.
-   * 
+   *
    * @return the context
    */
   public LoggerContext getLoggerContext() {
@@ -792,7 +792,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
    * After serialization, the logger instance does not know its LoggerContext.
    * The best we can do here, is to return a logger with the same name
    * returned by org.slf4j.LoggerFactory.
-   * 
+   *
    * @return Logger instance with the same name
    * @throws ObjectStreamException
    */

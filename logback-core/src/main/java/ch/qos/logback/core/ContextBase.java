@@ -50,8 +50,8 @@ public class ContextBase implements Context, LifeCycle {
    * Set the {@link StatusManager} for this context. Note that by default this
    * context is initialized with a {@link BasicStatusManager}. A null value for
    * the 'statusManager' argument is not allowed.
-   * <p/>
-   * <p> A malicious attacker can set the status manager to a dummy instance,
+   * <p>
+   * A malicious attacker can set the status manager to a dummy instance,
    * disabling internal error reporting.
    *
    * @param statusManager the new status manager
@@ -76,8 +76,8 @@ public class ContextBase implements Context, LifeCycle {
    * Given a key, return the corresponding property value. If invoked with
    * the special key "CONTEXT_NAME", the name of the context is returned.
    *
-   * @param key
-   * @return
+   * @param key the property's key
+   * @return the string value associated with the key
    */
   public String getProperty(String key) {
     if (CONTEXT_NAME_KEY.equals(key))

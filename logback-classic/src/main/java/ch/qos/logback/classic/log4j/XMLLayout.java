@@ -55,7 +55,7 @@ public class XMLLayout extends LayoutBase<ILoggingEvent> {
    * this layout. If the the option is set to true, then the file name and line
    * number of the statement at the origin of the log statement will be output.
    *
-   * <p>If you are embedding this layout within an {@link
+   * <p>If you are embedding this layout within an {@code
    * org.apache.log4j.net.SMTPAppender} then make sure to set the
    * <b>LocationInfo</b> option of that appender as well.
    */

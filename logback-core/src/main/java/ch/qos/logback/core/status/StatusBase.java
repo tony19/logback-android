@@ -20,7 +20,7 @@ import java.util.List;
 abstract public class StatusBase implements Status {
 
   static private final List<Status> EMPTY_LIST = new ArrayList<Status>(0);
-  
+
   int level;
   final String message;
   final Object origin;
@@ -105,14 +105,12 @@ abstract public class StatusBase implements Status {
   public Throwable getThrowable() {
     return throwable;
   }
-  
+
   public Long getDate() {
     return date;
   }
 
-  /**
-   * @Override
-   */
+  @Override
   public String toString() {
     StringBuffer buf = new StringBuffer();
     switch (getEffectiveLevel()) {
@@ -171,5 +169,5 @@ abstract public class StatusBase implements Status {
     return true;
   }
 
-  
+
 }

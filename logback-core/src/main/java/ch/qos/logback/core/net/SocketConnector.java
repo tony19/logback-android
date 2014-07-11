@@ -40,7 +40,7 @@ public interface SocketConnector extends Callable<Socket> {
    * Blocks the calling thread until a connection is successfully
    * established.
    * @return the connected socket
-   * @throws InterruptedException
+   * @throws InterruptedException the running connection thread was cancelled
    */
   Socket call() throws InterruptedException;
 

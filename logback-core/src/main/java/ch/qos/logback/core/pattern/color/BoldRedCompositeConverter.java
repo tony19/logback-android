@@ -17,7 +17,7 @@ import static ch.qos.logback.core.pattern.color.ANSIConstants.*;
 
 /**
  * Encloses a given set of converter output in bold red using the appropriate ANSI escape codes.
- * @param <E>
+ * @param <E> type of log event object
  * @author  Ceki G&uuml;lc&uuml;
  * @since 1.0.5
  * @deprecated

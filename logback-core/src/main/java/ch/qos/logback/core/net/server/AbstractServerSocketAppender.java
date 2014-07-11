@@ -107,15 +107,15 @@ public abstract class AbstractServerSocketAppender<E> extends AppenderBase<E> {
   }
 
   /**
-   * Post process an event received via {@link #append(E)}.
-   * @param event
+   * Post process an event received via {@link #append}.
+   * @param event the log event
    */
   protected abstract void postProcessEvent(E event);
 
   /**
    * Gets a transformer that will be used to convert a received event
    * to a {@link Serializable} form.
-   * @return
+   * @return the pre-serialization transformer
    */
   protected abstract PreSerializationTransformer<E> getPST();
 
@@ -127,6 +127,7 @@ public abstract class AbstractServerSocketAppender<E> extends AppenderBase<E> {
    * private a different socket factory implementation.
    *
    * @return socket factory.
+   * @throws Exception could not get socket factory
    */
   protected ServerSocketFactory getServerSocketFactory() throws Exception {
     return ServerSocketFactory.getDefault();
@@ -135,7 +136,7 @@ public abstract class AbstractServerSocketAppender<E> extends AppenderBase<E> {
   /**
    * Gets the local address for the listener.
    * @return an {@link InetAddress} representation of the local address.
-   * @throws UnknownHostException
+   * @throws UnknownHostException could not determine local address
    */
   protected InetAddress getInetAddress() throws UnknownHostException {
     if (getAddress() == null) return null;

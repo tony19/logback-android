@@ -26,12 +26,11 @@ import org.slf4j.spi.MDCAdapter;
  * distinguishing interleaved log output from different sources. Log output is
  * typically interleaved when a server handles multiple clients
  * near-simultaneously.
- * <p/>
+ * <p>
  * <b><em>The MDC is managed on a per thread basis</em></b>. A child thread
  * automatically inherits a <em>copy</em> of the mapped diagnostic context of
  * its parent.
- * <p/>
- * <p/>
+ * <p>
  * For more information about MDC, please refer to the online manual at
  * http://logback.qos.ch/manual/mdc.html
  *
@@ -87,8 +86,7 @@ public final class LogbackMDCAdapter implements MDCAdapter {
    * Put a context value (the <code>val</code> parameter) as identified with the
    * <code>key</code> parameter into the current thread's context map. Note that
    * contrary to log4j, the <code>val</code> parameter can be null.
-   * <p/>
-   * <p/>
+   * <p>
    * If the current thread does not have a context map it is created as a side
    * effect of this call.
    *
@@ -112,7 +110,6 @@ public final class LogbackMDCAdapter implements MDCAdapter {
 
   /**
    * Remove the the context identified by the <code>key</code> parameter.
-   * <p/>
    */
   public void remove(String key) {
     if (key == null) {
@@ -142,7 +139,6 @@ public final class LogbackMDCAdapter implements MDCAdapter {
 
   /**
    * Get the context identified by the <code>key</code> parameter.
-   * <p/>
    */
   public String get(String key) {
     Map<String, String> map = getPropertyMap();

@@ -49,8 +49,7 @@ import ch.qos.logback.core.util.OptionHelper;
 /**
  * An abstract class that provides support for sending events to an email
  * address.
- * <p/>
- * <p/>
+ * <p>
  * See http://logback.qos.ch/manual/appenders.html#SMTPAppender for further
  * documentation.
  *
@@ -99,7 +98,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
    * subjectStr parameter is null, then a default value for subjectStr should be
    * used.
    *
-   * @param subjectStr
+   * @param subjectStr the desired subject
    * @return a layout as appropriate for the module
    */
   abstract protected Layout<E> makeSubjectLayout(String subjectStr);
@@ -236,11 +235,11 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * This method determines if there is a sense in attempting to append.
-   * <p/>
-   * <p/>
+   * <p>
    * It checks whether there is a set output target and also if there is a set
    * layout. If these checks fail, then the boolean value <code>false</code> is
    * returned.
+   * @return true if appender is setup properly
    */
   public boolean checkEntryConditions() {
     if (!this.started) {
@@ -306,6 +305,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * Returns value of the <b>toList</b> option.
+   * @return list of pattern layout
    */
   public List<PatternLayoutBase<E>> getToList() {
     return toPatternLayoutList;
@@ -313,6 +313,8 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * Send the contents of the cyclic buffer as an e-mail message.
+   * @param cb the cyclic buffer
+   * @param lastEventObject the log event
    */
   protected void sendBuffer(CyclicBuffer<E> cb, E lastEventObject) {
 
@@ -389,6 +391,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * Returns value of the <b>From</b> option.
+   * @return the value of "from"
    */
   public String getFrom() {
     return from;
@@ -396,6 +399,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * Returns value of the <b>Subject</b> option.
+   * @return the subject text
    */
   public String getSubject() {
     return subjectStr;
@@ -404,6 +408,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * The <b>From</b> option takes a string value which should be a e-mail
    * address of the sender.
+   * @param from desired value of "from" field
    */
   public void setFrom(String from) {
     this.from = from;
@@ -412,6 +417,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * The <b>Subject</b> option takes a string value which should be a the
    * subject of the e-mail message.
+   * @param subject desired subject text
    */
   public void setSubject(String subject) {
     this.subjectStr = subject;
@@ -420,7 +426,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * Alias for smtpHost
    *
-   * @param smtpHost
+   * @param smtpHost desired alias for SMTP host
    */
   public void setSMTPHost(String smtpHost) {
     setSmtpHost(smtpHost);
@@ -429,6 +435,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * The <b>smtpHost</b> option takes a string value which should be a the host
    * name of the SMTP server that will send the e-mail message.
+   * @param smtpHost desired SMTP hostname
    */
   public void setSmtpHost(String smtpHost) {
     this.smtpHost = smtpHost;
@@ -436,6 +443,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * Alias for getSmtpHost().
+   * @return the SMTP hostname
    */
   public String getSMTPHost() {
     return getSmtpHost();
@@ -443,6 +451,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   /**
    * Returns value of the <b>SMTPHost</b> option.
+   * @return the SMTP hostname
    */
   public String getSmtpHost() {
     return smtpHost;
@@ -451,7 +460,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * Alias for {@link #setSmtpPort}.
    *
-   * @param port
+   * @param port desired SMTP port
    */
   public void setSMTPPort(int port) {
     setSmtpPort(port);
@@ -460,7 +469,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * The port where the SMTP server is running. Default value is 25.
    *
-   * @param port
+   * @param port desired SMTP port
    */
   public void setSmtpPort(int port) {
     this.smtpPort = port;
@@ -469,7 +478,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * Alias for {@link #getSmtpPort}
    *
-   * @return
+   * @return the SMTP port
    */
   public int getSMTPPort() {
     return getSmtpPort();
@@ -478,7 +487,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * See {@link #setSmtpPort}
    *
-   * @return
+   * @return the SMTP port
    */
   public int getSmtpPort() {
     return smtpPort;
@@ -491,12 +500,12 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * Set the "mail.smtp.localhost" property to the value passed as parameter to
    * this method.
-   * <p/>
-   * <p>Useful in case the hostname for the client host is not fully qualified
+   * <p>
+   * Useful in case the hostname for the client host is not fully qualified
    * and as a consequence the SMTP server rejects the clients HELO/EHLO command.
    * </p>
    *
-   * @param localhost
+   * @param localhost the localhost name
    */
   public void setLocalhost(String localhost) {
     this.localhost = localhost;
@@ -585,6 +594,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
    * of the class implementing the {@link EventEvaluator} interface. A
    * corresponding object will be instantiated and assigned as the event
    * evaluator for the SMTPAppender.
+   * @param eventEvaluator the desired event evaluator
    */
   public void setEvaluator(EventEvaluator<E> eventEvaluator) {
     this.eventEvaluator = eventEvaluator;
@@ -618,7 +628,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
    * Set the character set encoding of the outgoing email messages. The default
    * encoding is "UTF-8" which usually works well for most purposes.
    *
-   * @param charsetEncoding
+   * @param charsetEncoding desired character encoding
    */
   public void setCharsetEncoding(String charsetEncoding) {
     this.charsetEncoding = charsetEncoding;

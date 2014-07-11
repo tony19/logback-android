@@ -57,7 +57,7 @@ public class Parser<E> extends ContextAwareBase {
 
   final List tokenList;
   int pointer = 0;
-  
+
   Parser(TokenStream ts) throws ScanException {
     this.tokenList = ts.tokenize();
   }
@@ -65,7 +65,7 @@ public class Parser<E> extends ContextAwareBase {
   public Parser(String pattern) throws ScanException {
     this(pattern, new RegularEscapeUtil());
   }
-  
+
   public Parser(String pattern, IEscapeUtil escapeUtil) throws ScanException {
     try {
       TokenStream ts = new TokenStream(pattern, escapeUtil);
@@ -79,10 +79,9 @@ public class Parser<E> extends ContextAwareBase {
    * When the parsing step is done, the Node list can be transformed into a
    * converter chain.
    *
-   * @param top
-   * @param converterMap
-   * @return
-   * @throws ScanException
+   * @param top the top node
+   * @param converterMap converter map
+   * @return the converter chain
    */
   public Converter<E> compile(final Node top, Map converterMap) {
     Compiler<E> compiler = new Compiler<E>(top, converterMap);

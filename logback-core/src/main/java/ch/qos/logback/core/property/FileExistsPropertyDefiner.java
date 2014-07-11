@@ -36,9 +36,9 @@ public class FileExistsPropertyDefiner extends PropertyDefinerBase {
   }
 
   /**
-   * The path for the file to search for.
+   * Sets the path for the file to search for.
    *
-   * @param path
+   * @param path the file path
    */
   public void setPath(String path) {
     this.path = path;

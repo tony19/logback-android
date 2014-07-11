@@ -156,7 +156,7 @@ public class SSLParametersConfiguration extends ContextAwareBase {
    * Sets the JSSE secure transport protocols to include.
    * @param protocols a string containing comma-separated JSSE secure
    *    transport protocol names
-   * @see Java Cryptography Architecture Standard Algorithm Name Documentation
+   * See Java Cryptography Architecture Standard Algorithm Name Documentation
    */
   public void setIncludedProtocols(String protocols) {
     this.includedProtocols = protocols;
@@ -175,7 +175,7 @@ public class SSLParametersConfiguration extends ContextAwareBase {
    * Sets the JSSE secure transport protocols to exclude.
    * @param protocols a string containing comma-separated JSSE secure
    *    transport protocol names
-   * @see Java Cryptography Architecture Standard Algorithm Name Documentation
+   * See Java Cryptography Architecture Standard Algorithm Name Documentation
    */
   public void setExcludedProtocols(String protocols) {
     this.excludedProtocols = protocols;
@@ -194,7 +194,7 @@ public class SSLParametersConfiguration extends ContextAwareBase {
    * Sets the JSSE cipher suite names to include.
    * @param cipherSuites a string containing comma-separated JSSE cipher
    *    suite names
-   * @see Java Cryptography Architecture Standard Algorithm Name Documentation
+   * See Java Cryptography Architecture Standard Algorithm Name Documentation
    */
   public void setIncludedCipherSuites(String cipherSuites) {
     this.includedCipherSuites = cipherSuites;
@@ -213,7 +213,7 @@ public class SSLParametersConfiguration extends ContextAwareBase {
    * Sets the JSSE cipher suite names to exclude.
    * @param cipherSuites a string containing comma-separated JSSE cipher
    *    suite names
-   * @see Java Cryptography Architecture Standard Algorithm Name Documentation
+   * See Java Cryptography Architecture Standard Algorithm Name Documentation
    */
   public void setExcludedCipherSuites(String cipherSuites) {
     this.excludedCipherSuites = cipherSuites;

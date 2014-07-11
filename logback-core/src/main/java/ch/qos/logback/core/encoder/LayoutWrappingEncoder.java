@@ -42,6 +42,7 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
    * the doEncode() method will immediately flush the underlying OutputStream. Although immediate flushing
    * is safer, it also significantly degrades logging throughput.
    *
+   * @param immediateFlush desired value
    * @since 1.0.3
    */
   public void setImmediateFlush(boolean immediateFlush) {
@@ -69,12 +70,12 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
   /**
    * Set the charset to use when converting the string returned by the layout
    * into bytes.
-   * <p/>
+   * <p>
    * By default this property has the value
-   * <code>null</null> which corresponds to
+   * <code>null</code> which corresponds to
    * the system's default charset.
    *
-   * @param charset
+   * @param charset desired character set
    */
   public void setCharset(Charset charset) {
     this.charset = charset;

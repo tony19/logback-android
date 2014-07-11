@@ -36,9 +36,10 @@ public interface Context extends PropertyContainer {
   StatusManager getStatusManager();
 
   /**
-   * A Context can act as a store for various objects used by LOGBack
+   * A Context can act as a store for various objects used by logback
    * components.
    *
+   * @param key the key of the object
    * @return The object stored under 'key'.
    */
   Object getObject(String key);
@@ -46,33 +47,29 @@ public interface Context extends PropertyContainer {
   /**
    * Store an object under 'key'. If no object can be found, null is returned.
    *
-   * @param key
-   * @param value
+   * @param key the key of the object
+   * @param value the value to associate with the key
    */
   void putObject(String key, Object value);
 
   /**
-   * Get all the properties for this context as a Map. Note that the returned
-   * cop might be a copy not the original. Thus, modifying the returned Map will
-   * have no effect (on the original.)
-   *
-   * @return
-   */
-  // public Map<String, String> getPropertyMap();
-  /**
    * Get the property of this context.
+   * @param key the key of the property
+   * @return the associated string value
    */
   String getProperty(String key);
 
   /**
    * Set a property of this context.
+   * @param key the property's key
+   * @param value the value associated with the key
    */
   void putProperty(String key, String value);
 
 
   /**
    * Get a copy of the property map
-   * @return
+   * @return the property map copy
    * @since 0.9.20
    */
   Map<String, String> getCopyOfPropertyMap();
@@ -85,9 +82,9 @@ public interface Context extends PropertyContainer {
   String getName();
 
   /**
-   * The name of the context can be set only once.
+   * The name of the context. This can be set only once.
    *
-   * @param name
+   * @param name the desired context name
    */
   void setName(String name);
 
@@ -102,6 +99,7 @@ public interface Context extends PropertyContainer {
   /**
    * Object used for synchronization purposes.
    * INTENDED FOR INTERNAL USAGE.
+   * @return the configuration lock
    */
   Object getConfigurationLock();
 

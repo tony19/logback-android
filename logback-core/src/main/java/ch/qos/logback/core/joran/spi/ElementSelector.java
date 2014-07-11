@@ -39,7 +39,7 @@ public class ElementSelector extends ElementPath {
    * Build an elementPath from a string.
    *
    * Note that "/x" is considered equivalent to "x" and to "x/"
-   *
+   * @param p element path
    */
   public ElementSelector(String p) {
     super(p);
@@ -64,6 +64,8 @@ public class ElementSelector extends ElementPath {
    * Returns the number of "tail" components that this pattern has in common
    * with the pattern p passed as parameter. By "tail" components we mean the
    * components at the end of the pattern.
+   * @param p element path
+   * @return the number of "tail" components in common with p
    */
   public int getTailMatchLength(ElementPath p) {
     if (p == null) {
@@ -107,6 +109,8 @@ public class ElementSelector extends ElementPath {
    * Returns the number of "prefix" components that this pattern has in common
    * with the pattern p passed as parameter. By "prefix" components we mean the
    * components at the beginning of the pattern.
+   * @param p element path
+   * @return the number of "prefix" components in common with p
    */
   public int getPrefixMatchLength(ElementPath p) {
     if (p == null) {

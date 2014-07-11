@@ -41,7 +41,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
    * located at the given URL
    *
    * @param url URL to the file, containing the configuration XML
-   * @throws JoranException
+   * @throws JoranException configuration error occurred
    */
   public final void doConfigure(URL url) throws JoranException {
     InputStream in = null;
@@ -67,7 +67,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
    * located at the given path on the host filesystem
    *
    * @param filename path to the file, containing the configuration XML
-   * @throws JoranException
+   * @throws JoranException configuration error occurred
    */
   public final void doConfigure(String filename) throws JoranException {
     doConfigure(new File(filename));
@@ -77,7 +77,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
    * Configures logback with the configuration XML read from a given file
    *
    * @param file the file, containing the configuration XML
-   * @throws JoranException
+   * @throws JoranException configuration error occurred
    */
   public final void doConfigure(File file) throws JoranException {
     FileInputStream fis = null;
@@ -111,7 +111,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
    * and then closes the stream
    *
    * @param inputStream stream to contents of configuration XML
-   * @throws JoranException
+   * @throws JoranException configuration error occurred
    */
   public final void doConfigure(InputStream inputStream) throws JoranException {
     try {
@@ -180,7 +180,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
    * Configures logback with SAX events of configuration XML
    *
    * @param eventList list of SAX events
-   * @throws JoranException
+   * @throws JoranException configuration error occurred
    */
   public void doConfigure(final List<SaxEvent> eventList)
           throws JoranException {
@@ -203,6 +203,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
 
   /**
    * Recall the event list previously registered as a safe point.
+   * @return the SAX event list
    */
   public List<SaxEvent> recallSafeConfiguration() {
     return (List<SaxEvent>) context.getObject(SAFE_JORAN_CONFIGURATION);

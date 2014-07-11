@@ -189,7 +189,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
    * {@link TriggeringPolicy}, then the triggering policy for this appender is
    * automatically set to be the policy argument.
    *
-   * @param policy
+   * @param policy the desired rolling policy
    */
   @SuppressWarnings("unchecked")
   public void setRollingPolicy(RollingPolicy policy) {
