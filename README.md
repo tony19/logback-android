@@ -240,7 +240,7 @@ Even though `assets/logback.xml` is the first configuration loaded, this file co
 </configuration>
 ```
 
-Prior to `v1.0.8-1`, the initialization search path was hard-coded, and that can be recreated with this configuration:
+Prior to `v1.1.1-3`, the initialization search path was hard-coded, and that can be recreated with this configuration:
 
 ```xml
 <configuration>
@@ -462,7 +462,7 @@ Build
     cd logback-android
     ./makejar.sh
 
-The jar would be in: `./target/logback-android-<version>.jar`
+The jar would be in: `./target/logback-android-1.1.1-3.jar`
 
  [1]: http://logback.qos.ch
  [3]: http://tony19.github.com/logback-android
