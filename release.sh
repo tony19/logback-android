@@ -45,17 +45,9 @@ readme=$PWD/README.md
 if [ "x$1" == "xdryrun" ]; then
   echo "[dryrun] just a test!"
   dryrun=true
-fi
-echo "Starting release process for logback-android ${version}..."
-
-#
-# Build the JAR and print its MD5. The last line uses GNU sed (gsed)
-# to update the README with the current release version.
-#
-if [ ${dryrun} ]; then
-  echo '[dryrun]'
   dryrunflag=-DdryRun=true
 fi
+echo "Starting release process for logback-android ${version}..."
 
 mvn release:clean || exit 1
 mvn -Dtag=v_${version} $dryrunflag release:prepare || exit 1
@@ -72,10 +64,10 @@ gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 -e "s/\(logback-android.*SHA1\:\).*/\1 \`$(openssl dgst -sha1 ${outdir}/${outf} | awk '{print $2}')\`)/" ${readme}
 
 if [ ! ${dryrun} ]; then
-git add ${readme}
-git commit -m "Update README for release ${version}"
+  git add ${readme}
+  git commit -m "Update README for release ${version}"
 else
-echo '[dryrun] skip commit README...'
+  echo '[dryrun] skip commit README...'
 fi
 
 echo "Generating javadoc..."
@@ -92,18 +84,18 @@ gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/g" \
 -e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/g" index.html
 
 if [ ! ${dryrun} ]; then
-git add index.html
-git add doc/${version}
+  git add index.html
+  git add doc/${version}
 
-# checkin changes to the web pages
-git commit -m "release ${version}"
+  # checkin changes to the web pages
+  git commit -m "release ${version}"
 
 else
-echo '[dryrun] skip commit gh-pages...'
+  echo '[dryrun] skip commit gh-pages...'
 fi
 
 if [ ! ${dryrun} ]; then
-echo Done. Push changes to GitHub!!
+  echo Done. Push changes to GitHub!!
 else
-echo Done...just a dryrun!!
+  echo Done...just a dryrun!!
 fi
