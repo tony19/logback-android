@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 ##############################################################################
 # Logback: the reliable, generic, fast and flexible logging framework.
 # Copyright (C) 2011-2012, Anthony Trinh. All rights reserved.
