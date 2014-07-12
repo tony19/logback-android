@@ -52,13 +52,14 @@ echo "Starting release process for logback-android ${version}..."
 # Build the JAR and print its MD5. The last line uses GNU sed (gsed)
 # to update the README with the current release version.
 #
-if [ ! ${dryrun} ]; then
-mvn release:clean || exit 1
-mvn -Dtag=v_${version} release:prepare || exit 1
-mvn -Dtag=v_${version} release:perform || exit 1
-else
-echo '[dryrun] skip mvn release...'
+if [ ${dryrun} ]; then
+  echo '[dryrun]'
+  dryrunflag=-DdryRun=true
 fi
+
+mvn release:clean || exit 1
+mvn -Dtag=v_${version} $dryrunflag release:prepare || exit 1
+mvn -Dtag=v_${version} $dryrunflag release:perform || exit 1
 
 mvn versions:set -DnewVersion=${version}
 mvn clean install -DskipTests
