@@ -49,19 +49,18 @@ if [ "x$1" == "xdryrun" ]; then
 fi
 echo "Starting release process for logback-android ${version}..."
 
+# Deploy release to Sonatype
 mvn release:clean || exit 1
 mvn -Dtag=v_${version} $dryrunflag release:prepare || exit 1
 mvn -Dtag=v_${version} $dryrunflag release:perform || exit 1
 
-mvn versions:set -DnewVersion=${version}
-mvn clean install -DskipTests
-mvn -f pom-uber.xml package -DskipTests -Dmy.project.version=${version}
+echo "Create release version of uber-jar..."
+./makejar.sh -r
 
-md5 ${outdir}/${outf} && \
-echo "Updating README.md..." && \
+echo "Updating README.md..."
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
 -e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/" \
--e "s/\(logback-android.*SHA1\:\).*/\1 \`$(openssl dgst -sha1 ${outdir}/${outf} | awk '{print $2}')\`)/" ${readme}
+${readme}
 
 if [ ! ${dryrun} ]; then
   git add ${readme}
