@@ -23,7 +23,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
@@ -93,6 +92,9 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
 
   private volatile Socket socket;
 
+  private volatile boolean initialized = false;
+  private volatile boolean lazyInit = false;
+
   /**
    * Constructs a new appender.
    */
@@ -143,15 +145,6 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     }
 
     if (errorCount == 0) {
-      try {
-        address = InetAddress.getByName(remoteHost);
-      } catch (UnknownHostException ex) {
-        addError("unknown host: " + remoteHost);
-        errorCount++;
-      }
-    }
-
-    if (errorCount == 0) {
       queue = newBlockingQueue(queueSize);
       peerId = "remote peer " + remoteHost + ":" + port + ": ";
       task = getContext().getExecutorService().submit(this);
@@ -197,20 +190,9 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     signalEntryInRunMethod();
     try {
       while (!Thread.currentThread().isInterrupted()) {
-        SocketConnector connector = createConnector(address, port, 0,
-                reconnectionDelay.getMilliseconds());
-
-        connectorTask = activateConnector(connector);
-        if(connectorTask == null)
-          break;
-
-        socket = waitForConnectorToReturnASocket();
-        if(socket == null)
-          break;
         dispatchEvents();
       }
     } catch (InterruptedException ex) {
-      assert true;    // ok... we'll exit now
     }
     addInfo("shutting down");
   }
@@ -219,7 +201,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
       // do nothing by default
     }
 
-    private SocketConnector createConnector(InetAddress address, int port,
+  private SocketConnector createConnector(InetAddress address, int port,
                                           int initialDelay, long retryDelay) {
     SocketConnector connector = newConnector(address, port, initialDelay,
             retryDelay);
@@ -246,15 +228,52 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     }
   }
 
-  private void dispatchEvents() throws InterruptedException {
+  private Socket initSocket() throws InterruptedException, IOException {
+    address = InetAddress.getByName(remoteHost);
+    SocketConnector connector = createConnector(address, port, 0,
+        reconnectionDelay.getMilliseconds());
+
+    connectorTask = activateConnector(connector);
+    socket = (connectorTask != null) ? waitForConnectorToReturnASocket() : null;
+
+    if (socket == null) {
+      throw new IOException("cannot initialize socket");
+    }
+
+    return socket;
+  }
+
+  private ObjectOutputStream initObjectOutputStream() throws IOException {
+    socket.setSoTimeout(acceptConnectionTimeout);
+    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+    socket.setSoTimeout(0);
+    addInfo(peerId + "connection established");
+    return oos;
+  }
+
+  private ObjectOutputStream lazyInitSocketStream() throws IOException, InterruptedException {
+    ObjectOutputStream oos = null;
+    if (!lazyInit && !initialized) {
+      initialized = true;
+      initSocket();
+      oos = initObjectOutputStream();
+    }
+    return oos;
+  }
+
+  private void dispatchEvents() throws InterruptedException, UnknownHostException {
     try {
-      socket.setSoTimeout(acceptConnectionTimeout);
-      ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-      socket.setSoTimeout(0);
-      addInfo(peerId + "connection established");
+      ObjectOutputStream oos = lazyInitSocketStream();
+
       int counter = 0;
       while (true) {
         E event = queue.take();
+
+        if (oos == null) {
+          initSocket();
+          oos = initObjectOutputStream();
+        }
+
         postProcessEvent(event);
         Serializable serEvent = getPST().transform(event);
         oos.writeObject(serEvent);
@@ -266,6 +285,9 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
           counter = 0;
         }
       }
+    } catch (UnknownHostException ex) {
+      addError(peerId + "unknown host: " + ex);
+      throw ex;
     } catch (IOException ex) {
       addInfo(peerId + "connection failed: " + ex);
     } finally {
@@ -475,4 +497,31 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     this.acceptConnectionTimeout = acceptConnectionTimeout;
   }
 
+  /**
+   * Gets the enable status of lazy initialization of the socket
+   * connection
+   *
+   * @return true if enabled; false otherwise
+   */
+  public boolean getLazy() {
+    return lazyInit;
+  }
+
+  /**
+   * Enables/disables lazy initialization of the socket connection.
+   * This defers the connection process until the first outgoing message.
+   *
+   * @param enabled true to enable lazy initialization; false otherwise
+   */
+  public void setLazy(boolean enabled) {
+    lazyInit = enabled;
+  }
+
+  /**
+   * Determines whether the socket is ready
+   * @return true if socket ready; false otherwise
+   */
+  protected boolean isSocketInitialized() {
+    return socket != null;
+  }
 }
