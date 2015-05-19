@@ -13,25 +13,25 @@
  */
 package ch.qos.logback.classic;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.util.LoggerNameUtil;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.spi.AppenderAttachable;
+import ch.qos.logback.core.spi.AppenderAttachableImpl;
+import ch.qos.logback.core.spi.FilterReply;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.spi.LocationAwareLogger;
+
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import ch.qos.logback.classic.util.LoggerNameUtil;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.spi.LocationAwareLogger;
-
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.LoggingEvent;
-import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.CoreConstants;
-import ch.qos.logback.core.spi.AppenderAttachable;
-import ch.qos.logback.core.spi.AppenderAttachableImpl;
-import ch.qos.logback.core.spi.FilterReply;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     AppenderAttachable<ILoggingEvent>, Serializable {
@@ -341,7 +341,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     if (childrenList == null) {
       return;
     }
-    for (Logger childLogger : childrenList) {
+    for (Logger childLogger : new CopyOnWriteArrayList<Logger>(childrenList)) {
       childLogger.recursiveReset();
     }
   }
