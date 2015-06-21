@@ -240,7 +240,7 @@ Even though `assets/logback.xml` is the first configuration loaded, this file co
 </configuration>
 ```
 
-Prior to `v1.1.1-3`, the initialization search path was hard-coded, and that can be recreated with this configuration:
+Prior to `v1.0.8-1`, the initialization search path was hard-coded, and that can be recreated with this configuration:
 
 ```xml
 <configuration>
