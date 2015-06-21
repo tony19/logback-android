@@ -32,9 +32,9 @@
 
 # Release version "x.x.x-N"
 #
-# where 
+# where
 #	x.x.x is the version of logback on which logback-android is based
-# and 
+# and
 #	N is the integral release number of logback-android.
 #
 version=$(mvn help:evaluate -Dexpression=project.version | grep '^[^[]')
@@ -47,15 +47,6 @@ if [ "x$1" == "xdryrun" ]; then
   dryrun=true
   dryrunflag=-DdryRun=true
 fi
-echo "Starting release process for logback-android ${version}..."
-
-# Deploy release to Sonatype
-mvn release:clean || exit 1
-mvn -Dtag=v_${version} $dryrunflag release:prepare || exit 1
-mvn -Dtag=v_${version} $dryrunflag release:perform || exit 1
-
-echo "Create release version of uber-jar..."
-./makejar.sh -r
 
 echo "Updating README.md..."
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
@@ -68,6 +59,16 @@ if [ ! ${dryrun} ]; then
 else
   echo '[dryrun] skip commit README...'
 fi
+
+echo "Starting release process for logback-android ${version}..."
+
+# Deploy release to Sonatype
+mvn release:clean || exit 1
+mvn -Dtag=v_${version} $dryrunflag release:prepare || exit 1
+mvn -Dtag=v_${version} $dryrunflag release:perform || exit 1
+
+echo "Create release version of uber-jar..."
+./makejar.sh -r
 
 echo "Generating javadoc..."
 mvn javadoc:javadoc
