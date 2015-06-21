@@ -48,10 +48,11 @@ if [ "x$1" == "xdryrun" ]; then
   dryrunflag=-DdryRun=true
 fi
 
+prev_version_idx=${version#*-}
+prev_version_idx=$((prev_version_idx-1))
+prev_version=${version%-*}-${prev_version_idx}
 echo "Updating README.md..."
-gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/" \
--e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/" \
-${readme}
+gsed -i -e "s/${prev_version}/${version}/" ${readme}
 
 if [ ! ${dryrun} ]; then
   git add ${readme}
