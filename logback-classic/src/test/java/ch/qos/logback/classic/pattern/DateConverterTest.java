@@ -15,7 +15,6 @@ package ch.qos.logback.classic.pattern;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneOffset;
 import java.util.*;
 
 import ch.qos.logback.core.CoreConstants;
@@ -52,7 +51,7 @@ public class DateConverterTest {
   @BeforeClass
   public static void beforeClass() throws ParseException {
     SimpleDateFormat sdf = new SimpleDateFormat(DATETIME_PATTERN, Locale.US);
-    sdf.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     _date = sdf.parse(ENGLISH_TIME_UTC);
     _context = new LoggerContext();
     _logger = _context.getLogger(DateConverterTest.class);
