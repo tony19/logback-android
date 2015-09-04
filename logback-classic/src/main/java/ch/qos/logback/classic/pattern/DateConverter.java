@@ -14,6 +14,7 @@
 package ch.qos.logback.classic.pattern;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -22,8 +23,6 @@ import ch.qos.logback.core.util.CachingDateFormatter;
 
 public class DateConverter extends ClassicConverter {
 
-  long lastTimestamp = -1;
-  String timestampStrCache = null;
   CachingDateFormatter cachingDateFormatter = null;
 
   public void start() {
@@ -38,24 +37,44 @@ public class DateConverter extends ClassicConverter {
       datePattern = CoreConstants.ISO8601_PATTERN;
     }
 
+    TimeZone tz = TimeZone.getDefault();
+    Locale locale = Locale.ENGLISH;
+
+    List<String> optionList = getOptionList();
+    if (optionList != null) {
+      // Option[1] = Time zone
+      if (optionList.size() > 1) {
+        tz = TimeZone.getTimeZone(optionList.get(1));
+      }
+
+      // Option[2] = Locale
+      if (optionList.size() > 2) {
+        locale = parseLocale(optionList.get(2));
+      }
+    }
+
     try {
-      cachingDateFormatter = new CachingDateFormatter(datePattern);
-      // maximumCacheValidity =
-      // CachedDateFormat.getMaximumCacheValidity(pattern);
+      cachingDateFormatter = new CachingDateFormatter(datePattern, locale);
     } catch (IllegalArgumentException e) {
       addWarn("Could not instantiate SimpleDateFormat with pattern "
           + datePattern, e);
       // default to the ISO8601 format
-      cachingDateFormatter = new CachingDateFormatter(CoreConstants.ISO8601_PATTERN);
+      cachingDateFormatter = new CachingDateFormatter(CoreConstants.ISO8601_PATTERN, locale);
     }
 
-    List optionList = getOptionList();
+    cachingDateFormatter.setTimeZone(tz);
+  }
 
-    // if the option list contains a TZ option, then set it.
-    if (optionList != null && optionList.size() > 1) {
-      TimeZone tz = TimeZone.getTimeZone((String) optionList.get(1));
-      cachingDateFormatter.setTimeZone(tz);
+  private Locale parseLocale(String input) {
+    String[] localeParts = input.split(",");
+
+    Locale locale;
+    if (localeParts.length > 1) {
+      locale = new Locale(localeParts[0], localeParts[1]);
+    } else {
+      locale = new Locale(localeParts[0]);
     }
+    return locale;
   }
 
   public String convert(ILoggingEvent le) {
