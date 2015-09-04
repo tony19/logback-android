@@ -15,6 +15,7 @@ package ch.qos.logback.core.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -31,7 +32,11 @@ public class CachingDateFormatter {
   final SimpleDateFormat sdf;
 
   public CachingDateFormatter(String pattern) {
-    sdf = new SimpleDateFormat(pattern);
+    this(pattern, Locale.US);
+  }
+
+  public CachingDateFormatter(String pattern, Locale locale) {
+    sdf = new SimpleDateFormat(pattern, locale);
   }
 
   public final String format(long now) {
