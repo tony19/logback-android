@@ -17,11 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ch.qos.logback.classic.pattern.*;
-import ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.PatternLayoutBase;
-import ch.qos.logback.core.pattern.color.*;
 import ch.qos.logback.core.pattern.parser.Parser;
 
 /**
@@ -109,29 +107,7 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
 
     defaultConverterMap.put("n", LineSeparatorConverter.class.getName());
 
-    // All color converters are deprecated and will be removed in a future release.
-    // They only apply to ConsoleAppender, which is deprecated for LogcatAppender.
-    defaultConverterMap.put("black", BlackCompositeConverter.class.getName());
-    defaultConverterMap.put("red", RedCompositeConverter.class.getName());
-    defaultConverterMap.put("green", GreenCompositeConverter.class.getName());
-    defaultConverterMap.put("yellow", YellowCompositeConverter.class.getName());
-    defaultConverterMap.put("blue", BlueCompositeConverter.class.getName());
-    defaultConverterMap.put("magenta", MagentaCompositeConverter.class.getName());
-    defaultConverterMap.put("cyan", CyanCompositeConverter.class.getName());
-    defaultConverterMap.put("white", WhiteCompositeConverter.class.getName());
-    defaultConverterMap.put("gray", GrayCompositeConverter.class.getName());
-    defaultConverterMap.put("boldRed", BoldRedCompositeConverter.class.getName());
-    defaultConverterMap.put("boldGreen", BoldGreenCompositeConverter.class.getName());
-    defaultConverterMap.put("boldYellow", BoldYellowCompositeConverter.class.getName());
-    defaultConverterMap.put("boldBlue", BoldBlueCompositeConverter.class.getName());
-    defaultConverterMap.put("boldMagenta", BoldMagentaCompositeConverter.class.getName());
-    defaultConverterMap.put("boldCyan", BoldCyanCompositeConverter.class.getName());
-    defaultConverterMap.put("boldWhite", BoldWhiteCompositeConverter.class.getName());
-    defaultConverterMap.put("highlight", HighlightingCompositeConverter.class.getName());
-
     defaultConverterMap.put("lsn", LocalSequenceNumberConverter.class.getName());
-
-
   }
 
   public PatternLayout() {
