@@ -18,8 +18,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
+import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 /**
  * An appender that wraps the native Android logging mechanism (<i>logcat</i>);
@@ -36,7 +36,7 @@ import ch.qos.logback.core.Layout;
  * @author Fred Eisele
  * @author Anthony Trinh
  */
-public class LogcatAppender extends AppenderBase<ILoggingEvent> {
+public class LogcatAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   /**
    * Max tag length enforced by Android
    * http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)
