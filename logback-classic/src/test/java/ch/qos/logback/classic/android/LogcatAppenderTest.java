@@ -13,12 +13,20 @@
  */
 package ch.qos.logback.classic.android;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import android.util.Log;
+
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowLog;
 
+import java.util.List;
+
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.LoggingEvent;
@@ -29,17 +37,22 @@ import ch.qos.logback.classic.spi.ThrowableProxy;
  *
  * @author Anthony Trinh
  */
+@RunWith(RobolectricTestRunner.class)
 public class LogcatAppenderTest {
+  static private final String LOGGER_NAME = "LOGCAT";
   static private final int MAX_TAG_LENGTH = 23; // for android.util.Log.isLoggable()
   static private final String TAG = "123456789012345678901234567890";
   static private final String TRUNCATED_TAG = TAG.substring(0, MAX_TAG_LENGTH - 1) + "*";
 
   private LogcatAppender logcatAppender;
-  private LoggerContext context;
+  private LoggerContext context = new LoggerContext();
+  private Logger root = context.getLogger(Logger.ROOT_LOGGER_NAME);
 
   @Before
   public void before() {
-    configureAppenderDirectly();
+    context.reset();
+    root.detachAndStopAllAppenders();
+    configureLogcatAppender();
   }
 
   @Test
@@ -92,11 +105,10 @@ public class LogcatAppenderTest {
     logcatAppender.start();
   }
 
-  private void configureAppenderDirectly() {
-    context = new LoggerContext();
+  private void configureLogcatAppender() {
     logcatAppender = new LogcatAppender();
     logcatAppender.setContext(context);
-    logcatAppender.setName("LOGCAT");
+    logcatAppender.setName(LOGGER_NAME);
 
     PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     encoder.setContext(context);
@@ -111,5 +123,62 @@ public class LogcatAppenderTest {
     logcatAppender.setTagEncoder(tagEncoder);
     logcatAppender.setEncoder(encoder);
     logcatAppender.start();
+  }
+
+
+  private boolean logcatContains(List<ShadowLog.LogItem> logs, int level, String errorMessage) {
+    boolean found = false;
+    for (ShadowLog.LogItem s : logs) {
+      if (level == s.type) {
+        if (s.msg.contains(errorMessage)) {
+          found = true;
+          break;
+        }
+      }
+    }
+    return found;
+  }
+
+  private void assertLogcatContains(int level, String errorMessage) {
+    List<ShadowLog.LogItem> logs = ShadowLog.getLogsForTag(LOGGER_NAME);
+    assertThat(logs, is(notNullValue()));
+    assertThat(logcatContains(logs, level, errorMessage), is(true));
+  }
+
+  private void addLogcatAppenderToRoot() {
+    PatternLayoutEncoder encoder2 = new PatternLayoutEncoder();
+    encoder2.setContext(context);
+    encoder2.setPattern("[%thread] %method\\(\\): %msg%n");
+    encoder2.start();
+
+    LogcatAppender logcatAppender = new LogcatAppender();
+    logcatAppender.setContext(context);
+    logcatAppender.setName(LOGGER_NAME);
+    logcatAppender.setEncoder(encoder2);
+    logcatAppender.start();
+
+    root.addAppender(logcatAppender);
+  }
+
+  /**
+   * Issue #102
+   */
+  @Test
+  public void logsExceptionWhenMessageTrailsWithNewline() {
+    addLogcatAppenderToRoot();
+    ShadowLog.reset();
+    context.getLogger(LOGGER_NAME).debug("msg\n", new NullPointerException());
+    assertLogcatContains(Log.DEBUG, NullPointerException.class.getName());
+  }
+
+  /**
+   * Issue #102
+   */
+  @Test
+  public void logsExceptionWhenMessageHasNoTrailingNewline() {
+    addLogcatAppenderToRoot();
+    ShadowLog.reset();
+    context.getLogger(LOGGER_NAME).debug("msg", new NullPointerException());
+    assertLogcatContains(Log.DEBUG, NullPointerException.class.getName());
   }
 }
