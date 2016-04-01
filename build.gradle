@@ -10,10 +10,26 @@ subprojects {
   sourceCompatibility = 1.5
   targetCompatibility = 1.5
 
-  
+  test {
+    // Exclude abstract base classes for tests (e.g., BaseIncludesTezt),
+    // which causes an error because they can't be instantiated
+    exclude '**/*Tezt*'
+
+    // Skip fragile network tests (to be refactored later)
+    exclude '**/net/**'
+
+    // Skip performance tests, since they're already run in they're own 'perf' task
+    exclude '**/*PerfTest*'
+
+//    testLogging {
+//      // Show that tests are run in the command-line output
+//      events 'started', 'passed'
+//    }
+  }
+
   repositories {
     mavenLocal()
-    
+
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "http://repo.maven.apache.org/maven2" }
   }
@@ -21,13 +37,11 @@ subprojects {
   configurations.all {
   }
   dependencies {
-    testCompile(group: 'junit', name: 'junit', version:'4.10') {
+    testCompile(group: 'junit', name: 'junit', version: '4.10') {
       exclude(module: 'hamcrest-core')
     }
-    testCompile group: 'org.hamcrest', name: 'hamcrest-junit', version:'2.0.0.0'
-    testCompile group: 'org.robolectric', name: 'robolectric', version:'3.0'
-    testCompile group: 'org.mockito', name: 'mockito-core', version:'1.9.0'
-}
-
-  
+    testCompile group: 'org.hamcrest', name: 'hamcrest-junit', version: '2.0.0.0'
+    testCompile group: 'org.robolectric', name: 'robolectric', version: '3.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.0'
+  }
 }
