@@ -37,6 +37,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.*;
 import org.slf4j.helpers.BogoPerf;
+import static org.hamcrest.Matchers.*;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -73,7 +74,7 @@ public class ReconfigureOnChangeTest {
   final static String INCLUSION_SCAN_INNER0_AS_STR = ClassicTestConstants.INPUT_PREFIX
           + "turbo/inclusion/inner0.xml";
 
-  final static String INCLUSION_SCAN_INNER1_AS_STR = "target/test-classes/asResource/inner1.xml";
+  final static String INCLUSION_SCAN_INNER1_AS_STR = "/asResource/inner1.xml";
 
   // it actually takes time for Windows to propagate file modification changes
   // values below 100 milliseconds can be problematic the same propagation
@@ -164,7 +165,7 @@ public class ReconfigureOnChangeTest {
   @Test(timeout = 4000L)
   public void scanWithResourceInclusion() throws JoranException, IOException, InterruptedException {
     File topLevelFile = new File(INCLUSION_SCAN_TOP_BY_RESOURCE_AS_STR);
-    File innerFile = new File(INCLUSION_SCAN_INNER1_AS_STR);
+    File innerFile = new File(getClass().getResource(INCLUSION_SCAN_INNER1_AS_STR).getFile());
     configure(topLevelFile);
 
     List<File> fileList = getConfigurationFileList(loggerContext);
@@ -242,7 +243,7 @@ public class ReconfigureOnChangeTest {
 
   private void assertThatListContainsFile(List<File> fileList, File file) {
     // conversion to absolute file seems to work nicely
-    assertTrue(fileList.contains(file.getAbsoluteFile()));
+    assertThat(fileList, hasItem(file.getAbsoluteFile()));
   }
 
   private TurboFilter getFirstTurboFilter() {

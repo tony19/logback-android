@@ -11,9 +11,7 @@ subprojects {
   targetCompatibility = 1.5
 
   test {
-    // Exclude abstract base classes for tests (e.g., BaseIncludesTezt),
-    // which causes an error because they can't be instantiated
-    exclude '**/*Tezt*'
+    include '**/*Test.class'
 
     // Skip fragile network tests (to be refactored later)
     exclude '**/net/**'
