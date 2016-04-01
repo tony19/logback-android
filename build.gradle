@@ -1,3 +1,12 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
+  }
+}
 
 allprojects  {
   apply plugin: 'maven'
@@ -11,6 +20,7 @@ allprojects  {
 
 subprojects {
   apply plugin: 'java'
+
   sourceCompatibility = 1.5
   targetCompatibility = 1.5
 
@@ -36,9 +46,6 @@ subprojects {
     maven { url "http://repo.maven.apache.org/maven2" }
   }
 
-  configurations.all {
-  }
-
   dependencies {
     testCompile(group: 'junit', name: 'junit', version: '4.10') {
       exclude(module: 'hamcrest-core')
@@ -58,6 +65,8 @@ subprojects {
 }
 
 apply plugin: 'java'
+apply plugin: 'com.bmuschko.nexus'
+apply plugin: 'io.codearte.nexus-staging'
 
 task uberjar(type: Jar) {
   subprojects.each { subproject ->
@@ -65,3 +74,53 @@ task uberjar(type: Jar) {
   }
 }
 
+modifyPom {
+  project {
+    name 'logback-android'
+    description 'Advanced logging for Android apps'
+    url 'https://github.com/bmuschko/gradle-nexus-plugin'
+    inceptionYear '2005'
+
+    scm {
+      url 'https://github.com/tony19/logback-android'
+      connection 'scm:git@github.com:tony19/logback-android.git'
+      developerConnection 'scm:git:git@github.com:tony19/logback-android.git'
+    }
+
+    licenses {
+      license {
+        name 'Eclipse Public License - v 1.0'
+        url 'http://www.eclipse.org/legal/epl-v10.html'
+        distribution 'repo'
+      }
+      license {
+        name 'GNU Lesser General Public License'
+        url 'http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html'
+        distribution 'repo'
+      }
+    }
+
+    developers {
+      developer {
+        id 'tony19'
+        name 'Tony Trinh'
+        email 'tony19@gmail.com'
+      }
+    }
+  }
+}
+
+extraArchive {
+  sources = true
+  tests = true
+  javadoc = false
+}
+
+// We need to add our own javadoc task that ignores errors
+// because there are several elements missing javadoc
+task javadocJar(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc {
+    failOnError = false
+  }
+}
