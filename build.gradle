@@ -124,3 +124,10 @@ task javadocJar(type: Jar) {
     failOnError = false
   }
 }
+
+// Creates combined javadocs for all subprojects
+task javadocs(type: Javadoc) {
+  source subprojects.collect { project -> project.sourceSets.main.allJava }
+  classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
+  failOnError = false
+}
