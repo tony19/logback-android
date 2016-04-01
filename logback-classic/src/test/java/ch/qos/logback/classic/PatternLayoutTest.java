@@ -18,6 +18,8 @@ import static ch.qos.logback.classic.ClassicTestConstants.MAIN_REGEX;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +47,7 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
 
   ILoggingEvent le;
 
-	public PatternLayoutTest() {
+  public PatternLayoutTest() {
     super();
     Exception ex = new Exception("Bogus exception");
     le = makeLoggingEvent(ex);
@@ -82,7 +84,7 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
     String regex = ISO_REGEX + " INFO " + MAIN_REGEX
             + " c.q.l.c.pattern.ConverterTest - Some message\\s*";
 
-    assertTrue("val="+val, val.matches(regex));
+    assertThat(val, matchesPattern(regex));
   }
 
   @Test
@@ -90,7 +92,7 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
     pl.setPattern("%m%n");
     pl.start();
     String val = pl.doLayout(le);
-    assertTrue(val.contains("java.lang.Exception: Bogus exception"));
+    assertThat(val, containsString("java.lang.Exception: Bogus exception"));
   }
 
   @Test
@@ -101,7 +103,7 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
     // 2008-03-18 21:55:54,250 c.q.l.c.pattern.ConverterTest - Some message
     String regex = ISO_REGEX
             + " c.q.l.c.p.ConverterTest          - Some message\\s*";
-    assertTrue(val.matches(regex));
+    assertThat(val, matchesPattern(regex));
   }
 
   @Test
@@ -119,7 +121,7 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
     pl.setPattern("%nopex %m%n");
     pl.start();
     String val = pl.doLayout(le);
-    assertTrue(!val.contains("java.lang.Exception: Bogus exception"));
+    assertThat(val, not(containsString("java.lang.Exception: Bogus exception")));
   }
 
   @Test
@@ -142,7 +144,7 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
     // message
     String regex = ClassicTestConstants.ISO_REGEX + " INFO " + MAIN_REGEX
             + " c.q.l.c.pattern.ConverterTest - Some message\\s*";
-    assertTrue(val.matches(regex));
+    assertThat(val, matchesPattern(regex));
   }
 
   @Test
