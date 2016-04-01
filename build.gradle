@@ -43,3 +43,13 @@ subprojects {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.0'
   }
 }
+
+apply plugin: 'java'
+
+task uberjar(type: Jar) {
+  baseName = 'logback-android'
+  subprojects.each { subproject ->
+    from files(subproject.sourceSets.main.output)
+  }
+}
+
