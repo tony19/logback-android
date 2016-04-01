@@ -456,7 +456,7 @@ For help with using **logback-android**, ask the [Logback User mailing list](htt
 
 Build
 -----
-`logback-android` is built with Apache Maven 2+. Use these commands to create the uber JAR (with debug symbols).
+`logback-android` is built with Gradle 2.12+. Use these commands to create the uber JAR (with debug symbols).
 
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
