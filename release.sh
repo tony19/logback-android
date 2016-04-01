@@ -37,10 +37,10 @@
 # and
 #	N is the integral release number of logback-android.
 #
-version=$(mvn help:evaluate -Dexpression=project.version | grep '^[^[]')
-version=${version%-SNAPSHOT}
+. gradle.properties
+version=${baseVersion}-${buildVersion}
 outf=logback-android-${version}.jar
-outdir=$PWD/target
+docsdir=$PWD/build/docs/javadoc
 readme=$PWD/README.md
 if [ "x$1" == "xdryrun" ]; then
   echo "[dryrun] just a test!"
@@ -64,21 +64,19 @@ fi
 echo "Starting release process for logback-android ${version}..."
 
 # Deploy release to Sonatype
-mvn release:clean || exit 1
-mvn -Dtag=v_${version} $dryrunflag release:prepare || exit 1
-mvn -Dtag=v_${version} $dryrunflag release:perform || exit 1
+gradle clean build uploadArchives -Pver=${version}
 
 echo "Create release version of uber-jar..."
 ./makejar.sh -r
 
 echo "Generating javadoc..."
-mvn javadoc:javadoc
+gradle javadocs
 
 # Update the web pages
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
 cd gh-pages
 rm -rf doc/${version}
-mv ${outdir}/site/apidocs doc/${version}
+mv ${docsdir} doc/${version}
 
 echo "Updating index.html..."
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/g" \
