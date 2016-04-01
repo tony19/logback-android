@@ -462,7 +462,7 @@ Build
     cd logback-android
     ./makejar.sh
 
-The jar would be in: `./target/logback-android-1.1.1-4.jar`
+The jar would be in: `./builds/lib/logback-android-1.1.1-4.jar`
 
  [1]: http://logback.qos.ch
  [3]: http://tony19.github.com/logback-android
