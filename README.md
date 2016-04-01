@@ -1,4 +1,4 @@
-<h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/gh-pages/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android <a href='https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-SNAPSHOT/'><img src='https://tony19.ci.cloudbees.com/buildStatus/icon?job=logback-android/logback-android-SNAPSHOT'></a></h1>
+<h1><a href="http://tony19.github.com/logback-android/"><img src="https://github.com/tony19/logback-android/raw/gh-pages/img/lblogo-72x72.png" width="64" height="64" hspace="4" vspace="4" valign="middle"/></a> logback-android <a href='https://tony19.ci.cloudbees.com/job/logback-android/logback-android-gradle-build'><img src='https://tony19.ci.cloudbees.com/buildStatus/icon?job=logback-android/logback-android-gradle-build'></a></h1>
 <sup>v1.1.1-4</sup>
 
 Overview
