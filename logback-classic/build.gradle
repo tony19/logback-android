@@ -1,5 +1,5 @@
 
-description = 'Logback Android Classic Module'
+description = 'logback-android Classic module'
 dependencies {
     compile group: 'com.github.tony19', name: 'apktool-lib', version:'1.4.4-3'
     compile project(':logback-android-core')

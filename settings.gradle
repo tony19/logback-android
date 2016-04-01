@@ -1,4 +1,4 @@
-rootProject.name = 'logback-android-parent'
+rootProject.name = 'logback-android'
 include ':logback-android-core'
 include ':logback-android-classic'
 
