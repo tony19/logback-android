@@ -11,7 +11,6 @@ buildscript {
 }
 
 apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply from: 'gradle/nexus.gradle'
 
 allprojects  {
@@ -68,26 +67,9 @@ subprojects {
   }
 }
 
-
-task uberjar(type: Jar) {
-  subprojects.each { subproject ->
-    from files(subproject.sourceSets.main.output)
-  }
-}
-
 // Creates combined javadocs for all subprojects
 task javadocs(type: Javadoc) {
   source subprojects.collect { project -> project.sourceSets.main.allJava }
   classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
   failOnError = false
-}
-
-shadowJar {
-  dependencies {
-    include(project(':logback-android-core'))
-    include(project(':logback-android-classic'))
-    include(dependency('com.github.tony19:apktool-lib'))
-  }
-  relocate 'brut', 'ch.qos.logback.repackage.brut'
-  relocate 'com.mindprod', 'ch.qos.logback.repackage.com.mindprod'
 }

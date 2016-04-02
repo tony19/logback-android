@@ -23,5 +23,11 @@ set -e
 
 . gradle.properties
 version=${baseVersion}-$((${buildVersion} + 1))
-gradle clean build jar uberjar -Pver=${version} -P${profile}
+gradle clean shadowJar -Pver=${version} -P${profile}
+
+# FIXME: Currently applying shadowJar from logback-classic in order
+# to include all required dependencies.
+mv -f logback-classic/build/libs/logback-android-classic-${version}-all.jar \
+      build/libs/logback-android-${version}.jar
+
 echo "Created ./build/libs/logback-android-${version}.jar"

@@ -23,3 +23,10 @@ task packageTests(type: Jar) {
   classifier = 'tests'
 }
 artifacts.archives packageTests
+
+// FIXME: This is a hack to create the shaded uber jar.
+// Including this in the rootProject does not include
+// the subprojects for some reason. Since logback-classic
+// references all dependencies (including logback-core),
+// applying this config here achieves what we need.
+apply from: '../gradle/uberjar.gradle'
