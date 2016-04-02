@@ -23,7 +23,7 @@ set -e
 
 . gradle.properties
 version=${baseVersion}-$((${buildVersion} + 1))
-gradle clean shadowJar -Pver=${version} -P${profile}
+./gradlew clean shadowJar -Pver=${version} -P${profile}
 
 # FIXME: Currently applying shadowJar from logback-classic in order
 # to include all required dependencies.

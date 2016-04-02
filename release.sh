@@ -64,13 +64,13 @@ fi
 echo "Starting release process for logback-android ${version}..."
 
 # Deploy release to Sonatype
-gradle clean build uploadArchives -Pver=${version}
+./gradlew clean build uploadArchives -Pver=${version}
 
 echo "Create release version of uber-jar..."
 ./makejar.sh -r
 
 echo "Generating javadoc..."
-gradle javadocs
+./gradlew javadocs
 
 # Update the web pages
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
