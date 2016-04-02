@@ -15,10 +15,6 @@ plugins {
 
 apply plugin: 'java'
 apply from: 'gradle/nexus.gradle'
-
-def releaseVersion = "${baseVersion}-${buildVersion}"
-def developmentVersion = "${releaseVersion}-SNAPSHOT"
-version = project.hasProperty('ver') ? project.ver : developmentVersion
 apply from: 'gradle/readme.gradle'
 
 release {
@@ -34,7 +30,7 @@ allprojects  {
   apply plugin: 'nebula.optional-base'
 
   group = 'com.github.tony19'
-  version = version
+  version = "${version}"
 }
 
 subprojects {
