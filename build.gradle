@@ -9,6 +9,9 @@ buildscript {
     classpath "com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3"
   }
 }
+plugins {
+  id 'net.researchgate.release' version '2.3.4'
+}
 
 apply plugin: 'java'
 apply from: 'gradle/nexus.gradle'
@@ -17,6 +20,13 @@ def releaseVersion = "${baseVersion}-${buildVersion}"
 def developmentVersion = "${releaseVersion}-SNAPSHOT"
 version = project.hasProperty('ver') ? project.ver : developmentVersion
 apply from: 'gradle/readme.gradle'
+
+release {
+  tagTemplate = 'v_${version}' // must be single-quotes
+  git {
+    requireBranch = ''
+  }
+}
 
 allprojects  {
   apply plugin: 'maven'
