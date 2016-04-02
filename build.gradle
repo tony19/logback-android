@@ -13,16 +13,18 @@ buildscript {
 apply plugin: 'java'
 apply from: 'gradle/nexus.gradle'
 
+def releaseVersion = "${baseVersion}-${buildVersion}"
+def developmentVersion = "${releaseVersion}-SNAPSHOT"
+version = project.hasProperty('ver') ? project.ver : developmentVersion
+apply from: 'gradle/readme.gradle'
+
 allprojects  {
   apply plugin: 'maven'
   apply plugin: 'nebula.provided-base'
   apply plugin: 'nebula.optional-base'
 
   group = 'com.github.tony19'
-
-  def releaseVersion = "${baseVersion}-${buildVersion}"
-  def developmentVersion = "${releaseVersion}-SNAPSHOT"
-  version = project.hasProperty('ver') ? project.ver : developmentVersion
+  version = version
 }
 
 subprojects {

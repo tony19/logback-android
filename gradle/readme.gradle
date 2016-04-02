@@ -1,0 +1,15 @@
+task readme << {
+  def f = new File('gradle/readme.template')
+  def text = f.getText('UTF-8')
+  def template = new groovy.text.StreamingTemplateEngine().createTemplate(text)
+
+  def binding = [
+    version     : rootProject.version,
+    slf4jVersion: '1.7.6' // TODO: Read version from project config
+  ]
+
+  String newText = template.make(binding)
+
+  def readmeFile = new File('README.md')
+  readmeFile.write(newText)
+}
