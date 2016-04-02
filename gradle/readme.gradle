@@ -1,11 +1,13 @@
+/**
+ * Generates README.md based on project properties
+ */
 task readme << {
-  def f = new File('gradle/readme.template')
-  def text = f.getText('UTF-8')
+  def text = new File('gradle/readme.template').getText('UTF-8')
   def template = new groovy.text.StreamingTemplateEngine().createTemplate(text)
 
   def binding = [
     version     : rootProject.version,
-    slf4jVersion: '1.7.6' // TODO: Read version from project config
+    slf4jVersion: '1.7.6'
   ]
 
   String newText = template.make(binding)
