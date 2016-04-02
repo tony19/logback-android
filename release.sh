@@ -26,9 +26,6 @@
 # To run this script, simply run:
 #   $ ./release.sh
 #
-# For a dryrun, enter:
-#   $ ./release.sh dryrun
-#
 
 # Release version "x.x.x-N"
 #
@@ -42,11 +39,6 @@ version=${baseVersion}-${buildVersion}
 outf=logback-android-${version}.jar
 docsdir=$PWD/build/docs/javadoc
 readme=$PWD/README.md
-if [ "x$1" == "xdryrun" ]; then
-  echo "[dryrun] just a test!"
-  dryrun=true
-  dryrunflag=-DdryRun=true
-fi
 
 echo "Updating README.md..."
 ./gradlew readme
@@ -74,19 +66,10 @@ echo "Updating index.html..."
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/g" \
 -e "s/[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+/${version}/g" index.html
 
-if [ ! ${dryrun} ]; then
-  git add index.html
-  git add doc/${version}
+git add index.html
+git add doc/${version}
 
-  # checkin changes to the web pages
-  git commit -m "release ${version}"
+# checkin changes to the web pages
+git commit -m "release ${version}"
 
-else
-  echo '[dryrun] skip commit gh-pages...'
-fi
-
-if [ ! ${dryrun} ]; then
-  echo Done. Push changes to GitHub!!
-else
-  echo Done...just a dryrun!!
-fi
+echo Done. Push changes to GitHub!!
