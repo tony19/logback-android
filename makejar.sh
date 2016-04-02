@@ -12,6 +12,15 @@
 #
 #  -r   make release build (default: false)
 #
+
+if [ ! $1 ]; then
+  echo "Usage: $0 [-r]"
+  echo
+  echo "Options:"
+  echo "  -r  make release build (default: false)"
+  exit 1
+fi
+
 profile="debug"
 
 if [ "x$1" == "x-r" ]
