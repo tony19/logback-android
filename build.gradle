@@ -37,6 +37,7 @@ allprojects  {
 
   group = 'com.github.tony19'
   version = "${version}"
+  slf4jVersion = "${slf4jVersion}"
 }
 
 subprojects {
