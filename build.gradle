@@ -76,8 +76,9 @@ subprojects {
   }
 
   compileJava {
-    // Include debug symbols with `gradle build -Pdebug` on command line
-    options.debug = project.hasProperty('debug')
+    // Include debug symbols with `gradle build -Pdebug` on command line.
+    // Automatically enable symbols for code analysis.
+    options.debug = project.hasProperty('debug') || project.hasProperty('analysis')
 
     // Show deprecation warnings
     options.deprecation = true
