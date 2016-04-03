@@ -1,3 +1,7 @@
+if (!rootProject.hasProperty('analysis')) {
+  return
+}
+
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
 
