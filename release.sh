@@ -38,19 +38,16 @@
 version=${baseVersion}-${buildVersion}
 outf=logback-android-${version}.jar
 
-echo "Updating README.md..."
-./gradlew readme
-
 echo "Starting release process for logback-android ${version}..."
-
-# Deploy release to Sonatype
-./gradlew clean build uploadArchives -Pver=${version}
-
-echo "Create release version of uber-jar..."
-./makejar.sh -r
+./gradlew -Pver=${version}  \
+            clean           \
+            readme          \
+            release         \
+            uploadArchives  \
+            shadowJar
 
 echo "Generating javadoc..."
-./gradlew javadocs
+./gradlew javadocs -Pver=${version}
 
 # Update the web pages
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
