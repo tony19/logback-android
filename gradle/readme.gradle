@@ -35,3 +35,4 @@ task readme << {
     commitReadme()
   }
 }
+tasks.readme.description = 'Generates README.md based on project properties, and commits it.'

@@ -23,6 +23,7 @@ shadowJar {
 // the ability to read the AndroidManifest.xml, a feature that allows
 // specifying logback.xml inside the manifest.
 task uberjar(type: Jar) {
+  description 'Assembles a jar archive containing the classes of the "core" and "classic" modules.'
   subprojects.each { subproject ->
     from files(subproject.sourceSets.main.output)
   }
