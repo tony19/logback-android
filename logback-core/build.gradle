@@ -1,9 +1,5 @@
 description = 'logback-android Core module'
 
-configurations {
-  testArtifacts.extendsFrom testRuntime
-}
-
 dependencies {
   provided 'com.google.android:android:2.1.2'
 
@@ -11,13 +7,3 @@ dependencies {
   compile 'com.sun.mail:android-mail:1.5.5', optional
   compile 'com.sun.mail:android-activation:1.5.5', optional
 }
-
-task packageTests(type: Jar) {
-  from sourceSets.test.output
-  classifier = 'tests'
-}
-
-artifacts {
-  testArtifacts packageTests
-}
-

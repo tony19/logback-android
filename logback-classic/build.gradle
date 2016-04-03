@@ -3,7 +3,7 @@ description = 'logback-android Classic module'
 dependencies {
   compile 'com.github.tony19:apktool-lib:1.4.4-3'
   compile project(':logback-android-core')
-  testCompile project(path: ':logback-android-core', configuration: 'testArtifacts')
+  testCompile files(project(':logback-android-core').sourceSets.test.output)
   testCompile 'com.icegreen:greenmail:1.3'
   testCompile 'dom4j:dom4j:1.6.1'
   testCompile 'org.easytesting:fest-assert:1.2'
@@ -17,12 +17,6 @@ dependencies {
   provided 'com.google.android:android:2.1.2'
   provided "org.slf4j:slf4j-api:${slf4jVersion}"
 }
-
-task packageTests(type: Jar) {
-  from sourceSets.test.output
-  classifier = 'tests'
-}
-artifacts.archives packageTests
 
 // FIXME: This is a hack to create the shaded uber jar.
 // Including this in the rootProject does not include
