@@ -44,7 +44,7 @@ allprojects  {
 
 subprojects {
   apply plugin: 'java'
-  apply from: '../gradle/quality.gradle'
+  apply from: '../gradle/analysis.gradle'
 
   sourceCompatibility = 1.5
   targetCompatibility = 1.5
