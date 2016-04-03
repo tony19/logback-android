@@ -19,5 +19,6 @@ task uploadDocs(dependsOn: javadocs) << {
   FileUtils.copyDirectory(new File("build/docs/javadoc"), new File(dest))
   grgit.add(patterns: [dest])
   grgit.commit(message: ":books: Add javadoc for ${rootProject.version}")
+  grgit.push()
   grgit.checkout(branch: origBranch)
 }
