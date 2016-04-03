@@ -21,18 +21,18 @@ if [ ! $1 ]; then
   exit 1
 fi
 
-profile="debug"
+. gradle.properties
+_profile="debug"
 
 if [ "x$1" == "x-r" ]
 then
-  profile="release"
+  _profile="release"
+  version=${baseVersion}-${buildVersion}
 fi
 
 set -e
 
-. gradle.properties
-version=${baseVersion}-$((${buildVersion} + 1))
-./gradlew clean shadowJar -Pver=${version} -P${profile}
+./gradlew clean shadowJar -Pversion=${version} -P${_profile}
 
 # FIXME: Currently applying shadowJar from logback-classic in order
 # to include all required dependencies.
