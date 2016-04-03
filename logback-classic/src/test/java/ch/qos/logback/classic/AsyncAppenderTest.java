@@ -17,7 +17,6 @@ import ch.qos.logback.classic.net.testObjectBuilders.LoggingEventBuilderInContex
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.read.ListAppender;
-import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +39,6 @@ public class AsyncAppenderTest {
 
   @Before
   public void setUp() {
-    OnConsoleStatusListener.addNewInstanceToContext(context);
-
     asyncAppender.setContext(context);
     listAppender.setContext(context);
     listAppender.setName("list");

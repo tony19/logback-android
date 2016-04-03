@@ -3,9 +3,6 @@
 
 <configuration debug="true">
 
-  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />  
-    
-
   <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
 
     <discriminator>

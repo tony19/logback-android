@@ -23,7 +23,6 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.testUtil.EnvUtilForTests;
 import ch.qos.logback.core.testUtil.RandomUtil;
 
@@ -75,8 +74,6 @@ public class SMTPAppender_GreenTest {
 
   @Before
   public void setUp() throws Exception {
-
-    OnConsoleStatusListener.addNewInstanceToContext(loggerContext);
     MDC.clear();
     ServerSetup serverSetup = new ServerSetup(port, "localhost",
             ServerSetup.PROTOCOL_SMTP);

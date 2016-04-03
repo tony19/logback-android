@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,7 +25,6 @@ import ch.qos.logback.core.contention.RunnableWithCounterAndDone;
 import ch.qos.logback.core.encoder.EchoEncoder;
 import ch.qos.logback.core.recovery.RecoveryCoordinator;
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
-import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.ResilienceUtil;
@@ -45,9 +43,6 @@ public class FileAppenderResilienceTest {
 
   @Before
   public void setUp() throws InterruptedException {
-
-    OnConsoleStatusListener.addNewInstanceToContext(context);
-
     File outputDir = new File(outputDirStr);
     outputDir.mkdirs();
 

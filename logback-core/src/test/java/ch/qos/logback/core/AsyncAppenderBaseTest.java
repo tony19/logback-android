@@ -16,7 +16,6 @@ package ch.qos.logback.core;
 import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.read.ListAppender;
 import ch.qos.logback.core.testUtil.DelayingListAppender;
-import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.NPEAppender;
 import org.junit.Before;
@@ -42,8 +41,6 @@ public class AsyncAppenderBaseTest {
 
   @Before
   public void setUp() {
-    OnConsoleStatusListener.addNewInstanceToContext(context);
-
     asyncAppenderBase.setContext(context);
     lossyAsyncAppender.setContext(context);
 
