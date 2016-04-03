@@ -1,0 +1,12 @@
+// TODO: Once we finalize the license for all files, remove this guard
+// in order to enforce the proper license.
+if (!rootProject.hasProperty('license')) {
+  return
+}
+
+apply plugin: 'license'
+
+license {
+  header rootProject.file('config/licenseHeader.txt')
+  include '**/*.java'
+}

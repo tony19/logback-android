@@ -36,22 +36,17 @@ allprojects  {
   apply plugin: 'maven'
   apply plugin: 'nebula.provided-base'
   apply plugin: 'nebula.optional-base'
-  apply plugin: 'license'
 
   group = 'com.github.tony19'
   version = "${version}"
   slf4jVersion = "${slf4jVersion}"
-
-  license {
-    header rootProject.file('config/licenseHeader.txt')
-    include '**/*.java'
-  }
 
 }
 
 subprojects {
   apply plugin: 'java'
   apply from: '../gradle/analysis.gradle'
+  apply from: '../gradle/license.gradle'
 
   sourceCompatibility = 1.5
   targetCompatibility = 1.5
