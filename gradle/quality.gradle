@@ -1,0 +1,16 @@
+apply plugin: 'findbugs'
+apply plugin: 'pmd'
+
+// FIXME: This causes a bunch of NoClassDefFoundErrors
+// with `gradle clean cobertura` (under JDK 8).
+apply plugin: 'cobertura'
+
+findbugs {
+  effort = 'max'
+  reportLevel = 'low'
+  ignoreFailures = true
+}
+
+pmd {
+  ignoreFailures = true
+}
