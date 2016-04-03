@@ -6,7 +6,8 @@ buildscript {
     classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
     classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
     classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-    classpath "com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3"
+    classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3'
+    classpath 'org.ajoberstar:gradle-git:1.4.2'
   }
 }
 plugins {

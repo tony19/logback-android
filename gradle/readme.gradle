@@ -1,17 +1,37 @@
+apply plugin: 'org.ajoberstar.grgit'
+
 /**
- * Generates README.md based on project properties
+ * Generates README.md based on project properties, and commits it
  */
 task readme << {
-  def text = new File('gradle/readme.template').getText('UTF-8')
-  def template = new groovy.text.StreamingTemplateEngine().createTemplate(text)
 
-  def binding = [
-    version     : rootProject.version,
-    slf4jVersion: rootProject.slf4jVersion
-  ]
+  def updateReadme = {
+    def text = new File('gradle/readme.template').getText('UTF-8')
+    def template = new groovy.text.StreamingTemplateEngine().createTemplate(text)
 
-  String newText = template.make(binding)
+    def binding = [
+      version     : rootProject.version,
+      slf4jVersion: rootProject.slf4jVersion
+    ]
 
-  def readmeFile = new File('README.md')
-  readmeFile.write(newText)
+    String newText = template.make(binding)
+
+    def updated = false
+    def readmeFile = new File('README.md')
+    if (readmeFile.text != newText) {
+      readmeFile.text = newText
+      updated = true
+    }
+    return updated
+  }
+
+  def commitReadme = {
+    grgit.add(patterns: ['README.md'])
+    grgit.commit(message: ":books: Update README for ${rootProject.version}")
+    println 'committed new README'
+  }
+
+  if (updateReadme()) {
+    commitReadme()
+  }
 }

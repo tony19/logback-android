@@ -37,13 +37,9 @@
 . gradle.properties
 version=${baseVersion}-${buildVersion}
 outf=logback-android-${version}.jar
-docsdir=$PWD/build/docs/javadoc
-readme=$PWD/README.md
 
 echo "Updating README.md..."
 ./gradlew readme
-git add ${readme}
-git commit -m "Update README for release ${version}"
 
 echo "Starting release process for logback-android ${version}..."
 
@@ -60,7 +56,7 @@ echo "Generating javadoc..."
 git clone -b gh-pages https://github.com/tony19/logback-android.git gh-pages
 cd gh-pages
 rm -rf doc/${version}
-mv ${docsdir} doc/${version}
+mv $PWD/build/docs/javadoc doc/${version}
 
 echo "Updating index.html..."
 gsed -i -e "s/logback-android-[^j]*\.jar/${outf}/g" \
