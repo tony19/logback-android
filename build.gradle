@@ -15,6 +15,7 @@ plugins {
   id 'net.researchgate.release' version '2.3.4'
 }
 
+// expose FileUtils to imported Gradle scripts
 project.ext.FileUtils = org.apache.commons.io.FileUtils
 
 release {

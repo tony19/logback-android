@@ -1,13 +1,18 @@
 apply plugin: 'org.ajoberstar.grgit'
 
-// Creates combined javadocs for all subprojects
+/**
+ * Creates combined javadocs for all subprojects
+ */
 task javadocs(type: Javadoc) {
   source subprojects.collect { project -> project.sourceSets.main.allJava }
   classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
   failOnError = false
 }
 
-task docs(dependsOn: javadocs) << {
+/**
+ * Uploads javadocs to gh-pages
+ */
+task uploadDocs(dependsOn: javadocs) << {
   def origBranch = grgit.branch.current.name
   grgit.checkout(branch: 'gh-pages', createBranch: false)
   def dest = "doc/${rootProject.version}"

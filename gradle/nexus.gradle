@@ -1,3 +1,9 @@
+
+/*
+ * Configures project for Nexus OSS Sonatype deployment,
+ * invoked with `gradle uploadArchives`.
+ */
+
 apply plugin: 'com.bmuschko.nexus'
 apply plugin: 'io.codearte.nexus-staging'
 
@@ -43,7 +49,7 @@ extraArchive {
   javadoc = false
 }
 
-// We need to add our own javadoc task that ignores errors
+// We need to add our own javadocJar task that ignores errors
 // because there are several elements missing javadoc
 task javadocJar(type: Jar) {
   classifier = 'javadoc'

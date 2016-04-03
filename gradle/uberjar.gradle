@@ -1,5 +1,9 @@
 apply plugin: 'com.github.johnrengelman.shadow'
 
+/**
+ * Creates a shaded uber jar, containing the core and classic
+ * modules along with brut and mindprod packages.
+ */
 shadowJar {
   dependencies {
     include(project(':logback-android-core'))

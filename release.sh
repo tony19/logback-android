@@ -24,5 +24,5 @@ echo "Starting release process for logback-android ${version}..."
             readme          \
             release         \
             uploadArchives  \
-            docs            \
+            uploadDocs      \
             shadowJar
