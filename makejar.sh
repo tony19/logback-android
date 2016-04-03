@@ -1,9 +1,9 @@
 #!/bin/sh
 #
 # This script creates the uber jar (with debug symbols). The tests are skipped.
-# The jar will be stored in the "./target" directory:
+# The jar will be stored in the "./build/libs" directory:
 #
-#   ./target/logback-android-<version>.jar
+#   ./build/libs/logback-android-<version>.jar
 #
 
 # Usage: ./makejar.sh [-r]

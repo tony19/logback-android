@@ -26,7 +26,7 @@ public class CoreTestConstants {
   public static final String TEST_INPUT_PREFIX    = TEST_DIR_PREFIX + "input/";
   public static final String JORAN_INPUT_PREFIX   = TEST_INPUT_PREFIX + "joran/";
 
-  public static final String TARGET_DIR           = BASE_DIR + "target/";
+  public static final String TARGET_DIR           = BASE_DIR + "build/";
   public static final String OUTPUT_DIR_PREFIX    = TARGET_DIR + "test-output/";
 
   public static final String BASH_PATH_ON_CYGWIN = "c:/cygwin/bin/bash";

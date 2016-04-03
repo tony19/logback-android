@@ -19,6 +19,7 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.contention.ThreadedThroughputCalculator;
+import ch.qos.logback.core.util.CoreTestConstants;
 
 /**
  * Short sample code testing the throughput of a fair lock.
@@ -57,7 +58,7 @@ public class LoggingToFileThroughput {
     patternLayout.start();
     FileAppender<ILoggingEvent> fileAppender = new FileAppender<ILoggingEvent>();
     fileAppender.setContext(lc);
-    fileAppender.setFile("target/lbclassic135.log");
+    fileAppender.setFile(CoreTestConstants.TARGET_DIR + "lbclassic135.log");
     fileAppender.setEncoder(patternLayout);
     fileAppender.setAppend(false);
     fileAppender.start();

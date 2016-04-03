@@ -4,15 +4,15 @@ echo "run length $2"
 
 
 #On windows
-#CLASSPATH="${CLASSPATH};./target/classes/"
-#CLASSPATH="${CLASSPATH};./target/test-classes/"
-#CLASSPATH="${CLASSPATH};../logback-core/target/classes"
+#CLASSPATH="${CLASSPATH};./build/classes/"
+#CLASSPATH="${CLASSPATH};./build/test-classes/"
+#CLASSPATH="${CLASSPATH};../logback-core/build/classes"
 #CLASSPATH="${CLASSPATH};../logback-examples/lib/slf4j-api-1.5.5.jar"
 
 # On Unix
-#CLASSPATH="${CLASSPATH}:./target/classes/"
-#CLASSPATH="${CLASSPATH}:./target/test-classes/"
-#CLASSPATH="${CLASSPATH}:../logback-core/target/classes"
+#CLASSPATH="${CLASSPATH}:./build/classes/"
+#CLASSPATH="${CLASSPATH}:./build/test-classes/"
+#CLASSPATH="${CLASSPATH}:../logback-core/build/classes"
 #CLASSPATH="${CLASSPATH}:../logback-examples/lib/slf4j-api-1.5.5.jar"
 
 
