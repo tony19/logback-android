@@ -4,10 +4,7 @@ if (!rootProject.hasProperty('analysis')) {
 
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
-
-// FIXME: This causes a bunch of NoClassDefFoundErrors
-// with `gradle clean cobertura` (under JDK 8).
-apply plugin: 'cobertura'
+apply plugin: 'jacoco'
 
 findbugs {
   effort = 'max'
