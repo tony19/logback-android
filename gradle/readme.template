@@ -20,13 +20,18 @@ Quick Start
 2. In `app/build.gradle`, add the following dependencies:
 
     ```groovy
+    // only needed for SNAPSHOT builds
+    repositories {
+      maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    }
+
     dependencies {
-        compile 'org.slf4j:slf4j-api:${slf4jVersion}'
-        compile 'com.github.tony19:logback-android-core:${version}'
-        compile('com.github.tony19:logback-android-classic:${version}') {
-            // workaround issue #73
-            exclude group: 'com.google.android', module: 'android'
-        }
+      compile 'org.slf4j:slf4j-api:${slf4jVersion}'
+      compile 'com.github.tony19:logback-android-core:${version}'
+      compile('com.github.tony19:logback-android-classic:${version}') {
+        // workaround issue #73
+        exclude group: 'com.google.android', module: 'android'
+      }
     }
     ```
 
@@ -77,6 +82,11 @@ Download
 _Gradle_
 
 ```groovy
+// only needed for SNAPSHOT builds
+repositories {
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
 dependencies {
   compile 'org.slf4j:slf4j-api:${slf4jVersion}'
   compile 'com.github.tony19:logback-android-core:${version}'

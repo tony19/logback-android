@@ -20,18 +20,22 @@ Quick Start
 2. In `app/build.gradle`, add the following dependencies:
 
     ```groovy
+    // only needed for SNAPSHOT builds
+    repositories {
+      maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    }
+
     dependencies {
-        // ...
-        compile 'org.slf4j:slf4j-api:1.7.6'
-        compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
-        compile('com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT') {
-            // workaround issue #73
-            exclude group: 'com.google.android', module: 'android'
-        }
+      compile 'org.slf4j:slf4j-api:1.7.6'
+      compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
+      compile('com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT') {
+        // workaround issue #73
+        exclude group: 'com.google.android', module: 'android'
+      }
     }
     ```
 
-3. Create `src/main/assets/logback.xml` containing:
+3. Create `app/src/main/assets/logback.xml` containing:
 
     ```xml
     <configuration>
@@ -78,9 +82,16 @@ Download
 _Gradle_
 
 ```groovy
-compile 'org.slf4j:slf4j-api:1.7.6'
-compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
-compile 'com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT'
+// only needed for SNAPSHOT builds
+repositories {
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies {
+  compile 'org.slf4j:slf4j-api:1.7.6'
+  compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
+  compile 'com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT'
+}
 ```
 
 _Prefer local jars?_
