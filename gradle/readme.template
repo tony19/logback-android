@@ -35,7 +35,7 @@ Quick Start
     }
     ```
 
-3. Create `src/main/assets/logback.xml` containing:
+3. Create `app/src/main/assets/logback.xml` containing:
 
     ```xml
     <configuration>
