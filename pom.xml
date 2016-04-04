@@ -2,6 +2,29 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <!--
+    NOTE: If setting up this pom.xml on a new machine, make sure to
+    update ~/.m2/settings.xml with credentials for oss.sonatype.org
+    in order to deploy artifacts. Otherwise, `mvn deploy` fails with
+    "Unauthorized".
+
+    Your settings.xml should look like this:
+
+    <settings>
+      <servers>
+        <server>
+          <id>sonatype-nexus-snapshots</id>
+          <username>_USERNAME_</username>
+          <password>_ENCRYPTED_PASSWORD_</password>
+        </server>
+        <server>
+          <id>sonatype-nexus-staging</id>
+          <username>_USERNAME_</username>
+          <password>_ENCRYPTED_PASSWORD_</password>
+        </server>
+      </servers>
+    <settings>
+  -->
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -58,8 +81,12 @@
     <!-- redirect test output to a file in order to reduce noise -->
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
 
-    <logbackAndroidVersion></logbackAndroidVersion>
-    <slf4jVersion></slf4jVersion>
+    <!-- This Maven build is normally used only for deploying snapshots
+         (as Gradle can't seem to do it correctly atm). The versions of
+         logback-android and SLF4J are set from the command line in a
+         script (deploysnapshots.sh). -->
+    <logbackAndroidVersion>0.0.0-SNAPSHOT</logbackAndroidVersion>
+    <slf4jVersion>RELEASE</slf4jVersion>
   </properties>
 
   <developers>
