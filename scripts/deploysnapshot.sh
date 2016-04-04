@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
 . gradle.properties
-mvn deploy -DlogbackAndroidVersion=$version -Dslf4jVersion=$slf4jVersion
+
+[[ "$TRAVIS" == true ]] && settings='--settings config/travisMavenSettings.xml' || settings=''
+
+mvn deploy $settings                    \
+    -B                                  \
+    -DskipTests=true                    \
+    -DlogbackAndroidVersion=$version    \
+    -Dslf4jVersion=$slf4jVersion
