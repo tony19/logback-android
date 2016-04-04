@@ -10,7 +10,7 @@
 
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-parent</artifactId>
-  <version>1.1.1-5-SNAPSHOT</version>
+  <version>${logbackAndroidVersion}</version>
   <packaging>pom</packaging>
   <name>Logback Android Parent</name>
   <description>logback-android project pom.xml file</description>
@@ -57,6 +57,9 @@
 
     <!-- redirect test output to a file in order to reduce noise -->
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+
+    <logbackAndroidVersion></logbackAndroidVersion>
+    <slf4jVersion></slf4jVersion>
   </properties>
 
   <developers>
@@ -206,28 +209,28 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
-        <version>1.7.6</version>
+        <version>${slf4jVersion}</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.6</version>
+        <version>${slf4jVersion}</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-ext</artifactId>
-        <version>1.7.6</version>
+        <version>${slf4jVersion}</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>integration</artifactId>
-        <version>1.7.6</version>
+        <version>${slf4jVersion}</version>
         <scope>test</scope>
       </dependency>
 
@@ -235,7 +238,7 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <type>test-jar</type>
-        <version>1.7.6</version>
+        <version>${slf4jVersion}</version>
         <scope>test</scope>
       </dependency>
 
