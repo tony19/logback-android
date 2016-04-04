@@ -1,4 +1,4 @@
-# logback-android [![Build Status](https://tony19.ci.cloudbees.com/buildStatus/icon?job=logback-android/logback-android-gradle-build)](https://tony19.ci.cloudbees.com/job/logback-android/job/logback-android-gradle-build) [![Codacy Badge](https://api.codacy.com/project/badge/grade/c1d818d1911440e3b6d685c20a425856)](https://www.codacy.com/app/tony19/logback-android)
+# logback-android [![Build Status](https://travis-ci.org/tony19/logback-android.svg?branch=master)](https://travis-ci.org/tony19/logback-android) [![Codacy Badge](https://api.codacy.com/project/badge/grade/c1d818d1911440e3b6d685c20a425856)](https://www.codacy.com/app/tony19/logback-android)
 <sup>v${version}</sup>
 
 Overview
