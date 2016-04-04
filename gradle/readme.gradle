@@ -15,6 +15,7 @@ task readme << {
     ]
 
     String newText = template.make(binding)
+    newText = newText.replace('\\u007B', '{')
 
     def updated = false
     def readmeFile = new File('README.md')

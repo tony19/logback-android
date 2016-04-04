@@ -17,7 +17,7 @@ Runs on Android 2.1 or higher.
 Quick Start
 -----------
 1. Add [`logback-android`][9] and [`slf4j-api`][10] to your project class path.
-2. Configure `logback-android` using either [`$\{project-root}/assets/logback.xml`](#configuration-via-xml) or [in-code statements](#configuration-in-code). Otherwise, logging is silently disabled.
+2. Configure `logback-android` using either [`$\u007Bproject-root}/assets/logback.xml`](#configuration-via-xml) or [in-code statements](#configuration-in-code). Otherwise, logging is silently disabled.
 3. Use `slf4j-api` in your application to write logging statements as shown in the example below.
 
 *Example:*
@@ -129,7 +129,7 @@ Configuration via XML
       <onMismatch>DENY</onMismatch>
     </filter>
 
-    <file>$\{LOG_DIR}/trace.log</file>
+    <file>$\u007BLOG_DIR}/trace.log</file>
 
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -144,7 +144,7 @@ Configuration via XML
       <onMismatch>DENY</onMismatch>
     </filter>
 
-    <file>$\{LOG_DIR}/debug.log</file>
+    <file>$\u007BLOG_DIR}/debug.log</file>
 
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
