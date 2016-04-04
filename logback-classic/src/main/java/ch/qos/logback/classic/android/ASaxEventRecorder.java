@@ -42,13 +42,6 @@ public class ASaxEventRecorder extends SaxEventRecorder {
   private Map<String,String> elemAttrs = null;
 
   /**
-   * Constructor
-   */
-  public ASaxEventRecorder() {
-    super();
-  }
-
-  /**
    * Sets a filter so that only sub-elements of a specific element
    * are captured
    *
