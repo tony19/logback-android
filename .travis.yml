@@ -5,7 +5,7 @@ sudo: false
 env:
   global:
     - SONATYPE_USERNAME=tony19
-    - secure: "B7oQdDb6uIkLIVG71lsgRI5/djLCwy9lm3Uds6LVGuGAFrb36YOl8I2JWadbQPU221uFU7t8yBxlNoUz/8mHy3olF7LxzAuGEL/hUtC3ViRpB9GzfeaYimxGLnc1fc0EZwcwrQPSMO11O6u2ebp+fWyatVNcYqfkyJbExPi2oRY="
+    - secure: "WqV8/mCUXdw96cVt/n05emxav3wJdUku39n4AIRgIBamFuuxuLTHBi61Mx4rlJOmI23b7So7eA24Dq4KqexurfNwkAoCZbmpmrihZREPM2hQ7UIs/q0usBQxWB1wt38giUc6kV1yBRTexxQTdlg+HbZOLinTcAhifBrRQuLqums="
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
