@@ -38,7 +38,7 @@ set -e
 # to include all required dependencies, so we need to copy it from
 # logback-classic's output directory into the main output.
 mkdir -p build/libs
-mv -f logback-classic/build/libs/logback-android-classic-${version}-all.jar \
+mv -f logback-classic/build/libs/logback-android-${version}-all.jar \
       build/libs/logback-android-${version}.jar
 
 echo "Created ./build/libs/logback-android-${version}.jar"
