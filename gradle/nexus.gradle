@@ -11,8 +11,8 @@ modifyPom {
   project {
     name 'logback-android'
     description 'Advanced logging for Android apps'
-    url 'https://github.com/bmuschko/gradle-nexus-plugin'
-    inceptionYear '2005'
+    url 'https://github.com/tony19/logback-android'
+    inceptionYear '2011'
 
     scm {
       url 'https://github.com/tony19/logback-android'
