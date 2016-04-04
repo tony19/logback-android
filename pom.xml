@@ -21,7 +21,7 @@
     <name>QOS.ch</name>
     <url>http://www.qos.ch</url>
   </organization>
-  <inceptionYear>2005</inceptionYear>
+  <inceptionYear>2011</inceptionYear>
 
   <licenses>
     <license>
@@ -64,23 +64,10 @@
 
   <developers>
     <developer>
-      <id>ceki</id>
-      <name>Ceki Gulcu</name>
-      <email>ceki@qos.ch</email>
-    </developer>
-
-    <developer>
-      <id>hixi</id>
-      <name>Joern Huxhorn</name>
-      <email>huxi@undisclosed.org</email>
-    </developer>
-
-    <developer>
       <id>tony19</id>
       <name>Tony Trinh</name>
       <email>tony19@gmail.com</email>
       <url>http://tony19.github.com</url>
-      <timezone>-5</timezone>
     </developer>
   </developers>
 
@@ -259,6 +246,9 @@
   </dependencyManagement>
 
   <build>
+
+    <!-- Use Gradle's output directory to avoid unnecessary rebuilds -->
+    <directory>build</directory>
 
     <pluginManagement>
       <plugins>

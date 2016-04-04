@@ -53,6 +53,9 @@
   </dependencies>
 
   <build>
+    <!-- Use Gradle's output directory to avoid unnecessary rebuilds -->
+    <directory>build</directory>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
