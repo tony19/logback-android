@@ -26,7 +26,7 @@ Quick Start
     }
 
     dependencies {
-      compile 'org.slf4j:slf4j-api:1.7.6'
+      compile 'org.slf4j:slf4j-api:1.7.21'
       compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
       compile('com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT') {
         // workaround issue #73
@@ -88,7 +88,7 @@ repositories {
 }
 
 dependencies {
-  compile 'org.slf4j:slf4j-api:1.7.6'
+  compile 'org.slf4j:slf4j-api:1.7.21'
   compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
   compile 'com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT'
 }
@@ -97,7 +97,7 @@ dependencies {
 _Prefer local jars?_
 
  * [logback-android-1.1.1-5-SNAPSHOT.jar][3] (uber jar)
- * [slf4j-api-1.7.6.jar][4]
+ * [slf4j-api-1.7.21.jar][4]
 
 
 Build
@@ -113,6 +113,6 @@ The jar would be in: `./builds/lib/logback-android-1.1.1-5-SNAPSHOT.jar`
  [1]: http://logback.qos.ch
  [2]: http://tony19.github.com/logback-android
  [3]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.1.1-5-SNAPSHOT.jar
- [4]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.6/slf4j-api-1.7.6.jar
+ [4]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar
  [5]: http://developer.android.com/sdk/index.html
  [6]: https://github.com/tony19/logback-android/wiki
