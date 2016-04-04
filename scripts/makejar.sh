@@ -13,7 +13,7 @@
 #  -r   make release build (default: false)
 #
 
-if [ ! $1 ]; then
+if [[ ! -z "$1" ]] && [[ "$1" != -r ]]; then
   echo "Usage: $0 [-r]"
   echo
   echo "Options:"
