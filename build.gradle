@@ -52,6 +52,7 @@ subprojects {
   targetCompatibility = 1.5
 
   test {
+    maxParallelForks = 4
     include '**/*Test.class'
 
     // Skip fragile network tests (to be refactored later)
