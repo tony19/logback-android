@@ -21,7 +21,6 @@ Quick Start
 
     ```groovy
     dependencies {
-        // ...
         compile 'org.slf4j:slf4j-api:${slf4jVersion}'
         compile 'com.github.tony19:logback-android-core:${version}'
         compile('com.github.tony19:logback-android-classic:${version}') {
@@ -78,9 +77,11 @@ Download
 _Gradle_
 
 ```groovy
-compile 'org.slf4j:slf4j-api:${slf4jVersion}'
-compile 'com.github.tony19:logback-android-core:${version}'
-compile 'com.github.tony19:logback-android-classic:${version}'
+dependencies {
+  compile 'org.slf4j:slf4j-api:${slf4jVersion}'
+  compile 'com.github.tony19:logback-android-core:${version}'
+  compile 'com.github.tony19:logback-android-classic:${version}'
+}
 ```
 
 _Prefer local jars?_
@@ -95,7 +96,7 @@ Build
 
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
-    ./makejar.sh
+    scripts/makejar.sh
 
 The jar would be in: `./builds/lib/logback-android-${version}.jar`
 
