@@ -2,9 +2,17 @@ language: java
 
 sudo: false
 
+env:
+  global:
+    - SONATYPE_USERNAME=tony19
+    - secure: "B7oQdDb6uIkLIVG71lsgRI5/djLCwy9lm3Uds6LVGuGAFrb36YOl8I2JWadbQPU221uFU7t8yBxlNoUz/8mHy3olF7LxzAuGEL/hUtC3ViRpB9GzfeaYimxGLnc1fc0EZwcwrQPSMO11O6u2ebp+fWyatVNcYqfkyJbExPi2oRY="
+
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+after_success:
+  - "[[ $TRAVIS_BRANCH == \"master\" ]] && mvn deploy -DskipTests=true -B --settings config/travisMavenSettings.xml"
