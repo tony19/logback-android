@@ -154,9 +154,17 @@
       </dependency>
 
       <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4</version>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>android-mail</artifactId>
+        <version>1.5.5</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>android-activation</artifactId>
+        <version>1.5.5</version>
         <scope>provided</scope>
         <optional>true</optional>
       </dependency>
