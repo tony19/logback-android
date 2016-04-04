@@ -17,6 +17,18 @@ shadowJar {
   relocate 'com.mindprod', 'ch.qos.logback.repackage.com.mindprod'
 }
 
+jar {
+  manifest {
+    attributes(
+      'Implementation-Title': rootProject.name,
+      'Implementation-Version': rootProject.version,
+      'Implementation-Vendor-Id': rootProject.group,
+      'Implementation-Vendor': rootProject.group,
+      'Build-Jdk': JavaVersion.current()
+    )
+  }
+}
+
 // XXX: Currently not used. This is superceded by 'shadowJar' above.
 // This task does not include the required dependencies. We could
 // switch back to this task (and remove shadowJar) once we remove
