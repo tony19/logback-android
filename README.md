@@ -95,7 +95,7 @@ Build
 
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
-    ./makejar.sh
+    scripts/makejar.sh
 
 The jar would be in: `./builds/lib/logback-android-1.1.1-5-SNAPSHOT.jar`
 
