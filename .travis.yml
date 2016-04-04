@@ -15,4 +15,4 @@ cache:
     - $HOME/.gradle/wrapper/
 
 after_success:
-  - "[[ $TRAVIS_BRANCH == \"master\" ]] && mvn deploy -DskipTests=true -B --settings config/travisMavenSettings.xml"
+  - "[[ $TRAVIS_BRANCH == \"master\" ]] && scripts/deploysnapshot.sh"
