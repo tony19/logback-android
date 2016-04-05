@@ -108,7 +108,7 @@ Build
     cd logback-android
     scripts/makejar.sh
 
-The jar would be in: `./builds/lib/logback-android-1.1.1-5-SNAPSHOT.jar`
+The jar would be in: `./build/logback-android-1.1.1-5-SNAPSHOT.jar`
 
  [1]: http://logback.qos.ch
  [2]: http://tony19.github.com/logback-android

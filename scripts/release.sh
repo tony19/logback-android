@@ -25,4 +25,4 @@ echo "Starting release process for logback-android ${version}..."
             release             \
             uploadArchives      \
             uploadDocs          \
-            shadowJar
+            uberjar

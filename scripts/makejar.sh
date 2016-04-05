@@ -1,44 +1,23 @@
-#!/bin/sh
-#
-# This script creates the uber jar (with debug symbols). The tests are skipped.
-# The jar will be stored in the "./build/libs" directory:
-#
-#   ./build/libs/logback-android-<version>.jar
-#
-
-# Usage: ./makejar.sh [-r]
-#
-#  Options:
-#
-#  -r   make release build (default: false)
-#
+#!/bin/sh -e
 
 if [[ ! -z "$1" ]] && [[ "$1" != -r ]]; then
-  echo "Usage: $0 [-r]"
+  echo "Creates the uber jar in ./build"
   echo
-  echo "Options:"
-  echo "  -r  make release build (default: false)"
+  echo " Usage: $0 [-r]"
+  echo
+  echo " Options:"
+  echo "   -r  make release build (default: false)"
   exit 1
 fi
 
 . gradle.properties
-_profile="debug"
 
-if [ "x$1" == "x-r" ]
-then
+_profile="debug"
+if [[ "$1" == "-r" ]]; then
   _profile="release"
-  version=${baseVersion}-${buildVersion}
+  version=${version%-SNAPSHOT}
 fi
 
-set -e
+./gradlew clean uberjar -x test -Pversion=${version} -P${_profile}
 
-./gradlew clean shadowJar -Pversion=${version} -P${_profile}
-
-# FIXME: Currently applying shadowJar from logback-classic in order
-# to include all required dependencies, so we need to copy it from
-# logback-classic's output directory into the main output.
-mkdir -p build/libs
-mv -f logback-classic/build/libs/logback-android-${version}-all.jar \
-      build/libs/logback-android-${version}.jar
-
-echo "Created ./build/libs/logback-android-${version}.jar"
+echo "created  $PWD/build/logback-android-${version}.jar"

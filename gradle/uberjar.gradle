@@ -32,15 +32,15 @@ jar {
   }
 }
 
-// XXX: Currently not used. This is superceded by 'shadowJar' above.
-// This task does not include the required dependencies. We could
-// switch back to this task (and remove shadowJar) once we remove
-// the ability to read the AndroidManifest.xml, a feature that allows
-// specifying logback.xml inside the manifest.
-task uberjar(type: Jar) {
+/**
+ * Creates a shaded uber jar, and copies it into the root
+ * build directory
+ */
+task uberjar(type: Copy) {
   description 'Assembles a jar archive containing the classes of the "core" and "classic" modules.'
-  baseName projectName
-  subprojects.each { subproject ->
-    from files(subproject.sourceSets.main.output)
+  from shadowJar
+  into rootProject.buildDir
+  rename { String fileName ->
+    fileName - '-all.jar' + '.jar'
   }
 }
