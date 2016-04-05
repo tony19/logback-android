@@ -20,6 +20,7 @@ version=${baseVersion}-${buildVersion}
 echo "Starting release process for logback-android ${version}..."
 
 ./gradlew -Pversion=${version}  \
+            -Ppush              \
             clean               \
             readme              \
             release             \

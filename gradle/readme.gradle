@@ -1,7 +1,8 @@
 apply plugin: 'org.ajoberstar.grgit'
 
 /**
- * Generates README.md based on project properties, and commits it
+ * Generates README.md based on project properties, and
+ * pushes it to GitHub if rootProject.hasProperty('push')
  */
 task readme << {
 
@@ -29,11 +30,12 @@ task readme << {
   def commitReadme = {
     grgit.add(patterns: ['README.md'])
     grgit.commit(message: ":books: Update README for ${rootProject.version}")
-    println 'committed new README'
+    grgit.push()
   }
 
-  if (updateReadme()) {
+  if (updateReadme() && rootProject.hasProperty('push')) {
+    logger.info "committing README for ${rootProject.version}"
     commitReadme()
   }
 }
-tasks.readme.description = 'Generates README.md based on project properties, and commits it.'
+tasks.readme.description = 'Updates README.md, and pushes it to GitHub.'
