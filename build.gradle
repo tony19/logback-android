@@ -21,15 +21,6 @@ project.ext.FileUtils = org.apache.commons.io.FileUtils
 
 release {
   tagTemplate = 'v_${version}' // must be single-quotes
-
-  // FIXME: START EXPERIMENTS
-  failOnSnapshotDependencies = false
-  failOnUnversionedFiles = false
-  failOnCommitNeeded = false
-  git {
-    requireBranch = ''
-  }
-  // FIXME: END EXPERIMENTS
 }
 
 allprojects  {
