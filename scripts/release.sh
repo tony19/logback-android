@@ -19,10 +19,10 @@ version=${baseVersion}-${buildVersion}
 
 echo "Starting release process for logback-android ${version}..."
 
-./gradlew -Pver=${version}  \
-            clean           \
-            readme          \
-            release         \
-            uploadArchives  \
-            uploadDocs      \
+./gradlew -Pversion=${version}  \
+            clean               \
+            readme              \
+            release             \
+            uploadArchives      \
+            uploadDocs          \
             shadowJar
