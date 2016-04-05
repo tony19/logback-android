@@ -5,7 +5,7 @@
 
 mvn versions:set -DnewVersion=${version}
 
-mvn deploy $settings                    \
+mvn clean deploy $settings              \
     -Pdebug                             \
     -B                                  \
     -DskipTests=true                    \
