@@ -26,3 +26,5 @@ echo "Starting release process for logback-android ${version}..."
             uploadArchives      \
             uploadDocs          \
             uberjar
+
+hub release edit -d -m '' ${version} -a build/logback-android-${version}.jar
