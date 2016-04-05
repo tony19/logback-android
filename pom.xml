@@ -274,7 +274,7 @@
 
   <build>
 
-    <!-- Use Gradle's output directory to avoid unnecessary rebuilds -->
+    <!-- Use Gradle's output directory -->
     <directory>build</directory>
 
     <pluginManagement>
