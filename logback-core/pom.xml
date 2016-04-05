@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.github.tony19</groupId>
     <artifactId>logback-android-parent</artifactId>
-    <version>${logbackAndroidVersion}</version>
+    <version>0.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>logback-android-core</artifactId>

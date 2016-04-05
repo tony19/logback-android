@@ -3,9 +3,12 @@
 
 [[ "$TRAVIS" == true ]] && settings='--settings config/travisMavenSettings.xml' || settings=''
 
+mvn versions:set -DnewVersion=${version}
+
 mvn deploy $settings                    \
     -Pdebug                             \
     -B                                  \
     -DskipTests=true                    \
-    -DlogbackAndroidVersion=$version    \
     -Dslf4jVersion=$slf4jVersion
+
+mvn versions:revert

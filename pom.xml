@@ -24,6 +24,11 @@
         </server>
       </servers>
     <settings>
+
+    This Maven build is normally used only for deploying snapshots
+    (as Gradle can't seem to do it correctly atm). The versions of
+    logback-android and SLF4J are set from the command line in a
+    script (deploysnapshots.sh).
   -->
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -33,7 +38,7 @@
 
   <groupId>com.github.tony19</groupId>
   <artifactId>logback-android-parent</artifactId>
-  <version>${logbackAndroidVersion}</version>
+  <version>0.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Logback Android Parent</name>
   <description>logback-android project pom.xml file</description>
@@ -81,11 +86,6 @@
     <!-- redirect test output to a file in order to reduce noise -->
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
 
-    <!-- This Maven build is normally used only for deploying snapshots
-         (as Gradle can't seem to do it correctly atm). The versions of
-         logback-android and SLF4J are set from the command line in a
-         script (deploysnapshots.sh). -->
-    <logbackAndroidVersion>0.0.0-SNAPSHOT</logbackAndroidVersion>
     <slf4jVersion>RELEASE</slf4jVersion>
   </properties>
 

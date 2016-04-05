@@ -13,6 +13,9 @@ logback-classic/jdbc:hsqldb:mem:test.properties
 logback-classic/jdbc:hsqldb:mem:test.script
 local.properties
 
+# Ignore `mvn versions` output
+*.versionsBackup
+
 .gradle
 build/
 
