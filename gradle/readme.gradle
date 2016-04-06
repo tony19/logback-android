@@ -4,7 +4,7 @@ apply plugin: 'org.ajoberstar.grgit'
  * Generates README.md based on project properties, and
  * pushes it to GitHub if rootProject.hasProperty('push')
  */
-task readme << {
+task readme(description: 'Updates README.md, and pushes it to GitHub.') << {
 
   def updateReadme = {
     def text = new File('gradle/readme.template').getText('UTF-8')
@@ -36,6 +36,7 @@ task readme << {
   if (updateReadme() && rootProject.hasProperty('push')) {
     logger.info "committing README for ${rootProject.version}"
     commitReadme()
+  } else {
+    logger.info "no README changes for ${rootProject.version}"
   }
 }
-tasks.readme.description = 'Updates README.md, and pushes it to GitHub.'
