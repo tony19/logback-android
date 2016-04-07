@@ -16,6 +16,9 @@ plugins {
   id 'net.researchgate.release' version '2.3.4'
 }
 
+apply plugin: 'io.codearte.nexus-staging' // must be in root project
+apply from: 'gradle/readme.gradle'
+
 // expose FileUtils to imported Gradle scripts
 project.ext.FileUtils = org.apache.commons.io.FileUtils
 
@@ -27,9 +30,12 @@ release {
 }
 
 allprojects  {
+  apply plugin: 'java'
   apply plugin: 'maven'
   apply plugin: 'nebula.provided-base'
   apply plugin: 'nebula.optional-base'
+  apply from: "${rootProject.projectDir}/gradle/nexus.gradle"
+  apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 
   group = 'com.github.tony19'
   version = "${version}"
@@ -38,9 +44,8 @@ allprojects  {
 }
 
 subprojects {
-  apply plugin: 'java'
-  apply from: '../gradle/analysis.gradle'
-  apply from: '../gradle/license.gradle'
+  apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
+  apply from: "${rootProject.projectDir}/gradle/license.gradle"
 
   sourceCompatibility = 1.5
   targetCompatibility = 1.5
@@ -82,8 +87,3 @@ subprojects {
     options.deprecation = true
   }
 }
-
-apply plugin: 'java'
-apply from: 'gradle/nexus.gradle'
-apply from: 'gradle/readme.gradle'
-apply from: 'gradle/docs.gradle'

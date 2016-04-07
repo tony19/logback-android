@@ -4,8 +4,9 @@
  * invoked with `gradle uploadArchives`.
  */
 
+// This plugin must be declared in all projects with artifacts
+// in order for them to be uploaded to Nexus.
 apply plugin: 'com.bmuschko.nexus'
-apply plugin: 'io.codearte.nexus-staging'
 
 modifyPom {
   project {
