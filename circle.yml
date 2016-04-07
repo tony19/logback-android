@@ -1,0 +1,21 @@
+# Configuration for CircleCI
+# https://circleci.com/gh/tony19/logback-android
+
+general:
+  branches:
+    ignore:
+      - gh-pages
+  artifacts:
+    - "build/reports"
+    - "logback-core/build/reports"
+    - "logback-core/build/outputs"
+    - "logback-classic/build/reports"
+    - "logback-classic/build/outputs"
+
+test:
+  post:
+    - scripts/triggertestapp.sh
+    - mkdir -p $CIRCLE_ARTIFACTS/jars
+    - find . -name "logback-android*.jar" -type f -exec cp -v {} $CIRCLE_ARTIFACTS/jars/ \;
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit
+    - find . -type f -name "TEST-*.xml" -exec cp -v {} $CIRCLE_TEST_REPORTS/junit/ \;
