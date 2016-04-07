@@ -53,6 +53,7 @@ extraArchive {
 // We need to add our own javadocJar task that ignores errors
 // because there are several elements missing javadoc
 task javadocJar(type: Jar) {
+  description = 'Assembles a jar archive containing javadocs.'
   classifier = 'javadoc'
   from javadoc {
     failOnError = false
