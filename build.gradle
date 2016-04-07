@@ -38,9 +38,8 @@ allprojects  {
   apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 
   group = 'com.github.tony19'
-  version = "${version}"
-  slf4jVersion = "${slf4jVersion}"
-
+  version = version
+  slf4jVersion = slf4jVersion
 }
 
 subprojects {
