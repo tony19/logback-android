@@ -35,7 +35,6 @@ allprojects  {
   apply plugin: 'nebula.provided-base'
   apply plugin: 'nebula.optional-base'
   apply from: "${rootProject.projectDir}/gradle/nexus.gradle"
-  apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 
   group = 'com.github.tony19'
   version = version
@@ -86,3 +85,5 @@ subprojects {
     options.deprecation = true
   }
 }
+
+apply from: "gradle/docs.gradle" // must be after subprojects
