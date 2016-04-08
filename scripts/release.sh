@@ -7,7 +7,17 @@ baseVersion=${version%*-*}
 nextBuild=$((${version##*-} + 1))
 nextVersion="${baseVersion}-${nextBuild}-SNAPSHOT"
 
-echo "Starting release for logback-android ${version}..."
+echo "Starting release for logback-android-${version} ..."
+
+fail() {
+    echo "error: $1" >&2
+    exit 1
+}
+
+# Run Git integrity checks early (gradle-release-plugin does this
+# after we update the readme) to avoid premature push of new readme
+[[ "$(git rev-parse master)" != "$(git rev-parse origin/master)" ]] && fail "branches out of sync"
+[[ -n "$(git status -u -s)" ]] && fail "found unstaged changes"
 
 # gradle-release-plugin prompts for your Nexus credentials
 # with "Please specify username" (no mention of Nexus).
@@ -32,9 +42,7 @@ echo ''
             uploadArchives                      \
             uberjar
 
-echo ''
-echo '/**********************/'
-echo ''
+echo -e "\n\n"
 
 # FIXME: In test repo, this can't checkout 'gh-pages' -- no error provided
 #./gradlew   uploadDocs
