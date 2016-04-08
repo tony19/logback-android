@@ -1,5 +1,5 @@
 # logback-android [![CircleCI branch](https://img.shields.io/circleci/project/tony19/logback-android/master.svg)](https://circleci.com/gh/tony19/logback-android) [![Codacy Badge](https://api.codacy.com/project/badge/grade/c1d818d1911440e3b6d685c20a425856)](https://www.codacy.com/app/tony19/logback-android)
-<sup>v1.1.1-5-SNAPSHOT</sup>
+<sup>v1.1.1-5</sup>
 
 Overview
 --------
@@ -27,8 +27,8 @@ Quick Start
 
     dependencies {
       compile 'org.slf4j:slf4j-api:1.7.21'
-      compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
-      compile('com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT') {
+      compile 'com.github.tony19:logback-android-core:1.1.1-5'
+      compile('com.github.tony19:logback-android-classic:1.1.1-5') {
         // workaround issue #73
         exclude group: 'com.google.android', module: 'android'
       }
@@ -89,14 +89,14 @@ repositories {
 
 dependencies {
   compile 'org.slf4j:slf4j-api:1.7.21'
-  compile 'com.github.tony19:logback-android-core:1.1.1-5-SNAPSHOT'
-  compile 'com.github.tony19:logback-android-classic:1.1.1-5-SNAPSHOT'
+  compile 'com.github.tony19:logback-android-core:1.1.1-5'
+  compile 'com.github.tony19:logback-android-classic:1.1.1-5'
 }
 ```
 
 _Prefer local jars?_
 
- * [logback-android-1.1.1-5-SNAPSHOT.jar][3] (uber jar)
+ * [logback-android-1.1.1-5.jar][3] (uber jar)
  * [slf4j-api-1.7.21.jar][4]
 
 
@@ -108,11 +108,11 @@ Build
     cd logback-android
     scripts/makejar.sh
 
-The jar would be in: `./build/logback-android-1.1.1-5-SNAPSHOT.jar`
+The jar would be in: `./build/logback-android-1.1.1-5.jar`
 
  [1]: http://logback.qos.ch
  [2]: http://tony19.github.com/logback-android
- [3]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.1.1-5-SNAPSHOT.jar
+ [3]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.1.1-5.jar
  [4]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar
  [5]: http://developer.android.com/sdk/index.html
  [6]: https://github.com/tony19/logback-android/wiki
