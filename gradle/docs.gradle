@@ -5,6 +5,7 @@ apply plugin: 'org.ajoberstar.grgit'
  */
 task javadocs(type: Javadoc) {
   description 'Creates combined javadocs for all subprojects.'
+  title "${rootProject.name - '-parent'} ${rootProject.version} API"
   source subprojects.collect { project -> project.sourceSets.main.allJava }
   classpath = files(subprojects.collect { project -> project.sourceSets.main.compileClasspath })
   failOnError = false
