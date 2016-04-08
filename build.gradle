@@ -24,9 +24,10 @@ project.ext.FileUtils = org.apache.commons.io.FileUtils
 
 release {
   tagTemplate = 'v_${version}' // must be single-quotes
-  preTagCommitMessage = ':octocat: release'
-  tagCommitMessage = ':octocat:'
-  newVersionCommitMessage = ':octocat: bump to'
+  preTagCommitMessage = ':cloud: Release'
+  tagCommitMessage = ':cloud: Release'
+  newVersionCommitMessage = ':cloud: Bump'
+  git.pushToRemote = project.hasProperty('push')
 }
 
 allprojects  {
