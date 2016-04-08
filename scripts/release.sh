@@ -47,9 +47,9 @@ echo -e "\n\n"
 # FIXME: In test repo, this can't checkout 'gh-pages' -- no error provided
 #./gradlew   uploadDocs
 echo TODO: upload javadocs to gh-pages with:
-echo ./gradlew uploadDocs
+echo ./gradlew uploadDocs -P${version%*-SNAPSHOT}
 
 # FIXME: hub is no longer able to find tagged releases for some reason.
 #hub release edit -m '' v_${version} -a build/logback-android-${version}.jar
 echo TODO: attach uber jar to release at:
-echo https://github.com/tony19/logback-android/releases/tag/v_${version%*-SNAPSHOT}
+echo https://github.com/tony19/logback-android/releases/tag/v_${version}
