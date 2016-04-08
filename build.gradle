@@ -27,7 +27,6 @@ release {
   preTagCommitMessage = ':cloud: Release'
   tagCommitMessage = ':cloud: Release'
   newVersionCommitMessage = ':cloud: Bump'
-  git.pushToRemote = project.hasProperty('push')
 }
 
 allprojects  {
