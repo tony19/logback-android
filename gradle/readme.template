@@ -74,7 +74,7 @@ Quick Start
 
 6. Build and start the app.
 7. Open logcat for your device (via the _Android Monitor_ tab in Android Studio).
-8. Click the menu, and select the menu-option. You should see "hello world" in logcat.
+8. Click the app menu, and select the menu-option. You should see "hello world" in logcat.
 
 
 Download
@@ -102,7 +102,7 @@ _Prefer local jars?_
 
 Build
 -----
-`logback-android` is built with Gradle 2.12+. Use these commands to create the uber JAR (with debug symbols).
+`logback-android` is built with Gradle 2.12. Use these commands to create the uber jar (with debug symbols).
 
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
