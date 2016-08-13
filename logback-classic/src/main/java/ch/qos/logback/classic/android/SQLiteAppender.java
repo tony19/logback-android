@@ -32,6 +32,7 @@ import ch.qos.logback.classic.spi.ThrowableProxyUtil;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.android.CommonPathUtil;
+import ch.qos.logback.core.util.Duration;
 
 /**
  * SQLiteAppender is a logback appender optimized for Android SQLite. It requires no JDBC
@@ -47,6 +48,8 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private String insertExceptionSQL;
   private String insertSQL;
   private DBNameResolver dbNameResolver;
+  private Duration maxHistory;
+  private long lastCleanupTime = 0;
 
   /**
    * Sets the database name resolver, used to customize the names of the table names
@@ -56,6 +59,25 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
    */
   public void setDbNameResolver(DBNameResolver dbNameResolver) {
     this.dbNameResolver = dbNameResolver;
+  }
+
+  /**
+   * Get the maximum history in time duration of records to keep
+   *
+   * @return max history in time duration (e.g., "1 day")
+   */
+  public String getMaxHistory() {
+    return maxHistory != null ? maxHistory.toString() : "";
+  }
+
+  /**
+   * Set the maximum history in time duration of records to keep
+   *
+   * @param maxHistory
+   *                max history in time duration (e.g., "2 days")
+   */
+  public void setMaxHistory(String maxHistory) {
+    this.maxHistory = Duration.valueOf(maxHistory);
   }
 
   /*
@@ -90,6 +112,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
       if (dbNameResolver == null) {
         dbNameResolver = new DefaultDBNameResolver();
       }
+
       insertExceptionSQL = SQLBuilder.buildInsertExceptionSQL(dbNameResolver);
       insertPropertiesSQL = SQLBuilder.buildInsertPropertiesSQL(dbNameResolver);
       insertSQL = SQLBuilder.buildInsertSQL(dbNameResolver);
@@ -99,6 +122,8 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
         this.db.execSQL(SQLBuilder.buildCreatePropertyTableSQL(dbNameResolver));
         this.db.execSQL(SQLBuilder.buildCreateExceptionTableSQL(dbNameResolver));
 
+        clearExpiredLogs(this.db);
+
         super.start();
 
         this.started = true;
@@ -106,6 +131,44 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
         addError("Cannot create database tables", e);
       }
     }
+  }
+
+  /**
+   * Removes expired logs from the database
+   * @param db
+   */
+  private void clearExpiredLogs(SQLiteDatabase db) {
+    if (lastCheckExpired(this.maxHistory, this.lastCleanupTime)) {
+      this.lastCleanupTime = System.currentTimeMillis();
+      this.performLogCleanup(db, this.maxHistory);
+    }
+  }
+
+  /**
+   * Determines whether it's time to clear expired logs
+   * @param expiry max time duration between checks
+   * @param lastCleanupTime timestamp (ms) of last cleanup
+   * @return true if last check has expired
+   */
+  private boolean lastCheckExpired(Duration expiry, long lastCleanupTime) {
+    boolean isExpired = false;
+    if (expiry != null && expiry.getMilliseconds() > 0) {
+      final long now = System.currentTimeMillis();
+      final long timeDiff = now - lastCleanupTime;
+      isExpired = (lastCleanupTime <= 0) || (timeDiff >= expiry.getMilliseconds());
+    }
+    return isExpired;
+  }
+
+  /**
+   * Executes DELETE command to remove expired logs from the database
+   * @param db
+   * @param expiry
+   */
+  private void performLogCleanup(SQLiteDatabase db, Duration expiry) {
+    final long expiryMs = System.currentTimeMillis() - expiry.getMilliseconds();
+    final String deleteExpiredLogsSQL = SQLBuilder.buildDeleteExpiredLogsSQL(dbNameResolver, expiryMs);
+    db.execSQL(deleteExpiredLogsSQL);
   }
 
   /*
@@ -124,6 +187,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   @Override
   public void stop() {
     this.db.close();
+    this.lastCleanupTime = 0;
   }
 
   /*
@@ -134,6 +198,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   public void append(ILoggingEvent eventObject) {
     if (isStarted()) {
       try {
+        clearExpiredLogs(db);
         SQLiteStatement stmt = db.compileStatement(insertSQL);
         try {
           db.beginTransaction();
