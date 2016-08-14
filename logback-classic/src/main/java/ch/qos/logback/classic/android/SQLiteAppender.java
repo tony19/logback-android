@@ -137,6 +137,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     boolean dbOpened = false;
     try {
       dbfile.getParentFile().mkdirs();
+      addInfo("db path: " + dbfile.getAbsolutePath());
       this.db = SQLiteDatabase.openOrCreateDatabase(dbfile.getPath(), null);
       dbOpened = true;
     } catch (SQLiteException e) {
