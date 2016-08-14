@@ -51,6 +51,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private DBNameResolver dbNameResolver;
   private Duration maxHistory;
   private long lastCleanupTime = 0;
+  private SQLiteLogCleaner logCleaner;
 
   /**
    * Sets the database name resolver, used to customize the names of the table names
@@ -176,7 +177,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private void clearExpiredLogs(SQLiteDatabase db) {
     if (lastCheckExpired(this.maxHistory, this.lastCleanupTime)) {
       this.lastCleanupTime = System.currentTimeMillis();
-      this.performLogCleanup(db, this.maxHistory);
+      this.getLogCleaner().performLogCleanup(db, this.maxHistory);
     }
   }
 
@@ -197,14 +198,29 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   }
 
   /**
-   * Executes DELETE command to remove expired logs from the database
-   * @param db
-   * @param expiry
+   * Gets the {@code SQLiteLogCleaner} in use. Creates default if needed.
    */
-  private void performLogCleanup(SQLiteDatabase db, Duration expiry) {
-    final long expiryMs = System.currentTimeMillis() - expiry.getMilliseconds();
-    final String deleteExpiredLogsSQL = SQLBuilder.buildDeleteExpiredLogsSQL(dbNameResolver, expiryMs);
-    db.execSQL(deleteExpiredLogsSQL);
+  public SQLiteLogCleaner getLogCleaner() {
+    if (this.logCleaner == null) {
+      this.logCleaner = new SQLiteLogCleaner() {
+        @Override
+        public void performLogCleanup(SQLiteDatabase db, Duration expiry) {
+          final long expiryMs = System.currentTimeMillis() - expiry.getMilliseconds();
+          final String deleteExpiredLogsSQL = SQLBuilder.buildDeleteExpiredLogsSQL(dbNameResolver, expiryMs);
+          db.execSQL(deleteExpiredLogsSQL);
+        }
+      };
+    }
+    return this.logCleaner;
+  }
+
+  /**
+   * Sets the {@code SQLiteLogCleaner}, invoked when {@code maxHistory} is exceeded
+   * at startup and in between logging events
+   * @param logCleaner
+   */
+  public void setLogCleaner(SQLiteLogCleaner logCleaner) {
+    this.logCleaner = logCleaner;
   }
 
   /*

@@ -37,18 +37,25 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.StatusUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
+import ch.qos.logback.core.util.Duration;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(RobolectricTestRunner.class)
 public class SQLiteAppenderTest {
 
   private static final String TEST_SQLITE_FILENAME = CoreTestConstants.OUTPUT_DIR_PREFIX + "SQLiteAppenderTest/logback.db";
   private static final long EXPIRY_MS = 500;
+  private static final long NO_EXPIRY = 0;
 
   private static final String SQLITE_APPENDER_WITHOUT_MAX_HISTORY_XML =
       "<configuration>" +
@@ -73,6 +80,8 @@ public class SQLiteAppenderTest {
 
   @Rule
   public TemporaryFolder tmp = new TemporaryFolder();
+
+  private SQLiteLogCleaner logCleaner;
   private long startTimeMs;
   private LoggerContext context;
   private SQLiteAppender appender;
@@ -82,7 +91,9 @@ public class SQLiteAppenderTest {
     context = new LoggerContext();
     context.putProperty(CoreConstants.PACKAGE_NAME_KEY, "com.example");
     appender = new SQLiteAppender();
+    appender.setFilename(TEST_SQLITE_FILENAME);
     appender.setContext(context);
+    logCleaner = mock(SQLiteLogCleaner.class);
   }
 
   @After
@@ -93,11 +104,11 @@ public class SQLiteAppenderTest {
   @Test
   public void maxHistoryRemovesExpiredLogs() throws InterruptedException, JoranException {
     configureLogbackByString(SQLITE_APPENDER_WITH_MAX_HISTORY_XML);
-    addLogEvents(12, EXPIRY_MS / 2);
+    final int count = 12;
+    addLogEvents(count, EXPIRY_MS / 2);
 
-    SQLiteDatabase db = SQLiteDatabase.openDatabase(TEST_SQLITE_FILENAME, null, SQLiteDatabase.OPEN_READONLY);
-    Cursor c = db.rawQuery("SELECT timestmp FROM logging_event;", null);
-    assertThat(c.getCount(), is(greaterThan(0)));
+    Cursor c = getCursor();
+    assertRowCount(c, 0, count);
 
     final int colIndex = c.getColumnIndex("timestmp");
     while (c.moveToNext()) {
@@ -109,11 +120,39 @@ public class SQLiteAppenderTest {
   @Test
   public void maxHistoryIsDisabledByDefault() throws InterruptedException, JoranException {
     configureLogbackByString(SQLITE_APPENDER_WITHOUT_MAX_HISTORY_XML);
-    addLogEvents(1000, 0);
+    final int count = 1000;
+    addLogEvents(count, NO_EXPIRY);
 
-    SQLiteDatabase db = SQLiteDatabase.openDatabase(TEST_SQLITE_FILENAME, null, SQLiteDatabase.OPEN_READONLY);
-    Cursor c = db.rawQuery("SELECT timestmp FROM logging_event;", null);
-    assertThat(c.getCount(), is(1000));
+    assertThat(getCursor().getCount(), is(count));
+  }
+
+  @Test
+  public void cleanuOccursAtAppenderStartup() throws InterruptedException {
+    addAppenderToContext("1 hour");
+    verify(logCleaner, times(1)).performLogCleanup(any(SQLiteDatabase.class), any(Duration.class));
+  }
+
+  @Test
+  public void cleanupDoesNotOccurBeforeExpiration() throws InterruptedException {
+    addAppenderToContext("1 hour");
+
+    addLogEvents(3, NO_EXPIRY);
+
+    // log-cleanup normally called between logging events if expiry time
+    // exceeded, but no expiration here, so call-count should still be 1
+    verify(logCleaner, times(1)).performLogCleanup(any(SQLiteDatabase.class), any(Duration.class));
+  }
+
+  @Test
+  public void cleanupOccursAfterEveryExpiration() throws InterruptedException {
+    addAppenderToContext(EXPIRY_MS + " milli");
+
+    final int count = 7;
+    final long delayMs = EXPIRY_MS / 2;
+    final int expectedCallCount = (int)Math.ceil((double)(delayMs * count)/EXPIRY_MS);
+    addLogEvents(count, delayMs);
+
+    verify(logCleaner, times(expectedCallCount)).performLogCleanup(any(SQLiteDatabase.class), any(Duration.class));
   }
 
   @Test
@@ -175,5 +214,24 @@ public class SQLiteAppenderTest {
         Thread.sleep(delayMs);
       }
     }
+  }
+
+  /** Gets a SQLiteAppender with a no-op log-cleaner mock */
+  private void addAppenderToContext(String maxHistory) {
+    appender.setMaxHistory(maxHistory);
+    appender.setLogCleaner(logCleaner);
+    appender.start();
+    ch.qos.logback.classic.Logger testRoot = context.getLogger(SQLiteAppenderTest.class);
+    testRoot.addAppender(appender);
+  }
+
+  private Cursor getCursor() {
+    SQLiteDatabase db = SQLiteDatabase.openDatabase(TEST_SQLITE_FILENAME, null, SQLiteDatabase.OPEN_READONLY);
+    return db.rawQuery("SELECT timestmp FROM logging_event;", null);
+  }
+
+  private void assertRowCount(Cursor c, int min, int max) {
+    assertThat(c.getCount(), is(greaterThan(min)));
+    assertThat(c.getCount(), is(lessThan(max)));
   }
 }
