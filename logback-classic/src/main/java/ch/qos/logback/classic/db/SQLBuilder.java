@@ -119,4 +119,13 @@ public class SQLBuilder {
         .append(")");
     return sqlBuilder.toString();
   }
+
+  public static String buildDeleteExpiredLogsSQL(DBNameResolver dbNameResolver, long expiryMs) {
+    StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ")
+            .append(dbNameResolver.getTableName(TableName.LOGGING_EVENT))
+            .append(" WHERE ").append(dbNameResolver.getColumnName(ColumnName.TIMESTMP))
+            .append(" <= ").append(expiryMs)
+            .append(";");
+    return sqlBuilder.toString();
+  }
 }
