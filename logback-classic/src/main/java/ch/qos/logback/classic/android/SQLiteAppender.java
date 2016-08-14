@@ -73,6 +73,14 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   }
 
   /**
+   * Gets the maximum history in milliseconds
+   * @return the max history in milliseconds
+   */
+  public long getMaxHistoryMs() {
+    return maxHistory != null ? maxHistory.getMilliseconds() : 0;
+  }
+
+  /**
    * Set the maximum history in time duration of records to keep
    *
    * @param maxHistory

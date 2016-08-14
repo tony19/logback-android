@@ -39,6 +39,7 @@ import ch.qos.logback.core.status.StatusUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.Duration;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
@@ -189,6 +190,46 @@ public class SQLiteAppenderTest {
     final File file = appender.getDatabaseFile(tmpFile.getAbsolutePath());
     assertThat(file, is(notNullValue()));
     assertThat(file.getName(), is(tmpFile.getName()));
+  }
+
+  @Test
+  public void getMaxHistoryReturnsOriginalSetting() {
+    // note that Duration.toString() returns units in "milliseconds",
+    // "seconds", "minutes", or "hours"
+    appender.setMaxHistory("800 milli");
+    assertThat(appender.getMaxHistory(), containsString("800 milli"));
+    appender.setMaxHistory("500 seconds");
+    assertThat(appender.getMaxHistory(), containsString("8 minutes"));
+    appender.setMaxHistory("120 minutes");
+    assertThat(appender.getMaxHistory(), containsString("2 hours"));
+    appender.setMaxHistory("1 hour");
+    assertThat(appender.getMaxHistory(), containsString("1 hour"));
+    appender.setMaxHistory("7 days");
+    assertThat(appender.getMaxHistory(), containsString("168 hours"));
+  }
+
+  @Test
+  public void maxHistorySetsMilliseconds() {
+    appender.setMaxHistory("800 milli");
+    assertThat(appender.getMaxHistoryMs(), is(800L));
+    appender.setMaxHistory("500 seconds");
+    assertThat(appender.getMaxHistoryMs(), is(500 * 1000L));
+    appender.setMaxHistory("120 minutes");
+    assertThat(appender.getMaxHistoryMs(), is(120 * 60 * 1000L));
+    appender.setMaxHistory("1 hour");
+    assertThat(appender.getMaxHistoryMs(), is(60 * 60 * 1000L));
+    appender.setMaxHistory("7 days");
+    assertThat(appender.getMaxHistoryMs(), is(7 * 24 * 60 * 60 * 1000L));
+  }
+
+  @Test
+  public void getMaxHistoryEmptyByDefault() {
+    assertThat(appender.getMaxHistory(), is(""));
+  }
+
+  @Test
+  public void getMaxHistoryMsZeroByDefault() {
+    assertThat(appender.getMaxHistoryMs(), is(0L));
   }
 
   private void configureLogbackByString(String xml) throws JoranException {
