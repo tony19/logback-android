@@ -47,6 +47,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private String insertPropertiesSQL;
   private String insertExceptionSQL;
   private String insertSQL;
+  private String filename;
   private DBNameResolver dbNameResolver;
   private Duration maxHistory;
   private long lastCleanupTime = 0;
@@ -80,6 +81,45 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     this.maxHistory = Duration.valueOf(maxHistory);
   }
 
+  /**
+   * Gets the absolute path to the SQLite database
+   * @return
+     */
+  public String getFilename() {
+    return this.filename;
+  }
+
+  /**
+   * Sets the path to the destination SQLite database
+   * @param filename absolute path to file
+   */
+  public void setFilename(String filename) {
+    this.filename = filename;
+  }
+
+  /**
+   * Gets a file object from a file path to a SQLite database
+   * @param filename absolute path to database file
+   * @return the file object if a valid file found; otherwise, null
+   */
+  public File getDatabaseFile(String filename) {
+    File dbFile = null;
+    if (filename != null && filename.trim().length() > 0) {
+      dbFile = new File(filename);
+    }
+    if (dbFile == null || dbFile.isDirectory()) {
+      if (getContext() != null) {
+        final String packageName = getContext().getProperty(CoreConstants.PACKAGE_NAME_KEY);
+        if (packageName != null && packageName.trim().length() > 0) {
+          dbFile = new File(CommonPathUtil.getDatabaseDirectoryPath(packageName), "logback.db");
+        }
+      } else {
+        dbFile = null;
+      }
+    }
+    return dbFile;
+  }
+
   /*
    * (non-Javadoc)
    * @see ch.qos.logback.core.UnsynchronizedAppenderBase#start()
@@ -88,19 +128,14 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   public void start() {
     this.started = false;
 
-    String packageName = null;
-    if (getContext() != null) {
-      packageName = getContext().getProperty(CoreConstants.PACKAGE_NAME_KEY);
-    }
-
-    if (packageName == null || packageName.length() == 0) {
-      addError("Cannot create database without package name");
+    File dbfile = getDatabaseFile(this.filename);
+    if (dbfile == null) {
+      addError("Cannot determine database filename");
       return;
     }
 
     boolean dbOpened = false;
     try {
-      File dbfile = new File(CommonPathUtil.getDatabaseDirectoryPath(packageName), "logback.db");
       dbfile.getParentFile().mkdirs();
       this.db = SQLiteDatabase.openOrCreateDatabase(dbfile.getPath(), null);
       dbOpened = true;
