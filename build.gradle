@@ -55,7 +55,7 @@ subprojects {
     // Skip fragile network tests (to be refactored later)
     exclude '**/net/**'
 
-    // Skip performance tests, since they're already run in they're own 'perf' task
+    // Skip performance tests, since they're already run in their own 'perf' task
     exclude '**/*PerfTest*'
   }
 
