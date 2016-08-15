@@ -13,6 +13,8 @@ general:
     - "logback-classic/build/outputs"
 
 test:
+  override:
+    - ./gradlew check
   post:
     - scripts/triggertestapp.sh
     - mkdir -p $CIRCLE_ARTIFACTS/jars
