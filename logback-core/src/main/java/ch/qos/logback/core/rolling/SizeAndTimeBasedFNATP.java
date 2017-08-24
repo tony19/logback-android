@@ -22,6 +22,7 @@ import ch.qos.logback.core.rolling.helper.CompressionMode;
 import ch.qos.logback.core.rolling.helper.FileFilterUtil;
 import ch.qos.logback.core.rolling.helper.SizeAndTimeBasedArchiveRemover;
 import ch.qos.logback.core.util.FileSize;
+import ch.qos.logback.core.util.FileUtil;
 
 @NoAutoStart
 public class SizeAndTimeBasedFNATP<E> extends
@@ -57,7 +58,7 @@ public class SizeAndTimeBasedFNATP<E> extends
   }
 
   void computeCurrentPeriodsHighestCounterValue(final String stemRegex) {
-    File file = new File(getCurrentPeriodsFileNameWithoutCompressionSuffix());
+    File file = FileUtil.createFile(getContext(), getCurrentPeriodsFileNameWithoutCompressionSuffix());
     File parentDir = file.getParentFile();
 
     File[] matchingFileArray = FileFilterUtil

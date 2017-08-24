@@ -16,6 +16,7 @@ package ch.qos.logback.core.rolling;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.helper.CompressionMode;
 import ch.qos.logback.core.rolling.helper.FileNamePattern;
+import ch.qos.logback.core.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
       }
     }
 
-    currentlyActiveFile = new File(getFile());
+    currentlyActiveFile = FileUtil.createFile(getContext(), getFile());
     addInfo("Active log file name: " + getFile());
     super.start();
   }
@@ -146,7 +147,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
       try {
         // update the currentlyActiveFile
         // http://jira.qos.ch/browse/LBCORE-90
-        currentlyActiveFile = new File(filename);
+        currentlyActiveFile = FileUtil.createFile(getContext(), filename);
 
         // This will also close the file. This is OK since multiple
         // close operations are safe.

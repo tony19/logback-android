@@ -104,7 +104,6 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     String file = getFile();
 
     if (file != null) {
-      file = getAbsoluteFilePath(file);
       addInfo("File property is set to [" + file + "]");
 
       if (prudent) {
@@ -156,9 +155,8 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    */
   protected boolean openFile(String filename) throws IOException {
     boolean successful = false;
-    filename = getAbsoluteFilePath(filename);
     synchronized (lock) {
-      File file = new File(filename);
+      File file = FileUtil.createFile(getContext(), filename);
       if (FileUtil.isParentDirectoryCreationRequired(file)) {
         boolean result = FileUtil.createMissingParentDirectories(file);
         if (!result) {
@@ -263,27 +261,5 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     }
 
     super.subAppend(event);
-  }
-
-  /**
-   * Gets the absolute path to the filename, starting from the app's
-   * "files" directory, if it is not already an absolute path
-   *
-   * @param filename filename to evaluate
-   * @return absolute path to the filename
-   */
-  private String getAbsoluteFilePath(String filename) {
-    // In Android, relative paths created with File() are relative
-    // to root, so fix it by prefixing the path to the app's "files"
-    // directory.
-    // This transformation is rather expensive, since it involves loading the
-    // Android manifest from the APK (which is a ZIP file), and parsing it to
-    // retrieve the application package name. This should be avoided if
-    // possible as it may perceptibly delay the app launch time.
-    if (EnvUtil.isAndroidOS() && !new File(filename).isAbsolute()) {
-      String dataDir = context.getProperty(CoreConstants.DATA_DIR_KEY);
-      filename = FileUtil.prefixRelativePath(dataDir, filename);
-    }
-    return filename;
   }
 }

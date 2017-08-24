@@ -52,10 +52,10 @@ public class RenameUtil extends ContextAwareBase {
       addWarn("Source and target files are the same [" + src + "]. Skipping.");
       return;
     }
-    File srcFile = new File(src);
+    File srcFile = FileUtil.createFile(getContext(), src);
 
     if (srcFile.exists()) {
-      File targetFile = new File(target);
+      File targetFile = FileUtil.createFile(getContext(), target);
       createMissingTargetDirsIfNecessary(targetFile);
 
       addInfo("Renaming file [" + srcFile + "] to [" + targetFile + "]");

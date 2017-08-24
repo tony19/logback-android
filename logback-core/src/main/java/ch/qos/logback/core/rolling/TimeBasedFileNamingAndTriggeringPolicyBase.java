@@ -20,6 +20,7 @@ import ch.qos.logback.core.rolling.helper.ArchiveRemover;
 import ch.qos.logback.core.rolling.helper.DateTokenConverter;
 import ch.qos.logback.core.rolling.helper.RollingCalendar;
 import ch.qos.logback.core.spi.ContextAwareBase;
+import ch.qos.logback.core.util.FileUtil;
 
 abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
         ContextAwareBase implements TimeBasedFileNamingAndTriggeringPolicy<E> {
@@ -57,7 +58,7 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
 
     setDateInCurrentPeriod(new Date(getCurrentTime()));
     if (tbrp.getParentsRawFileProperty() != null) {
-      File currentFile = new File(tbrp.getParentsRawFileProperty());
+      File currentFile = FileUtil.createFile(getContext(), tbrp.getParentsRawFileProperty());
       if (currentFile.exists() && currentFile.canRead()) {
         setDateInCurrentPeriod(new Date(currentFile.lastModified()));
       }

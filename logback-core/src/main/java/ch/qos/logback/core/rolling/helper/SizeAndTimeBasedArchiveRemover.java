@@ -13,6 +13,8 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
+import ch.qos.logback.core.util.FileUtil;
+
 import java.io.File;
 import java.util.Date;
 
@@ -28,8 +30,8 @@ public class SizeAndTimeBasedArchiveRemover extends DefaultArchiveRemover {
 
     String regex = fileNamePattern.toRegexForFixedDate(dateOfPeriodToClean);
     String stemRegex = FileFilterUtil.afterLastSlash(regex);
-    File archive0 = new File(fileNamePattern.convertMultipleArguments(
-        dateOfPeriodToClean, 0));
+    File archive0 = FileUtil.createFile(getContext(), fileNamePattern.convertMultipleArguments(
+            dateOfPeriodToClean, 0));
     // in case the file has no directory part, i.e. if it's written into the
     // user's current directory.
     archive0 = archive0.getAbsoluteFile();
