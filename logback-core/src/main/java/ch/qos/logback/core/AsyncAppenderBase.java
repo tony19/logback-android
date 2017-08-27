@@ -116,6 +116,7 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> implemen
     try {
       worker.join(1000);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       addError("Failed to join worker thread", e);
     }
   }
@@ -138,6 +139,7 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> implemen
     try {
       blockingQueue.put(eventObject);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
   }
 
