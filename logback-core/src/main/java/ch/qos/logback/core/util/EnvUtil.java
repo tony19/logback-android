@@ -21,17 +21,23 @@ import java.util.List;
  */
 public class EnvUtil {
 
+  // cache Android environment identifier; cannot change during the runtime
+  private static Boolean isAndroid = null;
+
   /**
    * Heuristically determines whether the current OS is Android
    */
   static public boolean isAndroidOS() {
-    String osname = OptionHelper.getSystemProperty("os.name");
-    String root = OptionHelper.getEnv("ANDROID_ROOT");
-    String data = OptionHelper.getEnv("ANDROID_DATA");
+    if (isAndroid == null) {
+      String osname = OptionHelper.getSystemProperty("os.name");
+      String root = OptionHelper.getEnv("ANDROID_ROOT");
+      String data = OptionHelper.getEnv("ANDROID_DATA");
 
-    return osname != null && osname.contains("Linux") &&
-        root != null && root.contains("/system") &&
-        data != null && data.contains("/data");
+      isAndroid = osname != null && osname.contains("Linux") &&
+          root != null && root.contains("/system") &&
+          data != null && data.contains("/data");
+    }
+    return isAndroid;
   }
 
   static private boolean isJDK_N_OrHigher(int n) {

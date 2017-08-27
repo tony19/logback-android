@@ -15,6 +15,7 @@ package ch.qos.logback.core.util;
 
 import java.io.File;
 import ch.qos.logback.core.Context;
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.rolling.RolloverFailure;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
@@ -71,14 +72,50 @@ public class FileUtil extends ContextAwareBase {
     return path;
   }
 
+  /**
+   * Gets the absolute path to the filename, starting from the app's
+   * "files" directory, if it is not already an absolute path
+   *
+   * @param filename filename to evaluate
+   * @return absolute path to the filename
+   */
+  public static String getAbsoluteFilePath(Context context, String filename) {
+    // In Android, relative paths created with File() are relative
+    // to root, so fix it by prefixing the path to the app's "files"
+    // directory.
+    // This transformation is rather expensive, since it involves loading the
+    // Android manifest from the APK (which is a ZIP file), and parsing it to
+    // retrieve the application package name. This should be avoided if
+    // possible as it may perceptibly delay the app launch time.
+    String absoluteFilePath = filename;
+    if (EnvUtil.isAndroidOS() && !new File(filename).isAbsolute()) {
+      String dataDir = context.getProperty(CoreConstants.DATA_DIR_KEY);
+      absoluteFilePath = prefixRelativePath(dataDir, filename);
+    }
+    return absoluteFilePath;
+  }
+
+  /**
+   * Creates a new {@link File} in environment-safe manner.
+   * <br>
+   * On Android, if filename isn't already an absolute path, it prefixes the path with
+   * the app's "files" directory.
+   * On any other environment, it just creates a new {@link File} with the "filename" path.
+   */
+  public static File createFile(Context context, String filename) {
+    return new File(getAbsoluteFilePath(context, filename));
+  }
+
    static final int BUF_SIZE = 32 * 1024;
 
    public void copy(String src, String destination) throws RolloverFailure {
      BufferedInputStream bis = null;
      BufferedOutputStream bos = null;
      try {
-       bis = new BufferedInputStream(new FileInputStream(src));
-       bos = new BufferedOutputStream(new FileOutputStream(destination));
+       String absolutePathSrc = getAbsoluteFilePath(getContext(), src);
+       String absolutePathDest = getAbsoluteFilePath(getContext(), destination);
+       bis = new BufferedInputStream(new FileInputStream(absolutePathSrc));
+       bos = new BufferedOutputStream(new FileOutputStream(absolutePathDest));
        byte[] inbuf = new byte[BUF_SIZE];
        int n;
 

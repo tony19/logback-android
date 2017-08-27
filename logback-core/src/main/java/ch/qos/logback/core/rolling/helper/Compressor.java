@@ -64,6 +64,7 @@ public class Compressor extends ContextAwareBase {
   }
 
   private void zipCompress(String nameOfFile2zip, String nameOfZippedFile, String innerEntryName) {
+    nameOfFile2zip = FileUtil.getAbsoluteFilePath(getContext(), nameOfFile2zip);
     File file2zip = new File(nameOfFile2zip);
 
     if (!file2zip.exists()) {
@@ -82,6 +83,7 @@ public class Compressor extends ContextAwareBase {
       nameOfZippedFile = nameOfZippedFile + ".zip";
     }
 
+    nameOfZippedFile = FileUtil.getAbsoluteFilePath(getContext(), nameOfZippedFile);
     File zippedFile = new File(nameOfZippedFile);
 
     if (zippedFile.exists()) {
@@ -168,6 +170,7 @@ public class Compressor extends ContextAwareBase {
 
 
   private void gzCompress(String nameOfFile2gz, String nameOfgzedFile) {
+    nameOfFile2gz = FileUtil.getAbsoluteFilePath(getContext(), nameOfFile2gz);
     File file2gz = new File(nameOfFile2gz);
 
     if (!file2gz.exists()) {
@@ -182,6 +185,7 @@ public class Compressor extends ContextAwareBase {
       nameOfgzedFile = nameOfgzedFile + ".gz";
     }
 
+    nameOfgzedFile = FileUtil.getAbsoluteFilePath(getContext(), nameOfgzedFile);
     File gzedFile = new File(nameOfgzedFile);
 
     if (gzedFile.exists()) {

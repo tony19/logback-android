@@ -18,6 +18,7 @@ import java.util.Date;
 
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.rolling.helper.*;
+import ch.qos.logback.core.util.FileUtil;
 
 /**
  * When rolling over, <code>FixedWindowRollingPolicy</code> renames files
@@ -126,7 +127,7 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
     // If maxIndex <= 0, then there is no file renaming to be done.
     if (maxIndex >= 0) {
       // Delete the oldest file, to keep Windows happy.
-      File file = new File(fileNamePattern.convertInt(maxIndex));
+      File file = FileUtil.createFile(getContext(), fileNamePattern.convertInt(maxIndex));
 
       if (file.exists()) {
         file.delete();
@@ -135,7 +136,7 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
       // Map {(maxIndex - 1), ..., minIndex} to {maxIndex, ..., minIndex+1}
       for (int i = maxIndex - 1; i >= minIndex; i--) {
         String toRenameStr = fileNamePattern.convertInt(i);
-        File toRename = new File(toRenameStr);
+        File toRename = FileUtil.createFile(context, toRenameStr);
         // no point in trying to rename an inexistent file
         if (toRename.exists()) {
           util.rename(toRenameStr, fileNamePattern.convertInt(i + 1));
@@ -147,8 +148,9 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
       // move active file name to min
       switch (compressionMode) {
       case NONE:
-        util.rename(getActiveFileName(), fileNamePattern
-            .convertInt(minIndex));
+        String src = getActiveFileName();
+        String target = fileNamePattern.convertInt(minIndex);
+        util.rename(src, target);
         break;
       case GZ:
         compressor.compress(getActiveFileName(), fileNamePattern.convertInt(minIndex), null);

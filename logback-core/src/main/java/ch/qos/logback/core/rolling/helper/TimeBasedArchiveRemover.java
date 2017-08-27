@@ -19,6 +19,7 @@ import java.util.Date;
 import ch.qos.logback.core.pattern.Converter;
 import ch.qos.logback.core.pattern.LiteralConverter;
 import ch.qos.logback.core.spi.ContextAwareBase;
+import ch.qos.logback.core.util.FileUtil;
 
 public class TimeBasedArchiveRemover extends DefaultArchiveRemover {
 
@@ -30,7 +31,7 @@ public class TimeBasedArchiveRemover extends DefaultArchiveRemover {
   protected void cleanByPeriodOffset(Date now, int periodOffset) {
     Date date2delete = rc.getRelativeDate(now, periodOffset);
     String filename = fileNamePattern.convert(date2delete);
-    File file2Delete = new File(filename);
+    File file2Delete = FileUtil.createFile(getContext(), filename);
     if (file2Delete.exists() && file2Delete.isFile()) {
       file2Delete.delete();
       addInfo("deleting " + file2Delete);
