@@ -21,6 +21,8 @@ import static junit.framework.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.MDC;
 
 import ch.qos.logback.classic.ClassicConstants;
@@ -58,6 +60,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@RunWith(RobolectricTestRunner.class)
 public class SiftingAppenderTest {
 
   static String SIFT_FOLDER_PREFIX = ClassicTestConstants.JORAN_INPUT_PREFIX + "sift/";

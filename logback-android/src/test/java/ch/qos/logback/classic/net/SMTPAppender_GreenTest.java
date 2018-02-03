@@ -35,6 +35,8 @@ import org.dom4j.io.SAXReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.MDC;
 
 import javax.mail.MessagingException;
@@ -54,6 +56,7 @@ import static org.junit.Assert.*;
  *
  * http://www.icegreen.com/greenmail/
  */
+@RunWith(RobolectricTestRunner.class)
 public class SMTPAppender_GreenTest {
 
   static final String HEADER = "HEADER\n";

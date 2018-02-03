@@ -18,6 +18,8 @@ import static org.junit.Assert.assertNotNull;
 import java.security.KeyStore;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.core.net.ssl.KeyStoreFactoryBean;
 import ch.qos.logback.core.net.ssl.SSL;
@@ -28,6 +30,7 @@ import ch.qos.logback.core.net.ssl.SSL;
  *
  * @author Carl Harris
  */
+@RunWith(RobolectricTestRunner.class)
 public class KeyStoreFactoryBeanTest {
 
   private KeyStoreFactoryBean factoryBean = new KeyStoreFactoryBean();

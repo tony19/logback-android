@@ -17,12 +17,13 @@ import static ch.qos.logback.classic.ClassicTestConstants.ISO_REGEX;
 import static ch.qos.logback.classic.ClassicTestConstants.MAIN_REGEX;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.MDC;
 
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -38,6 +39,7 @@ import ch.qos.logback.core.testUtil.StringListAppender;
 import ch.qos.logback.core.util.OptionHelper;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEvent> {
 
   private PatternLayout pl = new PatternLayout();

@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.LoggerContext;
@@ -35,6 +38,8 @@ import ch.qos.logback.core.status.Status;
 /**
  * Tests the {@link FindIncludeAction} class
  */
+@RunWith(RobolectricTestRunner.class)
+@Ignore()
 public class BaseIncludesTezt {
   protected static final String OUT_DIR = ClassicTestConstants.OUTPUT_DIR_PREFIX;
   protected static final String RESOURCE_DIR = ClassicTestConstants.RESOURCES_PREFIX;

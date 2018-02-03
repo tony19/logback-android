@@ -18,6 +18,8 @@ import static junit.framework.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.Logger;
 
 import ch.qos.logback.classic.ClassicTestConstants;
@@ -31,6 +33,7 @@ import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class LayoutInsteadOfEncoderTest {
 
   // TeztConstants.TEST_DIR_PREFIX + "input/joran/ignore.xml"

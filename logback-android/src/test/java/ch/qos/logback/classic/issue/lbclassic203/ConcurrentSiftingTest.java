@@ -16,6 +16,8 @@ package ch.qos.logback.classic.issue.lbclassic203;
 import static junit.framework.Assert.assertEquals;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.Logger;
@@ -25,10 +27,8 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.contention.MultiThreadedHarness;
 import ch.qos.logback.core.contention.RunnableWithCounterAndDone;
 import ch.qos.logback.core.joran.spi.JoranException;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
+@RunWith(RobolectricTestRunner.class)
 public class ConcurrentSiftingTest {
   final static int THREAD_COUNT = 5;
   static String FOLDER_PREFIX = ClassicTestConstants.JORAN_INPUT_PREFIX

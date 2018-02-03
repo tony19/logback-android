@@ -25,6 +25,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import ch.qos.logback.core.joran.spi.ElementSelector;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
@@ -45,6 +47,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
  * 
  * @author Ceki Gulcu
  */
+@RunWith(RobolectricTestRunner.class)
 public class SkippingInInterpreterTest {
 
   HashMap<ElementSelector, Action> rulesMap = new HashMap<ElementSelector, Action>();

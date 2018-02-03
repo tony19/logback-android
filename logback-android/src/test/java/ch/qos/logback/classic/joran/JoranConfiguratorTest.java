@@ -27,6 +27,8 @@ import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CachingDateFormatter;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.MDC;
 
 import ch.qos.logback.classic.ClassicTestConstants;
@@ -48,6 +50,7 @@ import ch.qos.logback.core.testUtil.StringListAppender;
 
 import static junit.framework.Assert.*;
 
+@RunWith(RobolectricTestRunner.class)
 public class JoranConfiguratorTest {
 
   LoggerContext loggerContext = new LoggerContext();

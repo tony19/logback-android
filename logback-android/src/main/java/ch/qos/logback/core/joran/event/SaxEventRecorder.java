@@ -22,7 +22,6 @@ import java.util.List;
 import static ch.qos.logback.core.CoreConstants.XML_PARSING;
 
 import ch.qos.logback.core.joran.spi.ElementPath;
-import ch.qos.logback.core.joran.spi.ElementSelector;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;

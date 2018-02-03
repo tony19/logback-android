@@ -23,6 +23,8 @@ import ch.qos.logback.core.joran.spi.ElementSelector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
@@ -38,6 +40,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
  * 
  * @author Aleksey Didik
  */
+@RunWith(RobolectricTestRunner.class)
 public class DefinePropertyActionTest {
 
   private static final String DEFINE_INPUT_DIR = CoreTestConstants.JORAN_INPUT_PREFIX

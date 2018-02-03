@@ -20,6 +20,8 @@ import static junit.framework.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
@@ -36,6 +38,7 @@ import ch.qos.logback.core.recovery.RecoveryCoordinator;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class SyslogAppenderTest {
 
   LoggerContext lc = new LoggerContext();

@@ -23,6 +23,8 @@ import java.util.Stack;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.xml.sax.SAXParseException;
 
 import ch.qos.logback.core.Context;
@@ -39,6 +41,7 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.FileTestUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 
+@RunWith(RobolectricTestRunner.class)
 public class ConditionalIncludeActionTest {
 
   Context context = new ContextBase();

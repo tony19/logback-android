@@ -23,6 +23,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import ch.qos.logback.core.status.StatusChecker;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.xml.sax.Attributes;
 
 import ch.qos.logback.core.Context;
@@ -36,6 +38,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
  * 
  * @author Ceki Gulcu
  */
+@RunWith(RobolectricTestRunner.class)
 public class SaxEventRecorderTest {
 
   Context context =  new ContextBase();

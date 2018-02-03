@@ -15,10 +15,13 @@ package org.slf4j.impl;
 
 import static junit.framework.Assert.assertEquals;
 
+import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.core.status.StatusChecker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.LoggerFactoryFriend;
@@ -29,6 +32,7 @@ import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class RecursiveInitializationTest {
 
   int diff = RandomUtil.getPositiveInt();
@@ -36,7 +40,7 @@ public class RecursiveInitializationTest {
   @Before
   public void setUp() throws Exception {
     System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY,
-        "recursiveInit.xml");
+            ClassicTestConstants.RESOURCES_PREFIX + "recursiveInit.xml");
     StaticLoggerBinderFriend.reset();
     LoggerFactoryFriend.reset();
 

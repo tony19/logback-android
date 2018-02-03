@@ -22,6 +22,8 @@ import java.util.List;
 
 import ch.qos.logback.core.joran.spi.ElementSelector;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.core.joran.SimpleConfigurator;
 import ch.qos.logback.core.joran.action.Action;
@@ -32,6 +34,7 @@ import ch.qos.logback.core.util.StatusPrinter;
 /** 
  * The Fruit* code is intended to test Joran's replay capability
  * */
+@RunWith(RobolectricTestRunner.class)
 public class FruitConfigurationTest  {
 
   FruitContext fruitContext = new FruitContext();

@@ -13,11 +13,10 @@
  */
 package ch.qos.logback.classic.rolling;
 
-import static junit.framework.Assert.assertTrue;
-
 import ch.qos.logback.core.util.CachingDateFormatter;
-import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.Logger;
@@ -35,6 +34,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
  * @author Ceki G&uuml;lc&uuml;
  *
  */
+@RunWith(RobolectricTestRunner.class)
 public class UniqueFileTest {
 
   LoggerContext lc = new LoggerContext();

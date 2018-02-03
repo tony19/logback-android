@@ -28,6 +28,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.xml.sax.EntityResolver;
 
 import ch.qos.logback.classic.ClassicTestConstants;
@@ -45,6 +47,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.testUtil.StringListAppender;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class HTMLLayoutTest {
 
   LoggerContext lc;

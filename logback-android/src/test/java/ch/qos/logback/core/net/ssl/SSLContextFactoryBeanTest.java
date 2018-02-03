@@ -18,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.core.net.ssl.mock.MockContextAware;
 import ch.qos.logback.core.net.ssl.mock.MockKeyManagerFactoryFactoryBean;
@@ -30,6 +32,7 @@ import ch.qos.logback.core.net.ssl.mock.MockTrustManagerFactoryFactoryBean;
  *
  * @author Carl Harris
  */
+@RunWith(RobolectricTestRunner.class)
 public class SSLContextFactoryBeanTest {
 
   private static final String SSL_CONFIGURATION_MESSAGE_PATTERN =

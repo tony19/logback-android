@@ -31,6 +31,8 @@ import ch.qos.logback.core.testUtil.FileTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.xml.sax.SAXParseException;
 
 import ch.qos.logback.core.Context;
@@ -45,6 +47,7 @@ import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class IncludeActionTest {
 
   final static String INCLUDE_KEY = "includeKey";

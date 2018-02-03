@@ -18,10 +18,13 @@ import java.io.ByteArrayInputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
+@RunWith(RobolectricTestRunner.class)
 public class LoggerContextDeadlockTest {
 
   LoggerContext loggerContext = new LoggerContext();

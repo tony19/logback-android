@@ -29,6 +29,8 @@ import java.util.zip.ZipEntry;
 
 import ch.qos.logback.core.CoreConstants;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
@@ -43,6 +45,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
 
 import static org.mockito.Mockito.*;
 
+@RunWith(RobolectricTestRunner.class)
 public class TrivialConfiguratorTest {
 
   Context context = new ContextBase();

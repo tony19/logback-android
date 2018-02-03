@@ -19,6 +19,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,7 @@ import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.Loader;
 
+@RunWith(RobolectricTestRunner.class)
 public class ASaxEventRecorderTest {
   static private LoggerContext context;
   static private ASaxEventRecorder recorder;

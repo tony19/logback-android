@@ -22,6 +22,8 @@ import java.util.Stack;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.Context;
@@ -36,6 +38,7 @@ import ch.qos.logback.core.joran.spi.ElementSelector;
 /**
  * Integration tests for {@link AndroidManifestPropertiesUtil}
  */
+@RunWith(RobolectricTestRunner.class)
 public class AndroidManifestPropertiesUtilTest {
 
   // Package name is "android" when running on PC because the "AndroidManifest.xml"

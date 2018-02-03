@@ -28,6 +28,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.Logger;
@@ -42,6 +44,7 @@ import ch.qos.logback.core.status.StatusListener;
 import ch.qos.logback.core.status.TrivialStatusListener;
 import ch.qos.logback.core.util.Loader;
 
+@RunWith(RobolectricTestRunner.class)
 public class ContextInitializerTest {
 
   LoggerContext loggerContext = new LoggerContext();
