@@ -3,7 +3,7 @@
 
 [[ "$TRAVIS" == true ]] && settings='--settings config/travisMavenSettings.xml' || settings=''
 
-mvn versions:set -DnewVersion=${version}
+mvn versions:set -DnewVersion=${VERSION_NAME}
 
 mvn clean deploy $settings              \
     -Pdebug                             \

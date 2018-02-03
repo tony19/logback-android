@@ -9,7 +9,7 @@ fi
 # ...or prompt for the version
 . gradle.properties
 
-ver=${version%*-SNAPSHOT}
+ver=${VERSION_NAME%*-SNAPSHOT}
 baseVersion=${ver%*-*}
 prevBuild=$((${ver##*-} - 1))
 prevVersion="${baseVersion}-${prevBuild}"

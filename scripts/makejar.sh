@@ -12,6 +12,7 @@ fi
 
 . gradle.properties
 
+version=${VERSION_NAME}
 _profile="debug"
 if [[ "$1" == "-r" ]]; then
   _profile="release"
