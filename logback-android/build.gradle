@@ -2,16 +2,16 @@ apply plugin: 'com.android.library'
 apply from: 'maven-push.gradle'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 15
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_5
+        targetCompatibility JavaVersion.VERSION_1_5
     }
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 15
         versionCode VERSION_CODE.toInteger()
         versionName VERSION_NAME
     }
@@ -33,6 +33,11 @@ dependencies {
     }
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
     testImplementation 'org.robolectric:robolectric:3.6.1'
+
+    // This dep is required when using Robolectric and targeting pre-21 SDKs.
+    // Otherwise, tests fail with java.lang.NoClassDefFoundError.
+    // https://github.com/robolectric/robolectric/issues/2562#issuecomment-263086503
+    testImplementation 'org.robolectric:android-all:6.0.0_r1-robolectric-0'
 
     implementation 'com.github.tony19:apktool-lib:1.4.4-3'
 
