@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-NEXUS_USERNAME=${NEXUS_USERNAME?} \
-NEXUS_PASSWORD=${NEXUS_PASSWORD?} \
-./gradlew uploadArchives -x test
+user=${NEXUS_USERNAME?}
+pass=${NEXUS_PASSWORD?}
+./gradlew uploadArchives -x test -PNEXUS_USERNAME=${user} -PNEXUS_PASSWORD=${pass}
