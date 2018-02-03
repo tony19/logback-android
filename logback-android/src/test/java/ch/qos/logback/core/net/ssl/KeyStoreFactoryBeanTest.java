@@ -17,20 +17,15 @@ import static org.junit.Assert.assertNotNull;
 
 import java.security.KeyStore;
 
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-
-import ch.qos.logback.core.net.ssl.KeyStoreFactoryBean;
-import ch.qos.logback.core.net.ssl.SSL;
-
 
 /**
  * Unit tests for {@link KeyStoreFactoryBean}.
  *
  * @author Carl Harris
  */
-@RunWith(RobolectricTestRunner.class)
+@Ignore()
 public class KeyStoreFactoryBeanTest {
 
   private KeyStoreFactoryBean factoryBean = new KeyStoreFactoryBean();
