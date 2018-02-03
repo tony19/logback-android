@@ -31,9 +31,11 @@ jobs:
           destination: reports
       - store_test_results:
           path: logback-android/build/test-results
-    post:
-      - scripts/triggertestapp.sh
-      - mkdir -p $CIRCLE_ARTIFACTS/aar
-      - find . -name "logback-android*.aar" -type f -exec cp -v {} $CIRCLE_ARTIFACTS/aar/ \;
-      - mkdir -p $CIRCLE_TEST_REPORTS/junit
-      - find . -type f -name "TEST-*.xml" -exec cp -v {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - run:
+          name: Trigger Test App
+          command: |
+              scripts/triggertestapp.sh
+              mkdir -p $CIRCLE_ARTIFACTS/aar
+              find . -name "logback-android*.aar" -type f -exec cp -v {} $CIRCLE_ARTIFACTS/aar/ \;
+              mkdir -p $CIRCLE_TEST_REPORTS/junit
+              find . -type f -name "TEST-*.xml" -exec cp -v {} $CIRCLE_TEST_REPORTS/junit/ \;
