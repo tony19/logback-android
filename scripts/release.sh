@@ -2,7 +2,7 @@
 
 . gradle.properties
 
-version=${version%*-SNAPSHOT}
+version=${VERSION_NAME%*-SNAPSHOT}
 baseVersion=${version%*-*}
 nextBuild=$((${version##*-} + 1))
 nextVersion="${baseVersion}-${nextBuild}-SNAPSHOT"
@@ -32,15 +32,13 @@ echo ''
 ./gradlew   -Prelease.useAutomaticVersion=true  \
             -Prelease.releaseVersion=${version} \
             -Prelease.newVersion=${nextVersion} \
-            -Pversion=${version}                \
-            -PnexusUsername=${user}             \
-            -PnexusPassword=${pass}             \
+            -PVERSION_NAME=${version}           \
+            -PNEXUS_USERNAME=${user}            \
+            -PNEXUS_PASSWORD=${pass}            \
             -Ppush                              \
             clean                               \
-            readme                              \
-            release                             \
-            uploadArchives                      \
-            uberjar
+            assembleRelease                     \
+            uploadArchives
 
 echo -e "\n\n"
 
