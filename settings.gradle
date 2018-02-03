@@ -1,6 +1,4 @@
-rootProject.name = 'logback-android-parent'
-include ':logback-android-core'
-include ':logback-android-classic'
+rootProject.name = 'logback-android'
 
 project(':logback-android-core').projectDir = "$rootDir/logback-core" as File
 project(':logback-android-classic').projectDir = "$rootDir/logback-classic" as File
