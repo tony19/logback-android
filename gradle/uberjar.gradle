@@ -1,6 +1,6 @@
 apply plugin: 'com.github.johnrengelman.shadow'
 
-def projectName = rootProject.name - '-parent'
+def projectName = rootProject.name
 
 /**
  * Creates a shaded uber jar, containing the core and classic
@@ -8,8 +8,7 @@ def projectName = rootProject.name - '-parent'
  */
 shadowJar {
   dependencies {
-    include(project(':logback-android-core'))
-    include(project(':logback-android-classic'))
+    include(project(':logback-android'))
     // FIXME: How do we exclude META-INF/*? Using `exclude 'META-INF/*'
     // does not work, so the shadow jar ends up with the META-INF
     // from apktool-lib.
