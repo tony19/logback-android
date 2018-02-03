@@ -14,6 +14,7 @@
 package ch.qos.logback.core.joran.spi;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -28,12 +29,12 @@ public class DefaultNestedComponentRegistry {
 
   public void add(Class<?> hostClass, String propertyName, Class<?> componentClass) {
     HostClassAndPropertyDouble hpDouble = new HostClassAndPropertyDouble(
-        hostClass, propertyName.toLowerCase());
+        hostClass, propertyName.toLowerCase(Locale.US));
     defaultComponentMap.put(hpDouble, componentClass);
   }
 
   public Class<?> findDefaultComponentType(Class<?> hostClass, String propertyName) {
-    propertyName = propertyName.toLowerCase();
+    propertyName = propertyName.toLowerCase(Locale.US);
     while (hostClass != null) {
       Class<?> componentClass = oneShotFind(hostClass, propertyName);
       if (componentClass != null) {

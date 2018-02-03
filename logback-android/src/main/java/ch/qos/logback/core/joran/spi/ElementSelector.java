@@ -13,8 +13,8 @@
  */
 package ch.qos.logback.core.joran.spi;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * ElementSelector extends {@link ElementPath} with matching operations such as {@link #fullPathMatch(ElementPath)},
@@ -178,7 +178,7 @@ public class ElementSelector extends ElementPath {
     for (int i = 0; i < len; i++) {
       // make Pattern comparisons case insensitive
       // http://jira.qos.ch/browse/LBCORE-76
-      hc ^= get(i).toLowerCase().hashCode();
+      hc ^= get(i).toLowerCase(Locale.US).hashCode();
     }
     return hc;
   }
