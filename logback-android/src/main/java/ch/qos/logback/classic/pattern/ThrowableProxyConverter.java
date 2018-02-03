@@ -15,6 +15,7 @@ package ch.qos.logback.classic.pattern;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -49,7 +50,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
     if (lengthStr == null) {
       lengthOption = Integer.MAX_VALUE;
     } else {
-      lengthStr = lengthStr.toLowerCase();
+      lengthStr = lengthStr.toLowerCase(Locale.US);
       if ("full".equals(lengthStr)) {
         lengthOption = Integer.MAX_VALUE;
       } else if ("short".equals(lengthStr)) {

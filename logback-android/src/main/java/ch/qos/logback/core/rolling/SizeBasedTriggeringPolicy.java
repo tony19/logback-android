@@ -14,6 +14,7 @@
 package ch.qos.logback.core.rolling;
 
 import java.io.File;
+import java.util.Locale;
 
 import ch.qos.logback.core.util.FileSize;
 import ch.qos.logback.core.util.InvocationGate;
@@ -72,7 +73,7 @@ public class SizeBasedTriggeringPolicy<E> extends TriggeringPolicyBase<E> {
     if (value == null)
       return DEFAULT_MAX_FILE_SIZE;
 
-    String s = value.trim().toUpperCase();
+    String s = value.trim().toUpperCase(Locale.US);
     long multiplier = 1;
     int index;
 

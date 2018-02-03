@@ -16,6 +16,7 @@ package ch.qos.logback.core.joran.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 import ch.qos.logback.core.joran.spi.DefaultClass;
 import ch.qos.logback.core.joran.spi.DefaultNestedComponentRegistry;
@@ -379,7 +380,7 @@ public class PropertySetter extends ContextAwareBase {
   }
 
   private String capitalizeFirstLetter(String name) {
-    return name.substring(0, 1).toUpperCase() + name.substring(1);
+    return name.substring(0, 1).toUpperCase(Locale.US) + name.substring(1);
   }
 
   protected Method getMethod(String methodName) {

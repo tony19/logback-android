@@ -81,7 +81,7 @@ public class RollingCalendar extends GregorianCalendar {
 
     if (datePattern != null) {
       for (PeriodicityType i : PeriodicityType.VALID_ORDERED_LIST) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern, Locale.US);
         simpleDateFormat.setTimeZone(GMT_TIMEZONE); // all date formatting done
         // in GMT
 

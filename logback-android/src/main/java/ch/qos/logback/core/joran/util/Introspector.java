@@ -16,6 +16,7 @@ package ch.qos.logback.core.joran.util;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -37,7 +38,7 @@ public class Introspector {
     if (name == null || name.length() == 0) {
       return name;
     } else {
-      String nm = name.substring(0, 1).toLowerCase();
+      String nm = name.substring(0, 1).toLowerCase(Locale.US);
       if (name.length() > 1) {
         nm += name.substring(1);
       }

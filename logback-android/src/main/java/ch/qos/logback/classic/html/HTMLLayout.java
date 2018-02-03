@@ -13,12 +13,12 @@
  */
 package ch.qos.logback.classic.html;
 
+import java.util.Locale;
 import java.util.Map;
 
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.pattern.MDCConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.html.DefaultCssBuilder;
 import ch.qos.logback.core.html.HTMLLayoutBase;
 import ch.qos.logback.core.html.IThrowableRenderer;
 import ch.qos.logback.core.pattern.Converter;
@@ -81,7 +81,7 @@ public class HTMLLayout extends HTMLLayoutBase<ILoggingEvent> {
       odd = false;
     }
 
-    String level = event.getLevel().toString().toLowerCase();
+    String level = event.getLevel().toString().toLowerCase(Locale.US);
 
     buf.append(LINE_SEPARATOR);
     buf.append("<tr class=\"");

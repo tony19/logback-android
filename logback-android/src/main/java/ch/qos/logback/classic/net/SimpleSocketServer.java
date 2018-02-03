@@ -14,11 +14,11 @@
 package ch.qos.logback.classic.net;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import javax.net.ServerSocketFactory;
@@ -127,14 +127,14 @@ public class SimpleSocketServer extends Thread {
    * Returns the name given to the server thread.
    */
   protected String getServerThreadName() {
-    return String.format("Logback %s (port %d)", getClass().getSimpleName(), port);
+    return String.format(Locale.US,"Logback %s (port %d)", getClass().getSimpleName(), port);
   }
 
   /**
    * Returns a name to identify each client thread.
    */
   protected String getClientThreadName(Socket socket) {
-    return String.format("Logback SocketNode (client: %s)", socket.getRemoteSocketAddress());
+    return String.format(Locale.US, "Logback SocketNode (client: %s)", socket.getRemoteSocketAddress());
   }
 
   /**
