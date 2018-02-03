@@ -16,13 +16,12 @@ package ch.qos.logback.core.joran.spi;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 
-import java.awt.Window;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.joran.util.House;
+import ch.qos.logback.core.joran.util.Window;
 
 public class DefaultNestedComponentRegistryTest {
 

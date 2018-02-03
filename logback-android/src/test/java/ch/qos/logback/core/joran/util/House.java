@@ -158,10 +158,6 @@ class Door {
   int handle;
 }
 
-class Window {
-  int handle;
-}
-
 interface SwimmingPool {
 }
 
