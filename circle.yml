@@ -1,23 +1,39 @@
 # Configuration for CircleCI
 # https://circleci.com/gh/tony19/logback-android
 
-general:
-  branches:
-    ignore:
-      - gh-pages
-  artifacts:
-    - "build/reports"
-    - "logback-core/build/reports"
-    - "logback-core/build/outputs"
-    - "logback-classic/build/reports"
-    - "logback-classic/build/outputs"
-
-test:
-  override:
-    - ./gradlew check
-  post:
-    - scripts/triggertestapp.sh
-    - mkdir -p $CIRCLE_ARTIFACTS/jars
-    - find . -name "logback-android*.jar" -type f -exec cp -v {} $CIRCLE_ARTIFACTS/jars/ \;
-    - mkdir -p $CIRCLE_TEST_REPORTS/junit
-    - find . -type f -name "TEST-*.xml" -exec cp -v {} $CIRCLE_TEST_REPORTS/junit/ \;
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-26-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
+#      - run:
+#         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
+#         command: sudo chmod +x ./gradlew
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - store_artifacts:
+          path: logback-android/build/reports
+          destination: reports
+      - store_test_results:
+          path: logback-android/build/test-results
+    post:
+      - scripts/triggertestapp.sh
+      - mkdir -p $CIRCLE_ARTIFACTS/aar
+      - find . -name "logback-android*.aar" -type f -exec cp -v {} $CIRCLE_ARTIFACTS/aar/ \;
+      - mkdir -p $CIRCLE_TEST_REPORTS/junit
+      - find . -type f -name "TEST-*.xml" -exec cp -v {} $CIRCLE_TEST_REPORTS/junit/ \;
