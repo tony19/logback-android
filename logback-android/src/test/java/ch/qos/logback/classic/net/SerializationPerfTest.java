@@ -18,10 +18,14 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import junit.framework.TestCase;
+
+import org.junit.Ignore;
+
 import ch.qos.logback.classic.net.testObjectBuilders.Builder;
 import ch.qos.logback.classic.net.testObjectBuilders.MinimalSerBuilder;
 import ch.qos.logback.classic.net.testObjectBuilders.TrivialLoggingEventVOBuilder;
 
+@Ignore()
 public class SerializationPerfTest extends TestCase {
 
   ObjectOutputStream oos;

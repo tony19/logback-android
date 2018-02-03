@@ -21,6 +21,7 @@ import java.io.ObjectOutputStream;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.MDC;
 import org.slf4j.helpers.BogoPerf;
@@ -46,6 +47,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
 //   average time per logging event: 4034
 //   average size 57, with params, average size=148
 
+@Ignore()
 public class LoggingEventSerializationPerfTest {
 
   static int LOOP_LEN = 10 * 1000;
