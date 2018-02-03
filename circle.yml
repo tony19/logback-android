@@ -29,6 +29,8 @@ jobs:
       - store_artifacts:
           path: logback-android/build/reports
           destination: reports
+      - store_artifacts:
+          path: logback-android/build/outputs
       - store_test_results:
           path: logback-android/build/test-results
       - run:
