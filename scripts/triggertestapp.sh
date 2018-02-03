@@ -8,7 +8,7 @@ project=logback-test-app
 
 curl -X POST  --header "Content-Type: application/json" -d '{
     "build_parameters": {
-      "LOGBACK_ANDROID_VERSION": "'$logbackAndroidVersion'",
+      "LOGBACK_ANDROID_VERSION": "'${VERSION_NAME}'",
       "SLF4J_VERSION": "'$slf4jVersion'",
       "CIRCLE_BRANCH": "'$CIRCLE_BRANCH'",
       "CIRCLE_TAG": "'$CIRCLE_TAG'",
