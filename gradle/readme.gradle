@@ -11,7 +11,7 @@ task readme(description: 'Updates README.md, and pushes it to GitHub.') {
     def template = new groovy.text.StreamingTemplateEngine().createTemplate(text)
 
     def binding = [
-      version     : rootProject.VERSION_NAME,
+      version     : rootProject.VERSION_NAME - ~/-SNAPSHOT/,
       slf4jVersion: rootProject.slf4jVersion
     ]
 
