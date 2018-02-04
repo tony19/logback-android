@@ -75,7 +75,7 @@ configurations {
 allprojects {
     tasks.withType(JavaCompile) {
         // Warn about deprecations
-        options.compilerArgs << '-Xlint:deprecation'
+        //options.compilerArgs << '-Xlint:deprecation'
         // Warn about unchecked usages
         options.compilerArgs << '-Xlint:unchecked'
         // Don't warn about using source/target 1.5 option
