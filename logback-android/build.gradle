@@ -29,6 +29,15 @@ android {
         checkAllWarnings true
         lintConfig rootProject.file('gradle/lint.xml')
     }
+    testOptions.unitTests.all {
+        testLogging {
+            events 'failed', 'skipped'
+            showStackTraces = true
+            exceptionFormat = 'full'
+        }
+        maxParallelForks = 8
+        forkEvery = 20
+    }
 }
 
 dependencies {
