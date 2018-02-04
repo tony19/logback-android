@@ -100,8 +100,12 @@ afterEvaluate { project ->
             source = variant.javaCompile.source
             ext.androidJar = "${project.android.sdkDirectory}/platforms/${project.android.compileSdkVersion}/android.jar"
             classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-            options.links("http://docs.oracle.com/javase/5/docs/api/");
-            options.linksOffline("http://d.android.com/reference", "${project.android.sdkDirectory}/docs/reference");
+            options.links("http://docs.oracle.com/javase/5/docs/api/")
+            options.linksOffline("http://d.android.com/reference", "${project.android.sdkDirectory}/docs/reference")
+
+            // disable javadoc lint warnings (e.g., missing javadoc)
+            options.addBooleanOption('Xdoclint:none', true)
+
             exclude '** /BuildConfig.java'
             exclude '** /R.java'
         }
