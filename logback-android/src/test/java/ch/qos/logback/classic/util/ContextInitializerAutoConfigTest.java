@@ -43,6 +43,7 @@ public class ContextInitializerAutoConfigTest {
     System.clearProperty(ContextInitializer.STATUS_LISTENER_CLASS);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   @Ignore
   // this test works only if logback-test.xml or logback.xml files are on the classpath.

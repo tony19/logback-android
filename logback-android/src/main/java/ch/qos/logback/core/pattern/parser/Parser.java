@@ -169,6 +169,7 @@ public class Parser<E> extends ContextAwareBase {
     }
   }
 
+  @SuppressWarnings("unchecked")
   FormattingNode SINGLE() throws ScanException {
     // System.out.println("in SINGLE()");
     Token t = getNextToken();
@@ -184,6 +185,7 @@ public class Parser<E> extends ContextAwareBase {
     return keywordNode;
   }
 
+  @SuppressWarnings("unchecked")
   FormattingNode COMPOSITE(String keyword) throws ScanException {
     CompositeNode compositeNode = new CompositeNode(keyword);
 

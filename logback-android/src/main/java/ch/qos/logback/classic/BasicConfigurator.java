@@ -33,6 +33,7 @@ import ch.qos.logback.core.status.StatusManager;
 @Deprecated
 public class BasicConfigurator {
 
+  @SuppressWarnings("deprecation")
   final static BasicConfigurator hiddenSingleton = new BasicConfigurator();
 
   private BasicConfigurator() {

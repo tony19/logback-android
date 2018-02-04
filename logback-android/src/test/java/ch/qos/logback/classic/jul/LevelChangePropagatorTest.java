@@ -25,6 +25,7 @@ import org.junit.rules.ExpectedException;
 
 import static junit.framework.Assert.assertEquals;
 
+@SuppressWarnings("deprecation")
 public class LevelChangePropagatorTest {
   int rand = RandomUtil.getPositiveInt();
   LoggerContext loggerContext = new LoggerContext();

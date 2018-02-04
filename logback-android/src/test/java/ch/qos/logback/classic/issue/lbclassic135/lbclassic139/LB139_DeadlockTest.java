@@ -22,7 +22,8 @@ import ch.qos.logback.classic.LoggerContext;
 public class LB139_DeadlockTest {
 
   LoggerContext loggerContext = new LoggerContext();
-  
+
+  @SuppressWarnings("deprecation")
   @Before
   public void setUp() {
     loggerContext.setName("LB139");

@@ -332,6 +332,7 @@ public class JoranConfiguratorTest {
     assertEquals(expected, sysPropValue);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void encoderCharset() throws JoranException, IOException,
           InterruptedException {
@@ -350,6 +351,7 @@ public class JoranConfiguratorTest {
     checker.assertIsErrorFree();
   }
 
+  @SuppressWarnings("deprecation")
   void verifyJULLevel(String loggerName, Level expectedLevel) {
     java.util.logging.Logger julLogger = JULHelper.asJULLogger(loggerName);
     java.util.logging.Level julLevel = julLogger.getLevel();

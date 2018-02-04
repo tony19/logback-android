@@ -32,16 +32,11 @@ import ch.qos.logback.core.encoder.NopEncoder;
 import ch.qos.logback.core.layout.DummyLayout;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Redirecting System.out is quite messy. Disable this test in Maven bu not in Package.class
  */
+@SuppressWarnings("deprecation")
 public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   XTeeOutputStream tee;

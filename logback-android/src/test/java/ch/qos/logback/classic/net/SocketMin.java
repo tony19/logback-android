@@ -50,6 +50,7 @@ public class SocketMin {
     System.exit(1);
   }
 
+  @SuppressWarnings("deprecation")
   static void init(String host, String portStr) {
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     BasicConfigurator.configure(root.getLoggerContext());

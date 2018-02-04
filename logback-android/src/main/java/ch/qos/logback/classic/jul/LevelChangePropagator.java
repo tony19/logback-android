@@ -59,6 +59,7 @@ public class LevelChangePropagator extends ContextAwareBase implements LoggerCon
     propagate(logger, level);
   }
 
+  @SuppressWarnings("deprecation")
   private void propagate(Logger logger, Level level) {
     addInfo("Propagating " + level + " level on " + logger + " onto the JUL framework");
     java.util.logging.Logger julLogger = JULHelper.asJULLogger(logger);

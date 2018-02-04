@@ -37,12 +37,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.CoreConstants;
-import ch.qos.logback.core.LogbackException;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.StatusListener;
 import ch.qos.logback.core.status.TrivialStatusListener;
-import ch.qos.logback.core.util.Loader;
 
 @RunWith(RobolectricTestRunner.class)
 public class ContextInitializerTest {
@@ -60,7 +57,7 @@ public class ContextInitializerTest {
     System.clearProperty(ContextInitializer.STATUS_LISTENER_CLASS);
   }
 
-
+  @SuppressWarnings("deprecation")
   @Test
   @Ignore
   // this test works only if logback-test.xml or logback.xml files are on the classpath.

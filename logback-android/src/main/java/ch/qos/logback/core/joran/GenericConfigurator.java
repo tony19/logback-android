@@ -205,6 +205,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
    * Recall the event list previously registered as a safe point.
    * @return the SAX event list
    */
+  @SuppressWarnings("unchecked")
   public List<SaxEvent> recallSafeConfiguration() {
     return (List<SaxEvent>) context.getObject(SAFE_JORAN_CONFIGURATION);
   }
