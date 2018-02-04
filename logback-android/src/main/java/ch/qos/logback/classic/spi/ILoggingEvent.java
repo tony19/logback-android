@@ -70,12 +70,13 @@ public interface ILoggingEvent extends DeferredProcessingAware {
   Marker getMarker();
 
   /**
-   * Returns the MDC map. The returned value can be an empty map but not null.
+   * @return the MDC map. The returned value can be an empty map but not null.
    */
   Map<String, String> getMDCPropertyMap();
 
   /**
    * Synonym for [@link #getMDCPropertyMap}.
+   * @return a map of MDC properties to values
    * @deprecated  Replaced by [@link #getMDCPropertyMap}
    */
   Map<String, String> getMdc();

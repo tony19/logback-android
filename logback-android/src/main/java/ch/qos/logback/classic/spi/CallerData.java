@@ -53,6 +53,12 @@ public class CallerData {
   /**
    * Extract caller data information as an array based on a Throwable passed as
    * parameter
+   *
+   * @param t Throwable to extract data from
+   * @param fqnOfInvokingClass Fully qualified name of invoking class
+   * @param maxDepth maximum stack depth
+   * @param frameworkPackageList list of framework package names to search
+   * @return caller stack trace array
    */
   public static StackTraceElement[] extract(Throwable t,
                                             String fqnOfInvokingClass, final int maxDepth,

@@ -31,8 +31,8 @@ public class EventArgUtil {
   /**
    * This method should be called only if {@link #successfulExtraction(Throwable)} returns true.
    *
-   * @param argArray
-   * @return
+   * @param argArray array to copy
+   * @return copy of array with one less element
    */
   public static Object[] trimmedCopy(Object[] argArray) {
     if (argArray == null || argArray.length == 0) {

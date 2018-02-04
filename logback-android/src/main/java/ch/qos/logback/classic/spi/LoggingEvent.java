@@ -186,6 +186,7 @@ public class LoggingEvent implements ILoggingEvent {
 
   /**
    * Set this event's throwable information.
+   * @param tp desired throwable proxy info
    */
   public void setThrowableProxy(ThrowableProxy tp) {
     if (throwableProxy != null) {
@@ -320,7 +321,7 @@ public class LoggingEvent implements ILoggingEvent {
   /**
    * Set the MDC map for this event.
    *
-   * @param map
+   * @param map map of MDC properties to values
    * @since 1.0.8
    */
   public void setMDCPropertyMap(Map<String, String> map) {
