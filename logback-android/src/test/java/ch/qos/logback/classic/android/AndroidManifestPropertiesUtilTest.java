@@ -14,11 +14,13 @@
 package ch.qos.logback.classic.android;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +44,8 @@ import ch.qos.logback.core.joran.spi.ElementSelector;
 public class AndroidManifestPropertiesUtilTest {
 
   // Package name is "android" when running on PC because the "AndroidManifest.xml"
-  // is read from the android.jar. Assume 2.1 SDK.
+  // is read from the android.jar.
   private static final String PACKAGE_VAL = "android";
-  private static final String VERSION_NAME_VAL = "2.1";
   private static final String VERSION_CODE_VAL = ""; // no version code for android.jar
   private static final String EXT_DIR_VAL = "/mnt/sdcard";
   private static final String DATA_DIR_VAL = "/data/data/" + PACKAGE_VAL + "/files";
@@ -81,9 +82,9 @@ public class AndroidManifestPropertiesUtilTest {
   public void versionNameKeyFound() throws JoranException {
     tc.doConfigure(toXml(CoreConstants.VERSION_NAME_KEY));
     String ver = stackAction.getStack().pop();
-    // check first part of version name only; "2.1-update1" is
-    // equivalent to "2.1" for our test purposes
-    assertEquals(VERSION_NAME_VAL, ver.substring(0, VERSION_NAME_VAL.length()));
+    Pattern pattern = Pattern.compile("\\d+(\\.\\d+)+");
+    Boolean isValidVersion = pattern.matcher(ver).find();
+    assertTrue("Invalid version number: " + ver, isValidVersion);
   }
 
   @Test
