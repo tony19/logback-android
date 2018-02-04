@@ -1,6 +1,7 @@
 # Configuration for CircleCI
 # https://circleci.com/gh/tony19/logback-android
-version: 2
+version: 2.0
+
 jobs:
   build_and_test:
     branches:
@@ -61,12 +62,9 @@ jobs:
 
 workflows:
   version: 2
-  build-and-deploy:
+  build_and_deploy:
     jobs:
       - build_and_test
       - deploy:
           requires:
             - build_and_test
-          #filters:
-          #  branches:
-          #    only: master
