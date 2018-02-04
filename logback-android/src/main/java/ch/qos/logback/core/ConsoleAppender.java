@@ -36,6 +36,7 @@ import ch.qos.logback.core.status.WarnStatus;
 @Deprecated
 public class ConsoleAppender<E> extends OutputStreamAppender<E> {
 
+  @SuppressWarnings("deprecation")
   protected ConsoleTarget target = ConsoleTarget.SystemOut;
 
   /**
@@ -44,6 +45,7 @@ public class ConsoleAppender<E> extends OutputStreamAppender<E> {
    * @param value desired console-output target
    */
   public void setTarget(String value) {
+    @SuppressWarnings("deprecation")
     ConsoleTarget t = ConsoleTarget.findByName(value.trim());
     if (t == null) {
       targetWarn(value);

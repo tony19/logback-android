@@ -33,6 +33,7 @@ import ch.qos.logback.core.joran.spi.RuleStore;
  */
 public class JoranConfigurator extends JoranConfiguratorBase {
 
+  @SuppressWarnings("deprecation")
   @Override
   public void addInstanceRules(RuleStore rs) {
     // parent rules already added
