@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/env bash -e
 
 if [[ ! -z "$1" ]] && [[ "$1" != -r ]]; then
   echo "Creates the uber jar in ./build"
@@ -13,12 +13,11 @@ fi
 . gradle.properties
 
 version=${VERSION_NAME}
-_profile="debug"
+_profile=Debug
 if [[ "$1" == "-r" ]]; then
-  _profile="release"
+  _profile=Release
   version=${version%-SNAPSHOT}
 fi
 
-./gradlew clean uberjar -x test -Pversion=${version} -P${_profile}
-
-echo "created  $PWD/build/logback-android-${version}.jar"
+./gradlew clean assemble${_profile} -x test -PVERSION_NAME=${version}
+cp -vf ./logback-android/build/outputs/aar/logback-android*.aar ./build/
