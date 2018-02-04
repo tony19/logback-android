@@ -17,7 +17,7 @@ android {
         targetSdkVersion 15
         versionCode VERSION_CODE.toInteger()
         versionName VERSION_NAME
-        setProperty('archivesBaseName', "${rootProject.name}-${versionName}")
+        setProperty('archivesBaseName', "logback-android-${versionName}")
     }
     buildTypes {
         release {
