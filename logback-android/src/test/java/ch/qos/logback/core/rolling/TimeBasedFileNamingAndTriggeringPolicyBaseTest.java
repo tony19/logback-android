@@ -31,8 +31,8 @@ public class TimeBasedFileNamingAndTriggeringPolicyBaseTest {
 
   Context context = new ContextBase();
   RollingFileAppender rfa = new RollingFileAppender();
-  TimeBasedRollingPolicy tbrp = new TimeBasedRollingPolicy();
-  DefaultTimeBasedFileNamingAndTriggeringPolicy timeBasedFNATP = new DefaultTimeBasedFileNamingAndTriggeringPolicy();
+  TimeBasedRollingPolicy<Object> tbrp = new TimeBasedRollingPolicy<Object>();
+  DefaultTimeBasedFileNamingAndTriggeringPolicy<Object> timeBasedFNATP = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>();
 
   @Before
   public void setUp() {

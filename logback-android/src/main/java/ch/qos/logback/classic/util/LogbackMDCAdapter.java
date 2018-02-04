@@ -176,7 +176,7 @@ public final class LogbackMDCAdapter implements MDCAdapter {
    * Return a copy of the current thread's context map. Returned value may be
    * null.
    */
-  public Map getCopyOfContextMap() {
+  public Map<String, String> getCopyOfContextMap() {
     lastOperation.set(READ_OPERATION);
     Map<String, String> hashMap = copyOnInheritThreadLocal.get();
     if (hashMap == null) {
@@ -186,8 +186,7 @@ public final class LogbackMDCAdapter implements MDCAdapter {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public void setContextMap(Map contextMap) {
+  public void setContextMap(Map<String, String> contextMap) {
     lastOperation.set(WRITE_OPERATION);
 
     Map<String, String> newMap = Collections.synchronizedMap(new HashMap<String, String>());

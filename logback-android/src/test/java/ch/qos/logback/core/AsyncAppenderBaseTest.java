@@ -64,7 +64,7 @@ public class AsyncAppenderBaseTest {
 
   @Test
   public void exceptionsShouldNotCauseHalting() throws InterruptedException {
-    NPEAppender npeAppender = new NPEAppender<Integer>();
+    NPEAppender<Integer> npeAppender = new NPEAppender<Integer>();
     npeAppender.setName("bad");
     npeAppender.setContext(context);
     npeAppender.start();
