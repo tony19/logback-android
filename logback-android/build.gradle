@@ -85,4 +85,9 @@ allprojects {
         options.debug(['debugLevel': 'source,lines,vars'])
         options.debug = VERSION_NAME.contains('SNAPSHOT')
     }
+
+    tasks.withType(AbstractArchiveTask) {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
 }
