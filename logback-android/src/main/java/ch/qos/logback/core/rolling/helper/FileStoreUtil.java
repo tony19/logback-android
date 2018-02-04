@@ -32,9 +32,9 @@ public class FileStoreUtil {
   /**
    * This method assumes that both files a and b exists.
    *
-   * @param a
-   * @param b
-   * @return
+   * @param a first file
+   * @param b second file
+   * @return whether files are on same store
    * @throws IllegalArgumentException
    */
   static public boolean areOnSameFileStore(File a, File b) throws RolloverFailure {

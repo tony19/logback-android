@@ -142,7 +142,9 @@ public class DynamicThresholdFilter extends TurboFilter {
   }
 
   /**
-   * @see setKey
+   * Sets the MDC key whose value will be used as a level threshold
+   *
+   * @param key desired key name
    */
   public void setKey(String key) {
     this.key = key;

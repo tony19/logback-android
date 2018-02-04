@@ -33,8 +33,7 @@ abstract class OnPrintStreamStatusListenerBase extends ContextAwareBase implemen
 
 
   /**
-   * The PrintStream used by derived classes
-   * @return
+   * @return PrintStream used by derived classes
    */
   abstract protected PrintStream getPrintStream();
 

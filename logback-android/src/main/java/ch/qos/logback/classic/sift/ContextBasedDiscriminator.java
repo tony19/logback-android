@@ -54,8 +54,8 @@ public class ContextBasedDiscriminator extends AbstractDiscriminator<ILoggingEve
   }
 
   /**
-   * @see #setDefaultValue(String)
-   * @return
+   * @return The default context name in case the context name is not set for the
+   * current logging event.
    */
   public String getDefaultValue() {
     return defaultValue;
@@ -65,7 +65,7 @@ public class ContextBasedDiscriminator extends AbstractDiscriminator<ILoggingEve
    * The default context name in case the context name is not set for the
    * current logging event.
    * 
-   * @param defaultValue
+   * @param defaultValue desired default value
    */
   public void setDefaultValue(String defaultValue) {
     this.defaultValue = defaultValue;

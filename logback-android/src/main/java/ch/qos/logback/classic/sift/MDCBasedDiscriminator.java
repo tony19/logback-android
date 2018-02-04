@@ -76,8 +76,8 @@ public class MDCBasedDiscriminator extends AbstractDiscriminator<ILoggingEvent> 
   }
 
   /**
-   * @return
-   * @see #setDefaultValue(String)
+   * @return The default MDC value in case the MDC is not set for
+   * {@link #setKey(String) mdcKey}.
    */
   public String getDefaultValue() {
     return defaultValue;

@@ -246,7 +246,7 @@ public class OptionHelper {
    * is specified.
    *
    * @param key
-   * @return
+   * @return array, where item 0 is the key, and item 1 is the default value
    */
   static public String[] extractDefaultReplacement(String key) {
     String[] result = new String[2];

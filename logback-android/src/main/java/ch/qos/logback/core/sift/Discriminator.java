@@ -31,8 +31,8 @@ public interface Discriminator<E> extends LifeCycle {
   /**
    * Given event 'e' return a discriminating value.
    * 
-   * @param e
-   * @return
+   * @param e event to evaluate
+   * @return discriminating value
    */
   String getDiscriminatingValue(E e);
 
@@ -40,7 +40,7 @@ public interface Discriminator<E> extends LifeCycle {
    * The key or variable name under which the discriminating value should be
    * exported into the host environment. 
    *
-   * @return
+   * @return key or name
    */
   String getKey();
 }

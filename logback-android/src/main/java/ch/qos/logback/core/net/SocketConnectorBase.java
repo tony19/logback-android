@@ -73,9 +73,6 @@ public class SocketConnectorBase implements SocketConnector {
     this.delayStrategy = delayStrategy;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void run() {
     if (socket != null) {
       throw new IllegalStateException("connector cannot be reused");
@@ -118,16 +115,10 @@ public class SocketConnectorBase implements SocketConnector {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public Socket awaitConnection() throws InterruptedException {
     return awaitConnection(Long.MAX_VALUE);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public Socket awaitConnection(long delay) throws InterruptedException {
     lock.lock();
     try {

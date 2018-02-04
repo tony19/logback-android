@@ -55,7 +55,7 @@ public interface ComponentTracker<C> {
    * Find the component identified by 'key', without updating the timestamp. Returns null if no
    * corresponding component could be found.
    *
-   * @param key
+   * @param key key of component
    * @return corresponding component, may be null
    */
   C find(String key);
@@ -64,9 +64,9 @@ public interface ComponentTracker<C> {
    * Get the component identified by 'key', updating its timestamp in the
    * process. If the corresponding component could not be found, it is created.
    *
-   * @param key
-   * @param timestamp
-   * @return
+   * @param key key of component
+   * @param timestamp timestamp in ms
+   * @return the component
    */
   C getOrCreate(String key, long timestamp);
 
@@ -104,7 +104,7 @@ public interface ComponentTracker<C> {
   /**
    * Set of all keys in this tracker in no particular order.
    *
-   * @return
+   * @return the keys
    */
   Set<String> allKeys();
 }

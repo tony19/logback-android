@@ -25,7 +25,7 @@ import java.util.concurrent.BlockingQueue;
  * appender should be closed. It is the user's  responsibility to close appenders, typically at the end of the
  * application lifecycle.
  * <p>
- * This appender buffers events in a {@link BlockingQueue}. {@link Worker} thread created by this appender takes
+ * This appender buffers events in a {@link BlockingQueue}. {@link ch.qos.logback.core.AsyncAppenderBase.Worker} thread created by this appender takes
  * events from the head of the queue, and dispatches them to the single appender attached to this appender.
  * <p>
  * Please refer to the <a href="http://logback.qos.ch/manual/appenders.html#AsyncAppender">logback manual</a> for

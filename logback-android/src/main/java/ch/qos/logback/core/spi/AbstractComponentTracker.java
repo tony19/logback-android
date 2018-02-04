@@ -60,8 +60,8 @@ abstract public class AbstractComponentTracker<C> implements ComponentTracker<C>
   /**
    * Build a component based on the key.
    *
-   * @param key
-   * @return
+   * @param key desired key
+   * @return the component
    */
   abstract protected C buildComponent(String key);
 
@@ -69,8 +69,8 @@ abstract public class AbstractComponentTracker<C> implements ComponentTracker<C>
    * Components can declare themselves stale. Such components may be
    * removed before they time out.
    *
-   * @param c
-   * @return
+   * @param c component to evaluate
+   * @return whether component is stale
    */
   protected abstract boolean isComponentStale(C c);
 

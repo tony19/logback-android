@@ -63,9 +63,9 @@ public class Loader {
    * Compute the number of occurrences a resource can be found by a class
    * loader.
    *
-   * @param resource
-   * @param classLoader
-   * @return
+   * @param resource the resource name to look for
+   * @param classLoader the classloader used for the search
+   * @return matching resource URLs
    * @throws IOException
    */
 
@@ -99,8 +99,8 @@ public class Loader {
    * Attempt to find a resource by using the classloader that loaded this class,
    * namely Loader.class.
    *
-   * @param resource
-   * @return
+   * @param resource the resource name to look for
+   * @return resource URL
    */
   public static URL getResourceBySelfClassLoader(String resource) {
     return getResource(resource, getClassLoaderOfClass(Loader.class));
@@ -114,11 +114,19 @@ public class Loader {
    * Get the Thread Context Loader which is a JDK 1.2 feature. If we are running
    * under JDK 1.1 or anything else goes wrong the method returns
    * <code>null</code>.
+   * @return the thread context loader
    */
   public static ClassLoader getTCL() {
     return Thread.currentThread().getContextClassLoader();
   }
 
+  /**
+   *
+   * @param clazz the name of the class to find
+   * @param context the logging context
+   * @return the class
+   * @throws ClassNotFoundException if class not found
+   */
   public static Class<?> loadClass(String clazz, Context context)
           throws ClassNotFoundException {
     ClassLoader cl = getClassLoaderOfObject(context);
@@ -129,8 +137,8 @@ public class Loader {
    * Get the class loader of the object passed as argument. Return the system
    * class loader if appropriate.
    *
-   * @param o
-   * @return
+   * @param o object to evaluate
+   * @return the classloader of the object
    */
   public static ClassLoader getClassLoaderOfObject(Object o) {
     if (o == null) {
@@ -142,8 +150,8 @@ public class Loader {
   /**
    * Returns the class loader of clazz in an access privileged section.
    *
-   * @param clazz
-   * @return
+   * @param clazz the class to evaluate
+   * @return the classloader of the object
    */
   public static ClassLoader getClassLoaderAsPrivileged(final Class<?> clazz) {
     if (!HAS_GET_CLASS_LOADER_PERMISSION)
@@ -161,8 +169,8 @@ public class Loader {
    * Return the class loader which loaded the class passed as argument. Return
    * the system class loader if appropriate.
    *
-   * @param clazz
-   * @return
+   * @param clazz the class to evaluate
+   * @return the classloader of the object
    */
   public static ClassLoader getClassLoaderOfClass(final Class<?> clazz) {
     ClassLoader cl = clazz.getClassLoader();
@@ -177,6 +185,9 @@ public class Loader {
    * If running under JDK 1.2 load the specified class using the
    * <code>Thread</code> <code>contextClassLoader</code> if that fails try
    * Class.forname. Under JDK 1.1 only Class.forName is used.
+   *
+   * @param clazz the name of the class to find
+   * @return the class
    */
   public static Class<?> loadClass(String clazz) throws ClassNotFoundException {
     // Just call Class.forName(clazz) if we are running under JDK 1.1

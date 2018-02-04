@@ -29,9 +29,9 @@ public class LoggerNameUtil {
    * Get the position of the separator character, if any, starting at position
    * 'fromIndex'.
    *
-   * @param name
-   * @param fromIndex
-   * @return
+   * @param name string to search
+   * @param fromIndex starting search index
+   * @return position of separator
    */
   public static int getSeparatorIndexOf(String name, int fromIndex) {
     int dotIndex = name.indexOf(CoreConstants.DOT, fromIndex);

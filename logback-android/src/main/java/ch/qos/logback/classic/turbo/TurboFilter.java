@@ -48,7 +48,7 @@ public abstract class TurboFilter extends ContextAwareBase implements LifeCycle 
    * @param format
    * @param params
    * @param t
-   * @return
+   * @return decision
    */
   public abstract FilterReply decide(Marker marker, Logger logger,
       Level level, String format, Object[] params, Throwable t);

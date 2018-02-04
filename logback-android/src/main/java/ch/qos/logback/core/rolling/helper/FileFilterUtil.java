@@ -69,7 +69,7 @@ public class FileFilterUtil {
    *
    * @param file folder's file object
    * @param stemRegex regex file pattern to match
-   * @return
+   * @return matching files
    */
   public static File[] filesInFolderMatchingStemRegex(File file,
       final String stemRegex) {

@@ -91,8 +91,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   }
 
   /**
-   * Gets the absolute path to the SQLite database
-   * @return
+   * @return the absolute path to the SQLite database
      */
   public String getFilename() {
     return this.filename;
