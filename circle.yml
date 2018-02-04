@@ -1,9 +1,11 @@
 # Configuration for CircleCI
 # https://circleci.com/gh/tony19/logback-android
-
 version: 2
 jobs:
-  build:
+  build_and_test:
+    branches:
+      ignore:
+        - gh-pages
     working_directory: ~/code
     docker:
       - image: circleci/android:api-26-alpha
@@ -26,6 +28,11 @@ jobs:
       - run:
           name: Run Tests
           command: ./gradlew check assembleDebug assembleRelease
+      - persist_to_workspace:
+          root: ~/code
+          paths:
+            - build
+            - logback-android/build
       - store_artifacts:
           path: logback-android/build/reports
           destination: reports
@@ -34,9 +41,32 @@ jobs:
           destination: outputs
       - store_test_results:
           path: logback-android/build/test-results
+
+      # TODO: Move test app to local dir and run test referencing locally build AAR
+      #- run:
+      #    name: Trigger Test App
+      #    command: scripts/triggertestapp.sh
+
+  deploy:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-26-alpha
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/code
       - run:
           name: Deploy snapshot
           command: scripts/deploysnapshot.sh
-      - run:
-          name: Trigger Test App
-          command: scripts/triggertestapp.sh
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build_and_test
+      - deploy:
+          requires:
+            - build_and_test
+          #filters:
+          #  branches:
+          #    only: master
