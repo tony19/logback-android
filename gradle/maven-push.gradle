@@ -106,8 +106,8 @@ afterEvaluate { project ->
             // disable javadoc lint warnings (e.g., missing javadoc)
             options.addBooleanOption('Xdoclint:none', true)
 
-            exclude '** /BuildConfig.java'
-            exclude '** /R.java'
+            exclude '**/BuildConfig.java'
+            exclude '**/R.java'
         }
     }
 
