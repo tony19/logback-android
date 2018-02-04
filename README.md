@@ -79,7 +79,7 @@ dependencies {
 }
 ```
 
-_Gradle_ **snapshot**
+_Gradle_ **snapshot (unstable)**
 
 ```groovy
 repositories {
@@ -94,13 +94,13 @@ dependencies {
 
 Build
 -----
-Use these commands to create the AAR (with debug symbols):
+Use these commands to create the AAR:
 
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
     scripts/makejar.sh
 
-The file would be in: `./build/logback-android-1.1.1-7-debug.aar`
+The file is output to: `./build/logback-android-1.1.1-7-debug.aar`
 
  [1]: http://logback.qos.ch
  [2]: http://tony19.github.com/logback-android
