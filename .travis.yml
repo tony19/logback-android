@@ -6,11 +6,6 @@ android:
 
 sudo: false
 
-env:
-  global:
-    - SONATYPE_USERNAME=tony19
-    - secure: "WqV8/mCUXdw96cVt/n05emxav3wJdUku39n4AIRgIBamFuuxuLTHBi61Mx4rlJOmI23b7So7eA24Dq4KqexurfNwkAoCZbmpmrihZREPM2hQ7UIs/q0usBQxWB1wt38giUc6kV1yBRTexxQTdlg+HbZOLinTcAhifBrRQuLqums="
-
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
