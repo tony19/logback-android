@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-
+    <issue id="OldTargetApi" severity="ignore" />
+    <issue id="PrivateApi">
+        <ignore path="*/SystemPropertiesProxy.java" />
+    </issue>
+    <issue id="SdCardPath">
+        <ignore path="*/CommonPathUtil.java" />
+    </issue>
+    <issue id="TrulyRandom">
+        <ignore path="*/SecureRandomFactoryBean.java" />
+    </issue>
 </lint>
