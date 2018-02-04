@@ -1,3 +1,6 @@
+plugins {
+    id 'net.researchgate.release' version '2.6.0'
+}
 apply plugin: 'com.android.library'
 apply from: '../gradle/maven-push.gradle'
 
@@ -89,5 +92,19 @@ allprojects {
     tasks.withType(AbstractArchiveTask) {
         preserveFileTimestamps = false
         reproducibleFileOrder = true
+    }
+}
+
+release {
+    tagTemplate = 'v_${version}'
+    preTagCommitMessage = ':cloud: Release'
+    tagCommitMessage = ':cloud: Release'
+    newVersionCommitMessage = ':cloud: Bump'
+
+    versionPropertyFile = '../gradle.properties'
+    versionProperties = ['VERSION_NAME']
+
+    git {
+        requireBranch = ''
     }
 }

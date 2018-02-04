@@ -32,10 +32,12 @@ echo ''
 ./gradlew   -Prelease.useAutomaticVersion=true  \
             -Prelease.releaseVersion=${version} \
             -Prelease.newVersion=${nextVersion} \
+            -Pversion=${version}                \
             -PVERSION_NAME=${version}           \
             -PNEXUS_USERNAME=${user}            \
             -PNEXUS_PASSWORD=${pass}            \
             -Ppush                              \
+            -x test                             \
             clean                               \
             assembleRelease                     \
             uploadArchives
