@@ -1,5 +1,5 @@
 # logback-android [![CircleCI branch](https://img.shields.io/circleci/project/tony19/logback-android/master.svg)](https://circleci.com/gh/tony19/logback-android) [![Codacy Badge](https://api.codacy.com/project/badge/grade/c1d818d1911440e3b6d685c20a425856)](https://www.codacy.com/app/tony19/logback-android)
-<sup>v1.1.1-6</sup>
+<sup>v1.1.1-7</sup>
 
 Overview
 --------
@@ -12,26 +12,17 @@ Overview
  * syslog
  * email
 
-Runs on Android 2.1 or higher. See [Wiki][6] for documentation.
+Runs on Android 2.1 or higher. See [Wiki][4] for documentation.
 
 Quick Start
 -----------
-1. Create a new "Basic Activity" app in [Android Studio][5].
+1. Create a new "Basic Activity" app in [Android Studio][3].
 2. In `app/build.gradle`, add the following dependencies:
 
     ```groovy
-    // only needed for SNAPSHOT builds
-    repositories {
-      maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    }
-
     dependencies {
       compile 'org.slf4j:slf4j-api:1.7.21'
-      compile 'com.github.tony19:logback-android-core:1.1.1-6'
-      compile('com.github.tony19:logback-android-classic:1.1.1-6') {
-        // workaround issue #73
-        exclude group: 'com.google.android', module: 'android'
-      }
+      compile 'com.github.tony19:logback-android:1.1.1-7'
     }
     ```
 
@@ -79,40 +70,39 @@ Quick Start
 
 Download
 --------
-_Gradle_
+_Gradle_ **release**
 
 ```groovy
-// only needed for SNAPSHOT builds
+dependencies {
+  compile 'org.slf4j:slf4j-api:1.7.21'
+  compile 'com.github.tony19:logback-android:1.1.1-7'
+}
+```
+
+_Gradle_ **snapshot**
+
+```groovy
 repositories {
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
   compile 'org.slf4j:slf4j-api:1.7.21'
-  compile 'com.github.tony19:logback-android-core:1.1.1-6'
-  compile 'com.github.tony19:logback-android-classic:1.1.1-6'
+  compile 'com.github.tony19:logback-android:1.1.1-8-SNAPSHOT'
 }
 ```
 
-_Prefer local jars?_
-
- * [logback-android-1.1.1-6.jar][3] (uber jar)
- * [slf4j-api-1.7.21.jar][4]
-
-
 Build
 -----
-`logback-android` is built with Gradle 2.12. Use these commands to create the uber jar (with debug symbols).
+Use these commands to create the AAR (with debug symbols):
 
     git clone git://github.com/tony19/logback-android.git
     cd logback-android
     scripts/makejar.sh
 
-The jar would be in: `./build/logback-android-1.1.1-6.jar`
+The file would be in: `./build/logback-android-1.1.1-7-debug.aar`
 
  [1]: http://logback.qos.ch
  [2]: http://tony19.github.com/logback-android
- [3]: https://bitbucket.org/tony19/logback-android-jar/downloads/logback-android-1.1.1-6.jar
- [4]: http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar
- [5]: http://developer.android.com/sdk/index.html
- [6]: https://github.com/tony19/logback-android/wiki
+ [3]: http://developer.android.com/sdk/index.html
+ [4]: https://github.com/tony19/logback-android/wiki
