@@ -29,14 +29,9 @@ import javax.mail.internet.MimeMultipart;
 
 import org.dom4j.io.SAXReader;
 import org.junit.*;
-import org.subethamail.smtp.AuthenticationHandler;
-import org.subethamail.smtp.AuthenticationHandlerFactory;
-import org.subethamail.smtp.auth.LoginAuthenticationHandler;
+import org.subethamail.smtp.auth.EasyAuthenticationHandlerFactory;
 import org.subethamail.smtp.auth.LoginFailedException;
-import org.subethamail.smtp.auth.PlainAuthenticationHandler;
-import org.subethamail.smtp.auth.PluginAuthenticationHandler;
 import org.subethamail.smtp.auth.UsernamePasswordValidator;
-import org.subethamail.smtp.server.MessageListenerAdapter;
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
 
@@ -85,8 +80,7 @@ public class SMTPAppender_SubethaSMTPTest {
   @After
   public void tearDown() {
     // clear any authentication handler factory
-    MessageListenerAdapter mla = (MessageListenerAdapter) WISER.getServer().getMessageHandlerFactory();
-    mla.setAuthenticationHandlerFactory(null);
+    WISER.getServer().setAuthenticationHandlerFactory(null);
   }
 
   void buildSMTPAppender() throws Exception {
@@ -237,8 +231,7 @@ public class SMTPAppender_SubethaSMTPTest {
 
   @Test
   public void authenticated() throws Exception {
-    MessageListenerAdapter mla = (MessageListenerAdapter) WISER.getServer().getMessageHandlerFactory();
-    mla.setAuthenticationHandlerFactory(new TrivialAuthHandlerFactory());
+    setupServerAuth();
 
     smtpAppender.setUsername("x");
     smtpAppender.setPassword("x");
@@ -270,9 +263,7 @@ public class SMTPAppender_SubethaSMTPTest {
   // Unfortunately, there seems to be a problem with SubethaSMTP's implementation
   // of startTLS. The same SMTPAppender code works fine when tested with gmail.
   public void authenticatedSSL() throws Exception {
-    MessageListenerAdapter mla = (MessageListenerAdapter) WISER.getServer().getMessageHandlerFactory();
-    mla.setAuthenticationHandlerFactory(new TrivialAuthHandlerFactory());
-
+    setupServerAuth();
 
     smtpAppender.setSTARTTLS(true);
     smtpAppender.setUsername("xx");
@@ -350,21 +341,13 @@ public class SMTPAppender_SubethaSMTPTest {
     assertEquals(numberOfOldMessages + 3, wiserMsgList.size());
   }
 
-  public class TrivialAuthHandlerFactory implements AuthenticationHandlerFactory {
-    public AuthenticationHandler create() {
-      PluginAuthenticationHandler ret = new PluginAuthenticationHandler();
-      UsernamePasswordValidator validator = new UsernamePasswordValidator() {
-        public void login(String username, String password)
-                throws LoginFailedException {
-          if (!username.equals(password)) {
-            throw new LoginFailedException("username=" + username + ", password=" + password);
-          }
+  private void setupServerAuth() {
+    WISER.getServer().setAuthenticationHandlerFactory(new EasyAuthenticationHandlerFactory(new UsernamePasswordValidator() {
+      public void login(String username, String password) throws LoginFailedException {
+        if (!username.equals(password)) {
+          throw new LoginFailedException("username=" + username + ", password=" + password);
         }
-      };
-      ret.addPlugin(new PlainAuthenticationHandler(validator));
-      ret.addPlugin(new LoginAuthenticationHandler(validator));
-      return ret;
-    }
+      }
+    }));
   }
-
 }
