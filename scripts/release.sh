@@ -39,7 +39,8 @@ echo ''
             -Ppush                              \
             -x test                             \
             clean                               \
-            assembleRelease                     \
+            readme                              \
+            release                             \
             uploadArchives
 
 echo -e "\n\n"
