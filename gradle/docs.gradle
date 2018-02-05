@@ -33,7 +33,10 @@ afterEvaluate { project ->
       def origBranch = grgit.branch.current.name
       grgit.checkout(branch: 'gh-pages', createBranch: false)
       def dest = "doc/${rootProject.version}"
-      FileUtils.copyDirectory(new File("build/docs/javadoc"), new File(dest))
+      copy {
+        from "${buildDir}/docs/javadoc"
+        into "${rootProject.rootDir}/${dest}"
+      }
       grgit.add(patterns: [dest])
       grgit.commit(message: ":books: Add javadoc for ${rootProject.version}")
       grgit.push()
