@@ -15,7 +15,7 @@ task javadocs(type: Javadoc) {
  * Uploads javadocs to gh-pages
  */
 task uploadDocs(description: 'Uploads javadocs to gh-pages.',
-                dependsOn: javadocs) << {
+                dependsOn: javadocs) {
   def origBranch = grgit.branch.current.name
   grgit.checkout(branch: 'gh-pages', createBranch: false)
   def dest = "doc/${rootProject.version}"
