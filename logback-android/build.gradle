@@ -123,3 +123,7 @@ release {
         requireBranch = ''
     }
 }
+
+nexusStaging {
+    packageGroup = "com.github.tony19"
+}

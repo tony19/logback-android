@@ -15,7 +15,9 @@ buildscript {
     // in the individual module build.gradle files
   }
 }
-
+plugins {
+  id 'io.codearte.nexus-staging' version '0.11.0' // must be in root project
+}
 apply plugin: 'org.ajoberstar.grgit'
 apply from: 'gradle/readme.gradle'
 
