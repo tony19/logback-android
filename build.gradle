@@ -16,6 +16,7 @@ buildscript {
   }
 }
 
+apply plugin: 'org.ajoberstar.grgit'
 apply from: 'gradle/readme.gradle'
 
 allprojects {
