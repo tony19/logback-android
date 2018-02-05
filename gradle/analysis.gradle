@@ -2,18 +2,24 @@ if (!rootProject.hasProperty('analysis')) {
   return
 }
 
-apply plugin: 'findbugs'
-apply plugin: 'pmd'
 apply plugin: 'jacoco'
+apply plugin: 'com.novoda.static-analysis'
 
-findbugs {
-  effort = 'max'
-  reportLevel = 'low'
-  ignoreFailures = true
-}
-
-pmd {
-  ignoreFailures = true
+staticAnalysis {
+  penalty {
+    maxErrors = 0
+    maxWarnings = 0
+  }
+  checkstyle {
+    toolVersion "8.8"
+    configFile rootProject.file('config/checkstyle.xml')
+  }
+  pmd {
+    exclude '**/*.html'
+  }
+  findbugs { }
+  detekt { }
+  lintOptions { }
 }
 
 task jacocoTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {

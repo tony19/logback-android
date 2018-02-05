@@ -2,8 +2,8 @@ plugins {
     id 'net.researchgate.release' version '2.6.0'
 }
 apply plugin: 'com.android.library'
-apply from: '../gradle/maven-push.gradle'
-apply from: '../gradle/analysis.gradle'
+apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
+apply from: "${rootProject.projectDir}/gradle/maven-push.gradle"
 
 android {
     compileSdkVersion 15
