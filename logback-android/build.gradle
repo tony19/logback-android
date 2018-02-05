@@ -4,7 +4,7 @@ plugins {
 apply plugin: 'com.android.library'
 apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
 apply from: "${rootProject.projectDir}/gradle/docs.gradle"
-apply from: "${rootProject.projectDir}/gradle/maven-push.gradle"
+apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
     compileSdkVersion 15
