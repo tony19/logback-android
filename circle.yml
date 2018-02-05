@@ -27,7 +27,7 @@ jobs:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
       - run:
           name: Run Tests
-          command: ./gradlew check assembleDebug assembleRelease
+          command: ./gradlew check assembleDebug assembleRelease --parallel
       - store_artifacts:
           path: logback-android/build/reports
           destination: reports
