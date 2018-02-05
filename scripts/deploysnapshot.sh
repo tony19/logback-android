@@ -2,4 +2,4 @@
 
 user=${NEXUS_USERNAME?}
 pass=${NEXUS_PASSWORD?}
-./gradlew uploadArchives -x test -PNEXUS_USERNAME=${user} -PNEXUS_PASSWORD=${pass}
+./gradlew uploadArchives -x test -x build -PNEXUS_USERNAME=${user} -PNEXUS_PASSWORD=${pass}
