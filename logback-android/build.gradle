@@ -3,6 +3,7 @@ plugins {
 }
 apply plugin: 'com.android.library'
 apply from: '../gradle/maven-push.gradle'
+apply from: '../gradle/analysis.gradle'
 
 android {
     compileSdkVersion 15
