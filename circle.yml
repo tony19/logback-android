@@ -4,9 +4,6 @@ version: 2.0
 
 jobs:
   build_and_test:
-    branches:
-      ignore:
-        - gh-pages
     working_directory: ~/code
     docker:
       - image: circleci/android:api-26-alpha
@@ -64,7 +61,10 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build_and_test
+      - build_and_test:
+          filters:
+            branches:
+              ignore: gh-pages
       - deploy:
           requires:
             - build_and_test
