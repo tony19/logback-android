@@ -31,7 +31,7 @@ android {
     }
     testOptions.unitTests.all {
         testLogging {
-            events 'failed', 'skipped'
+            events 'failed'
             showStackTraces = true
             exceptionFormat = 'full'
         }
