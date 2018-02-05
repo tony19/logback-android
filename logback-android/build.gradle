@@ -59,7 +59,7 @@ dependencies {
     // https://github.com/robolectric/robolectric/issues/2562#issuecomment-263086503
     testImplementation 'org.robolectric:android-all:8.1.0-robolectric-r4458339'
 
-    implementation 'com.github.tony19:apktool-lib:1.4.4-3'
+    implementation 'com.github.tony19:apktool-lib:1.4.4-4'
 
     testImplementation 'com.icegreen:greenmail:1.5.6'
     testImplementation 'dom4j:dom4j:1.6.1'
