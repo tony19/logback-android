@@ -43,6 +43,9 @@ echo ''
             release                             \
             uploadArchives
 
+# To deploy archives without git transactions (tagging, etc.),
+# replace the `release` task above with `assembleRelease`.
+
 echo -e "\n\n"
 
 # FIXME: In test repo, this can't checkout 'gh-pages' -- no error provided
