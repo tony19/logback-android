@@ -52,6 +52,11 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private Duration maxHistory;
   private long lastCleanupTime = 0;
   private SQLiteLogCleaner logCleaner;
+  private Clock clock = new SystemClock();
+
+  void setClock(Clock clock) {
+    this.clock = clock;
+  }
 
   /**
    * Sets the database name resolver, used to customize the names of the table names
@@ -183,7 +188,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
    */
   private void clearExpiredLogs(SQLiteDatabase db) {
     if (lastCheckExpired(this.maxHistory, this.lastCleanupTime)) {
-      this.lastCleanupTime = System.currentTimeMillis();
+      this.lastCleanupTime = this.clock.currentTimeMillis();
       this.getLogCleaner().performLogCleanup(db, this.maxHistory);
     }
   }
@@ -197,7 +202,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private boolean lastCheckExpired(Duration expiry, long lastCleanupTime) {
     boolean isExpired = false;
     if (expiry != null && expiry.getMilliseconds() > 0) {
-      final long now = System.currentTimeMillis();
+      final long now = this.clock.currentTimeMillis();
       final long timeDiff = now - lastCleanupTime;
       isExpired = (lastCleanupTime <= 0) || (timeDiff >= expiry.getMilliseconds());
     }
@@ -209,10 +214,11 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
    */
   public SQLiteLogCleaner getLogCleaner() {
     if (this.logCleaner == null) {
+      final Clock thisClock = this.clock;
       this.logCleaner = new SQLiteLogCleaner() {
         @Override
         public void performLogCleanup(SQLiteDatabase db, Duration expiry) {
-          final long expiryMs = System.currentTimeMillis() - expiry.getMilliseconds();
+          final long expiryMs = thisClock.currentTimeMillis() - expiry.getMilliseconds();
           final String deleteExpiredLogsSQL = SQLBuilder.buildDeleteExpiredLogsSQL(dbNameResolver, expiryMs);
           db.execSQL(deleteExpiredLogsSQL);
         }
