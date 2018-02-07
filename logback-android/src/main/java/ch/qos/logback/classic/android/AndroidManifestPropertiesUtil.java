@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import ch.qos.logback.classic.android.ASaxEventRecorder;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.android.CommonPathUtil;
