@@ -18,7 +18,6 @@ import java.net.URL;
 
 import org.xml.sax.Attributes;
 
-import ch.qos.logback.classic.android.ASaxEventRecorder;
 import ch.qos.logback.core.joran.action.IncludeAction;
 import ch.qos.logback.core.joran.event.SaxEventRecorder;
 import ch.qos.logback.core.joran.spi.ActionException;
@@ -70,18 +69,6 @@ public class FindIncludeAction extends IncludeAction {
    */
   @Override
   protected SaxEventRecorder createRecorder(InputStream in, URL url) {
-    SaxEventRecorder recorder;
-
-    // if the stream URL is named AndroidManifest.xml, assume it's
-    // the manifest in binary XML
-    if (url.toString().endsWith("AndroidManifest.xml")) {
-      // create an AXml parser that only takes XML inside a logback element
-      ASaxEventRecorder rec = new ASaxEventRecorder();
-      rec.setFilter("logback");
-      recorder = rec;
-    } else {
-      recorder = new SaxEventRecorder(getContext());
-    }
-    return recorder;
+    return new SaxEventRecorder(getContext());
   }
 }

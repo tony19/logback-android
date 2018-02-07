@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * Tests the {@link CommonPathUtil} class
+ * Tests the {@link AndroidContextUtil} class
  *
  * @author Anthony Trinh
  */
@@ -26,26 +26,26 @@ public class CommonPathUtilTest {
 
   @Test
   public void testGetMountedExternalStorageDirectoryPathIsNotEmpty() {
-    assertEquals("/mnt/sdcard", CommonPathUtil.getMountedExternalStorageDirectoryPath());
+    assertEquals("/mnt/sdcard", AndroidContextUtil.getMountedExternalStorageDirectoryPath());
   }
 
   @Test
   public void testGetExternalStorageDirectoryPathIsNotEmpty() {
-    assertEquals("/sdcard", CommonPathUtil.getExternalStorageDirectoryPath());
+    assertEquals("/sdcard", AndroidContextUtil.getExternalStorageDirectoryPath());
   }
 
   @Test
   public void testGetAssetsDirectoryPathIsNotEmpty() {
-    assertEquals("assets", CommonPathUtil.getAssetsDirectoryPath());
+    assertEquals("assets", AndroidContextUtil.getAssetsDirectoryPath());
   }
 
   @Test
   public void testGetFilesDirectoryPathIsNotEmpty() {
-    assertEquals("/data/data/android/files", CommonPathUtil.getFilesDirectoryPath("android"));
+    assertEquals("/data/data/android/files", AndroidContextUtil.getFilesDirectoryPath("android"));
   }
 
   @Test
   public void testGetDatabaseDirectoryPathIsNotEmpty() {
-    assertEquals("/data/data/android/databases", CommonPathUtil.getDatabaseDirectoryPath("android"));
+    assertEquals("/data/data/android/databases", AndroidContextUtil.getDatabaseDirectoryPath("android"));
   }
 }

@@ -62,8 +62,6 @@ public class ConditionalIncludeActionTest {
 
   static private final String INCLUDED_AS_RESOURCE = "asResource/joran/inclusion/includedAsResource.xml";
 
-  static private final String ANDROID_XML_RESOURCE = "asResource/AndroidManifest.xml";
-
   @Before
   public void setUp() throws Exception {
     FileTestUtil.makeTestOutputDir();
@@ -307,21 +305,6 @@ public class ConditionalIncludeActionTest {
     final ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes());
     tc.doConfigure(stream);
     verifyConfig("IA", "IB", "C");
-  }
-
-  @Test
-  public void includesAndroidManifest() throws JoranException {
-    final String xml =
-        "<x>" +
-            "<findInclude>" +
-                "<include resource='nonexistent.txt'/>" +
-                "<include resource='"+ ANDROID_XML_RESOURCE +"'/>" +
-            "</findInclude>" +
-            "<stack name='C'/>" +
-        "</x>";
-    final ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes());
-    tc.doConfigure(stream);
-
   }
 
   void verifyConfig(String... expected) {
