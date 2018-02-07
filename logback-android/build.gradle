@@ -47,7 +47,7 @@ android {
 }
 
 dependencies {
-    testImplementation(group: 'junit', name: 'junit', version: '4.12') {
+    testImplementation('junit:junit:4.12') {
         exclude(module: 'hamcrest-core')
     }
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
@@ -125,5 +125,5 @@ release {
 }
 
 nexusStaging {
-    packageGroup = "com.github.tony19"
+    packageGroup = 'com.github.tony19'
 }
