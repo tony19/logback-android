@@ -19,7 +19,6 @@ android {
         targetSdkVersion 27
         versionCode VERSION_CODE.toInteger()
         versionName VERSION_NAME
-        setProperty('archivesBaseName', "${POM_NAME}-${versionName}")
     }
     buildTypes {
         release {
