@@ -7,7 +7,7 @@ apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
-    compileSdkVersion 15
+    compileSdkVersion 27
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_5
@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 15
+        targetSdkVersion 27
         versionCode VERSION_CODE.toInteger()
         versionName VERSION_NAME
         setProperty('archivesBaseName', "logback-android-${versionName}")
@@ -77,6 +77,7 @@ dependencies {
     compileOnly 'com.sun.mail:android-mail:1.6.0'
     compileOnly 'com.sun.mail:android-activation:1.6.0'
 
+    testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
     testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
 }
 
