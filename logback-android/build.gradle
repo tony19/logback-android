@@ -69,7 +69,7 @@ dependencies {
         exclude(module: 'slf4j-api')
     }
 
-    implementation 'com.github.tony19:apktool-lib:1.4.4-4'
+    implementation 'com.github.tony19:apktool-lib:1.4.4-5'
 
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
 
