@@ -209,7 +209,6 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     if (this.logCleaner == null) {
       final Clock thisClock = this.clock;
       this.logCleaner = new SQLiteLogCleaner() {
-        @Override
         public void performLogCleanup(SQLiteDatabase db, Duration expiry) {
           final long expiryMs = thisClock.currentTimeMillis() - expiry.getMilliseconds();
           final String deleteExpiredLogsSQL = SQLBuilder.buildDeleteExpiredLogsSQL(dbNameResolver, expiryMs);
