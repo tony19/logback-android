@@ -13,7 +13,9 @@
  */
 package ch.qos.logback.core.android;
 
+import android.annotation.TargetApi;
 import android.content.ContextWrapper;
+import android.os.Build;
 import android.os.Environment;
 
 import java.lang.reflect.InvocationTargetException;
@@ -117,6 +119,25 @@ public class AndroidContextUtil {
   public String getFilesDirectoryPath() {
     return this.context != null
             ? this.context.getFilesDir().getAbsolutePath()
+            : "";
+  }
+
+  /**
+   * Returns the absolute path to the directory on the Android
+   * filesystem similar to {@link #getFilesDirectoryPath()}.
+   * The difference is these files are excluded from automatic
+   * backup to remote storage by {@link android.app.backup.BackupAgent}.
+   * This API is only available on SDK 21+. On older versions,
+   * this function returns an empty string.
+   *
+   * @return the absolute path to the files directory
+   * (example: "/data/data/com.example/nobackup/files")
+   */
+  @TargetApi(21)
+  public String getNoBackupFilesDirectoryPath() {
+    return Build.VERSION.SDK_INT >= 21 &&
+            this.context != null
+            ? this.context.getNoBackupFilesDir().getAbsolutePath()
             : "";
   }
 
