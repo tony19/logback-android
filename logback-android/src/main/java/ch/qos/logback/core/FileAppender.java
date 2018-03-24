@@ -157,7 +157,8 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   protected boolean openFile(String filename) throws IOException {
     boolean successful = false;
     filename = getAbsoluteFilePath(filename);
-    synchronized (lock) {
+    lock.lock();
+    try {
       File file = new File(filename);
       if (FileUtil.isParentDirectoryCreationRequired(file)) {
         boolean result = FileUtil.createMissingParentDirectories(file);
@@ -172,6 +173,8 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
       resilientFos.setContext(context);
       setOutputStream(resilientFos);
       successful = true;
+    } finally {
+      lock.unlock();
     }
     return successful;
   }
