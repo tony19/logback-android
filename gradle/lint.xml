@@ -3,9 +3,7 @@
     <issue id="OldTargetApi" severity="ignore" />
     <issue id="PrivateApi">
         <ignore path="*/SystemPropertiesProxy.java" />
-    </issue>
-    <issue id="SdCardPath">
-        <ignore path="*/CommonPathUtil.java" />
+        <ignore path="*/AndroidContextUtil.java" />
     </issue>
     <issue id="TrulyRandom">
         <ignore path="*/SecureRandomFactoryBean.java" />
