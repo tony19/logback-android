@@ -134,29 +134,33 @@ public class RollingFileAppender<E> extends FileAppender<E> {
       // make sure to close the hereto active log file! Renaming under windows
       // does not work for open files.
       this.closeOutputStream();
-
-      try {
-        rollingPolicy.rollover();
-      } catch (RolloverFailure rf) {
-        addWarn("RolloverFailure occurred. Deferring rollover");
-        // we failed to roll-over, let us not truncate and risk data loss
-        this.append = true;
-      }
-
-      String filename = rollingPolicy.getActiveFileName();
-      try {
-        // update the currentlyActiveFile
-        // http://jira.qos.ch/browse/LBCORE-90
-        currentlyActiveFile = new File(filename);
-
-        // This will also close the file. This is OK since multiple
-        // close operations are safe.
-        this.openFile(filename);
-      } catch (IOException e) {
-        addError("openFile(" + filename + ") failed", e);
-      }
+      attemptRollover();
+      attemptOpenFile();
     } finally {
       lock.unlock();
+    }
+  }
+
+  private void attemptOpenFile() {
+    String filename = rollingPolicy.getActiveFileName();
+    try {
+      // update the currentlyActiveFile LOGBACK-64
+      currentlyActiveFile = new File(filename);
+
+      // This will also close the file. This is OK since multiple close operations are safe.
+      this.openFile(filename);
+    } catch (IOException e) {
+      addError("setFile(" + filename + ", false) call failed.", e);
+    }
+  }
+
+  private void attemptRollover() {
+    try {
+      rollingPolicy.rollover();
+    } catch (RolloverFailure rf) {
+      addWarn("RolloverFailure occurred. Deferring roll-over.");
+      // we failed to roll-over, let us not truncate and risk data loss
+      this.append = true;
     }
   }
 
