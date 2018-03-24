@@ -153,6 +153,56 @@ public class AsyncAppenderBaseTest {
     statusChecker.assertContainsMatch("Invalid queue size");
   }
 
+  @SuppressWarnings("deprecation")
+  @Test
+  public void workerThreadFlushesOnStop() {
+    int loopLen = 5;
+    int maxRuntime = (loopLen + 1) * Math.max(1000, delayingListAppender.delay);
+    ListAppender<Integer> la = delayingListAppender;
+    asyncAppenderBase.addAppender(la);
+    asyncAppenderBase.setDiscardingThreshold(0);
+    asyncAppenderBase.setMaxFlushTime(maxRuntime);
+    asyncAppenderBase.start();
+    asyncAppenderBase.worker.suspend();
+
+    for (int i = 0; i < loopLen; i++) {
+      asyncAppenderBase.doAppend(i);
+    }
+    assertEquals(loopLen, asyncAppenderBase.getNumberOfElementsInQueue());
+    assertEquals(0, la.list.size());
+
+    asyncAppenderBase.worker.resume();
+    asyncAppenderBase.stop();
+
+    assertEquals(0, asyncAppenderBase.getNumberOfElementsInQueue());
+    verify(la, loopLen);
+  }
+
+  // @SuppressWarnings("deprecation")
+  @Test
+  public void stopExitsWhenMaxRuntimeReached() throws InterruptedException {
+    int maxFlushTime = 1; // runtime of 0 means wait forever, so use 1 ms instead
+    int loopLen = 10;
+    ListAppender<Integer> la = delayingListAppender;
+    asyncAppenderBase.addAppender(la);
+    asyncAppenderBase.setMaxFlushTime(maxFlushTime);
+    asyncAppenderBase.start();
+
+    for (int i = 0; i < loopLen; i++) {
+      asyncAppenderBase.doAppend(i);
+    }
+
+    asyncAppenderBase.stop();
+
+    // confirms that stop exited when runtime reached
+    statusChecker.assertContainsMatch("Max queue flush timeout \\(" + maxFlushTime + " ms\\) exceeded.");
+
+    asyncAppenderBase.worker.join();
+
+    // confirms that all entries do end up being flushed if we wait long enough
+    verify(la, loopLen);
+  }
+
   private void verify(ListAppender la, int expectedSize) {
     assertFalse(la.isStarted());
     assertEquals(expectedSize, la.list.size());
