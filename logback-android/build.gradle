@@ -78,16 +78,6 @@ dependencies {
     testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
 }
 
-configurations {
-    all {
-        exclude module: 'httpclient'
-        exclude module: 'commons-logging'
-        exclude module: 'opengl-api'
-        exclude module: 'xmlParserAPIs'
-        exclude module: 'xpp3'
-    }
-}
-
 allprojects {
     tasks.withType(JavaCompile) {
         // Warn about deprecations
