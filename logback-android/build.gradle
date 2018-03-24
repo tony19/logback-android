@@ -50,14 +50,14 @@ dependencies {
         exclude(module: 'hamcrest-core')
     }
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
-    testImplementation 'org.robolectric:robolectric:3.6.1'
-    testImplementation 'org.mockito:mockito-core:2.13.0'
+    testImplementation 'org.robolectric:robolectric:3.8'
+    testImplementation 'org.mockito:mockito-core:2.16.0'
 
     // This dep is required when using Robolectric and targeting pre-21 SDKs.
     // Otherwise, tests fail with java.lang.NoClassDefFoundError.
     // https://github.com/robolectric/robolectric/issues/2562#issuecomment-263086503
     testImplementation 'org.robolectric:android-all:8.1.0-robolectric-r4458339'
-    testImplementation 'com.icegreen:greenmail:1.5.6'
+    testImplementation 'com.icegreen:greenmail:1.5.7'
     testImplementation 'dom4j:dom4j:1.6.1'
     testImplementation 'org.easytesting:fest-assert:1.4'
     testImplementation "org.slf4j:integration:${slf4jVersion}"
@@ -71,8 +71,8 @@ dependencies {
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
 
     // For SMTPAppender
-    compileOnly 'com.sun.mail:android-mail:1.6.0'
-    compileOnly 'com.sun.mail:android-activation:1.6.0'
+    compileOnly 'com.sun.mail:android-mail:1.6.1'
+    compileOnly 'com.sun.mail:android-activation:1.6.1'
 
     testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
     testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
