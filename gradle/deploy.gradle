@@ -29,7 +29,9 @@ bintray {
         repo = 'generic'
         name = "${GROUP}:${POM_NAME}"
         desc = POM_DESCRIPTION
-        licenses = [POM_LICENCE_ID]
+        // TODO: Use license config from gradle.properties when ready to switch to Apache License.
+        //licenses = [POM_LICENCE_ID]
+        licenses = ['EPL-1.0', 'LGPL-2.1']
         labels = ['android', 'logging']
         websiteUrl = POM_URL
         issueTrackerUrl = POM_SCM_ISSUES_URL
@@ -53,12 +55,12 @@ def isReleaseBuild() {
 
 def getReleaseRepositoryUrl() {
     return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
 }
 
 def getSnapshotRepositoryUrl() {
     return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "https://oss.sonatype.org/content/repositories/snapshots/"
+            : 'https://oss.sonatype.org/content/repositories/snapshots/'
 }
 
 def getRepositoryUsername() {
@@ -99,9 +101,20 @@ afterEvaluate { project ->
                     }
 
                     licenses {
+// TODO: Use license config from gradle.properties when ready to switch to Apache License.
+//                        license {
+//                            name POM_LICENCE_NAME
+//                            url POM_LICENCE_URL
+//                            distribution POM_LICENCE_DIST
+//                        }
                         license {
-                            name POM_LICENCE_NAME
-                            url POM_LICENCE_URL
+                            name 'Eclipse Public License, Version 1.0'
+                            url 'https://www.eclipse.org/legal/epl-v10.html'
+                            distribution POM_LICENCE_DIST
+                        }
+                        license {
+                            name 'GNU Lesser General Public License, Version 2.1'
+                            url 'http://www.gnu.org/licenses/lgpl-2.1.html'
                             distribution POM_LICENCE_DIST
                         }
                     }
