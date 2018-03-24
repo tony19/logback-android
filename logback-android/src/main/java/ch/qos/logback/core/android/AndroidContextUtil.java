@@ -18,6 +18,7 @@ import android.content.ContextWrapper;
 import android.os.Build;
 import android.os.Environment;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -69,7 +70,7 @@ public class AndroidContextUtil {
     String state = Environment.getExternalStorageState();
     if (state.equals(Environment.MEDIA_MOUNTED) ||
         state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-      path = Environment.getExternalStorageDirectory().getAbsolutePath();
+      path = absPath(Environment.getExternalStorageDirectory());
     }
     return path;
   }
@@ -85,19 +86,19 @@ public class AndroidContextUtil {
 
   public String getExternalFilesDirectoryPath() {
     return this.context != null
-            ? this.context.getExternalFilesDir(null).getAbsolutePath()
+            ? absPath(this.context.getExternalFilesDir(null))
             : "";
   }
 
   public String getCacheDirectoryPath() {
     return this.context != null
-            ? this.context.getCacheDir().getAbsolutePath()
+            ? absPath(this.context.getCacheDir())
             : "";
   }
 
   public String getExternalCacheDirectoryPath() {
     return this.context != null
-            ? this.context.getExternalCacheDir().getAbsolutePath()
+            ? absPath(this.context.getExternalCacheDir())
             : "";
   }
 
@@ -118,7 +119,7 @@ public class AndroidContextUtil {
    */
   public String getFilesDirectoryPath() {
     return this.context != null
-            ? this.context.getFilesDir().getAbsolutePath()
+            ? absPath(this.context.getFilesDir())
             : "";
   }
 
@@ -137,7 +138,7 @@ public class AndroidContextUtil {
   public String getNoBackupFilesDirectoryPath() {
     return Build.VERSION.SDK_INT >= 21 &&
             this.context != null
-            ? this.context.getNoBackupFilesDir().getAbsolutePath()
+            ? absPath(this.context.getNoBackupFilesDir())
             : "";
   }
 
@@ -159,13 +160,18 @@ public class AndroidContextUtil {
    */
   public String getDatabaseDirectoryPath() {
     return this.context != null
+            && this.context.getDatabasePath("x") != null
             ? this.context.getDatabasePath("x").getParent()
             : "";
   }
 
   public String getDatabasePath(String databaseName) {
     return this.context != null
-            ? this.context.getDatabasePath(databaseName).getAbsolutePath()
+            ? absPath(this.context.getDatabasePath(databaseName))
             : "";
+  }
+
+  private String absPath(File file) {
+    return file != null ? file.getAbsolutePath() : "";
   }
 }

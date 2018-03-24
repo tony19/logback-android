@@ -121,8 +121,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
       dbFile = new File(filename);
     }
     if (dbFile == null || dbFile.isDirectory()) {
-      final AndroidContextUtil contextUtil = new AndroidContextUtil();
-      dbFile = new File(contextUtil.getDatabasePath(contextUtil.getPackageName()));
+      dbFile = new File(new AndroidContextUtil().getDatabasePath("logback.db"));
     }
     return dbFile;
   }
