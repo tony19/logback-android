@@ -13,8 +13,12 @@
  */
 package ch.qos.logback.core.android;
 
-import static org.junit.Assert.assertEquals;
+import android.content.ContextWrapper;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -22,30 +26,40 @@ import org.junit.Test;
  *
  * @author Anthony Trinh
  */
-public class CommonPathUtilTest {
+public class AndroidContextUtilTest {
+
+  private AndroidContextUtil contextUtil;
+
+  @Before
+  public void before() {
+    ContextWrapper context = mock(ContextWrapper.class);
+    when(context.getPackageName()).thenReturn("com.github.foo");
+    when(context.get)
+    contextUtil = new AndroidContextUtil(context);
+  }
 
   @Test
   public void testGetMountedExternalStorageDirectoryPathIsNotEmpty() {
-    assertEquals("/mnt/sdcard", AndroidContextUtil.getMountedExternalStorageDirectoryPath());
+    assertEquals("/mnt/sdcard", contextUtil.getMountedExternalStorageDirectoryPath());
   }
 
   @Test
   public void testGetExternalStorageDirectoryPathIsNotEmpty() {
-    assertEquals("/sdcard", AndroidContextUtil.getExternalStorageDirectoryPath());
+    assertEquals("/sdcard", contextUtil.getExternalStorageDirectoryPath());
   }
 
   @Test
   public void testGetAssetsDirectoryPathIsNotEmpty() {
-    assertEquals("assets", AndroidContextUtil.getAssetsDirectoryPath());
+    assertEquals("assets", contextUtil.getAssetsDirectoryPath());
   }
 
   @Test
   public void testGetFilesDirectoryPathIsNotEmpty() {
-    assertEquals("/data/data/android/files", AndroidContextUtil.getFilesDirectoryPath("android"));
+    assertEquals("/data/data/android/files", contextUtil.getFilesDirectoryPath());
   }
 
   @Test
   public void testGetDatabaseDirectoryPathIsNotEmpty() {
-    assertEquals("/data/data/android/databases", AndroidContextUtil.getDatabaseDirectoryPath("android"));
+    assertEquals("/data/data/android/databases", contextUtil.getDatabaseDirectoryPath());
   }
 }

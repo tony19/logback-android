@@ -31,7 +31,7 @@ import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
-import ch.qos.logback.core.android.CommonPathUtil;
+import ch.qos.logback.core.android.AndroidContextUtil;
 import ch.qos.logback.core.util.Duration;
 
 /**
@@ -121,14 +121,8 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
       dbFile = new File(filename);
     }
     if (dbFile == null || dbFile.isDirectory()) {
-      if (getContext() != null) {
-        final String packageName = getContext().getProperty(CoreConstants.PACKAGE_NAME_KEY);
-        if (packageName != null && packageName.trim().length() > 0) {
-          dbFile = new File(CommonPathUtil.getDatabaseDirectoryPath(packageName), "logback.db");
-        }
-      } else {
-        dbFile = null;
-      }
+      final AndroidContextUtil contextUtil = new AndroidContextUtil();
+      dbFile = new File(contextUtil.getDatabasePath(contextUtil.getPackageName()));
     }
     return dbFile;
   }

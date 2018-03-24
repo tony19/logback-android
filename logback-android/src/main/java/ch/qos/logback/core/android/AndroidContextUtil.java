@@ -31,7 +31,11 @@ public class AndroidContextUtil {
   private ContextWrapper context;
 
   public AndroidContextUtil() {
-    this.context = getContext();
+    this(getContext());
+  }
+
+  public AndroidContextUtil(ContextWrapper contextWrapper) {
+    this.context = contextWrapper;
   }
 
   private static ContextWrapper getContext() {
@@ -138,4 +142,9 @@ public class AndroidContextUtil {
             : "";
   }
 
+  public String getDatabasePath(String databaseName) {
+    return this.context != null
+            ? this.context.getDatabasePath(databaseName).getAbsolutePath()
+            : "";
+  }
 }

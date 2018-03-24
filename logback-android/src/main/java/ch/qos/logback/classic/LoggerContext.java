@@ -20,7 +20,6 @@ import ch.qos.logback.classic.util.LoggerNameUtil;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Marker;
 
-import ch.qos.logback.classic.android.AndroidManifestPropertiesUtil;
 import ch.qos.logback.classic.spi.LoggerComparator;
 import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.classic.spi.LoggerContextVO;
@@ -28,7 +27,6 @@ import ch.qos.logback.classic.spi.TurboFilterList;
 import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.CoreConstants;
-import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.spi.FilterReply;
 import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.status.StatusListener;
@@ -57,7 +55,6 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
   private LoggerContextVO loggerContextRemoteView;
   private final TurboFilterList turboFilterList = new TurboFilterList();
   private boolean packagingDataEnabled = true;
-  private boolean androidPropsInitialized = false;
 
   private int maxCallerDataDepth = ClassicConstants.DEFAULT_MAX_CALLEDER_DATA_DEPTH;
 
@@ -87,33 +84,6 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
    */
   private void updateLoggerContextVO() {
     loggerContextRemoteView = new LoggerContextVO(this);
-  }
-
-  private boolean isSpecialKey(String key) {
-    return key.equals(CoreConstants.PACKAGE_NAME_KEY)
-        || key.equals(CoreConstants.VERSION_NAME_KEY)
-        || key.equals(CoreConstants.VERSION_CODE_KEY)
-        || key.equals(CoreConstants.EXT_DIR_KEY)
-        || key.equals(CoreConstants.DATA_DIR_KEY);
-  }
-
-  @Override
-  public String getProperty(String key) {
-    // lazily add the manifest attributes to the property map if
-    // a key containing the right prefix is requested
-    if (isSpecialKey(key)) {
-      try {
-        if (!androidPropsInitialized) {
-          androidPropsInitialized = true;
-          AndroidManifestPropertiesUtil.setAndroidProperties(this);
-        }
-      } catch (JoranException e) {
-        StatusManager sm = getStatusManager();
-        sm.add(new WarnStatus("Can't set manifest properties", e));
-        androidPropsInitialized = false;
-      }
-    }
-    return super.getProperty(key);
   }
 
   @Override
