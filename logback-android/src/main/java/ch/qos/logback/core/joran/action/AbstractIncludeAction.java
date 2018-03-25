@@ -62,7 +62,7 @@ public abstract class AbstractIncludeAction extends Action {
         processInclude(ec, url);
       }
     } catch (JoranException e) {
-      handleError("Error while parsing " + attributeInUse, e);
+      optionalWarning("Error while parsing " + attributeInUse, e);
     }
 
   }
@@ -94,10 +94,10 @@ public abstract class AbstractIncludeAction extends Action {
     }
 
     if (count == 0) {
-      handleError(String.format("One of \"%1$s\", \"%2$s\" or \"%3$s\" attributes must be set.", FILE_ATTR, RESOURCE_ATTR, URL_ATTR), null);
+      optionalWarning(String.format("One of \"%1$s\", \"%2$s\" or \"%3$s\" attributes must be set.", FILE_ATTR, RESOURCE_ATTR, URL_ATTR), null);
       return false;
     } else if (count > 1) {
-      handleError(String.format("Only one of \"%1$s\", \"%2$s\" or \"%3$s\" attributes should be set.", FILE_ATTR, RESOURCE_ATTR, URL_ATTR), null);
+      optionalWarning(String.format("Only one of \"%1$s\", \"%2$s\" or \"%3$s\" attributes should be set.", FILE_ATTR, RESOURCE_ATTR, URL_ATTR), null);
       return false;
     } else if (count == 1) {
       return true;
@@ -118,15 +118,9 @@ public abstract class AbstractIncludeAction extends Action {
 
       return url;
     } catch (MalformedURLException mue) {
-      if (!optional) {
-        String errMsg = "URL [" + urlAttribute + "] is not well formed.";
-        handleError(errMsg, mue);
-      }
+      optionalWarning("URL [" + urlAttribute + "] is not well formed.", mue);
     } catch (IOException e) {
-      if (!optional) {
-        String errMsg = "URL [" + urlAttribute + "] cannot be opened.";
-        handleError(errMsg, e);
-      }
+      optionalWarning("URL [" + urlAttribute + "] cannot be opened.", e);
     }
     return null;
   }
@@ -134,11 +128,8 @@ public abstract class AbstractIncludeAction extends Action {
   private URL resourceAsURL(String resourceAttribute) {
     URL url = Loader.getResourceBySelfClassLoader(resourceAttribute);
     if (url == null) {
-      if (!optional) {
-        String errMsg = "Could not find resource corresponding to ["
-            + resourceAttribute + "]";
-        handleError(errMsg, null);
-      }
+      optionalWarning("Could not find resource corresponding to ["
+                + resourceAttribute + "]", null);
       return null;
     } else
       return url;
@@ -147,9 +138,7 @@ public abstract class AbstractIncludeAction extends Action {
   private URL filePathAsURL(String path) {
     File file = new File(path);
     if (!file.exists() || !file.isFile()) {
-      if (!optional) {
-        handleError("File does not exist [" + path + "]", new FileNotFoundException(path));
-      }
+      optionalWarning("File does not exist [" + path + "]", new FileNotFoundException(path));
       return null;
     }
 
@@ -200,4 +189,9 @@ public abstract class AbstractIncludeAction extends Action {
     // do nothing
   }
 
+  protected void optionalWarning(String msg, Exception e) {
+    if (!isOptional()) {
+      handleError(msg, e);
+    }
+  }
 }

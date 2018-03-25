@@ -77,7 +77,7 @@ public class IncludeAction extends AbstractIncludeAction {
         ic.getJoranInterpreter().getEventPlayer().addEventsDynamically(recorder.getSaxEventList(), this.eventOffset);
       }
     } catch (JoranException e) {
-      addError("Failed processing [" + url.toString() + "]", e);
+      optionalWarning("Failed processing [" + url.toString() + "]", e);
     } finally {
       close(in);
     }
@@ -92,10 +92,7 @@ public class IncludeAction extends AbstractIncludeAction {
     try {
       return url.openStream();
     } catch (IOException e) {
-      if (!isOptional()) {
-        String errMsg = "Failed to open [" + url.toString() + "]";
-        addError(errMsg, e);
-      }
+      optionalWarning("Failed to open [" + url.toString() + "]", e);
       return null;
     }
   }
