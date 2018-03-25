@@ -3,6 +3,8 @@ android:
   components:
     - build-tools-27.0.3
     - android-27
+    - build-tools-26.0.2
+    - android-26
     - build-tools-15.0.0
     - android-15
 
