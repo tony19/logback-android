@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import org.xml.sax.Attributes;
 
@@ -42,7 +43,12 @@ public abstract class AbstractIncludeAction extends Action {
   abstract protected void processInclude(InterpretationContext ic, URL url) throws JoranException;
 
   protected void handleError(String message, Exception e) {
-    addError(message, e);
+    if ((e != null)
+            && ((e instanceof FileNotFoundException) || (e instanceof UnknownHostException))) {
+      addWarn(message, e);
+    } else {
+      addError(message, e);
+    }
   }
 
   @Override
