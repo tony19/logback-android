@@ -38,11 +38,6 @@ public abstract class AbstractIncludeAction extends Action {
 
   private String attributeInUse;
   private boolean optional;
-  private URL urlInUse;
-
-  public URL getUrl() {
-    return urlInUse;
-  }
 
   abstract protected void processInclude(InterpretationContext ic, URL url) throws JoranException;
 
