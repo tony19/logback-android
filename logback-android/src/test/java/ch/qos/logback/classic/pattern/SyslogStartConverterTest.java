@@ -104,7 +104,6 @@ public class SyslogStartConverterTest {
   }
 
   @Test
-  @Ignore
   public void hostnameShouldNotIncludeDomain() throws Exception {
     // RFC 3164, section 4.1.2:
     // The Domain Name MUST NOT be included in the HOSTNAME field.
