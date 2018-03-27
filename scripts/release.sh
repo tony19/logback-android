@@ -2,10 +2,6 @@
 
 . gradle.properties
 
-function prop {
-    grep "${1}" local.properties|cut -d'=' -f2
-}
-
 version=${VERSION_NAME%*-SNAPSHOT}
 baseVersion=${version%*-*}
 nextBuild=$((${version##*-} + 1))
@@ -32,12 +28,6 @@ pass=${NEXUS_PASSWORD}
 [ -z "$user" ] && read -p "Nexus username: " user
 [ -z "$pass" ] && read -p "Nexus password: " -s pass
 
-bintray_user=$(prop BINTRAY_USER)
-bintray_key=$(prop BINTRAY_KEY)
-[ -z "$bintray_user" ] && read -p "Bintray username: " bintray_user
-[ -z "$bintray_key" ] && read -p "Bintray API key: " bintray_key
-echo ''
-
 ./gradlew   -Prelease.useAutomaticVersion=true  \
             -Prelease.releaseVersion=${version} \
             -Prelease.newVersion=${nextVersion} \
@@ -52,14 +42,13 @@ echo ''
             release                             \
             uploadArchives
 
-./gradlew   -PBINTRAY_USER=${bintray_user}      \
-            -PBINTRAY_KEY=${bintray_key}        \
-            bintrayUpload
-
 # To deploy archives without git transactions (tagging, etc.),
 # replace the `release` task above with `assembleRelease`.
 
 echo -e "\n\n"
+
+echo TODO: upload archives to Bintray with:
+echo scripts/bintray.sh
 
 # FIXME: In test repo, this can't checkout 'gh-pages' -- no error provided
 #./gradlew   uploadDocs
