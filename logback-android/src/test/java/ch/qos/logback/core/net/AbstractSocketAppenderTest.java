@@ -89,7 +89,6 @@ public class AbstractSocketAppenderTest {
     appender = spy(new InstrumentedSocketAppender(preSerializationTransformer, queueFactory, objectWriterFactory, socketConnector));
 
     doReturn(mock(OutputStream.class)).when(socket).getOutputStream();
-    doReturn(socket).when(socketConnector).call();
     doReturn(objectWriter).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
     doReturn(deque).when(queueFactory).<String>newLinkedBlockingDeque(anyInt());
 
@@ -101,8 +100,6 @@ public class AbstractSocketAppenderTest {
   public void tearDown() throws Exception {
     appender.stop();
     assertFalse(appender.isStarted());
-
-    breakOutSocketReConnectionLoop();
 
     executorService.shutdownNow();
     assertTrue(executorService.awaitTermination(TIMEOUT, TimeUnit.MILLISECONDS));
@@ -204,9 +201,10 @@ public class AbstractSocketAppenderTest {
   }
 
   @Test
-  public void addsInfoMessageWhenSocketConnectionWasEstablished() {
+  public void addsInfoMessageWhenSocketConnectionWasEstablished() throws Exception {
 
     // when
+    mockOneSuccessfulSocketConnection();
     appender.start();
 
     // then
@@ -217,6 +215,7 @@ public class AbstractSocketAppenderTest {
   public void addsInfoMessageWhenSocketConnectionFailed() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     doThrow(new IOException()).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
     appender.start();
 
@@ -231,6 +230,7 @@ public class AbstractSocketAppenderTest {
   public void closesSocketOnException() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     doThrow(new IOException()).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
     appender.start();
 
@@ -245,6 +245,7 @@ public class AbstractSocketAppenderTest {
   public void addsInfoMessageWhenSocketConnectionClosed() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     doThrow(new IOException()).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
     appender.start();
 
@@ -259,6 +260,7 @@ public class AbstractSocketAppenderTest {
   public void shutsDownOnInterruptWhileWaitingForEvent() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     doThrow(new InterruptedException()).when(deque).takeFirst();
 
     // when
@@ -341,6 +343,7 @@ public class AbstractSocketAppenderTest {
   public void takesEventsFromTheFrontOfTheDeque() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     appender.start();
     awaitStartOfEventDispatching();
 
@@ -355,6 +358,7 @@ public class AbstractSocketAppenderTest {
   public void reAddsEventAtTheFrontOfTheDequeWhenTransmissionFails() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     doThrow(new IOException()).when(objectWriter).write(anyObject());
     appender.start();
     awaitStartOfEventDispatching();
@@ -385,6 +389,7 @@ public class AbstractSocketAppenderTest {
   public void postProcessesEventsBeforeTransformingItToASerializable() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     appender.start();
     awaitStartOfEventDispatching();
 
@@ -402,6 +407,7 @@ public class AbstractSocketAppenderTest {
   public void writesSerializedEventToStream() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     when(preSerializationTransformer.transform("some event")).thenReturn("some serialized event");
     appender.start();
     awaitStartOfEventDispatching();
@@ -417,6 +423,7 @@ public class AbstractSocketAppenderTest {
   public void addsInfoMessageWhenEventIsBeingDroppedBecauseOfConnectionProblemAndDequeCapacityLimitReached() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     doThrow(new IOException()).when(objectWriter).write(anyObject());
     doReturn(false).when(deque).offerFirst("some event");
     appender.start();
@@ -434,6 +441,7 @@ public class AbstractSocketAppenderTest {
   public void reEstablishesSocketConnectionOnConnectionDropWhenWritingEvent() throws Exception {
 
     // given
+    mockTwoSuccessfulSocketConnections();
     doThrow(new IOException()).when(objectWriter).write(anyObject());
     appender.start();
     awaitStartOfEventDispatching();
@@ -449,6 +457,7 @@ public class AbstractSocketAppenderTest {
   public void triesToReEstablishSocketConnectionIfItFailed() throws Exception {
 
     // given
+    mockOneSuccessfulSocketConnection();
     doThrow(new IOException()).when(socket).getOutputStream();
     appender.start();
 
@@ -463,6 +472,7 @@ public class AbstractSocketAppenderTest {
   public void usesConfiguredAcceptConnectionTimeoutAndResetsSocketTimeoutAfterSuccessfulConnection() throws Exception {
 
     // when
+    mockOneSuccessfulSocketConnection();
     appender.setAcceptConnectionTimeout(42);
     appender.start();
     awaitStartOfEventDispatching();
@@ -481,8 +491,12 @@ public class AbstractSocketAppenderTest {
     verify(deque, timeout(TIMEOUT)).takeFirst();
   }
 
-  private void breakOutSocketReConnectionLoop() throws InterruptedException {
-    doReturn(null).when(socketConnector).call();
+  private void mockOneSuccessfulSocketConnection() throws InterruptedException {
+    doReturn(socket).doReturn(null).when(socketConnector).call();
+  }
+
+  private void mockTwoSuccessfulSocketConnections() throws InterruptedException {
+    doReturn(socket).doReturn(socket).doReturn(null).when(socketConnector).call();
   }
 
   private static class InstrumentedSocketAppender extends AbstractSocketAppender<String> {
