@@ -1,7 +1,10 @@
 #!/usr/bin/env bash -e
 
 . gradle.properties
-. local.properties
+
+function prop {
+    grep "${1}" local.properties|cut -d'=' -f2
+}
 
 version=${VERSION_NAME%*-SNAPSHOT}
 baseVersion=${version%*-*}
@@ -29,8 +32,8 @@ pass=${NEXUS_PASSWORD}
 [ -z "$user" ] && read -p "Nexus username: " user
 [ -z "$pass" ] && read -p "Nexus password: " -s pass
 
-bintray_user=${BINTRAY_USER}
-bintray_key=${BINTRAY_KEY}
+bintray_user=$(prop 'BINTRAY_USER')
+bintray_key=$(prop 'BINTRAY_KEY')
 [ -z "$bintray_user" ] && read -p "Bintray username: " bintray_user
 [ -z "$bintray_key" ] && read -p "Bintray API key: " bintray_key
 echo ''
