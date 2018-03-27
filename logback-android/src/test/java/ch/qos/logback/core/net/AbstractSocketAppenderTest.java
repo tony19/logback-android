@@ -64,19 +64,30 @@ public class AbstractSocketAppenderTest {
    */
   private static final int TIMEOUT = 1000;
 
-  private ThreadPoolExecutor executorService = spy((ThreadPoolExecutor) Executors.newCachedThreadPool());
-  private MockContext mockContext = new MockContext(executorService);
-  private PreSerializationTransformer<String> preSerializationTransformer = spy(new StringPreSerializationTransformer());
-  private Socket socket = mock(Socket.class);
-  private SocketConnector socketConnector = mock(SocketConnector.class);
-  private AutoFlushingObjectWriter objectWriter = mock(AutoFlushingObjectWriter.class);
-  private ObjectWriterFactory objectWriterFactory = mock(ObjectWriterFactory.class);
-  private LinkedBlockingDeque<String> deque = spy(new LinkedBlockingDeque<String>(1));
-  private QueueFactory queueFactory = mock(QueueFactory.class);
-  private InstrumentedSocketAppender appender = spy(new InstrumentedSocketAppender(preSerializationTransformer, queueFactory, objectWriterFactory, socketConnector));
+  private ThreadPoolExecutor executorService;
+  private MockContext mockContext;
+  private PreSerializationTransformer<String> preSerializationTransformer;
+  private Socket socket;
+  private SocketConnector socketConnector;
+  private AutoFlushingObjectWriter objectWriter;
+  private ObjectWriterFactory objectWriterFactory;
+  private LinkedBlockingDeque<String> deque;
+  private QueueFactory queueFactory;
+  private InstrumentedSocketAppender appender;
 
   @Before
   public void setupValidAppenderWithMockDependencies() throws Exception {
+    executorService = spy((ThreadPoolExecutor) Executors.newCachedThreadPool());
+    mockContext = new MockContext(executorService);
+    preSerializationTransformer = spy(new StringPreSerializationTransformer());
+    socket = mock(Socket.class);
+    socketConnector = mock(SocketConnector.class);
+    objectWriter = mock(AutoFlushingObjectWriter.class);
+    objectWriterFactory = mock(ObjectWriterFactory.class);
+    deque = spy(new LinkedBlockingDeque<String>(1));
+    queueFactory = mock(QueueFactory.class);
+    appender = spy(new InstrumentedSocketAppender(preSerializationTransformer, queueFactory, objectWriterFactory, socketConnector));
+
     doReturn(mock(OutputStream.class)).when(socket).getOutputStream();
     doReturn(socket).when(socketConnector).call();
     doReturn(objectWriter).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
