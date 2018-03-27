@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import java.nio.charset.Charset;
+
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -102,7 +104,7 @@ public class SyslogAppenderTest {
 
     assertTrue(mockServer.isFinished());
     assertEquals(1, mockServer.getMessageList().size());
-    String msg = mockServer.getMessageList().get(0);
+    String msg = new String(mockServer.getMessageList().get(0));
 
     String threadName = Thread.currentThread().getName();
 
@@ -137,7 +139,7 @@ public class SyslogAppenderTest {
     // System.out.println(i++ + ": " + line);
     // }
 
-    String msg = mockServer.getMessageList().get(0);
+    String msg = new String(mockServer.getMessageList().get(0));
     String expected = "<"
         + (SyslogConstants.LOG_MAIL + SyslogConstants.DEBUG_SEVERITY) + ">";
     assertTrue(msg.startsWith(expected));
@@ -147,11 +149,11 @@ public class SyslogAppenderTest {
         + " " + logMsg;
     checkRegexMatch(msg, regex);
 
-    msg = mockServer.getMessageList().get(1);
+    msg = new String(mockServer.getMessageList().get(1));
     assertTrue(msg.contains(ex.getClass().getName()));
     assertTrue(msg.contains(ex.getMessage()));
 
-    msg = mockServer.getMessageList().get(2);
+    msg = new String(mockServer.getMessageList().get(2));
     assertTrue(msg.startsWith(expected));
     regex = SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " +  "foo "+CoreConstants.TAB + "at ch\\.qos.*";
     checkRegexMatch(msg, regex);
@@ -188,13 +190,13 @@ public class SyslogAppenderTest {
 
     // large message is truncated
     final int maxMessageSize = sa.getMaxMessageSize();
-    String largeMsg = mockServer.getMessageList().get(0);
+    String largeMsg = new String(mockServer.getMessageList().get(0));
     assertTrue(largeMsg.startsWith(expected));
     String largeRegex = SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " + loggerName
         + " " + "a{" + (maxMessageSize - 2000) + "," + maxMessageSize + "}";
     checkRegexMatch(largeMsg, largeRegex);
 
-    String msg = mockServer.getMessageList().get(1);
+    String msg = new String(mockServer.getMessageList().get(1));
     assertTrue(msg.startsWith(expected));
     String regex = SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " + loggerName
         + " " + logMsg;
@@ -272,6 +274,37 @@ public class SyslogAppenderTest {
     sa.setFacility("MAIL");
     sa.start();
     sa.stop();
+  }
+
+  @Test
+  public void nonAsciiMessageEncoding() throws Exception {
+    // See LOGBACK-732
+    setMockServerAndConfigure(1);
+
+    // Use a string that can be encoded in a somewhat odd encoding (ISO-8859-4) to minimize
+    // the probability of the encoding test to work by accident
+    String logMsg = "Rīga";
+
+    Charset ISO_8859_4 = Charset.forName("ISO-8859-4");
+    sa.setCharset(ISO_8859_4);
+    logger.debug(logMsg);
+
+    // wait max 8 seconds for mock server to finish. However, it should
+    // be done much sooner than that.
+    mockServer.join(8000);
+
+    assertTrue(mockServer.isFinished());
+    assertEquals(1, mockServer.getMessageList().size());
+    String msg = new String(mockServer.getMessageList().get(0), ISO_8859_4);
+    String threadName = Thread.currentThread().getName();
+
+    String expected = "<"
+            + (SyslogConstants.LOG_MAIL + SyslogConstants.DEBUG_SEVERITY) + ">";
+    assertTrue(msg.startsWith(expected));
+
+    checkRegexMatch(msg, SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " + loggerName + " "
+            + logMsg);
+
   }
 
   class SyslogAppenderFriend extends SyslogAppender {

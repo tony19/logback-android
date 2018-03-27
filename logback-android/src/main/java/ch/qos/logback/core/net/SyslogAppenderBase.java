@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.CoreConstants;
@@ -44,12 +45,19 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   boolean initialized = false;
   private boolean lazyInit = false;
   int maxMessageSize;
+  Charset charset;
 
   public void start() {
     int errorCount = 0;
     if (facilityStr == null) {
       addError("The Facility option is mandatory");
       errorCount++;
+    }
+
+    if (charset == null) {
+      // Using defaultCharset() preserves the previous behavior when String.getBytes() was
+      // called without arguments
+      charset = Charset.defaultCharset();
     }
 
     if (!lazyInit) {
@@ -121,7 +129,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
       if (msg.length() > maxMessageSize) {
         msg = msg.substring(0, maxMessageSize);
       }
-      sos.write(msg.getBytes());
+      sos.write(msg.getBytes(charset));
       sos.flush();
       postProcess(eventObject, sos);
     } catch (IOException ioe) {
@@ -317,7 +325,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
     super.stop();
   }
 
-/**
+  /**
    * See {@link #setSuffixPattern(String)}.
    *
    * @return the suffix pattern
@@ -334,5 +342,22 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
    */
   public void setSuffixPattern(String suffixPattern) {
     this.suffixPattern = suffixPattern;
+  }
+
+  /**
+   * Returns the Charset used to encode String messages into byte sequences when writing to
+   * syslog.
+   */
+  public Charset getCharset() {
+    return charset;
+  }
+
+  /**
+   * The Charset to use when encoding messages into byte sequences.
+   *
+   * @param charset
+   */
+  public void setCharset(Charset charset) {
+    this.charset = charset;
   }
 }
