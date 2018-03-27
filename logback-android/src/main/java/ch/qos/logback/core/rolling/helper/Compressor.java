@@ -255,17 +255,11 @@ public class Compressor extends ContextAwareBase {
     throw new IllegalStateException("Execution should not reach this point");
   }
 
-
   void createMissingTargetDirsIfNecessary(File file) {
-    if (FileUtil.isParentDirectoryCreationRequired(file)) {
-      boolean result = FileUtil.createMissingParentDirectories(file);
-      if (!result) {
-        addError("Failed to create parent directories for ["
-                + file.getAbsolutePath() + "]");
-      } else {
-        addInfo("Created missing parent directories for ["
-                + file.getAbsolutePath() + "]");
-      }
+    boolean result = FileUtil.createMissingParentDirectories(file);
+    if (!result) {
+      addError("Failed to create parent directories for ["
+              + file.getAbsolutePath() + "]");
     }
   }
 
