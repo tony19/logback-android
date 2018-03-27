@@ -32,8 +32,8 @@ pass=${NEXUS_PASSWORD}
 [ -z "$user" ] && read -p "Nexus username: " user
 [ -z "$pass" ] && read -p "Nexus password: " -s pass
 
-bintray_user=$(prop 'BINTRAY_USER')
-bintray_key=$(prop 'BINTRAY_KEY')
+bintray_user=$(prop BINTRAY_USER)
+bintray_key=$(prop BINTRAY_KEY)
 [ -z "$bintray_user" ] && read -p "Bintray username: " bintray_user
 [ -z "$bintray_key" ] && read -p "Bintray API key: " bintray_key
 echo ''
@@ -52,8 +52,8 @@ echo ''
             release                             \
             uploadArchives
 
-./gradlew   -PBINTRAY_USER=${BINTRAY_USER}      \
-            -PBINTRAY_KEY=${BINTRAY_KEY}        \
+./gradlew   -PBINTRAY_USER=${bintray_user}      \
+            -PBINTRAY_KEY=${bintray_key}        \
             bintrayUpload
 
 # To deploy archives without git transactions (tagging, etc.),

@@ -18,8 +18,8 @@ apply plugin: 'signing'
 apply plugin: 'com.jfrog.bintray'
 
 bintray {
-    user = hasProperty('BINTRAY_USER') ? BINTRAY_USER : ''
-    key = hasProperty('BINTRAY_KEY') ? BINTRAY_KEY : ''
+    user = rootProject.hasProperty('BINTRAY_USER') ? BINTRAY_USER : ''
+    key = rootProject.hasProperty('BINTRAY_KEY') ? BINTRAY_KEY : ''
     configurations = ['archives']
 
     publish = true
