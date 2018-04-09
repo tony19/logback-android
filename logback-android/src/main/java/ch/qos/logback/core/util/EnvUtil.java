@@ -57,16 +57,7 @@ public class EnvUtil {
     return isJDK_N_OrHigher(5);
   }
 
-  static public boolean isJDK6OrHigher() {
-    return isJDK_N_OrHigher(6);
-  }
-
   static public boolean isJDK7OrHigher() {
     return isJDK_N_OrHigher(7);
-  }
-
-  static public boolean isWindows() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Windows");
   }
 }
