@@ -38,10 +38,9 @@ import ch.qos.logback.core.util.OptionHelper;
  */
 public class ContextInitializer {
 
-  final public static String  AUTOCONFIG_FILE        = "logback.xml";
+  final public static String  AUTOCONFIG_FILE        = "assets/logback.xml";
   final public static String  CONFIG_FILE_PROPERTY   = "logback.configurationFile";
   final public static String  STATUS_LISTENER_CLASS  = "logback.statusListenerClass";
-  final private String ASSETS_DIR;
 
   final ClassLoader classLoader;
   final LoggerContext loggerContext;
@@ -49,7 +48,6 @@ public class ContextInitializer {
   public ContextInitializer(LoggerContext loggerContext) {
     this.loggerContext = loggerContext;
     this.classLoader = Loader.getClassLoaderOfObject(this);
-    this.ASSETS_DIR = new AndroidContextUtil().getAssetsDirectoryPath();
   }
 
   /**
@@ -92,7 +90,7 @@ public class ContextInitializer {
    * @return the file; or {@code null} if not found
    */
   private InputStream findConfigFileURLFromAssets(boolean updateStatus) {
-    return getResource(this.ASSETS_DIR + "/" + AUTOCONFIG_FILE, this.classLoader, updateStatus);
+    return getResource(AUTOCONFIG_FILE, this.classLoader, updateStatus);
   }
 
   /**

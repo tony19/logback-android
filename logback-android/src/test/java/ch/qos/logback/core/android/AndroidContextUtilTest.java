@@ -19,7 +19,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.Before;
@@ -109,11 +108,6 @@ public class AndroidContextUtilTest {
   public void getExternalStorageDirectoryPathIsNotEmpty() {
     assertThat(contextUtil.getExternalStorageDirectoryPath(),
             is(ShadowEnvironment.getExternalStorageDirectory().getAbsolutePath()));
-  }
-
-  @Test
-  public void getAssetsDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getAssetsDirectoryPath(), is(not(emptyString())));
   }
 
   @Test

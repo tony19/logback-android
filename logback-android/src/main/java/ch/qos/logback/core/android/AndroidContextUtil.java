@@ -30,7 +30,6 @@ import java.lang.reflect.Method;
  * @since 1.0.8-1
  */
 public class AndroidContextUtil {
-  private static final String ASSETS_DIRECTORY = "assets";
   private ContextWrapper context;
 
   public AndroidContextUtil() {
@@ -140,15 +139,6 @@ public class AndroidContextUtil {
             this.context != null
             ? absPath(this.context.getNoBackupFilesDir())
             : "";
-  }
-
-  /**
-   * Gets the relative path to the assets directory within the jar
-   *
-   * @return the relative path to the assets directory within the jar
-   */
-  public String getAssetsDirectoryPath() {
-    return ASSETS_DIRECTORY;
   }
 
   /**
