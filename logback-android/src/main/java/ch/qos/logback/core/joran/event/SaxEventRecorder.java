@@ -118,10 +118,10 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
       Attributes atts) {
 
     String q = qName == null || qName.length() == 0 ? localName : qName;
-    String tagName = getTagName(localName, qName);
+    String tagName = getTagName(localName, q);
     globalElementPath.push(tagName);
     ElementPath current = globalElementPath.duplicate();
-    saxEventList.add(new StartEvent(current, namespaceURI, localName, qName,
+    saxEventList.add(new StartEvent(current, namespaceURI, localName, q,
         atts, getLocator()));
   }
 
@@ -155,7 +155,7 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
   public void endElement(String namespaceURI, String localName, String qName) {
     String q = qName == null || qName.length() == 0 ? localName : qName;
     saxEventList
-        .add(new EndEvent(namespaceURI, localName, qName, getLocator()));
+        .add(new EndEvent(namespaceURI, localName, q, getLocator()));
     globalElementPath.pop();
   }
 
