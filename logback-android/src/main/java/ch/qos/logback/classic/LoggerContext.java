@@ -92,6 +92,13 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
     updateLoggerContextVO();
   }
 
+  public void putProperties(Properties props) {
+    for (String key : props.stringPropertyNames()) {
+      super.putProperty(key, props.getProperty(key));
+    }
+    updateLoggerContextVO();
+  }
+
   @Override
   public void setName(String name) {
     super.setName(name);

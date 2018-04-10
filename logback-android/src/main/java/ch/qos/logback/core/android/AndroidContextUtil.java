@@ -15,12 +15,18 @@ package ch.qos.logback.core.android;
 
 import android.annotation.TargetApi;
 import android.content.ContextWrapper;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Properties;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.CoreConstants;
 
 /**
  * This class provides utility methods to get common directory paths and
@@ -38,6 +44,25 @@ public class AndroidContextUtil {
 
   public AndroidContextUtil(ContextWrapper contextWrapper) {
     this.context = contextWrapper;
+  }
+
+  /**
+   * Sets properties for use in configs
+   * @param context logger context whose property map is updated
+   */
+  public void setupProperties(LoggerContext context) {
+    // legacy properties
+    Properties props = new Properties();
+    props.setProperty(CoreConstants.DATA_DIR_KEY, getFilesDirectoryPath());
+    final String extDir = getMountedExternalStorageDirectoryPath();
+    if (extDir != null) {
+      props.setProperty(CoreConstants.EXT_DIR_KEY, extDir);
+    }
+    props.setProperty(CoreConstants.PACKAGE_NAME_KEY, getPackageName());
+    props.setProperty(CoreConstants.VERSION_CODE_KEY, getVersionCode());
+    props.setProperty(CoreConstants.VERSION_NAME_KEY, getVersionName());
+
+    context.putProperties(props);
   }
 
   private static ContextWrapper getContext() {
@@ -159,6 +184,30 @@ public class AndroidContextUtil {
     return this.context != null
             ? absPath(this.context.getDatabasePath(databaseName))
             : "";
+  }
+
+  public String getVersionCode() {
+    String versionCode = "";
+    if (this.context != null) {
+      try {
+        PackageInfo pkgInfo = this.context.getPackageManager().getPackageInfo(getPackageName(), 0);
+        versionCode = "" + pkgInfo.versionCode;
+      } catch (PackageManager.NameNotFoundException e) {
+      }
+    }
+    return versionCode;
+  }
+
+  public String getVersionName() {
+    String versionName = "";
+    if (this.context != null) {
+      try {
+        PackageInfo pkgInfo = this.context.getPackageManager().getPackageInfo(getPackageName(), 0);
+        versionName = pkgInfo.versionName;
+      } catch (PackageManager.NameNotFoundException e) {
+      }
+    }
+    return versionName;
   }
 
   private String absPath(File file) {

@@ -121,6 +121,8 @@ public class ContextInitializer {
   public void autoConfig() throws JoranException {
     StatusListenerConfigHelper.installIfAsked(loggerContext);
 
+    new AndroidContextUtil().setupProperties(loggerContext);
+
     boolean verbose = true;
     boolean configured = false;
 

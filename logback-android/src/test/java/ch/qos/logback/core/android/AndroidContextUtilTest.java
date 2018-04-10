@@ -27,6 +27,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowEnvironment;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.CoreConstants;
+
 /**
  * Tests the {@link AndroidContextUtil} class
  *
@@ -143,5 +146,24 @@ public class AndroidContextUtilTest {
   @Test
   public void getPackageName() {
     assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android"));
+  }
+
+  @Test
+  public void setupProperties() {
+    LoggerContext loggerContext = new LoggerContext();
+
+    assertThat(loggerContext.getProperty(CoreConstants.DATA_DIR_KEY), is(nullValue()));
+    assertThat(loggerContext.getProperty(CoreConstants.EXT_DIR_KEY), is(nullValue()));
+    assertThat(loggerContext.getProperty(CoreConstants.VERSION_CODE_KEY), is(nullValue()));
+    assertThat(loggerContext.getProperty(CoreConstants.VERSION_NAME_KEY), is(nullValue()));
+    assertThat(loggerContext.getProperty(CoreConstants.PACKAGE_NAME_KEY), is(nullValue()));
+
+    contextUtil.setupProperties(loggerContext);
+
+    assertThat(loggerContext.getProperty(CoreConstants.DATA_DIR_KEY), is(contextUtil.getFilesDirectoryPath()));
+    assertThat(loggerContext.getProperty(CoreConstants.EXT_DIR_KEY), is(contextUtil.getMountedExternalStorageDirectoryPath()));
+    assertThat(loggerContext.getProperty(CoreConstants.VERSION_CODE_KEY), is(contextUtil.getVersionCode()));
+    assertThat(loggerContext.getProperty(CoreConstants.VERSION_NAME_KEY), is(contextUtil.getVersionName()));
+    assertThat(loggerContext.getProperty(CoreConstants.PACKAGE_NAME_KEY), is(contextUtil.getPackageName()));
   }
 }
