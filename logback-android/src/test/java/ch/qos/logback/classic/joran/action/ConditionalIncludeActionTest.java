@@ -279,6 +279,12 @@ public class ConditionalIncludeActionTest {
 
   @Test
   public void ignoresUnknownUrl() throws JoranException {
+    // FIXME: This test fails when the ISP does not return 404 for
+    // unknown URLs (required to cause an exception upon opening
+    // the URL request). This was observed when running tests
+    // while tethered to bluetooth mobile hotspot. The fix would
+    // be to refactor AbstractIncludeAction to inject a URL opener.
+
     final String xml =
         "<x>" +
             "<findInclude>" +

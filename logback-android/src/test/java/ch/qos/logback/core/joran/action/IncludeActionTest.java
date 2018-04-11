@@ -198,6 +198,12 @@ public class IncludeActionTest {
 
   @Test
   public void unknownURL() throws JoranException {
+    // FIXME: This test fails when the ISP does not return 404 for
+    // unknown URLs (required to cause an exception upon opening
+    // the URL request). This was observed when running tests
+    // while tethered to bluetooth mobile hotspot. The fix would
+    // be to refactor AbstractIncludeAction to inject a URL opener.
+
     System.setProperty(INCLUDE_KEY, "http://logback2345.qos.ch");
     tc.doConfigure(TOP_BY_URL);
     assertEquals(Status.ERROR, statusChecker.getHighestLevel(0));
