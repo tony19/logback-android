@@ -60,10 +60,7 @@ public class AndroidContextUtil {
     }
     props.setProperty(CoreConstants.PACKAGE_NAME_KEY, getPackageName());
     props.setProperty(CoreConstants.VERSION_CODE_KEY, getVersionCode());
-    final String versionName = getVersionName();
-    if (versionName != null) {
-      props.setProperty(CoreConstants.VERSION_NAME_KEY, versionName);
-    }
+    props.setProperty(CoreConstants.VERSION_NAME_KEY, getVersionName());
 
     context.putProperties(props);
   }
@@ -210,7 +207,7 @@ public class AndroidContextUtil {
       } catch (PackageManager.NameNotFoundException e) {
       }
     }
-    return versionName;
+    return versionName != null ? versionName : "";
   }
 
   private String absPath(File file) {
