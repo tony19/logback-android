@@ -60,7 +60,10 @@ public class AndroidContextUtil {
     }
     props.setProperty(CoreConstants.PACKAGE_NAME_KEY, getPackageName());
     props.setProperty(CoreConstants.VERSION_CODE_KEY, getVersionCode());
-    props.setProperty(CoreConstants.VERSION_NAME_KEY, getVersionName());
+    final String versionName = getVersionName();
+    if (versionName != null) {
+      props.setProperty(CoreConstants.VERSION_NAME_KEY, versionName);
+    }
 
     context.putProperties(props);
   }
