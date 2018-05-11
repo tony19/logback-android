@@ -207,7 +207,7 @@ public class AndroidContextUtil {
       } catch (PackageManager.NameNotFoundException e) {
       }
     }
-    return versionName;
+    return versionName != null ? versionName : "";
   }
 
   private String absPath(File file) {
