@@ -481,11 +481,17 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     if (callerDataArray != null && callerDataArray.length > 0) {
       StackTraceElement callerData = callerDataArray[0];
       if (callerData != null) {
-        stmt.bindString(CALLER_FILENAME_INDEX, callerData.getFileName());
-        stmt.bindString(CALLER_CLASS_INDEX, callerData.getClassName());
-        stmt.bindString(CALLER_METHOD_INDEX, callerData.getMethodName());
-        stmt.bindString(CALLER_LINE_INDEX, Integer.toString(callerData.getLineNumber()));
+        bindString(stmt, CALLER_FILENAME_INDEX, callerData.getFileName());
+        bindString(stmt, CALLER_CLASS_INDEX, callerData.getClassName());
+        bindString(stmt, CALLER_METHOD_INDEX, callerData.getMethodName());
+        bindString(stmt, CALLER_LINE_INDEX, Integer.toString(callerData.getLineNumber()));
       }
+    }
+  }
+
+  private void bindString(SQLiteStatement stmt, int columnIndex, String value) {
+    if (value != null) {
+      stmt.bindString(columnIndex, value);
     }
   }
 
