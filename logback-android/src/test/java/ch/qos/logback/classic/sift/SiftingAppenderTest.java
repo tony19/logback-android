@@ -20,6 +20,8 @@ import static junit.framework.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -45,18 +47,6 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.testUtil.StringListAppender;
 import ch.qos.logback.core.util.StatusPrinter;
-import org.junit.Test;
-import org.slf4j.MDC;
-
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-import org.slf4j.MDC;
-
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -76,6 +66,16 @@ public class SiftingAppenderTest {
     JoranConfigurator jc = new JoranConfigurator();
     jc.setContext(loggerContext);
     jc.doConfigure(file);
+  }
+
+  @Before
+  public void setUp() {
+    MDC.clear();
+  }
+
+  @After
+  public void tearDown() {
+    MDC.clear();
   }
 
   @Test
