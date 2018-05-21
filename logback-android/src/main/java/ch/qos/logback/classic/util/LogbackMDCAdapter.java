@@ -141,9 +141,9 @@ public final class LogbackMDCAdapter implements MDCAdapter {
    * Get the context identified by the <code>key</code> parameter.
    */
   public String get(String key) {
-    Map<String, String> map = getPropertyMap();
-    if ((map != null) && (key != null)) {
-      return map.get(key);
+    final Map<String, String> hashMap = copyOnInheritThreadLocal.get();
+    if (hashMap != null && key != null) {
+      return hashMap.get(key);
     } else {
       return null;
     }
