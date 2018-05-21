@@ -243,7 +243,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
       // Mainly to catch FileLockInterruptionExceptions (see LOGBACK-875)
       resilientFOS.postIOFailure(e);
     } finally {
-      if (fileLock != null) {
+      if (fileLock != null && fileLock.isValid()) {
         fileLock.release();
       }
 
