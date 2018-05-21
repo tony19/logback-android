@@ -15,6 +15,7 @@ package ch.qos.logback.classic.spi;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,7 +91,7 @@ public class LoggingEvent implements ILoggingEvent {
   private Marker marker;
 
   private Map<String, String> mdcPropertyMap;
-  private static final Map<String, String> CACHED_NULL_MAP = new HashMap<String, String>();
+  private static final Map<String, String> CACHED_NULL_MAP = Collections.unmodifiableMap(new HashMap<String, String>());
 
   /**
    * The number of milliseconds elapsed from 1/1/1970 until logging event was
