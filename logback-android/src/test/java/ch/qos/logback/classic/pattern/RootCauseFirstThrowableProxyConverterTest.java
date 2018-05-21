@@ -60,6 +60,7 @@ public class RootCauseFirstThrowableProxyConverterTest {
   @Test
   public void integration() {
     //given
+    context.setPackagingDataEnabled(true);
     PatternLayout pl = new PatternLayout();
     pl.setContext(context);
     pl.setPattern("%m%rEx%n");

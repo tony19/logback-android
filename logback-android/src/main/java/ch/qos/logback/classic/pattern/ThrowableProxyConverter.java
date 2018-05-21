@@ -201,7 +201,6 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
 
     int ignoredCount = 0;
     for (int i = 0; i < maxIndex; i++) {
-      ThrowableProxyUtil.indent(buf, indent);
       StackTraceElementProxy element = stepArray[i];
       if (!isIgnoredStackTraceLine(element.toString())) {
          ThrowableProxyUtil.indent(buf, indent);

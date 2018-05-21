@@ -41,6 +41,7 @@ public class ExtendedThrowableProxyConverterTest {
 
   @Before
   public void setUp() throws Exception {
+    lc.setPackagingDataEnabled(true);
     etpc.setContext(lc);
     etpc.start();
   }
