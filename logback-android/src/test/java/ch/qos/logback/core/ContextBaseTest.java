@@ -21,6 +21,9 @@ import static junit.framework.Assert.fail;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+
 import ch.qos.logback.core.spi.LifeCycle;
 
 public class ContextBaseTest {
@@ -79,6 +82,27 @@ public class ContextBaseTest {
     // good to have a raw reference to the "CONTEXT_NAME" as most clients would
     // not go through CoreConstants
     assertEquals(HELLO, context.getProperty("CONTEXT_NAME"));
+  }
+
+  @Test
+  public void contextThreadpoolIsDaemonized() throws InterruptedException {
+    ExecutorService execSvc = context.getExecutorService();
+    final ArrayList<Thread> executingThreads = new ArrayList<Thread>();
+    execSvc.execute(new Runnable() {
+      @Override
+      public void run() {
+        synchronized (executingThreads) {
+          executingThreads.add(Thread.currentThread());
+          executingThreads.notifyAll();
+        }
+      }
+    });
+    synchronized (executingThreads) {
+      while (executingThreads.isEmpty()) {
+        executingThreads.wait();
+      }
+    }
+    assertTrue("executing thread should be a daemon thread.", executingThreads.get(0).isDaemon());
   }
 
   private static class InstrumentedContextBase extends ContextBase {
