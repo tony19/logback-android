@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,8 +34,13 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.classic.util.TeztHelper;
+import ch.qos.logback.core.CoreConstants;
 
 import static ch.qos.logback.classic.util.TeztHelper.addSuppressed;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
@@ -158,6 +164,40 @@ public class ThrowableProxyConverterTest {
     assertTrue(reader.readLine().contains(t.getMessage()));
     assertNotNull(reader.readLine());
     assertNull("Unexpected line in stack trace", reader.readLine());
+  }
+
+  @Test
+  public void skipSelectedLine() throws Exception {
+    //given
+    final Throwable t = TeztHelper.makeNestedException(0);
+    t.printStackTrace(pw);
+    final ILoggingEvent le = createLoggingEvent(t);
+    tpc.setOptionList(Arrays.asList("full", "skipSelectedLines"));
+    tpc.start();
+
+    //when
+    final String result = tpc.convert(le);
+
+    //then
+    assertThat(result, is(not(emptyString())));
+    assertThat(result, not(containsString("skipSelectedLines")));
+  }
+
+  @Test
+  public void shouldLimitTotalLinesExcludingSkipped() throws Exception {
+    //given
+    final Throwable t = TeztHelper.makeNestedException(0);
+    t.printStackTrace(pw);
+    final ILoggingEvent le = createLoggingEvent(t);
+    tpc.setOptionList(Arrays.asList("3", "shouldLimitTotalLinesExcludingSkipped"));
+    tpc.start();
+
+    //when
+    final String result = tpc.convert(le);
+
+    //then
+    String[] lines = result.split(CoreConstants.LINE_SEPARATOR);
+    assertThat(lines, Matchers.<String>arrayWithSize(3 + 1));
   }
 
   void someMethod() throws Exception {
