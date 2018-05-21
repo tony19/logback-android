@@ -203,7 +203,7 @@ public class AsyncAppenderBaseTest {
     verify(la, loopLen);
   }
 
-  private void verify(ListAppender la, int expectedSize) {
+  private void verify(ListAppender<Integer> la, int expectedSize) {
     assertFalse(la.isStarted());
     assertEquals(expectedSize, la.list.size());
     statusChecker.assertIsErrorFree();
