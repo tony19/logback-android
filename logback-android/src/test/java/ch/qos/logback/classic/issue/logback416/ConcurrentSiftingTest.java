@@ -11,7 +11,7 @@
  * under the terms of the GNU Lesser General Public License version 2.1
  * as published by the Free Software Foundation.
  */
-package ch.qos.logback.classic.issue.lbclassic203;
+package ch.qos.logback.classic.issue.logback416;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -58,8 +58,8 @@ public class ConcurrentSiftingTest {
 
   @Test
   public void concurrentAccess() throws JoranException, InterruptedException {
-    configure(FOLDER_PREFIX + "lbclassic203.xml");
+    configure(FOLDER_PREFIX + "logback_416.xml");
     harness.execute(runnableArray);
-    assertEquals(1, InstanceCountingAppender.INSTANCE_COUNT);
+    assertEquals(1, InstanceCountingAppender.INSTANCE_COUNT.get());
   }
 }

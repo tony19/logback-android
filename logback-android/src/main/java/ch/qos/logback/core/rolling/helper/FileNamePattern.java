@@ -86,7 +86,7 @@ public class FileNamePattern extends ContextAwareBase {
 
     while (p != null) {
       if (p instanceof DateTokenConverter) {
-        DateTokenConverter<Object> dtc = (DateTokenConverter) p;
+        DateTokenConverter<Object> dtc = (DateTokenConverter<Object>) p;
         // only primary converters should be returned as
         if(dtc.isPrimary())
           return dtc;

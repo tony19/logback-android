@@ -72,7 +72,7 @@ public class JoranConfiguratorTest {
 
     Logger logger = loggerContext.getLogger(this.getClass().getName());
     Logger root = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
-    ListAppender listAppender = (ListAppender) root.getAppender("LIST");
+    ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) root.getAppender("LIST");
     assertEquals(0, listAppender.list.size());
     String msg = "hello world";
     logger.debug(msg);
@@ -84,7 +84,7 @@ public class JoranConfiguratorTest {
   @Test
   public void level() throws JoranException {
     configure(ClassicTestConstants.JORAN_INPUT_PREFIX + "simpleLevel.xml");
-    ListAppender listAppender = (ListAppender) root.getAppender("LIST");
+    ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) root.getAppender("LIST");
     assertEquals(0, listAppender.list.size());
     String msg = "hello world";
     logger.debug(msg);
@@ -106,7 +106,7 @@ public class JoranConfiguratorTest {
     configure(ClassicTestConstants.JORAN_INPUT_PREFIX
             + "rootLevelByProperty.xml");
     // StatusPrinter.print(loggerContext);
-    ListAppender listAppender = (ListAppender) root.getAppender("LIST");
+    ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) root.getAppender("LIST");
     assertEquals(0, listAppender.list.size());
     String msg = "hello world";
     logger.debug(msg);
@@ -121,7 +121,7 @@ public class JoranConfiguratorTest {
     configure(ClassicTestConstants.JORAN_INPUT_PREFIX
             + "loggerLevelByProperty.xml");
     // StatusPrinter.print(loggerContext);
-    ListAppender listAppender = (ListAppender) root.getAppender("LIST");
+    ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) root.getAppender("LIST");
     assertEquals(0, listAppender.list.size());
     String msg = "hello world";
     logger.debug(msg);
@@ -137,7 +137,7 @@ public class JoranConfiguratorTest {
             + "appenderRefByProperty.xml");
     final Logger logger = loggerContext
             .getLogger("ch.qos.logback.classic.joran");
-    final ListAppender listAppender = (ListAppender) logger.getAppender("A");
+    final ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) logger.getAppender("A");
     assertEquals(0, listAppender.list.size());
     final String msg = "hello world";
     logger.info(msg);
@@ -213,7 +213,7 @@ public class JoranConfiguratorTest {
     logger.error("to be ignored");
 
     @SuppressWarnings("unchecked")
-    ListAppender<ILoggingEvent> listAppender = (ListAppender) root
+    ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) root
             .getAppender("LIST");
 
     assertNotNull(listAppender);
@@ -228,7 +228,7 @@ public class JoranConfiguratorTest {
     configure(ClassicTestConstants.JORAN_INPUT_PREFIX
             + "turboDynamicThreshold.xml");
 
-    ListAppender listAppender = (ListAppender) root.getAppender("LIST");
+    ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) root.getAppender("LIST");
     assertEquals(0, listAppender.list.size());
 
     // this one should be denied
@@ -248,7 +248,7 @@ public class JoranConfiguratorTest {
     configure(ClassicTestConstants.JORAN_INPUT_PREFIX
             + "turboDynamicThreshold2.xml");
 
-    ListAppender listAppender = (ListAppender) root.getAppender("LIST");
+    ListAppender<ILoggingEvent> listAppender = (ListAppender<ILoggingEvent>) root.getAppender("LIST");
     assertEquals(0, listAppender.list.size());
 
     // this one should log
@@ -452,7 +452,7 @@ public class JoranConfiguratorTest {
   @Test
   public void packageDataDisabledByConfigAttribute() throws JoranException {
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
-              + "packageDataDisabled.xml";
+              + "packagingDataDisabled.xml";
     configure(configFileAsStr);
     assertFalse(loggerContext.isPackagingDataEnabled());
   }
@@ -460,7 +460,7 @@ public class JoranConfiguratorTest {
   @Test
   public void packageDataEnabledByConfigAttribute() throws JoranException {
     String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
-            + "packageDataEnabled.xml";
+            + "packagingDataEnabled.xml";
     configure(configFileAsStr);
     assertTrue(loggerContext.isPackagingDataEnabled());
   }
