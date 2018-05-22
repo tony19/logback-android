@@ -14,7 +14,8 @@
 package ch.qos.logback.classic.pattern;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -72,7 +73,7 @@ public class ExtendedThrowableProxyConverterTest {
     while(m.find()) {
       i++;
     }
-    assertTrue(i+ " should be larger than 1", i >= 1);
+    assertThat(i, greaterThan(5));
   }
 
   @Test

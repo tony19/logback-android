@@ -53,7 +53,7 @@ public final class LogbackMDCAdapter implements MDCAdapter {
   final InheritableThreadLocal<Map<String, String>> copyOnInheritThreadLocal = new InheritableThreadLocal<Map<String, String>>();
 
   private static final int WRITE_OPERATION = 1;
-  private static final int READ_OPERATION = 2;
+  private static final int MAP_COPY_OPERATION = 2;
 
   // keeps track of the last operation performed
   final ThreadLocal<Integer> lastOperation = new ThreadLocal<Integer>();
@@ -65,7 +65,7 @@ public final class LogbackMDCAdapter implements MDCAdapter {
   }
 
   private boolean wasLastOpReadOrNull(Integer lastOp) {
-    return lastOp == null || lastOp.intValue() == READ_OPERATION;
+    return lastOp == null || lastOp.intValue() == MAP_COPY_OPERATION;
   }
 
   private Map<String, String> duplicateAndInsertNewMap(Map<String, String> oldMap) {
@@ -141,9 +141,9 @@ public final class LogbackMDCAdapter implements MDCAdapter {
    * Get the context identified by the <code>key</code> parameter.
    */
   public String get(String key) {
-    final Map<String, String> hashMap = copyOnInheritThreadLocal.get();
-    if (hashMap != null && key != null) {
-      return hashMap.get(key);
+    final Map<String, String> map = copyOnInheritThreadLocal.get();
+    if ((map != null) && (key != null)) {
+      return map.get(key);
     } else {
       return null;
     }
@@ -154,7 +154,7 @@ public final class LogbackMDCAdapter implements MDCAdapter {
    * internally.
    */
   public Map<String, String> getPropertyMap() {
-    lastOperation.set(READ_OPERATION);
+    lastOperation.set(MAP_COPY_OPERATION);
     return copyOnInheritThreadLocal.get();
   }
 
@@ -177,7 +177,6 @@ public final class LogbackMDCAdapter implements MDCAdapter {
    * null.
    */
   public Map<String, String> getCopyOfContextMap() {
-    lastOperation.set(READ_OPERATION);
     Map<String, String> hashMap = copyOnInheritThreadLocal.get();
     if (hashMap == null) {
       return null;
