@@ -64,5 +64,5 @@ public interface RollingPolicy extends LifeCycle {
    * @param appender the associated file appender
    */
 
-  void setParent(FileAppender appender);
+  void setParent(FileAppender<?> appender);
 }

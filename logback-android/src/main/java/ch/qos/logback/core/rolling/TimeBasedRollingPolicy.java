@@ -165,13 +165,13 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     }
   }
 
-  Future asyncCompress(String nameOfFile2Compress, String nameOfCompressedFile, String innerEntryName)
+  Future<?> asyncCompress(String nameOfFile2Compress, String nameOfCompressedFile, String innerEntryName)
       throws RolloverFailure {
     AsynchronousCompressor ac = new AsynchronousCompressor(compressor);
     return ac.compressAsynchronously(nameOfFile2Compress, nameOfCompressedFile, innerEntryName);
   }
 
-  Future renamedRawAndAsyncCompress(String nameOfCompressedFile, String innerEntryName)
+  Future<?> renamedRawAndAsyncCompress(String nameOfCompressedFile, String innerEntryName)
       throws RolloverFailure {
     String parentsRawFile = getParentsRawFileProperty();
     String tmpTarget = parentsRawFile + System.nanoTime() + ".tmp";
