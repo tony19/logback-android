@@ -21,6 +21,8 @@ import ch.qos.logback.core.util.TeeOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.io.PrintStream;
 
@@ -30,6 +32,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Ceki G&uuml;c&uuml;
  */
+@RunWith(RobolectricTestRunner.class)
 public class InitializationOutputTest {
 
   int diff = RandomUtil.getPositiveInt();

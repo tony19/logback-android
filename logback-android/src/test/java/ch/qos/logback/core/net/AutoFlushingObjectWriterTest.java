@@ -15,7 +15,6 @@
 package ch.qos.logback.core.net;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -91,24 +90,4 @@ public class AutoFlushingObjectWriterTest {
     inOrder.verify(objectOutputStream).reset();
   }
 
-  private static class InstrumentedObjectOutputStream extends ObjectOutputStream {
-
-    protected InstrumentedObjectOutputStream() throws IOException, SecurityException {
-    }
-
-    @Override
-    protected void writeObjectOverride(final Object obj) throws IOException {
-      // nop
-    }
-
-    @Override
-    public void flush() throws IOException {
-      // nop
-    }
-
-    @Override
-    public void reset() throws IOException {
-      // nop
-    }
-  }
 }

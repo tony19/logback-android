@@ -16,7 +16,6 @@ package ch.qos.logback.core.net;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.Executors;
@@ -497,40 +496,5 @@ public class AbstractSocketAppenderTest {
 
   private void mockTwoSuccessfulSocketConnections() throws InterruptedException {
     doReturn(socket).doReturn(socket).doReturn(null).when(socketConnector).call();
-  }
-
-  private static class InstrumentedSocketAppender extends AbstractSocketAppender<String> {
-
-    private PreSerializationTransformer<String> preSerializationTransformer;
-    private SocketConnector socketConnector;
-
-    public InstrumentedSocketAppender(PreSerializationTransformer<String> preSerializationTransformer,
-                                      QueueFactory queueFactory,
-                                      ObjectWriterFactory objectWriterFactory,
-                                      SocketConnector socketConnector) {
-      super(queueFactory, objectWriterFactory);
-      this.preSerializationTransformer = preSerializationTransformer;
-      this.socketConnector = socketConnector;
-    }
-
-    @Override
-    protected void postProcessEvent(String event) {
-    }
-
-    @Override
-    protected PreSerializationTransformer<String> getPST() {
-      return preSerializationTransformer;
-    }
-
-    @Override
-    protected SocketConnector newConnector(InetAddress address, int port, long initialDelay, long retryDelay) {
-      return socketConnector;
-    }
-  }
-
-  private static class StringPreSerializationTransformer implements PreSerializationTransformer<String> {
-    public Serializable transform(String event) {
-      return event;
-    }
   }
 }

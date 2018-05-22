@@ -19,11 +19,14 @@ import ch.qos.logback.core.util.CoreTestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.LoggerFactory;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(RobolectricTestRunner.class)
 public class LoggerSerializationTest {
 
   static final String SERIALIZATION_PREFIX = CoreTestConstants.TEST_INPUT_PREFIX+"/serialization/";

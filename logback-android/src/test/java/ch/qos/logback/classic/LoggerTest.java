@@ -22,12 +22,15 @@ import static junit.framework.Assert.fail;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import ch.qos.logback.core.status.Status;
 
+@RunWith(RobolectricTestRunner.class)
 public class LoggerTest {
 
   LoggerContext lc = new LoggerContext();
