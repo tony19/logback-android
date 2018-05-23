@@ -14,7 +14,6 @@
 package ch.qos.logback.classic.turbo;
 
 import ch.qos.logback.classic.ClassicTestConstants;
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.issue.lbclassic135.LoggingRunnable;
@@ -30,7 +29,6 @@ import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
-import ch.qos.logback.core.testUtil.EnvUtilForTests;
 import ch.qos.logback.core.testUtil.FileTestUtil;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
@@ -38,7 +36,6 @@ import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.slf4j.helpers.BogoPerf;
 import static org.hamcrest.Matchers.*;
 
 import java.io.*;
@@ -286,68 +283,8 @@ public class ReconfigureOnChangeTest {
     return rocf;
   }
 
-  @Test
-  @Ignore
-  public void directPerfTest() throws MalformedURLException {
-    if (EnvUtilForTests.isLinux()) {
-      // for some reason this test does not pass on Linux (AMD 64 bit,
-      // Dual Core Opteron 170)
-      return;
-    }
-
-    ReconfigureOnChangeFilter rocf = initROCF();
-    assertTrue(rocf.isStarted());
-
-    for (int i = 0; i < 30; i++) {
-      directLoop(rocf);
-    }
-    double avg = directLoop(rocf);
-    System.out.println("directPerfTest: " + avg);
-  }
-
-  public double directLoop(ReconfigureOnChangeFilter rocf) {
-    long start = System.nanoTime();
-    for (int i = 0; i < LOOP_LEN; i++) {
-      rocf.decide(null, logger, Level.DEBUG, " ", null, null);
-    }
-    long end = System.nanoTime();
-    return (end - start) / (1.0d * LOOP_LEN);
-  }
-
-  @Ignore
-  @Test
-  public void indirectPerfTest() throws MalformedURLException {
-    if (EnvUtilForTests.isLinux()) {
-      // for some reason this test does not pass on Linux (AMD 64 bit,
-      // Dual Core
-      // Opteron 170)
-      return;
-    }
-
-    ReconfigureOnChangeFilter rocf = initROCF();
-    assertTrue(rocf.isStarted());
-    loggerContext.addTurboFilter(rocf);
-    logger.setLevel(Level.ERROR);
-
-    indirectLoop();
-    double avg = indirectLoop();
-    System.out.println(avg);
-    // the reference was computed on Orion (Ceki's computer)
-    long referencePerf = 68;
-    BogoPerf.assertDuration(avg, referencePerf, CoreTestConstants.REFERENCE_BIPS);
-  }
-
   void addInfo(String msg, Object o) {
     loggerContext.getStatusManager().add(new InfoStatus(msg, o));
-  }
-
-  public double indirectLoop() {
-    long start = System.nanoTime();
-    for (int i = 0; i < LOOP_LEN; i++) {
-      logger.debug("hello");
-    }
-    long end = System.nanoTime();
-    return (end - start) / (1.0d * LOOP_LEN);
   }
 
   enum UpdateType {TOUCH, MALFORMED, MALFORMED_INNER}
