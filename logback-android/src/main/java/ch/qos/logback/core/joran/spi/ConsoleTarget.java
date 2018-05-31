@@ -91,4 +91,9 @@ public enum ConsoleTarget {
   public OutputStream getStream() {
     return stream;
   }
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }
