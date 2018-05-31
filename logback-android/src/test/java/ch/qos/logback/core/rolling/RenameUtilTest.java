@@ -14,6 +14,7 @@
 package ch.qos.logback.core.rolling;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,13 +79,32 @@ public class RenameUtilTest {
     renameUtil.setContext(context);
 
     String src = "/tmp/ramdisk/foo.txt";
-    FileOutputStream fis = new FileOutputStream(src);
-    fis.write(("hello" + diff).getBytes());
+    makeFile(src);
 
     renameUtil.rename(src, "/tmp/foo" + diff + ".txt");
     StatusPrinter.print(context);
   }
 
+  @Test //  LOGBACK-1054
+  public void renameLockedAbstractFile_LOGBACK_1054 () throws IOException, RolloverFailure {
+    RenameUtil renameUtil = new RenameUtil();
+    renameUtil.setContext(context);
+
+    String abstractFileName = "abstract_pathname-" + diff;
+
+    String src = CoreTestConstants.OUTPUT_DIR_PREFIX + abstractFileName;
+    String target = src + ".target";
+
+    makeFile(src);
+
+    FileInputStream fisLock = new FileInputStream(src);
+    renameUtil.rename(src, target);
+    // release the lock
+    fisLock.close();
+
+    StatusPrinter.print(context);
+    assertEquals(0, statusChecker.matchCount("Parent of target file ." + target + ". is null"));
+  }
 
   @Test
   @Ignore
@@ -93,30 +113,17 @@ public class RenameUtilTest {
     renameUtil.setContext(context);
 
     String src = "c:/tmp/foo.txt";
-    FileOutputStream fis = new FileOutputStream(src);
-    fis.write(("hello" + diff).getBytes());
-    fis.close();
+    makeFile(src);
 
     renameUtil.rename(src, "d:/tmp/foo" + diff + ".txt");
     StatusPrinter.print(context);
     assertTrue(statusChecker.isErrorFree(0));
   }
 
-  @Test
-  public void renameLockedAbstractFile() throws IOException, RolloverFailure {
-    RenameUtil renameUtil = new RenameUtil();
-    renameUtil.setContext(context);
-
-    String src = "abstract_pathname.txt";
+  private void makeFile(String src) throws IOException {
     FileOutputStream fos = new FileOutputStream(src);
     fos.write(("hello" + diff).getBytes());
     fos.close();
-
-    FileInputStream fisLock = new FileInputStream(src);
-
-    renameUtil.rename(src, src+"."+ diff );
-    StatusPrinter.print(context);
-    assertTrue(statusChecker.isErrorFree(0));
   }
 
 }
