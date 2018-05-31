@@ -232,13 +232,14 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
 
   @Test
   public void collidingFileNamePattern() {
+    String filenamePattern = CoreTestConstants.OUTPUT_DIR_PREFIX + diff+ "-collision-%d.log.zip";
     RollingFileAppender<Object> appender0 = new RollingFileAppender<Object>();
     appender0.setName("FA0");
     appender0.setContext(context);
     appender0.setEncoder(new DummyEncoder<Object>());
     TimeBasedRollingPolicy<Object> tbrp0 = new TimeBasedRollingPolicy<Object>();
     tbrp0.setContext(context);
-    tbrp0.setFileNamePattern(CoreTestConstants.OUTPUT_DIR_PREFIX + "collision-%d.log.zip");
+    tbrp0.setFileNamePattern(filenamePattern);
     tbrp0.setParent(appender0);
     tbrp0.start();
     appender0.setRollingPolicy(tbrp0);
@@ -254,7 +255,7 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     appender1.setEncoder(new DummyEncoder<Object>());
     TimeBasedRollingPolicy<Object> tbrp1 = new TimeBasedRollingPolicy<Object>();
     tbrp1.setContext(context);
-    tbrp1.setFileNamePattern(CoreTestConstants.OUTPUT_DIR_PREFIX + "collision-%d.log.zip");
+    tbrp1.setFileNamePattern(filenamePattern);
     tbrp1.setParent(appender1);
     tbrp1.start();
     appender1.setRollingPolicy(tbrp1);
