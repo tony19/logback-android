@@ -17,7 +17,6 @@ import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
-import ch.qos.logback.core.util.StatusPrinter;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

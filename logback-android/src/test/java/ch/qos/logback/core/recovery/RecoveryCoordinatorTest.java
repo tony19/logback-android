@@ -19,6 +19,9 @@ import org.junit.Test;
 
 public class RecoveryCoordinatorTest {
 
+  long now = System.currentTimeMillis();
+  RecoveryCoordinator rc = new RecoveryCoordinator(now);
+
   @Test
   public void recoveryNotNeededAfterInit() {
     RecoveryCoordinator rc = new RecoveryCoordinator();
@@ -27,30 +30,24 @@ public class RecoveryCoordinatorTest {
 
   @Test
   public void recoveryNotNeededIfAsleepForLessThanBackOffTime() throws InterruptedException {
-    RecoveryCoordinator rc = new RecoveryCoordinator();
-    Thread.sleep(RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN / 2);
+    rc.setCurrentTime(now + RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN / 2);
     assertTrue(rc.isTooSoon());
   }
 
   @Test
   public void recoveryNeededIfAsleepForMoreThanBackOffTime() throws InterruptedException {
-    RecoveryCoordinator rc = new RecoveryCoordinator();
-    Thread.sleep(RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN + 20);
+    rc.setCurrentTime(now + RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN + 20);
     assertFalse(rc.isTooSoon());
   }
 
   @Test
   public void recoveryNotNeededIfCurrentTimeSetToBackOffTime() throws InterruptedException {
-    RecoveryCoordinator rc = new RecoveryCoordinator();
-    long now = System.currentTimeMillis();
     rc.setCurrentTime(now + RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN);
     assertTrue(rc.isTooSoon());
   }
 
   @Test
   public void recoveryNeededIfCurrentTimeSetToExceedBackOffTime() {
-    RecoveryCoordinator rc = new RecoveryCoordinator();
-    long now = System.currentTimeMillis();
     rc.setCurrentTime(now + RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN + 1);
     assertFalse(rc.isTooSoon());
   }
@@ -61,8 +58,6 @@ public class RecoveryCoordinatorTest {
     // we double the offset on each for-loop iteration, causing
     // every other iteration to trigger recovery.
 
-    RecoveryCoordinator rc = new RecoveryCoordinator();
-    long now = System.currentTimeMillis();
     long offset = RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN;
 
     for (int i = 0; i < 16; i++) {

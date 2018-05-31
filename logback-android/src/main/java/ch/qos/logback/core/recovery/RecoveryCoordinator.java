@@ -17,13 +17,23 @@ public class RecoveryCoordinator {
 
   public final static long BACKOFF_COEFFICIENT_MIN = 20;
   static long BACKOFF_COEFFICIENT_MAX = 327680;  // BACKOFF_COEFFICIENT_MIN * 4^7
-  
+  static long BACKOFF_MULTIPLIER = 4;
   private long backOffCoefficient = BACKOFF_COEFFICIENT_MIN;
   
   private static long UNSET = -1;
+  // tests can set the time directly independently of system clock
   private long currentTime = UNSET;
-  long next = System.currentTimeMillis()+getBackoffCoefficient();
-  
+  private long next;
+
+  public RecoveryCoordinator() {
+    next = getCurrentTime() + getBackoffCoefficient();
+  }
+
+  public RecoveryCoordinator(long currentTime) {
+    this.currentTime = currentTime;
+    next = getCurrentTime() + getBackoffCoefficient();
+  }
+
   public boolean isTooSoon() {
     long now = getCurrentTime();
     if(now > next) {
@@ -48,7 +58,7 @@ public class RecoveryCoordinator {
   private long getBackoffCoefficient() {
     long currentCoeff = backOffCoefficient;
     if(backOffCoefficient < BACKOFF_COEFFICIENT_MAX) {
-      backOffCoefficient*=4;
+      backOffCoefficient *= BACKOFF_MULTIPLIER;
     }
     return currentCoeff;
   }
