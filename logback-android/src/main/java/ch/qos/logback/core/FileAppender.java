@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.Map;
 
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
 import ch.qos.logback.core.util.EnvUtil;
@@ -31,6 +32,8 @@ import ch.qos.logback.core.util.FileUtil;
  * @author Ceki G&uuml;lc&uuml;
  */
 public class FileAppender<E> extends OutputStreamAppender<E> {
+
+  static protected String COLLISION_WITH_EARLIER_APPENDER_URL = CoreConstants.CODES_URL + "#earlier_fa_collision";
 
   /**
    * Append to or truncate the file? The default value for this variable is
@@ -107,6 +110,12 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
       file = getAbsoluteFilePath(file);
       addInfo("File property is set to [" + file + "]");
 
+      if (checkForFileCollisionInPreviousFileAppenders()) {
+        addError("Collisions detected with FileAppender/RollingAppender instances defined earlier. Aborting.");
+        addError(COLLISION_WITH_EARLIER_APPENDER_URL);
+        errors++;
+      }
+
       if (prudent) {
         if (!isAppend()) {
           setAppend(true);
@@ -133,6 +142,32 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     if (errors == 0) {
       super.start();
     }
+  }
+
+  protected boolean checkForFileCollisionInPreviousFileAppenders() {
+    boolean collisionsDetected = false;
+    if (fileName == null) {
+      return false;
+    }
+    @SuppressWarnings("unchecked")
+    Map<String, String> map = (Map<String, String>) context.getObject(CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP);
+    if (map == null) {
+      return collisionsDetected;
+    }
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      if (fileName.equals(entry.getValue())) {
+        addErrorForCollision("File", entry.getValue(), entry.getKey());
+        collisionsDetected = true;
+      }
+    }
+    if (name != null) {
+      map.put(getName(), fileName);
+    }
+    return collisionsDetected;
+  }
+
+  protected void addErrorForCollision(String optionName, String optionValue, String appenderName) {
+    addError("'"+optionName+"' option has the same value \""+optionValue+"\" as that given for appender [" + appenderName+"] defined earlier.");
   }
 
   /**

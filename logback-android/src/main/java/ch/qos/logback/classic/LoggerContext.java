@@ -221,6 +221,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
     resetCount++;
     super.reset();
     initEvaluatorMap();
+    initCollisionMaps();
     root.recursiveReset();
     resetTurboFilterList();
     fireOnReset();

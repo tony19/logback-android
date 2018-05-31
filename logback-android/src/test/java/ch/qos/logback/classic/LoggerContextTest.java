@@ -23,6 +23,8 @@ import static junit.framework.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Map;
+
 import ch.qos.logback.classic.turbo.NOPTurboFilter;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.status.StatusManager;
@@ -224,6 +226,21 @@ public class LoggerContextTest {
   public void evaluatorMapPostReset() {
     lc.reset();
     assertNotNull(lc.getObject(CoreConstants.EVALUATOR_MAP));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void collisionMapsPostReset() {
+    lc.reset();
+
+    Map<String, String> fileCollisions = (Map<String, String>) lc.getObject(CoreConstants.FA_FILENAME_COLLISION_MAP);
+    assertNotNull(fileCollisions);
+    assertTrue(fileCollisions.isEmpty());
+
+    Map<String, String> filenamePatternCollisionMap = (Map<String, String>) lc.getObject(CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP);
+    assertNotNull(filenamePatternCollisionMap);
+    assertTrue(filenamePatternCollisionMap.isEmpty());
+
   }
 
   // http://jira.qos.ch/browse/LOGBACK-142

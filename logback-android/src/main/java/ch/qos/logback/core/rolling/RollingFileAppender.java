@@ -13,12 +13,14 @@
  */
 package ch.qos.logback.core.rolling;
 
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.helper.CompressionMode;
 import ch.qos.logback.core.rolling.helper.FileNamePattern;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import static ch.qos.logback.core.CoreConstants.CODES_URL;
 
@@ -56,6 +58,12 @@ public class RollingFileAppender<E> extends FileAppender<E> {
       return;
     }
 
+    if (checkForCollisionsInPreviousRollingFileAppenders()) {
+      addError("Collisions detected with FileAppender/RollingAppender instances defined earlier. Aborting.");
+      addError(MORE_INFO_PREFIX + COLLISION_WITH_EARLIER_APPENDER_URL);
+      return;
+    }
+
     // we don't want to void existing log files
     if (!append) {
       addWarn("Append mode is mandatory for RollingFileAppender. Defaulting to append=true.");
@@ -70,7 +78,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     }
 
     // sanity check for http://jira.qos.ch/browse/LOGBACK-796
-    if (fileAndPatternCollide()) {
+    if (checkForFileAndPatternCollisions()) {
       addError("File property collides with fileNamePattern. Aborting.");
       addError(MORE_INFO_PREFIX + COLLISION_URL);
       return;
@@ -92,7 +100,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     super.start();
   }
 
-  private boolean fileAndPatternCollide() {
+  private boolean checkForFileAndPatternCollisions() {
     if (triggeringPolicy instanceof RollingPolicyBase) {
       final RollingPolicyBase base = (RollingPolicyBase) triggeringPolicy;
       final FileNamePattern fileNamePattern = base.fileNamePattern;
@@ -103,6 +111,37 @@ public class RollingFileAppender<E> extends FileAppender<E> {
       }
     }
     return false;
+  }
+
+  private boolean checkForCollisionsInPreviousRollingFileAppenders() {
+    boolean collisionResult = false;
+    if (triggeringPolicy instanceof RollingPolicyBase) {
+      final RollingPolicyBase base = (RollingPolicyBase) triggeringPolicy;
+      final FileNamePattern fileNamePattern = base.fileNamePattern;
+      boolean collisionsDetected = innerCheckForFileNamePatternCollisionInPreviousRFA(fileNamePattern.toString());
+      if (collisionsDetected)
+        collisionResult = true;
+    }
+    return collisionResult;
+  }
+
+  private boolean innerCheckForFileNamePatternCollisionInPreviousRFA(String fileNamePattern) {
+    boolean collisionsDetected = false;
+    @SuppressWarnings("unchecked")
+    Map<String, String> map = (Map<String, String>) context.getObject(CoreConstants.FA_FILENAME_COLLISION_MAP);
+    if (map == null) {
+      return collisionsDetected;
+    }
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      if (fileNamePattern.equals(entry.getValue())) {
+        addErrorForCollision("FileNamePattern", entry.getValue(), entry.getKey());
+        collisionsDetected = true;
+      }
+    }
+    if (name != null) {
+      map.put(getName(), fileNamePattern);
+    }
+    return collisionsDetected;
   }
 
   @Override

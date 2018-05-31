@@ -42,6 +42,10 @@ public class ContextBase implements Context, LifeCycle {
   private LifeCycleManager lifeCycleManager;
   private boolean started;
 
+  public ContextBase() {
+    initCollisionMaps();
+  }
+
   public StatusManager getStatusManager() {
     return sm;
   }
@@ -70,6 +74,11 @@ public class ContextBase implements Context, LifeCycle {
 
   public void putProperty(String key, String val) {
     this.propertyMap.put(key, val);
+  }
+
+  protected void initCollisionMaps() {
+    putObject(CoreConstants.FA_FILENAME_COLLISION_MAP, new HashMap<String, String>());
+    putObject(CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP, new HashMap<String, String>());
   }
 
   /**

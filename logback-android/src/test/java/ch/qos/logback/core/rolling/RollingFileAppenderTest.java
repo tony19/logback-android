@@ -229,4 +229,41 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     StatusPrinter.print(context);
     checker.assertContainsMatch("The date format in FileNamePattern will result");
   }
+
+  @Test
+  public void collidingFileNamePattern() {
+    RollingFileAppender<Object> appender0 = new RollingFileAppender<Object>();
+    appender0.setName("FA0");
+    appender0.setContext(context);
+    appender0.setEncoder(new DummyEncoder<Object>());
+    TimeBasedRollingPolicy<Object> tbrp0 = new TimeBasedRollingPolicy<Object>();
+    tbrp0.setContext(context);
+    tbrp0.setFileNamePattern(CoreTestConstants.OUTPUT_DIR_PREFIX + "collision-%d.log.zip");
+    tbrp0.setParent(appender0);
+    tbrp0.start();
+    appender0.setRollingPolicy(tbrp0);
+    appender0.start();
+    assertTrue(appender0.isStarted());
+
+
+
+    RollingFileAppender<Object> appender1 = new RollingFileAppender<Object>();
+    appender1.setName("FA1");
+    appender1.setFile("X");
+    appender1.setContext(context);
+    appender1.setEncoder(new DummyEncoder<Object>());
+    TimeBasedRollingPolicy<Object> tbrp1 = new TimeBasedRollingPolicy<Object>();
+    tbrp1.setContext(context);
+    tbrp1.setFileNamePattern(CoreTestConstants.OUTPUT_DIR_PREFIX + "collision-%d.log.zip");
+    tbrp1.setParent(appender1);
+    tbrp1.start();
+    appender1.setRollingPolicy(tbrp1);
+    appender1.start();
+
+    //StatusPrinter.print(context);
+
+    assertFalse(appender1.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR, "'FileNamePattern' option has the same value");
+  }
 }
