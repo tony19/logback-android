@@ -29,8 +29,7 @@ abstract class OnPrintStreamStatusListenerBase extends ContextAwareBase implemen
   boolean isStarted = false;
 
   static final long DEFAULT_RETROSPECTIVE = 300;
-  long retrospective = DEFAULT_RETROSPECTIVE;
-
+  long retrospectiveThresold = DEFAULT_RETROSPECTIVE;
 
   /**
    * @return PrintStream used by derived classes
@@ -59,26 +58,35 @@ abstract class OnPrintStreamStatusListenerBase extends ContextAwareBase implemen
     StatusManager sm = context.getStatusManager();
     List<Status> statusList = sm.getCopyOfStatusList();
     for (Status status : statusList) {
-      long timestamp = status.getDate();
-      if (now - timestamp < retrospective) {
+      long timestampOfStatusMesage = status.getDate();
+      if (isElapsedTimeLongerThanThreshold(now, timestampOfStatusMesage)) {
         print(status);
       }
     }
   }
 
+  private boolean isElapsedTimeLongerThanThreshold(long now, long timestamp) {
+    long elapsedTime = now - timestamp;
+    return elapsedTime < retrospectiveThresold;
+  }
+
+  /**
+   * Invoking the start method can cause the instance to print status messages created less than
+   * value of retrospectiveThresold.
+   */
   public void start() {
     isStarted = true;
-    if (retrospective > 0) {
+    if (retrospectiveThresold > 0) {
       retrospectivePrint();
     }
   }
 
   public void setRetrospective(long retrospective) {
-    this.retrospective = retrospective;
+    this.retrospectiveThresold = retrospective;
   }
 
   public long getRetrospective() {
-    return retrospective;
+    return retrospectiveThresold;
   }
 
   public void stop() {

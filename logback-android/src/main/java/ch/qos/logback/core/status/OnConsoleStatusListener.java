@@ -13,8 +13,6 @@
  */
 package ch.qos.logback.core.status;
 
-import ch.qos.logback.core.Context;
-
 import java.io.PrintStream;
 
 /**
@@ -28,25 +26,5 @@ public class OnConsoleStatusListener extends OnPrintStreamStatusListenerBase {
   protected PrintStream getPrintStream() {
     return System.out;
   }
-
-  /**
-   * This utility method adds a new OnConsoleStatusListener to the context of
-   * the contextAware object passed as parameter.
-   *
-   * @param loggerContext
-   * @since 1.0.1
-   */
-  static public void addNewInstanceToContext(Context loggerContext) {
-
-    OnConsoleStatusListener onConsoleStatusListener = new OnConsoleStatusListener();
-    onConsoleStatusListener.setContext(loggerContext);
-    boolean result = loggerContext.getStatusManager().addUniquely(onConsoleStatusListener, loggerContext);
-
-    // start only if registered successfully. This check avoids superfluous
-    // printing on the console.
-    if (result)
-      onConsoleStatusListener.start();
-  }
-
 
 }

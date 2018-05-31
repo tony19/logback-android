@@ -88,14 +88,14 @@ public class BasicStatusManagerTest {
     OnConsoleStatusListener sl1 = new OnConsoleStatusListener();
     sl1.start();
 
-    bsm.add(sl0);
+    assertTrue(bsm.add(sl0));
 
     {
       List<StatusListener> listeners = bsm.getCopyOfStatusListenerList();
       assertEquals(1, listeners.size());
     }
 
-    bsm.add(sl1);
+    assertFalse(bsm.add(sl1));
     {
       List<StatusListener> listeners = bsm.getCopyOfStatusListenerList();
       assertEquals(1, listeners.size());
