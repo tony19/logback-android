@@ -254,4 +254,12 @@ public class OptionHelperTest  {
     OptionHelper.substVars("${var}", context);
   }
 
+  @Test
+  public void trailingColon_LOGBACK_1140() {
+    String prefix = "c:";
+    String suffix = "/tmp";
+    context.putProperty("var", prefix);
+    String r = OptionHelper.substVars("${var}" + suffix, context);
+    assertEquals(prefix + suffix, r);
+  }
 }
