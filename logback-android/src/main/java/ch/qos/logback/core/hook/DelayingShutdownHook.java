@@ -13,8 +13,6 @@
  */
 package ch.qos.logback.core.hook;
 
-import ch.qos.logback.core.Context;
-import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.util.Duration;
 
 /**
@@ -34,9 +32,6 @@ public class DelayingShutdownHook extends ShutdownHookBase {
      * logback context
      */
     private Duration delay;
-
-    public DelayingShutdownHook() {
-    }
 
     public Duration getDelay() {
         return delay;
