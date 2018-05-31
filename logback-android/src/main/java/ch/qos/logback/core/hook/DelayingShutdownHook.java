@@ -50,7 +50,6 @@ public class DelayingShutdownHook extends ShutdownHookBase {
         try {
             Thread.sleep(delay.getMilliseconds());
         } catch (InterruptedException e) {
-            addError("");
         }
 
         super.stop();
