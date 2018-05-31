@@ -211,4 +211,21 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     assertTrue("Missing error: " + msg, containsMatch);
   }
 
+  @Test
+  public void collidingTimeformat() {
+    rfa.setContext(context);
+    rfa.setAppend(false);
+    rfa.setPrudent(true);
+
+    tbrp.setFileNamePattern(CoreTestConstants.OUTPUT_DIR_PREFIX + "toto-%d{dd}.log.zip");
+    tbrp.start();
+    rfa.setRollingPolicy(tbrp);
+
+    rfa.start();
+
+    StatusChecker checker = new StatusChecker(context);
+    assertFalse(rfa.isStarted());
+    assertEquals(Status.ERROR, checker.getHighestLevel(0));
+    checker.assertContainsMatch("The date pattern has collisions");
+  }
 }

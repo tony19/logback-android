@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2013, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2015, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -12,6 +12,9 @@
  * as published by the Free Software Foundation.
  */
 package ch.qos.logback.core.rolling.helper;
+
+import static ch.qos.logback.core.CoreConstants.MILLIS_IN_ONE_HOUR;
+import static ch.qos.logback.core.CoreConstants.MILLIS_IN_ONE_DAY;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,29 +42,22 @@ public class RollingCalendar extends GregorianCalendar {
   static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT");
 
   PeriodicityType periodicityType = PeriodicityType.ERRONEOUS;
+  String datePattern;
 
-  public RollingCalendar() {
+  public RollingCalendar(String datePattern) {
     super();
+    this.datePattern = datePattern;
+    this.periodicityType = computePeriodicityType();
   }
 
-  public RollingCalendar(TimeZone tz, Locale locale) {
+  public RollingCalendar(String datePattern, TimeZone tz, Locale locale) {
     super(tz, locale);
-  }
-
-  public void init(String datePattern) {
-    periodicityType = computePeriodicityType(datePattern);
-  }
-
-  private void setPeriodicityType(PeriodicityType periodicityType) {
-    this.periodicityType = periodicityType;
+    this.datePattern = datePattern;
+    this.periodicityType = computePeriodicityType();
   }
 
   public PeriodicityType getPeriodicityType() {
     return periodicityType;
-  }
-
-  public long getNextTriggeringMillis(Date now) {
-    return getNextTriggeringDate(now).getTime();
   }
 
   // This method computes the roll over period by looping over the
@@ -72,9 +68,9 @@ public class RollingCalendar extends GregorianCalendar {
   // formatting is done in GMT and not local format because the test
   // logic is based on comparisons relative to 1970-01-01 00:00:00
   // GMT (the epoch).
-  public PeriodicityType computePeriodicityType(String datePattern) {
-    RollingCalendar rollingCalendar = new RollingCalendar(GMT_TIMEZONE, Locale
-            .getDefault());
+  public PeriodicityType computePeriodicityType() {
+
+    GregorianCalendar calendar = new GregorianCalendar(GMT_TIMEZONE, Locale.US);
 
     // set sate to 1970-01-01 00:00:00 GMT
     Date epoch = new Date(0);
@@ -82,13 +78,11 @@ public class RollingCalendar extends GregorianCalendar {
     if (datePattern != null) {
       for (PeriodicityType i : PeriodicityType.VALID_ORDERED_LIST) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern, Locale.US);
-        simpleDateFormat.setTimeZone(GMT_TIMEZONE); // all date formatting done
-        // in GMT
+        simpleDateFormat.setTimeZone(GMT_TIMEZONE); // all date formatting done in GMT
 
         String r0 = simpleDateFormat.format(epoch);
-        rollingCalendar.setPeriodicityType(i);
 
-        Date next = new Date(rollingCalendar.getNextTriggeringMillis(epoch));
+        Date next = innerGetEndOfThisPeriod(calendar, i, epoch);
         String r1 = simpleDateFormat.format(next);
 
         // System.out.println("Type = "+i+", r0 = "+r0+", r1 = "+r1);
@@ -99,6 +93,47 @@ public class RollingCalendar extends GregorianCalendar {
     }
     // we failed
     return PeriodicityType.ERRONEOUS;
+  }
+
+  public boolean isCollisionFree() {
+    switch (periodicityType) {
+      case TOP_OF_HOUR:
+        // isolated hh or KK
+        return !collision(12 * MILLIS_IN_ONE_HOUR);
+
+      case TOP_OF_DAY:
+        // EE or uu
+        if(collision(7 * MILLIS_IN_ONE_DAY))
+          return false;
+        // isolated dd
+        if(collision(31 * MILLIS_IN_ONE_DAY))
+          return false;
+        // DD
+        if(collision(365 * MILLIS_IN_ONE_DAY))
+          return false;
+        return true;
+      case TOP_OF_WEEK:
+        // WW
+        if(collision(31 * MILLIS_IN_ONE_DAY))
+          return false;
+        // isolated ww
+        if(collision(365 * MILLIS_IN_ONE_DAY))
+          return false;
+        return true;
+      default:
+        return true;
+    }
+  }
+
+  private boolean collision(long delta) {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern, Locale.US);
+    simpleDateFormat.setTimeZone(GMT_TIMEZONE); // all date formatting done in GMT
+    Date epoch0 = new Date(0);
+    String r0 = simpleDateFormat.format(epoch0);
+    Date epoch12 = new Date(delta);
+    String r12 = simpleDateFormat.format(epoch12);
+
+    return r0.equals(r12);
   }
 
   public void printPeriodicity(ContextAwareBase cab) {
@@ -178,66 +213,73 @@ public class RollingCalendar extends GregorianCalendar {
     return yearDiff * 12 + monthDiff;
   }
 
-  public Date getRelativeDate(Date now, int periods) {
-    this.setTime(now);
+  static private Date innerGetEndOfThisPeriod(Calendar cal, PeriodicityType periodicityType, Date now) {
+    return innerGetEndOfNextNthPeriod(cal, periodicityType, now, 1);
+  }
 
+  static private Date innerGetEndOfNextNthPeriod(Calendar cal, PeriodicityType periodicityType, Date now, int numPeriods) {
+    cal.setTime(now);
     switch (periodicityType) {
       case TOP_OF_MILLISECOND:
-        this.add(Calendar.MILLISECOND, periods);
+        cal.add(Calendar.MILLISECOND, numPeriods);
         break;
 
       case TOP_OF_SECOND:
-        this.set(Calendar.MILLISECOND, 0);
-        this.add(Calendar.SECOND, periods);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.SECOND, numPeriods);
         break;
 
       case TOP_OF_MINUTE:
-        this.set(Calendar.SECOND, 0);
-        this.set(Calendar.MILLISECOND, 0);
-        this.add(Calendar.MINUTE, periods);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.MINUTE, numPeriods);
         break;
 
       case TOP_OF_HOUR:
-        this.set(Calendar.MINUTE, 0);
-        this.set(Calendar.SECOND, 0);
-        this.set(Calendar.MILLISECOND, 0);
-        this.add(Calendar.HOUR_OF_DAY, periods);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.HOUR_OF_DAY, numPeriods);
         break;
 
       case TOP_OF_DAY:
-        this.set(Calendar.HOUR_OF_DAY, 0);
-        this.set(Calendar.MINUTE, 0);
-        this.set(Calendar.SECOND, 0);
-        this.set(Calendar.MILLISECOND, 0);
-        this.add(Calendar.DATE, periods);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.DATE, numPeriods);
         break;
 
       case TOP_OF_WEEK:
-        this.set(Calendar.DAY_OF_WEEK, getFirstDayOfWeek());
-        this.set(Calendar.HOUR_OF_DAY, 0);
-        this.set(Calendar.MINUTE, 0);
-        this.set(Calendar.SECOND, 0);
-        this.set(Calendar.MILLISECOND, 0);
-        this.add(Calendar.WEEK_OF_YEAR, periods);
+        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.WEEK_OF_YEAR, numPeriods);
         break;
 
       case TOP_OF_MONTH:
-        this.set(Calendar.DATE, 1);
-        this.set(Calendar.HOUR_OF_DAY, 0);
-        this.set(Calendar.MINUTE, 0);
-        this.set(Calendar.SECOND, 0);
-        this.set(Calendar.MILLISECOND, 0);
-        this.add(Calendar.MONTH, periods);
+        cal.set(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.MONTH, numPeriods);
         break;
 
       default:
         throw new IllegalStateException("Unknown periodicity type.");
     }
 
-    return getTime();
+    return cal.getTime();
+  }
+
+  public Date getEndOfNextNthPeriod(Date now, int periods) {
+    return innerGetEndOfNextNthPeriod(this, this.periodicityType, now, periods);
   }
 
   public Date getNextTriggeringDate(Date now) {
-    return getRelativeDate(now, 1);
+    return getEndOfNextNthPeriod(now, 1);
   }
 }

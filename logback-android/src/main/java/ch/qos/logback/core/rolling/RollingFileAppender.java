@@ -41,12 +41,14 @@ public class RollingFileAppender<E> extends FileAppender<E> {
   static private String RFA_NO_TP_URL = CODES_URL + "#rfa_no_tp";
   static private String RFA_NO_RP_URL = CODES_URL + "#rfa_no_rp";
   static private String COLLISION_URL = CODES_URL + "#rfa_collision";
+  static private String RFA_LATE_FILE_URL = CODES_URL + "#rfa_file_after";
+  static private String MORE_INFO_PREFIX = "For more information, please visit ";
 
   public void start() {
     if (triggeringPolicy == null) {
       addWarn("No TriggeringPolicy was set for the RollingFileAppender named "
               + getName());
-      addWarn("For more information, please visit " + RFA_NO_TP_URL);
+      addWarn(MORE_INFO_PREFIX + RFA_NO_TP_URL);
       return;
     }
     if (!triggeringPolicy.isStarted()) {
@@ -63,14 +65,14 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     if (rollingPolicy == null) {
       addError("No RollingPolicy was set for the RollingFileAppender named "
               + getName());
-      addError("For more information, please visit " + RFA_NO_RP_URL);
+      addError(MORE_INFO_PREFIX + RFA_NO_RP_URL);
       return;
     }
 
     // sanity check for http://jira.qos.ch/browse/LOGBACK-796
     if (fileAndPatternCollide()) {
       addError("File property collides with fileNamePattern. Aborting.");
-      addError("For more information, please visit " + COLLISION_URL);
+      addError(MORE_INFO_PREFIX + COLLISION_URL);
       return;
     }
 
@@ -116,7 +118,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     // allow setting the file name to null if mandated by prudent mode
     if (file != null && ((triggeringPolicy != null) || (rollingPolicy != null))) {
       addError("File property must be set before any triggeringPolicy or rollingPolicy properties");
-      addError("Visit " + CODES_URL + "#rfa_file_after for more information");
+      addError(MORE_INFO_PREFIX + RFA_LATE_FILE_URL);
     }
     super.setFile(file);
   }

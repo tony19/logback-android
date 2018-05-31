@@ -30,6 +30,9 @@ public class DefaultTimeBasedFileNamingAndTriggeringPolicy<E> extends
   @Override
   public void start() {
     super.start();
+    if (!super.isErrorFree()) {
+      return;
+    }
     archiveRemover = new TimeBasedArchiveRemover(tbrp.fileNamePattern, rc);
     archiveRemover.setContext(context);
     started = true;

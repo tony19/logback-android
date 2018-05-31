@@ -22,8 +22,12 @@ import ch.qos.logback.core.rolling.helper.DateTokenConverter;
 import ch.qos.logback.core.rolling.helper.RollingCalendar;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
+import static ch.qos.logback.core.CoreConstants.CODES_URL;
+
 abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
         ContextAwareBase implements TimeBasedFileNamingAndTriggeringPolicy<E> {
+
+  static private String COLLIDING_DATE_FORMAT_URL = CODES_URL + "#rfa_collision_in_dateFormat";
 
   protected TimeBasedRollingPolicy<E> tbrp;
 
@@ -36,6 +40,8 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
 
   protected long nextCheck;
   protected boolean started = false;
+
+  protected boolean errorFree = true;
 
   public boolean isStarted() {
     return started;
@@ -50,15 +56,21 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
     }
 
     if (dtc.getTimeZone() != null) {
-      rc = new RollingCalendar(dtc.getTimeZone(), Locale.US);
+      rc = new RollingCalendar(dtc.getDatePattern(), dtc.getTimeZone(), Locale.US);
     } else {
-      rc = new RollingCalendar();
+      rc = new RollingCalendar(dtc.getDatePattern());
     }
-    rc.init(dtc.getDatePattern());
     addInfo("The date pattern is '" + dtc.getDatePattern()
             + "' from file name pattern '" + tbrp.fileNamePattern.getPattern()
             + "'.");
     rc.printPeriodicity(this);
+
+    if (!rc.isCollisionFree()) {
+        addError("The date format in FileNamePattern will result in collisions in the names of archived log files.");
+        addError(COLLIDING_DATE_FORMAT_URL);
+        errorFree = false;
+        return;
+    }
 
     setDateInCurrentPeriod(new Date(getCurrentTime()));
     if (tbrp.getParentsRawFileProperty() != null) {
@@ -77,7 +89,7 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
   }
 
   protected void computeNextCheck() {
-    nextCheck = rc.getNextTriggeringMillis(dateInCurrentPeriod);
+    nextCheck = rc.getNextTriggeringDate(dateInCurrentPeriod).getTime();
   }
 
   protected void setDateInCurrentPeriod(long now) {
@@ -118,6 +130,10 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
 
   public ArchiveRemover getArchiveRemover() {
     return archiveRemover;
+  }
+
+  protected boolean isErrorFree() {
+    return errorFree;
   }
 
 }

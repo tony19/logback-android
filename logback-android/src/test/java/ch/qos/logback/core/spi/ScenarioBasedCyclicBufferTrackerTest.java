@@ -37,7 +37,7 @@ public class ScenarioBasedCyclicBufferTrackerTest {
 
   @Before public void setUp() {
     parameters.keySpaceLen = 128;
-    parameters.maxTimestampInc =  ComponentTracker.DEFAULT_TIMEOUT / 2;
+    parameters.maxTimestampInc = (int)ComponentTracker.DEFAULT_TIMEOUT / 2;
   }
 
   @Test

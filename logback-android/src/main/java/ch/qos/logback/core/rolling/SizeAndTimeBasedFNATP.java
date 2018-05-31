@@ -41,6 +41,10 @@ public class SizeAndTimeBasedFNATP<E> extends
     // in super.start()
     super.start();
 
+    if (!super.isErrorFree()) {
+      return;
+    }
+
     if (!validDateAndIntegerTokens()) {
       started = false;
       return;
