@@ -121,7 +121,8 @@ public class CoreConstants {
   public static final String SAFE_JORAN_CONFIGURATION = "SAFE_JORAN_CONFIGURATION";
   public static final String XML_PARSING = "XML_PARSING";
 
-
+  // Context Object name for the shutdown hook
+  public static final String SHUTDOWN_HOOK_THREAD = "SHUTDOWN_HOOK";
 
   /**
    * The key under which the local host name is registered in the logger

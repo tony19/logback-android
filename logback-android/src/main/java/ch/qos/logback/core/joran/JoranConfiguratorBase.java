@@ -27,6 +27,7 @@ import ch.qos.logback.core.joran.action.NestedComplexPropertyIA;
 import ch.qos.logback.core.joran.action.NewRuleAction;
 import ch.qos.logback.core.joran.action.ParamAction;
 import ch.qos.logback.core.joran.action.PropertyAction;
+import ch.qos.logback.core.joran.action.ShutdownHookAction;
 import ch.qos.logback.core.joran.action.StatusListenerAction;
 import ch.qos.logback.core.joran.action.TimestampAction;
 import ch.qos.logback.core.joran.spi.ElementSelector;
@@ -62,7 +63,7 @@ abstract public class JoranConfiguratorBase extends GenericConfigurator {
         new PropertyAction());
 
     rs.addRule(new ElementSelector("configuration/timestamp"), new TimestampAction());
-
+    rs.addRule(new ElementSelector("configuration/shutdownHook"), new ShutdownHookAction());
     rs.addRule(new ElementSelector("configuration/define"), new DefinePropertyAction());
 
     rs.addRule(new ElementSelector("configuration/conversionRule"),
