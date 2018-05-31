@@ -255,15 +255,21 @@ public class ScaffoldingForRollingTests {
   void checkZipEntryName(String filepath, String pattern) throws IOException {
     System.out.println("Checking [" + filepath + "]");
     ZipFile zf = new ZipFile(filepath);
-    Enumeration<? extends ZipEntry> entries = zf.entries();
-    assert ((entries.hasMoreElements()));
-    ZipEntry firstZipEntry = entries.nextElement();
-    assert ((!entries.hasMoreElements()));
-    System.out.println("Testing zip entry [" + firstZipEntry.getName() + "]");
-    assertTrue(firstZipEntry.getName().matches(pattern));
+    try {
+      Enumeration<? extends ZipEntry> entries = zf.entries();
+      assert ((entries.hasMoreElements()));
+      ZipEntry firstZipEntry = entries.nextElement();
+      assert ((!entries.hasMoreElements()));
+      System.out.println("Testing zip entry [" + firstZipEntry.getName() + "]");
+      assertTrue(firstZipEntry.getName().matches(pattern));
+    } finally {
+      if (zf != null) {
+        zf.close();
+      }
+    }
   }
 
-  protected void add(Future future) {
+  protected void add(Future<?> future) {
     if (future == null) return;
     if (!futureList.contains(future)) {
       futureList.add(future);
@@ -271,7 +277,7 @@ public class ScaffoldingForRollingTests {
   }
 
   protected void waitForJobsToComplete() {
-    for (Future future : futureList) {
+    for (Future<?> future : futureList) {
       try {
         future.get(10, TimeUnit.SECONDS);
       } catch (Exception e) {

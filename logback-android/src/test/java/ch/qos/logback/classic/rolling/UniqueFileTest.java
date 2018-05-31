@@ -13,7 +13,11 @@
  */
 package ch.qos.logback.classic.rolling;
 
+import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CachingDateFormatter;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -37,10 +41,22 @@ import ch.qos.logback.core.util.CoreTestConstants;
 @RunWith(RobolectricTestRunner.class)
 public class UniqueFileTest {
 
+  static String UNIK_DIFF = "UNIK_DIFF";
+
   LoggerContext lc = new LoggerContext();
   StatusChecker sc = new StatusChecker(lc);
-  Logger logger = lc.getLogger(this.getClass());
+  int diff = RandomUtil.getPositiveInt()%1000;
+  String diffAsStr = Integer.toString(diff);
 
+  @Before
+  public void setUp() {
+    System.setProperty(UNIK_DIFF, diffAsStr);
+  }
+
+  @After
+  public void tearDown() {
+    System.clearProperty(UNIK_DIFF);
+  }
 
   void loadConfig(String confifFile) throws JoranException {
     JoranConfigurator jc = new JoranConfigurator();
@@ -51,7 +67,7 @@ public class UniqueFileTest {
   @Test
   public void basic() throws Exception {
     loadConfig(ClassicTestConstants.JORAN_INPUT_PREFIX + "unique.xml");
-    CachingDateFormatter sdf = new CachingDateFormatter("yyyyMMdd'T'HHmmss");
+    CachingDateFormatter sdf = new CachingDateFormatter("yyyyMMdd'T'HHmm");
     String timestamp = sdf.format(System.currentTimeMillis());
 
     sc.assertIsErrorFree();
@@ -59,6 +75,6 @@ public class UniqueFileTest {
     Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
     root.info("hello");
     
-    ScaffoldingForRollingTests.existenceCheck(CoreTestConstants.OUTPUT_DIR_PREFIX+"TS_"+timestamp+"log.txt");
+    ScaffoldingForRollingTests.existenceCheck(CoreTestConstants.OUTPUT_DIR_PREFIX + "UNIK_" + timestamp + diffAsStr + "log.txt");
   }
 }
