@@ -51,10 +51,13 @@ public interface StatusManager {
   int getCount();
 
   /**
-   * Add a status listener.
+   * Add a status listener. The StatusManager may decide to skip installation if an
+   * earlier instance was already installed.
+   *
    * @param listener the status listener
+   * @return true if actually added, false if skipped
    */
-  void add(StatusListener listener);
+  boolean add(StatusListener listener);
 
 
   /**

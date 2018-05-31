@@ -40,7 +40,6 @@ public class ContextInitializer {
 
   final public static String  AUTOCONFIG_FILE        = "assets/logback.xml";
   final public static String  CONFIG_FILE_PROPERTY   = "logback.configurationFile";
-  final public static String  STATUS_LISTENER_CLASS  = "logback.statusListenerClass";
 
   final ClassLoader classLoader;
   final LoggerContext loggerContext;

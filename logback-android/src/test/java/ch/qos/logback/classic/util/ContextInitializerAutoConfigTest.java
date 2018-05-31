@@ -18,6 +18,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.CoreConstants;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -40,7 +42,7 @@ public class ContextInitializerAutoConfigTest {
   @After
   public void tearDown() throws Exception {
     System.clearProperty(ContextInitializer.CONFIG_FILE_PROPERTY);
-    System.clearProperty(ContextInitializer.STATUS_LISTENER_CLASS);
+    System.clearProperty(CoreConstants.STATUS_LISTENER_CLASS);
   }
 
   @SuppressWarnings("deprecation")
