@@ -33,10 +33,10 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
-import ch.qos.logback.classic.util.TeztHelper;
+import ch.qos.logback.classic.util.TestHelper;
 import ch.qos.logback.core.CoreConstants;
 
-import static ch.qos.logback.classic.util.TeztHelper.addSuppressed;
+import static ch.qos.logback.classic.util.TestHelper.addSuppressed;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.containsString;
@@ -70,7 +70,7 @@ public class ThrowableProxyConverterTest {
   @Test
   public void suppressed() throws InvocationTargetException, IllegalAccessException
   {
-    assumeTrue(TeztHelper.suppressedSupported()); // only execute on Java 7, would work anyway but doesn't make sense.
+    assumeTrue(TestHelper.suppressedSupported()); // only execute on Java 7, would work anyway but doesn't make sense.
     Exception ex = null;
     try {
       someMethod();
@@ -87,7 +87,7 @@ public class ThrowableProxyConverterTest {
   @Test
   public void suppressedWithCause() throws InvocationTargetException, IllegalAccessException
   {
-    assumeTrue(TeztHelper.suppressedSupported()); // only execute on Java 7, would work anyway but doesn't make sense.
+    assumeTrue(TestHelper.suppressedSupported()); // only execute on Java 7, would work anyway but doesn't make sense.
     Exception ex = null;
     try {
       someMethod();
@@ -104,7 +104,7 @@ public class ThrowableProxyConverterTest {
   @Test
   public void suppressedWithSuppressed() throws Exception
   {
-    assumeTrue(TeztHelper.suppressedSupported()); // only execute on Java 7, would work anyway but doesn't make sense.
+    assumeTrue(TestHelper.suppressedSupported()); // only execute on Java 7, would work anyway but doesn't make sense.
     Exception ex = null;
     try {
       someMethod();
@@ -126,13 +126,13 @@ public class ThrowableProxyConverterTest {
 
   @Test
   public void nested() {
-    Throwable t = TeztHelper.makeNestedException(1);
+    Throwable t = TestHelper.makeNestedException(1);
     verify(t);
   }
 
   @Test
   public void withArgumentOfOne() throws Exception {
-    final Throwable t = TeztHelper.makeNestedException(0);
+    final Throwable t = TestHelper.makeNestedException(0);
     t.printStackTrace(pw);
     final ILoggingEvent le = createLoggingEvent(t);
 
@@ -150,7 +150,7 @@ public class ThrowableProxyConverterTest {
 
   @Test
   public void withShortArgument() throws Exception {
-    final Throwable t = TeztHelper.makeNestedException(0);
+    final Throwable t = TestHelper.makeNestedException(0);
     t.printStackTrace(pw);
     final ILoggingEvent le = createLoggingEvent(t);
 
@@ -169,7 +169,7 @@ public class ThrowableProxyConverterTest {
   @Test
   public void skipSelectedLine() throws Exception {
     //given
-    final Throwable t = TeztHelper.makeNestedException(0);
+    final Throwable t = TestHelper.makeNestedException(0);
     t.printStackTrace(pw);
     final ILoggingEvent le = createLoggingEvent(t);
     tpc.setOptionList(Arrays.asList("full", "skipSelectedLines"));
@@ -186,7 +186,7 @@ public class ThrowableProxyConverterTest {
   @Test
   public void shouldLimitTotalLinesExcludingSkipped() throws Exception {
     //given
-    final Throwable t = TeztHelper.makeNestedException(0);
+    final Throwable t = TestHelper.makeNestedException(0);
     t.printStackTrace(pw);
     final ILoggingEvent le = createLoggingEvent(t);
     tpc.setOptionList(Arrays.asList("3", "shouldLimitTotalLinesExcludingSkipped"));

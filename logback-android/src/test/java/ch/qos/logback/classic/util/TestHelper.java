@@ -1,6 +1,6 @@
 /**
  * Logback: the reliable, generic, fast and flexible logging framework.
- * Copyright (C) 1999-2013, QOS.ch. All rights reserved.
+ * Copyright (C) 1999-2015, QOS.ch. All rights reserved.
  *
  * This program and the accompanying materials are dual-licensed under
  * either the terms of the Eclipse Public License v1.0 as published by
@@ -16,7 +16,7 @@ package ch.qos.logback.classic.util;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class TeztHelper {
+public class TestHelper {
 
   private static final Method ADD_SUPPRESSED_METHOD;
 

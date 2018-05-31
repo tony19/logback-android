@@ -23,7 +23,7 @@ import java.net.URLClassLoader;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ch.qos.logback.classic.util.TeztHelper;
+import ch.qos.logback.classic.util.TestHelper;
 
 public class PackagingDataCalculatorTest {
 
@@ -47,7 +47,7 @@ public class PackagingDataCalculatorTest {
 
   @Test
   public void nested() throws Exception {
-    Throwable t = TeztHelper.makeNestedException(3);
+    Throwable t = TestHelper.makeNestedException(3);
     ThrowableProxy tp = new ThrowableProxy(t);
     PackagingDataCalculator pdc = tp.getPackagingDataCalculator();
     pdc.calculate(tp);

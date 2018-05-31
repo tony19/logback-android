@@ -25,6 +25,7 @@ import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.util.Loader;
 import ch.qos.logback.core.util.OptionHelper;
+import ch.qos.logback.core.util.StatusListenerConfigHelper;
 
 // contributors
 // Ted Graham, Matt Fowles, see also http://jira.qos.ch/browse/LBCORE-32
