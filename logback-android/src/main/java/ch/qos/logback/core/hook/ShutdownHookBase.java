@@ -31,7 +31,7 @@ public abstract class ShutdownHookBase extends ContextAwareBase implements Shutd
      * Default method for stopping the Logback context
      */
     protected void stop() {
-        addInfo("Logback context being closed automatically via shutdown hook");
+        addInfo("Logback context being closed via shutdown hook");
 
         Context hookContext = getContext();
         if (hookContext instanceof ContextBase) {
