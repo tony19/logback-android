@@ -49,10 +49,14 @@ public class RollingFileAppender<E> extends FileAppender<E> {
       addWarn("For more information, please visit " + RFA_NO_TP_URL);
       return;
     }
+    if (!triggeringPolicy.isStarted()) {
+      addWarn("TriggeringPolicy has not started. RollingFileAppender will not start");
+      return;
+    }
 
     // we don't want to void existing log files
     if (!append) {
-      addWarn("Append mode is mandatory for RollingFileAppender");
+      addWarn("Append mode is mandatory for RollingFileAppender. Defaulting to append=true.");
       append = true;
     }
 

@@ -15,6 +15,7 @@ package ch.qos.logback.core.rolling;
 
 import ch.qos.logback.core.encoder.EchoEncoder;
 import ch.qos.logback.core.status.InfoStatus;
+import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.Before;
@@ -25,6 +26,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static org.junit.Assert.assertFalse;
 
 public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
   private SizeAndTimeBasedFNATP<Object> sizeAndTimeBasedFNATP = null;
@@ -37,7 +40,6 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
   int fileSize = 0;
   int fileIndexCounter = 0;
   int sizeThreshold = 0;
-
 
   @Before
   public void setUp() {
@@ -127,7 +129,6 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     sortedContentCheck(randomOutputDir, runLength, prefix);
   }
 
-
   void secondPhase(String testId, String file, String stem, String compressionSuffix, int runLength, String prefix) {
     rfa1.stop();
 
@@ -192,5 +193,22 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     generic("test7", "toto.log", FIRST_PHASE_ONLY, ".zip");
     List<String> zipFiles = filterElementsInListBySuffix(".zip");
     checkZipEntryMatchesZipFilename(zipFiles);
+  }
+
+  @Test
+  public void checkMissingIntToken() {
+    String stem = "toto.log";
+    String testId = "test8";
+    String compressionSuffix = "gz";
+
+    String file = (stem != null) ? randomOutputDir + stem : null;
+    initRollingFileAppender(rfa1, file);
+    sizeThreshold = 300;
+    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + "}.txt" + compressionSuffix, sizeThreshold, currentTime, 0);
+
+    StatusPrinter.print(context);
+    assertFalse(rfa1.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch("Missing integer token");
   }
 }

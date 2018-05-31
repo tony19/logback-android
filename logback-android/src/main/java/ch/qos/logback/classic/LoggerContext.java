@@ -27,6 +27,7 @@ import ch.qos.logback.classic.spi.TurboFilterList;
 import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.boolex.EventEvaluator;
 import ch.qos.logback.core.spi.FilterReply;
 import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.status.StatusListener;
@@ -78,7 +79,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
   }
 
   void initEvaluatorMap() {
-    putObject(CoreConstants.EVALUATOR_MAP, new HashMap());
+    putObject(CoreConstants.EVALUATOR_MAP, new HashMap<String, EventEvaluator<?>>());
   }
 
   /**
@@ -108,7 +109,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
     updateLoggerContextVO();
   }
 
-  public final Logger getLogger(final Class clazz) {
+  public final Logger getLogger(final Class<?> clazz) {
     return getLogger(clazz.getName());
   }
 

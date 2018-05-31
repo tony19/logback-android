@@ -89,6 +89,11 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     timeBasedFileNamingAndTriggeringPolicy.setTimeBasedRollingPolicy(this);
     timeBasedFileNamingAndTriggeringPolicy.start();
 
+    if (!timeBasedFileNamingAndTriggeringPolicy.isStarted()) {
+      addWarn("Subcomponent did not start. TimeBasedRollingPolicy will not start.");
+      return;
+    }
+
     // the maxHistory property is given to TimeBasedRollingPolicy instead of to
     // the TimeBasedFileNamingAndTriggeringPolicy. This makes it more convenient
     // for the user at the cost of inconsistency here.
@@ -232,7 +237,6 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     this.maxHistory = maxHistory;
   }
 
-
   public boolean isCleanHistoryOnStart() {
     return cleanHistoryOnStart;
   }
@@ -245,7 +249,6 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   public void setCleanHistoryOnStart(boolean cleanHistoryOnStart) {
     this.cleanHistoryOnStart = cleanHistoryOnStart;
   }
-
 
   @Override
   public String toString() {

@@ -16,6 +16,7 @@ package ch.qos.logback.core.rolling;
 import java.io.File;
 import java.util.Date;
 
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.NoAutoStart;
 import ch.qos.logback.core.rolling.helper.ArchiveRemover;
 import ch.qos.logback.core.rolling.helper.CompressionMode;
@@ -31,11 +32,19 @@ public class SizeAndTimeBasedFNATP<E> extends
   FileSize maxFileSize;
   String maxFileSizeAsString;
 
+  static String MISSING_INT_TOKEN = "Missing integer token, that is %i, in FileNamePattern [";
+  static String MISSING_DATE_TOKEN = "Missing date token, that is %d, in FileNamePattern [";
+
   @Override
   public void start() {
     // we depend on certain fields having been initialized
     // in super.start()
     super.start();
+
+    if (!validDateAndIntegerTokens()) {
+      started = false;
+      return;
+    }
 
     archiveRemover = createArchiveRemover();
     archiveRemover.setContext(context);
@@ -50,6 +59,21 @@ public class SizeAndTimeBasedFNATP<E> extends
     computeCurrentPeriodsHighestCounterValue(stemRegex);
 
     started = true;
+  }
+
+  private boolean validDateAndIntegerTokens() {
+    boolean inError = false;
+    if (tbrp.fileNamePattern.getIntegerTokenConverter() == null) {
+      inError = true;
+      addError(MISSING_INT_TOKEN + tbrp.fileNamePatternStr + "]");
+      addError(CoreConstants.SEE_MISSING_INTEGER_TOKEN);
+    }
+    if (tbrp.fileNamePattern.getPrimaryDateTokenConverter() == null) {
+      inError = true;
+      addError(MISSING_DATE_TOKEN + tbrp.fileNamePatternStr + "]");
+    }
+
+    return !inError;
   }
 
   protected ArchiveRemover createArchiveRemover() {
@@ -114,12 +138,6 @@ public class SizeAndTimeBasedFNATP<E> extends
 
     return false;
   }
-
-  private String getFileNameIncludingCompressionSuffix(Date date, int counter) {
-    return tbrp.fileNamePattern.convertMultipleArguments(
-            dateInCurrentPeriod, counter);
-  }
-
 
   @Override
   public String getCurrentPeriodsFileNameWithoutCompressionSuffix() {

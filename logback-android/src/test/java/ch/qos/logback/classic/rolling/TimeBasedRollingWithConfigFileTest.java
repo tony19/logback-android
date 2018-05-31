@@ -13,11 +13,8 @@
  */
 package ch.qos.logback.classic.rolling;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Date;
 
-import ch.qos.logback.core.util.StatusPrinter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +32,9 @@ import ch.qos.logback.core.rolling.ScaffoldingForRollingTests;
 import ch.qos.logback.core.rolling.TimeBasedFileNamingAndTriggeringPolicy;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.status.StatusChecker;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class TimeBasedRollingWithConfigFileTest extends
@@ -145,6 +145,19 @@ public class TimeBasedRollingWithConfigFileTest extends
     assertTrue("exitenceCount=" + eCount + ", expectedFilenameList.size="
             + expectedFilenameList.size(), eCount >= 4
             && eCount > expectedFilenameList.size() / 2);
+  }
+
+  @Test
+  public void timeAndSizeWithoutIntegerToken() throws Exception {
+    String testId = "timeAndSizeWithoutIntegerToken";
+    loadConfig(ClassicTestConstants.JORAN_INPUT_PREFIX + "rolling/" + testId + ".xml");
+    Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+    expectedFilenameList.add(randomOutputDir + "z" + testId);
+    RollingFileAppender<ILoggingEvent> rfa = (RollingFileAppender<ILoggingEvent>) root.getAppender("ROLLING");
+//        StatusPrinter.print(lc);
+
+    statusChecker.assertContainsMatch("Missing integer token");
+    assertFalse(rfa.isStarted());
   }
 
   void addExpectedFileNamedIfItsTime(String testId, String msg,
