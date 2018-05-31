@@ -16,6 +16,7 @@ package ch.qos.logback.core.rolling;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import ch.qos.logback.core.Context;
@@ -31,9 +32,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class RenameUtilTest {
 
@@ -104,8 +103,20 @@ public class RenameUtilTest {
   }
 
   @Test
-  public void renameByCopying() {
+  public void renameLockedAbstractFile() throws IOException, RolloverFailure {
+    RenameUtil renameUtil = new RenameUtil();
+    renameUtil.setContext(context);
 
+    String src = "abstract_pathname.txt";
+    FileOutputStream fos = new FileOutputStream(src);
+    fos.write(("hello" + diff).getBytes());
+    fos.close();
+
+    FileInputStream fisLock = new FileInputStream(src);
+
+    renameUtil.rename(src, src+"."+ diff );
+    StatusPrinter.print(context);
+    assertTrue(statusChecker.isErrorFree(0));
   }
 
 }
