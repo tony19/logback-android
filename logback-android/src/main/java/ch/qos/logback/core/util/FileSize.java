@@ -40,13 +40,13 @@ public class FileSize {
   private static final Pattern FILE_SIZE_PATTERN = Pattern.compile(LENGTH_PART
       + "\\s*" + UNIT_PART, Pattern.CASE_INSENSITIVE);
 
-  static final long KB_COEFFICIENT = 1024;
-  static final long MB_COEFFICIENT = 1024 * KB_COEFFICIENT;
-  static final long GB_COEFFICIENT = 1024 * MB_COEFFICIENT;
+  static public final long KB_COEFFICIENT = 1024;
+  static public final long MB_COEFFICIENT = 1024 * KB_COEFFICIENT;
+  static public final long GB_COEFFICIENT = 1024 * MB_COEFFICIENT;
 
   final long size;
 
-  FileSize(long size) {
+  public FileSize(long size) {
     this.size = size;
   }
 
@@ -81,4 +81,19 @@ public class FileSize {
     }
 
   }
+
+  @Override
+  public String toString() {
+    long inKB = size / KB_COEFFICIENT;
+
+    if (inKB == 0)
+      return size + " Bytes";
+
+    long inMB = size / MB_COEFFICIENT;
+    if (inMB == 0) {
+      return inKB + " KB";
+    }
+    return inMB + " MB";
+  }
+
 }

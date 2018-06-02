@@ -189,7 +189,7 @@ public class MultiThreadedRollingTest {
 
   private void printScriptHeader(String type) throws IOException {
     out("# ====================================================");
-    out("# A script to check the exactness of the output ");
+    out("# A script to checkFileCount the exactness of the output ");
     out("# produced by " + type + " test");
     out("# ====================================================");
     out("# ");

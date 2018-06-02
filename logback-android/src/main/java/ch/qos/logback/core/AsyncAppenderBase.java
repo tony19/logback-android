@@ -90,6 +90,9 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> implemen
 
   @Override
   public void start() {
+    if (isStarted()) {
+      return;
+    }
     if (appenderCount == 0) {
       addError("No attached appenders found.");
       return;

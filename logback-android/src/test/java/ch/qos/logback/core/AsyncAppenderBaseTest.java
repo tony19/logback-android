@@ -256,4 +256,17 @@ public class AsyncAppenderBaseTest {
       return (i % 3 == 0);
     }
   }
+
+  @Test
+  public void checkThatStartMethodIsIdempotent() {
+    asyncAppenderBase.addAppender(lossyAsyncAppender);
+    asyncAppenderBase.start();
+
+    // we don't need mockito for this test, but if we did here is how it would look
+    //AsyncAppenderBase<Integer>  spied = Mockito.spy(asyncAppenderBase);
+    //Mockito.doThrow(new IllegalStateException("non idempotent start")).when((UnsynchronizedAppenderBase<Integer>) spied).start();
+
+    // a second invocation of start will cause a IllegalThreadStateException thrown by the asyncAppenderBase.worker thread
+    asyncAppenderBase.start();
+  }
 }

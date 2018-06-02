@@ -26,7 +26,7 @@ public class FileSizeTest{
   
 
   @Test
-  public void test() {
+  public void testValueOf() {
     {
       FileSize fs = FileSize.valueOf("8");
       assertEquals(8, fs.getSize());
@@ -53,4 +53,22 @@ public class FileSizeTest{
     }
 
   }
+
+  @Test
+  public void testToString() {
+    {
+      FileSize fs = new FileSize(8);
+      assertEquals("8 Bytes", fs.toString());
+    }
+    {
+      FileSize fs = new FileSize(8 * 1024 + 3);
+      assertEquals("8 KB", fs.toString());
+    }
+
+    {
+      FileSize fs = new FileSize(8 * 1024 * 1024 + 3 * 1024);
+      assertEquals("8 MB", fs.toString());
+    }
+  }
+
 }
