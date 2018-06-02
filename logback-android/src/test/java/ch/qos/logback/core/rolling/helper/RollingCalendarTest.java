@@ -20,6 +20,8 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import ch.qos.logback.core.util.EnvUtil;
+
 public class RollingCalendarTest {
 
   @Test
@@ -107,8 +109,11 @@ public class RollingCalendarTest {
     checkCollisionFreeness("yyyy-DDD", true);
     checkCollisionFreeness("DDD", false);
 
-    checkCollisionFreeness("yyyy-MM-dd-uu", true);
-    checkCollisionFreeness("yyyy-MM-uu", false);
+    // 'u' is new to JDK 7
+    if (EnvUtil.isJDK7OrHigher()) {
+      checkCollisionFreeness("yyyy-MM-dd-uu", true);
+      checkCollisionFreeness("yyyy-MM-uu", false);
+    }
 
     // weekly
     checkCollisionFreeness("yyyy-MM-WW", true);
