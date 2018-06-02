@@ -19,8 +19,9 @@ import static org.junit.Assert.assertTrue;
 public class SocketAppenderMessageLossTest {
   int runLen = 100;
   Duration reconnectionDelay =  new Duration(1000);
+  static final int TIMEOUT = 3000;
 
-  @Test(timeout = 1000)
+  @Test(timeout = TIMEOUT)
   public void synchronousSocketAppender() throws Exception {
 
     SocketAppender socketAppender = new SocketAppender();
@@ -30,7 +31,7 @@ public class SocketAppenderMessageLossTest {
     runTest(socketAppender);
   }
 
-  @Test(timeout = 1000)
+  @Test(timeout = TIMEOUT)
   public void smallQueueSocketAppender() throws Exception {
 
     SocketAppender socketAppender = new SocketAppender();
@@ -40,7 +41,7 @@ public class SocketAppenderMessageLossTest {
     runTest(socketAppender);
   }
 
-  @Test(timeout = 1000)
+  @Test(timeout = TIMEOUT)
   public void largeQueueSocketAppender() throws Exception {
     SocketAppender socketAppender = new SocketAppender();
     socketAppender.setReconnectionDelay(reconnectionDelay);
