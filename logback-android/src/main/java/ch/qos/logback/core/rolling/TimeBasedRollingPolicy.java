@@ -22,6 +22,9 @@ import java.util.concurrent.TimeoutException;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.rolling.helper.*;
 
+import static ch.qos.logback.core.CoreConstants.UNBOUND_HISTORY;
+import static ch.qos.logback.core.CoreConstants.UNBOUND_TOTAL_SIZE;
+
 /**
  * <code>TimeBasedRollingPolicy</code> is both easy to configure and quite
  * powerful. It allows the roll over to be made based on time. It is possible to
@@ -35,8 +38,6 @@ import ch.qos.logback.core.rolling.helper.*;
 public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     TriggeringPolicy<E> {
   static final String FNP_NOT_SET = "The FileNamePattern option must be set before using TimeBasedRollingPolicy. ";
-  static final int INFINITE_HISTORY = 0;
-  static final long INFINITE_TOTAL_SIZE = -1;
 
   // WCS: without compression suffix
   FileNamePattern fileNamePatternWCS;
@@ -46,8 +47,8 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   Future<?> compressionFuture;
   Future<?> cleanUpFuture;
 
-  private int maxHistory = INFINITE_HISTORY;
-  private long maxTotalSize = INFINITE_TOTAL_SIZE;
+  private int maxHistory = UNBOUND_HISTORY;
+  private long totalSizeCap = UNBOUND_TOTAL_SIZE;
 
   private ArchiveRemover archiveRemover;
 
@@ -100,15 +101,17 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     // the maxHistory property is given to TimeBasedRollingPolicy instead of to
     // the TimeBasedFileNamingAndTriggeringPolicy. This makes it more convenient
     // for the user at the cost of inconsistency here.
-    if (maxHistory != INFINITE_HISTORY) {
+    if (maxHistory != UNBOUND_HISTORY) {
       archiveRemover = timeBasedFileNamingAndTriggeringPolicy.getArchiveRemover();
       archiveRemover.setMaxHistory(maxHistory);
-      archiveRemover.setMaxTotalSize(maxTotalSize);
+      archiveRemover.setTotalSizeCap(totalSizeCap);
       if(cleanHistoryOnStart) {
         addInfo("Cleaning on start up");
         Date now = new Date(timeBasedFileNamingAndTriggeringPolicy.getCurrentTime());
         cleanUpFuture = archiveRemover.cleanAsynchronously(now);
       }
+    } else if (totalSizeCap != UNBOUND_TOTAL_SIZE) {
+      addWarn("'maxHistory' is not set, ignoring 'totalSizeCap' option with value ["+totalSizeCap+"]");
     }
 
     super.start();
@@ -254,5 +257,9 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   @Override
   public String toString() {
     return "c.q.l.core.rolling.TimeBasedRollingPolicy";
+  }
+
+  public void setTotalSizeCap(long totalSizeCap) {
+    this.totalSizeCap = totalSizeCap;
   }
 }

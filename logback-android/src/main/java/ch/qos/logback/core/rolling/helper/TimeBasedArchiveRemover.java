@@ -26,6 +26,8 @@ import ch.qos.logback.core.pattern.LiteralConverter;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.FileSize;
 
+import static ch.qos.logback.core.CoreConstants.UNBOUND_TOTAL_SIZE;
+
 public class TimeBasedArchiveRemover extends ContextAwareBase implements ArchiveRemover {
 
   static protected final long UNINITIALIZED = -1;
@@ -35,8 +37,8 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
 
   final FileNamePattern fileNamePattern;
   final RollingCalendar rc;
-  int maxHistory;
-  long maxTotalSize;
+  private int maxHistory = CoreConstants.UNBOUND_HISTORY;
+  private long totalSizeCap = UNBOUND_TOTAL_SIZE;
   final boolean parentClean;
   long lastHeartBeat = UNINITIALIZED;
 
@@ -93,16 +95,16 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
 
 
 
-  void cleanByTotalSize(Date now) {
+  void capTotalSize(Date now) {
     int totalSize = 0;
     int totalRemoved = 0;
     for (int offset = 0; offset < maxHistory; offset++) {
       Date date = rc.getEndOfNextNthPeriod(now, -offset);
       File[] matchingFileArray = getFilesInPeriod(date);
-      sortByLastModified(matchingFileArray);
+      descendingSortByLastModified(matchingFileArray);
       for (File f : matchingFileArray) {
         long size = f.length();
-        if (totalSize + size > maxTotalSize) {
+        if (totalSize + size > totalSizeCap) {
           addInfo("Deleting [" + f + "]" + " of size " + new FileSize(size));
           totalRemoved += size;
           f.delete();
@@ -112,11 +114,11 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     }
     addInfo("Removed  "+ new FileSize(totalRemoved) + " of files");
   }
-  private void sortByLastModified(File[] matchingFileArray) {
+  private void descendingSortByLastModified(File[] matchingFileArray) {
     Arrays.sort(matchingFileArray, new Comparator<File>() {
       @Override
       public int compare(final File f1, final File f2) {
-        long diff = f1.lastModified() - f2.lastModified();
+        long diff = f2.lastModified() - f1.lastModified();
         return (diff < 0) ? -1 : (diff > 0) ? 1 : 0;
       }
     });
@@ -209,10 +211,9 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     return -maxHistory - 1;
   }
 
-  public void setMaxTotalSize(long maxTotalSize) {
-    this.maxTotalSize = maxTotalSize;
+  public void setTotalSizeCap(long totalSizeCap) {
+    this.totalSizeCap = totalSizeCap;
   }
-
 
   public String toString() {
     return "c.q.l.core.rolling.helper.TimeBasedArchiveRemover";
@@ -234,6 +235,9 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     @Override
     public void run() {
       clean(now);
+      if(totalSizeCap != UNBOUND_TOTAL_SIZE && totalSizeCap > 0) {
+        capTotalSize(now);
+      }
     }
   }
 
