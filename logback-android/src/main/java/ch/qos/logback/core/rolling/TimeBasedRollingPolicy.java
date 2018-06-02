@@ -173,7 +173,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
 
     if (archiveRemover != null) {
       Date now = new Date(timeBasedFileNamingAndTriggeringPolicy.getCurrentTime());
-      archiveRemover.cleanAsynchronously(now);
+      cleanUpFuture = archiveRemover.cleanAsynchronously(now);
     }
   }
 
