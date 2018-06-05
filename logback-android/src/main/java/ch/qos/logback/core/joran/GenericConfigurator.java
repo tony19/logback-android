@@ -162,9 +162,9 @@ public abstract class GenericConfigurator extends ContextAwareBase {
           throws JoranException {
 
     long threshold = System.currentTimeMillis();
-    if (!ConfigurationWatchListUtil.wasConfigurationWatchListReset(context)) {
-      informContextOfURLUsedForConfiguration(getContext(), null);
-    }
+//    if (!ConfigurationWatchListUtil.wasConfigurationWatchListReset(context)) {
+//      informContextOfURLUsedForConfiguration(getContext(), null);
+//    }
     SaxEventRecorder recorder = new SaxEventRecorder(context);
     recorder.recordEvents(inputSource);
     doConfigure(recorder.getSaxEventList());
@@ -172,7 +172,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
     StatusUtil statusUtil = new StatusUtil(context);
     if (statusUtil.noXMLParsingErrorsOccurred(threshold)) {
       addInfo("Registering current configuration as safe fallback point");
-      registerSafeConfiguration();
+      registerSafeConfiguration(recorder.getSaxEventList());
     }
   }
 
@@ -197,8 +197,8 @@ public abstract class GenericConfigurator extends ContextAwareBase {
    *
    * @since 0.9.30
    */
-  public void registerSafeConfiguration() {
-    context.putObject(SAFE_JORAN_CONFIGURATION, interpreter.getEventPlayer().getCopyOfPlayerEventList());
+  public void registerSafeConfiguration(List<SaxEvent> eventList) {
+    context.putObject(SAFE_JORAN_CONFIGURATION, eventList);
   }
 
   /**

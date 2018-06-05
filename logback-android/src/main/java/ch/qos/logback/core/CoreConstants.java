@@ -26,6 +26,14 @@ public class CoreConstants {
   // so that there are no idle threads
   public static final int CORE_POOL_SIZE = EnvUtil.isJDK5() ? 1 : 0;
 
+  // Apparently ScheduledThreadPoolExecutor has limitation where a task cannot be submitted from
+  // within a running task unless the pool has worker threads already available. ThreadPoolExecutor
+  // does not have this limitation.
+  // This causes tests failures in SocketReceiverTest.testDispatchEventForEnabledLevel and
+  // ServerSocketReceiverFunctionalTest.testLogEventFromClient.
+  // We thus set a pool size > 0 for tests to pass.
+  public static final int SCHEDULED_EXECUTOR_POOL_SIZE = 2;
+
   /**
    * Maximum number of threads to allow in a context's executor service.
    */
@@ -133,7 +141,7 @@ public class CoreConstants {
   public static final String SEE_MISSING_INTEGER_TOKEN = "See also http://logback.qos.ch/codes.html#sat_missing_integer_token";
 
   public static final String CONFIGURATION_WATCH_LIST = "CONFIGURATION_WATCH_LIST";
-  public static final String CONFIGURATION_WATCH_LIST_RESET = "CONFIGURATION_WATCH_LIST_RESET";
+  public static final String CONFIGURATION_WATCH_LIST_RESET_X = "CONFIGURATION_WATCH_LIST_RESET";
 
   public static final String SAFE_JORAN_CONFIGURATION = "SAFE_JORAN_CONFIGURATION";
   public static final String XML_PARSING = "XML_PARSING";
@@ -207,4 +215,6 @@ public class CoreConstants {
   public static final String RIGHT_ACCOLADE = new String(new char[] {CURLY_RIGHT});
   public static final long UNBOUND_TOTAL_SIZE = 0;
   public static final int UNBOUND_HISTORY = 0;
+
+  public static final String RECONFIGURE_ON_CHANGE_TASK = "RECONFIGURE_ON_CHANGE_TASK";
 }

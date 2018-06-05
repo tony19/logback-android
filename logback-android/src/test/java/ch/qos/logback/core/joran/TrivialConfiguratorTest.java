@@ -101,7 +101,7 @@ public class TrivialConfiguratorTest {
       doTest(filename);
     } catch (Exception e) {
     }
-    assertTrue(tsl.list.size() >= 1);
+    assertEquals(2, tsl.list.size());
     Status s0 = tsl.list.get(0);
     assertTrue(s0.getMessage().startsWith(CoreConstants.XML_PARSING));
   }

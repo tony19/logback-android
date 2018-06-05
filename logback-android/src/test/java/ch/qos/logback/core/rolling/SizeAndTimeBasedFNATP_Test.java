@@ -61,7 +61,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
                             long givenTime, long lastCheck) {
     sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<Object>();
     tbrp.setContext(context);
-    sizeAndTimeBasedFNATP.setMaxFileSize("" + sizeThreshold);
+    sizeAndTimeBasedFNATP.setMaxFileSize(Integer.toString(sizeThreshold));
     tbrp.setTimeBasedFileNamingAndTriggeringPolicy(sizeAndTimeBasedFNATP);
     tbrp.setFileNamePattern(filenamePattern);
     tbrp.setParent(rfa);
@@ -158,7 +158,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
 
   static final boolean FIRST_PHASE_ONLY = false;
   static final boolean WITH_SECOND_PHASE = true;
-  static String DEFAULT_COMPRESSION_SUFFIX = "";
+  static final String DEFAULT_COMPRESSION_SUFFIX = "";
 
   @Test
   public void noCompression_FileSet_NoRestart_1() throws InterruptedException, ExecutionException, IOException {

@@ -224,7 +224,7 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
           JoranConfigurator.informContextOfURLUsedForConfiguration(lc, mainURL);
           joranConfigurator.doConfigure(eventList);
           addInfo("Re-registering previous fallback configuration once more as a fallback configuration point");
-          joranConfigurator.registerSafeConfiguration();
+          joranConfigurator.registerSafeConfiguration(eventList);
         } catch (JoranException e) {
           addError("Unexpected exception thrown by a configuration considered safe.", e);
         }

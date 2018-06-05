@@ -22,7 +22,9 @@ import ch.qos.logback.core.rolling.helper.ArchiveRemover;
 import ch.qos.logback.core.rolling.helper.CompressionMode;
 import ch.qos.logback.core.rolling.helper.FileFilterUtil;
 import ch.qos.logback.core.rolling.helper.SizeAndTimeBasedArchiveRemover;
+import ch.qos.logback.core.util.DefaultInvocationGate;
 import ch.qos.logback.core.util.FileSize;
+import ch.qos.logback.core.util.InvocationGate;
 
 @NoAutoStart
 public class SizeAndTimeBasedFNATP<E> extends
@@ -105,12 +107,8 @@ public class SizeAndTimeBasedFNATP<E> extends
     }
   }
 
-  // IMPORTANT: This field can be updated by multiple threads. It follows that
-  // its values may *not* be incremented sequentially. However, we don't care
-  // about the actual value of the field except that from time to time the
-  // expression (invocationCounter++ & invocationMask) == invocationMask) should be true.
-  private int invocationCounter;
-  private int invocationMask = 0x1;
+  InvocationGate invocationGate = new DefaultInvocationGate();
+  int getSizeInvocations = 0;
 
   public boolean isTriggeringEvent(File activeFile, final E event) {
 
@@ -125,13 +123,12 @@ public class SizeAndTimeBasedFNATP<E> extends
       return true;
     }
 
-    // for performance reasons, check for changes every 16,invocationMask invocations
-    if (((++invocationCounter) & invocationMask) != invocationMask) {
+    if (invocationGate.isTooSoon(time)) {
       return false;
     }
-    if (invocationMask < 0x0F) {
-      invocationMask = (invocationMask << 1) + 1;
-    }
+
+    invocationGate.updateMaskIfNecessary(time);
+    getSizeInvocations++;
 
     if (activeFile.length() >= maxFileSize.getSize()) {
       elapsedPeriodsFileName = tbrp.fileNamePatternWCS

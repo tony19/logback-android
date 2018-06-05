@@ -15,6 +15,8 @@ package ch.qos.logback.core;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.spi.PropertyContainer;
@@ -103,6 +105,16 @@ public interface Context extends PropertyContainer {
    */
   Object getConfigurationLock();
 
+  /**
+   * Returns the ScheduledExecutorService for this context.
+   * @return
+   * @since 1.1.7
+   */
+  // Apparently ScheduledThreadPoolExecutor has limitation where a task cannot be submitted from
+  // within a running task. ThreadPoolExecutor does not have this limitation.
+  // This causes tests failutes in SocketReceiverTest.testDispatchEventForEnabledLevel and
+  // ServerSocketReceiverFunctionalTest.testLogEventFromClient.
+  ScheduledExecutorService getScheduledExecutorService();
 
   /**
    * Every context has an ExecutorService which be invoked to execute certain
@@ -123,4 +135,5 @@ public interface Context extends PropertyContainer {
    */
   void register(LifeCycle component);
 
+  void addScheduledFuture(ScheduledFuture<?> scheduledFuture);
 }

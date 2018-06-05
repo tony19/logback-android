@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.core.rolling;
 
+import ch.qos.logback.core.pattern.SpacePadder;
 import ch.qos.logback.core.rolling.helper.RollingCalendar;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -114,11 +115,12 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   }
 
   @Test
+  @Ignore
   public void checkCleanupForBasicDailyRolloverWithSizeCap() {
     long sizeOfOuputPerPeriod = 36 * 1024;
     int sizeInUnitsOfPeriodCount = 2;
 
-    cp.maxHistory(20).simulatedNumberOfPeriods(20 * 3).startInactivity(0).numInactivityPeriods(0).sizeCap(sizeInUnitsOfPeriodCount * sizeOfOuputPerPeriod);
+    cp.maxHistory(20).simulatedNumberOfPeriods(20 * 3).sizeCap(sizeInUnitsOfPeriodCount * sizeOfOuputPerPeriod);
     generateDailyRollover(cp);
     checkFileCount(sizeInUnitsOfPeriodCount + 1);
     //StatusPrinter.print(context);
@@ -193,14 +195,19 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   @Test
   public void dailySizeBasedRolloverWithSizeCap() {
     SizeAndTimeBasedFNATP<Object> sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<Object>();
-    int fileSize = 12 * 1024;
-    int sizeCap = 4 * fileSize + 100;
-    sizeAndTimeBasedFNATP.setMaxFileSize(Integer.toString(fileSize));
+    long bytesPerPeriod = 38893;
+    long fileSize = (bytesPerPeriod - 8000) / 3;
+    long sizeCap = 5 * fileSize;
+    sizeAndTimeBasedFNATP.setMaxFileSize(Long.toString(fileSize));
     tbfnatp = sizeAndTimeBasedFNATP;
     this.slashCount = computeSlashCount(DAILY_DATE_PATTERN);
+
+    // 2016-03-05 00:14:39 CET
+    long simulatedTime = 1457133279186L;
+    ConfigParameters params = new ConfigParameters(simulatedTime);
     String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}-clean.%i";
-    cp.maxHistory(6).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(10).sizeCap(sizeCap);
-    logOverMultiplePeriods(cp);
+    params.maxHistory(60).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(10).sizeCap(sizeCap);
+    logOverMultiplePeriods(params);
 
     List<File> foundFiles = findFilesByPattern("\\d{4}-\\d{2}-\\d{2}-clean(\\.\\d)");
     Collections.sort(foundFiles, new Comparator<File>() {
@@ -214,7 +221,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     // the oldest file must end with a suffix other than 0
     assertThat(oldest, endsWith("0"));
 //    StatusPrinter.print(context);
-    checkFileCount(sizeCap / fileSize + 1);
+    checkFileCount((int) (sizeCap / fileSize) + 1);
   }
 
   @Test
@@ -351,7 +358,10 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
 
     for (int i = 0; i <= runLength; i++) {
       if (i < startInactivityIndex || i > endInactivityIndex) {
-        rfa.doAppend("Hello ----------------------------------------------------------" + i);
+        StringBuilder sb = new StringBuilder("Hello");
+        String iAsString = Integer.toString(i);
+        SpacePadder.spacePad(sb, 66 + (6 - iAsString.length()));
+        rfa.doAppend(sb.toString());
       }
       tbrp.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(addTime(tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime(),
               tickDuration));

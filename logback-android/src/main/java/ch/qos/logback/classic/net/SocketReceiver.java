@@ -116,8 +116,9 @@ public class SocketReceiver extends ReceiverBase
         SocketConnector connector = createConnector(address, port, 0,
                 reconnectionDelay);
         connectorTask = activateConnector(connector);
-        if (connectorTask == null)
+        if (connectorTask == null) {
           break;
+        }
         socket = waitForConnectorToReturnASocket();
         if (socket == null)
           break;
