@@ -122,6 +122,7 @@ public interface Context extends PropertyContainer {
    *
    * @return the executor for this context.
    * @since 1.0.0
+   * @deprecated use {@link #getScheduledExecutorService()} instead
    */
   ExecutorService getExecutorService();
 
