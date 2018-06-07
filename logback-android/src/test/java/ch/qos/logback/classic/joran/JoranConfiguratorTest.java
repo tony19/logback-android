@@ -13,11 +13,9 @@
  */
 package ch.qos.logback.classic.joran;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import ch.qos.logback.classic.jul.JULHelper;
 import ch.qos.logback.core.pattern.parser.Parser;
@@ -266,31 +264,6 @@ public class JoranConfiguratorTest {
     assertEquals("hello user1", le.getMessage());
     le = (ILoggingEvent) listAppender.list.get(1);
     assertEquals("hello user2", le.getMessage());
-  }
-
-  // Tests whether ConfigurationAction is installing ReconfigureOnChangeFilter
-  @Test
-  public void autoscanShouldReconfigureOnFileChange() throws Exception {
-
-    String configFileAsStr = ClassicTestConstants.JORAN_INPUT_PREFIX
-            + "scan1.xml";
-    configure(configFileAsStr);
-
-    File file = new File(configFileAsStr);
-    file.setLastModified(System.currentTimeMillis());
-
-    Thread.sleep(10);
-    // scanning requires 16 logs
-    for (int i = 0; i < 16; i++) {
-      logger.debug("after " + i);
-    }
-
-    loggerContext.getScheduledExecutorService().shutdown();
-    loggerContext.getScheduledExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS);
-
-    StatusChecker checker = new StatusChecker(loggerContext);
-    checker.assertIsErrorFree();
-    checker.assertContainsMatch(CoreConstants.RESET_MSG_PREFIX);
   }
 
   @Test

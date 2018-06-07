@@ -35,7 +35,7 @@ public class MockContext extends ContextBase {
   private Status lastStatus;
 
   public MockContext() {
-    this(new MockExecutorService());
+    this(new MockScheduledExecutorService());
   }
 
   public MockContext(ExecutorService executorService) {

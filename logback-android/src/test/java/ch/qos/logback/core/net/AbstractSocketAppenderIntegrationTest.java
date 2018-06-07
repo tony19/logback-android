@@ -31,6 +31,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +42,7 @@ import org.junit.Test;
 import ch.qos.logback.core.net.mock.MockContext;
 import ch.qos.logback.core.net.server.ServerSocketUtil;
 import ch.qos.logback.core.spi.PreSerializationTransformer;
+import ch.qos.logback.core.util.ExecutorServiceUtil;
 
 /**
  * Integration tests for {@link ch.qos.logback.core.net.AbstractSocketAppender}.
@@ -52,7 +54,7 @@ public class AbstractSocketAppenderIntegrationTest {
 
     private static final int TIMEOUT = 2000;
 
-    private ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+    private ScheduledExecutorService executorService = ExecutorServiceUtil.newScheduledExecutorService();
     private MockContext mockContext = new MockContext(executorService);
     private AutoFlushingObjectWriter objectWriter;
     private ObjectWriterFactory objectWriterFactory = new SpyProducingObjectWriterFactory();
