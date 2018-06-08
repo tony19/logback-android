@@ -18,6 +18,10 @@ import static ch.qos.logback.classic.joran.ReconfigureOnChangeTask.DETECTED_CHAN
 import static ch.qos.logback.classic.joran.ReconfigureOnChangeTask.FALLING_BACK_TO_SAFE_CONFIGURATION;
 import static ch.qos.logback.classic.joran.ReconfigureOnChangeTask.RE_REGISTERING_PREVIOUS_SAFE_CONFIGURATION;
 import static ch.qos.logback.core.CoreConstants.RECONFIGURE_ON_CHANGE_TASK;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -28,13 +32,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -53,6 +59,7 @@ import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class ReconfigureOnChangeTaskTest {
     final static int THREAD_COUNT = 5;
 
@@ -70,7 +77,7 @@ public class ReconfigureOnChangeTaskTest {
 
     final static String INCLUSION_SCAN_INNER0_AS_STR = JORAN_INPUT_PREFIX + "roct/inclusion/inner0.xml";
 
-    final static String INCLUSION_SCAN_INNER1_AS_STR = "target/test-classes/asResource/inner1.xml";
+    final static String INCLUSION_SCAN_INNER1_AS_STR = ".+/asResource/inner1.xml$";
 
     LoggerContext loggerContext = new LoggerContext();
     Logger logger = loggerContext.getLogger(this.getClass());
@@ -95,11 +102,11 @@ public class ReconfigureOnChangeTaskTest {
     }
 
     @Test
-    public void checkBasicLifecyle() throws JoranException, IOException, InterruptedException {
-        File file = new File(SCAN1_FILE_AS_STR);
+    public void checkBasicLifecyle() throws JoranException, InterruptedException {
+        File file = new File(SCAN1_FILE_AS_STR).getAbsoluteFile();
         configure(file);
         List<File> fileList = getConfigurationWatchList(loggerContext);
-        assertThatListContainsFile(fileList, file);
+        assertThat(fileList, hasItems(file));
         checkThatTaskHasRan();
         checkThatTaskCanBeStopped();
     }
@@ -118,36 +125,38 @@ public class ReconfigureOnChangeTaskTest {
     }
 
     List<File> getConfigurationWatchList(LoggerContext context) {
-        ConfigurationWatchList configurationWatchList = ConfigurationWatchListUtil.getConfigurationWatchList(loggerContext);
+        ConfigurationWatchList configurationWatchList = ConfigurationWatchListUtil.getConfigurationWatchList(context);
         return configurationWatchList.getCopyOfFileWatchList();
     }
 
     @Test(timeout = 4000L)
-    public void scanWithFileInclusion() throws JoranException, IOException, InterruptedException {
-        File topLevelFile = new File(INCLUSION_SCAN_TOPLEVEL0_AS_STR);
-        File innerFile = new File(INCLUSION_SCAN_INNER0_AS_STR);
+    public void scanWithFileInclusion() throws JoranException, InterruptedException {
+        File topLevelFile = new File(INCLUSION_SCAN_TOPLEVEL0_AS_STR).getAbsoluteFile();
+        File innerFile = new File(INCLUSION_SCAN_INNER0_AS_STR).getAbsoluteFile();
         configure(topLevelFile);
         waitForReconfigureOnChangeTaskToRun();
         List<File> fileList = getConfigurationWatchList(loggerContext);
-        assertThatListContainsFile(fileList, topLevelFile);
-        assertThatListContainsFile(fileList, innerFile);
+        assertThat(fileList, hasItems(topLevelFile, innerFile));
         checkThatTaskHasRan();
         checkThatTaskCanBeStopped();
     }
 
     @Test(timeout = 4000L)
-    public void scanWithResourceInclusion() throws JoranException, IOException, InterruptedException {
-        File topLevelFile = new File(INCLUSION_SCAN_TOP_BY_RESOURCE_AS_STR);
-        File innerFile = new File(INCLUSION_SCAN_INNER1_AS_STR);
+    public void scanWithResourceInclusion() throws JoranException {
+        File topLevelFile = new File(INCLUSION_SCAN_TOP_BY_RESOURCE_AS_STR).getAbsoluteFile();
         configure(topLevelFile);
         List<File> fileList = getConfigurationWatchList(loggerContext);
-        assertThatListContainsFile(fileList, topLevelFile);
-        assertThatListContainsFile(fileList, innerFile);
+        List<String> filenameList = new ArrayList<String>();
+        for (File f : fileList) {
+            filenameList.add(f.getAbsolutePath());
+        }
+        assertThat(filenameList, hasItem(matchesPattern(INCLUSION_SCAN_INNER1_AS_STR)));
+        assertThat(filenameList, hasItem(topLevelFile.getAbsolutePath()));
     }
 
     // See also http://jira.qos.ch/browse/LOGBACK-338
     @Test
-    public void reconfigurationIsNotPossibleInTheAbsenceOfATopFile() throws IOException, JoranException, InterruptedException {
+    public void reconfigurationIsNotPossibleInTheAbsenceOfATopFile() throws IOException, JoranException {
         String configurationStr = "<configuration scan=\"true\" scanPeriod=\"50 millisecond\"><include resource=\"asResource/inner1.xml\"/></configuration>";
         configure(new ByteArrayInputStream(configurationStr.getBytes("UTF-8")));
 
@@ -166,10 +175,10 @@ public class ReconfigureOnChangeTaskTest {
     public void fallbackToSafe_FollowedByRecovery() throws IOException, JoranException, InterruptedException {
         String path = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_fallbackToSafe-" + diff + ".xml";
         File topLevelFile = new File(path);
-        writeToFile(topLevelFile, "<configuration scan=\"true\" scanPeriod=\"5 millisecond\"><root level=\"ERROR\"/></configuration> ");
+        writeToFile(topLevelFile, "<configuration debug=\"true\" scan=\"true\" scanPeriod=\"5 millisecond\"><root level=\"ERROR\"/></configuration> ");
         configure(topLevelFile);
         CountDownLatch changeDetectedLatch = waitForTaskAndAttachReconfigDoneListener(null);
-        writeToFile(topLevelFile, "<configuration scan=\"true\" scanPeriod=\"5 millisecond\">\n" + "  <root></configuration>");
+        writeToFile(topLevelFile, "<configuration debug=\"true\" scan=\"true\" scanPeriod=\"5 millisecond\">\n" + "  <root></configuration>");
         ReconfigureOnChangeTask oldRoct = getRegisteredReconfigureTask();
         changeDetectedLatch.await();
 
@@ -179,7 +188,7 @@ public class ReconfigureOnChangeTaskTest {
         loggerContext.getStatusManager().clear();
 
         CountDownLatch secondDoneLatch = waitForTaskAndAttachReconfigDoneListener(oldRoct);
-        writeToFile(topLevelFile, "<configuration scan=\"true\" scanPeriod=\"5 millisecond\"><root level=\"ERROR\"/></configuration> ");
+        writeToFile(topLevelFile, "<configuration debug=\"true\" scan=\"true\" scanPeriod=\"5 millisecond\"><root level=\"ERROR\"/></configuration> ");
         secondDoneLatch.await();
 
         statusChecker.assertIsErrorFree();
@@ -187,11 +196,11 @@ public class ReconfigureOnChangeTaskTest {
     }
 
     @Test(timeout = 4000L)
-    public void fallbackToSafeWithIncludedFile_FollowedByRecovery() throws IOException, JoranException, InterruptedException, ExecutionException {
+    public void fallbackToSafeWithIncludedFile_FollowedByRecovery() throws IOException, JoranException, InterruptedException {
         String topLevelFileAsStr = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_top-" + diff + ".xml";
         String innerFileAsStr = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_inner-" + diff + ".xml";
         File topLevelFile = new File(topLevelFileAsStr);
-        writeToFile(topLevelFile, "<configuration xdebug=\"true\" scan=\"true\" scanPeriod=\"5 millisecond\"><include file=\"" + innerFileAsStr
+        writeToFile(topLevelFile, "<configuration debug=\"true\" scan=\"true\" scanPeriod=\"5 millisecond\"><include file=\"" + innerFileAsStr
                 + "\"/></configuration> ");
 
         File innerFile = new File(innerFileAsStr);
@@ -275,7 +284,7 @@ public class ReconfigureOnChangeTaskTest {
         return roct;
     }
 
-    private CountDownLatch waitForTaskAndAttachReconfigDoneListener(ReconfigureOnChangeTask oldTask) throws InterruptedException {
+    private CountDownLatch waitForTaskAndAttachReconfigDoneListener(ReconfigureOnChangeTask oldTask) {
         ReconfigureOnChangeTask roct = oldTask;
         while(roct == oldTask) {
             roct = getRegisteredReconfigureTask();
@@ -299,7 +308,7 @@ public class ReconfigureOnChangeTaskTest {
 
     // check for deadlocks
     @Test(timeout = 4000L)
-    public void scan_LOGBACK_474() throws JoranException, IOException, InterruptedException {
+    public void scan_LOGBACK_474() throws JoranException, InterruptedException {
         loggerContext.setName("scan_LOGBACK_474");
         File file = new File(SCAN_LOGBACK_474_FILE_AS_STR);
         // StatusListenerConfigHelper.addOnConsoleListenerInstance(loggerContext, new OnConsoleStatusListener());
@@ -316,11 +325,6 @@ public class ReconfigureOnChangeTaskTest {
         loggerContext.getStatusManager().add(new InfoStatus("end of execution ", this));
         StatusPrinter.print(loggerContext);
         checkResetCount(expectedResets);
-    }
-
-    private void assertThatListContainsFile(List<File> fileList, File file) {
-        // conversion to absolute file seems to work nicely
-        assertTrue(fileList.contains(file.getAbsoluteFile()));
     }
 
     private void checkResetCount(int expected) {

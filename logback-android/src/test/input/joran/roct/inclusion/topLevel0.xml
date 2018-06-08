@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE configuration>
 
-<configuration scan="true" scanPeriod="5 milliseconds">
+<configuration debug="true" scan="true" scanPeriod="5 milliseconds">
 
   <include file="src/test/input/joran/roct/inclusion/inner0.xml"/>
 
