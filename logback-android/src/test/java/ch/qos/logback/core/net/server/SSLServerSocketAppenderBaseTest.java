@@ -15,8 +15,6 @@ package ch.qos.logback.core.net.server;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.concurrent.Executors;
-
 import org.junit.Before;
 import org.junit.Test;
 

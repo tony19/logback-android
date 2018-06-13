@@ -113,6 +113,7 @@ public class SizeAndTimeBasedFNATP<E> extends
   public boolean isTriggeringEvent(File activeFile, final E event) {
 
     long time = getCurrentTime();
+    // first check for roll-over based on time
     if (time >= nextCheck) {
       Date dateInElapsedPeriod = dateInCurrentPeriod;
       elapsedPeriodsFileName = tbrp.fileNamePatternWCS
@@ -123,11 +124,11 @@ public class SizeAndTimeBasedFNATP<E> extends
       return true;
     }
 
+    // next check for roll-over based on size
     if (invocationGate.isTooSoon(time)) {
       return false;
     }
 
-    invocationGate.updateMaskIfNecessary(time);
     getSizeInvocations++;
 
     if (activeFile.length() >= maxFileSize.getSize()) {
