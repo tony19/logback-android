@@ -19,6 +19,8 @@ import java.net.InetAddress;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -28,6 +30,7 @@ import ch.qos.logback.classic.LoggerContext;
  *
  * @author Carl Harris
  */
+@RunWith(RobolectricTestRunner.class)
 public class SSLSocketReceiverTest {
 
   private SSLSocketReceiver remote =

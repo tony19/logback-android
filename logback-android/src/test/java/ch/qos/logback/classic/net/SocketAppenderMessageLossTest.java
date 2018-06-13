@@ -8,6 +8,8 @@ import ch.qos.logback.core.read.ListAppender;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.Duration;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.concurrent.CountDownLatch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(RobolectricTestRunner.class)
 public class SocketAppenderMessageLossTest {
   int runLen = 100;
   Duration reconnectionDelay =  new Duration(1000);

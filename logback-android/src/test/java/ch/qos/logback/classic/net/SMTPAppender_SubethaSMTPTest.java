@@ -29,6 +29,8 @@ import javax.mail.internet.MimeMultipart;
 
 import org.dom4j.io.SAXReader;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.subethamail.smtp.auth.EasyAuthenticationHandlerFactory;
 import org.subethamail.smtp.auth.LoginFailedException;
 import org.subethamail.smtp.auth.UsernamePasswordValidator;
@@ -45,6 +47,7 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@RunWith(RobolectricTestRunner.class)
 public class SMTPAppender_SubethaSMTPTest {
   static final String TEST_SUBJECT = "test subject";
   static final String HEADER = "HEADER\n";

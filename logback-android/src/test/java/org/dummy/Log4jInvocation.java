@@ -18,6 +18,8 @@ import static junit.framework.Assert.assertEquals;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
@@ -31,6 +33,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  * @author Ceki Gulcu
  *
  */
+@RunWith(RobolectricTestRunner.class)
 public class Log4jInvocation {
 
   static final String HELLO = "Hello";
