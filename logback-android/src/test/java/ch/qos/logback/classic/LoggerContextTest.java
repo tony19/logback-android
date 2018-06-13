@@ -213,6 +213,21 @@ public class LoggerContextTest {
   }
 
   @Test
+  public void loggerNameEndingInDotOrDollarShouldWork() {
+    {
+      String loggerName = "toto.x.";
+      Logger logger = lc.getLogger(loggerName);
+      assertEquals(loggerName, logger.getName());
+    }
+
+    {
+      String loggerName = "toto.x$";
+      Logger logger = lc.getLogger(loggerName);
+      assertEquals(loggerName, logger.getName());
+    }
+  }
+
+  @Test
   public void levelResetTest() {
     Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
     root.setLevel(Level.TRACE);
