@@ -207,6 +207,7 @@ public class ReconfigureOnChangeTaskTest {
 
         CountDownLatch doneLatch = waitForReconfigurationToBeDone(null);
         ReconfigureOnChangeTask oldRoct = getRegisteredReconfigureTask();
+        assertNotNull(oldRoct);
         writeToFile(innerFile, "<included>\n<root>\n</included>");
         doneLatch.await();
 
