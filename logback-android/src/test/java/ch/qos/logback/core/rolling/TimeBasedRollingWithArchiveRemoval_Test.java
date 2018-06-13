@@ -125,22 +125,29 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     return millisAtEnd;
   }
 
-  // FIXME: Fix failing test
-  @Ignore
   @Test
-  public void checkCrossedPeriods() {
+  public void checkCrossedPeriodsWithDSTBarrier() {
     long SAT_2016_03_26_T_230705_CET = WED_2016_03_23_T_230705_CET + 3 * CoreConstants.MILLIS_IN_ONE_DAY;
     System.out.println("SAT_2016_03_26_T_230705_CET " + new Date(SAT_2016_03_26_T_230705_CET));
     long MON_2016_03_28_T_000705_CET = SAT_2016_03_26_T_230705_CET + CoreConstants.MILLIS_IN_ONE_DAY;
     System.out.println("MON_2016_03_28_T_000705_CET " + new Date(MON_2016_03_28_T_000705_CET));
 
-    int result = computeCrossedDayBarriers(SAT_2016_03_26_T_230705_CET, MON_2016_03_28_T_000705_CET);
+    int result = computeCrossedDayBarriers(SAT_2016_03_26_T_230705_CET, MON_2016_03_28_T_000705_CET, "CET");
     assertEquals(2, result);
   }
 
   private int computeCrossedDayBarriers(long currentTime, long millisAtEnd) {
-    LocalDate startInstant = new LocalDate(currentTime, DateTimeZone.getDefault());
-    LocalDate endInstant = new LocalDate(millisAtEnd, DateTimeZone.getDefault());
+    return computeCrossedDayBarriers(currentTime, millisAtEnd, null);
+  }
+
+  private int computeCrossedDayBarriers(long currentTime, long millisAtEnd, String timeZoneID) {
+    DateTimeZone dateTimeZone = DateTimeZone.getDefault();
+    if (timeZoneID != null) {
+      dateTimeZone = DateTimeZone.forID(timeZoneID);
+
+    }
+    LocalDate startInstant = new LocalDate(currentTime, dateTimeZone);
+    LocalDate endInstant = new LocalDate(millisAtEnd, dateTimeZone);
     Days days = Days.daysBetween(startInstant, endInstant);
     return days.getDays();
   }
