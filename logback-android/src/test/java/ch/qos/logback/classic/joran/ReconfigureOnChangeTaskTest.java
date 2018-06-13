@@ -23,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -38,7 +39,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -168,9 +168,7 @@ public class ReconfigureOnChangeTaskTest {
         assertEquals(0, loggerContext.getScheduledFutures().size());
     }
 
-    // FIXME: Fix failing test
-    @Ignore
-    @Test(timeout = 4000L)
+    @Test(timeout = 3000L)
     public void fallbackToSafe_FollowedByRecovery() throws IOException, JoranException, InterruptedException {
         String path = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_fallbackToSafe-" + diff + ".xml";
         File topLevelFile = new File(path);
@@ -178,6 +176,7 @@ public class ReconfigureOnChangeTaskTest {
         configure(topLevelFile);
         CountDownLatch changeDetectedLatch = waitForReconfigurationToBeDone(null);
         ReconfigureOnChangeTask oldRoct = getRegisteredReconfigureTask();
+        assertNotNull(oldRoct);
         writeToFile(topLevelFile, "<configuration debug=\"true\" scan=\"true\" scanPeriod=\"5 millisecond\">\n" + "  <root></configuration>");
         changeDetectedLatch.await();
 
@@ -194,8 +193,6 @@ public class ReconfigureOnChangeTaskTest {
         statusChecker.containsMatch(DETECTED_CHANGE_IN_CONFIGURATION_FILES);
     }
 
-    // FIXME: Fix failing test
-    @Ignore
     @Test(timeout = 4000L)
     public void fallbackToSafeWithIncludedFile_FollowedByRecovery() throws IOException, JoranException, InterruptedException {
         String topLevelFileAsStr = CoreTestConstants.OUTPUT_DIR_PREFIX + "reconfigureOnChangeConfig_top-" + diff + ".xml";
@@ -355,6 +352,9 @@ public class ReconfigureOnChangeTaskTest {
         FileWriter fw = new FileWriter(file);
         fw.write(contents);
         fw.close();
+        // on linux changes to last modified are not propagated if the
+        // time stamp is near the previous time stamp hence the random delta
+        file.setLastModified(System.currentTimeMillis()+RandomUtil.getPositiveInt());
     }
 
     class Harness extends AbstractMultiThreadedHarness {
