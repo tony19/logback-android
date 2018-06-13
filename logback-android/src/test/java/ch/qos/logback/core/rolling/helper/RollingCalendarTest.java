@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.util.EnvUtil;
 
 public class RollingCalendarTest {
@@ -96,6 +97,22 @@ public class RollingCalendarTest {
       long expected = origin + p * MILLIS_IN_DAY;
       assertEquals("p=" + p, expected, result.getTime());
     }
+  }
+
+  // Wed Mar 23 23:07:05 CET 2016
+  final long WED_2016_03_23_T_230705_CET = 1458770825333L;
+
+  @Test
+  public void testBarrierCrossingComputation() {
+    checkPeriodBarriersCrossed("yyyy-MM-dd'T'HHmmss", WED_2016_03_23_T_230705_CET, WED_2016_03_23_T_230705_CET + 3 * CoreConstants.MILLIS_IN_ONE_SECOND, 3);
+    checkPeriodBarriersCrossed("yyyy-MM-dd'T'HHmm", WED_2016_03_23_T_230705_CET, WED_2016_03_23_T_230705_CET + 3 * CoreConstants.MILLIS_IN_ONE_MINUTE, 3);
+    checkPeriodBarriersCrossed("yyyy-MM-dd'T'HH", WED_2016_03_23_T_230705_CET, WED_2016_03_23_T_230705_CET + 3 * CoreConstants.MILLIS_IN_ONE_HOUR, 3);
+    checkPeriodBarriersCrossed("yyyy-MM-dd", WED_2016_03_23_T_230705_CET, WED_2016_03_23_T_230705_CET + 3 * CoreConstants.MILLIS_IN_ONE_DAY, 3);
+  }
+
+  private void checkPeriodBarriersCrossed(String pattern, long start, long end, int count) {
+    RollingCalendar rc = new RollingCalendar(pattern);
+    assertEquals(count, rc.periodBarriersCrossed(start, end));
   }
 
   @Test

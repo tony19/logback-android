@@ -30,9 +30,12 @@ import static ch.qos.logback.core.CoreConstants.UNBOUND_TOTAL_SIZE;
 
 public class TimeBasedArchiveRemover extends ContextAwareBase implements ArchiveRemover {
 
+  // we wish to leave two archive files alone even if their total is over totalSizeCap
+  private static final int UNTOUCHABLE_ARCHIVE_FILE_COUNT = 2;
+
   static protected final long UNINITIALIZED = -1;
   // aim for 64 days, except in case of hourly rollover
-  static protected final long INACTIVITY_TOLERANCE_IN_MILLIS = 64L * (long) CoreConstants.MILLIS_IN_ONE_DAY;
+  static protected final long INACTIVITY_TOLERANCE_IN_MILLIS = 32L * (long) CoreConstants.MILLIS_IN_ONE_DAY;
   static final int MAX_VALUE_FOR_INACTIVITY_PERIODS = 14 * 24; // 14 days in case of hourly rollover
 
   final FileNamePattern fileNamePattern;
@@ -63,7 +66,6 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     }
   }
 
-
   protected File[] getFilesInPeriod(Date dateOfPeriodToClean) {
     String filenameToDelete = fileNamePattern.convert(dateOfPeriodToClean);
     File file2Delete = new File(filenameToDelete);
@@ -93,8 +95,6 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     }
   }
 
-
-
   void capTotalSize(Date now) {
     int totalSize = 0;
     int totalRemoved = 0;
@@ -105,9 +105,13 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
       for (File f : matchingFileArray) {
         long size = f.length();
         if (totalSize + size > totalSizeCap) {
-          addInfo("Deleting [" + f + "]" + " of size " + new FileSize(size));
-          totalRemoved += size;
-          f.delete();
+          if (offset >= UNTOUCHABLE_ARCHIVE_FILE_COUNT) {
+            addInfo("Deleting [" + f + "]" + " of size " + new FileSize(size));
+            totalRemoved += size;
+            f.delete();
+          } else {
+            addWarn("Skipping [" + f + "]" + " of size " + new FileSize(size) + " as it is one of the two newest log achives.");
+          }
         }
         totalSize += size;
       }

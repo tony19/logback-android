@@ -16,6 +16,7 @@ package ch.qos.logback.core.rolling;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.SpacePadder;
 import ch.qos.logback.core.rolling.helper.RollingCalendar;
+import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.util.FixedRateInvocationGate;
 
 import org.junit.Before;
@@ -51,6 +52,8 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
 
   // by default tbfnatp is an instance of DefaultTimeBasedFileNamingAndTriggeringPolicy
   TimeBasedFileNamingAndTriggeringPolicy<Object> tbfnatp = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>();
+
+  StatusChecker checker = new StatusChecker(context);
 
   static long MILLIS_IN_MINUTE = 60 * 1000;
   static long MILLIS_IN_HOUR = 60 * MILLIS_IN_MINUTE;
@@ -166,6 +169,23 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     cp.maxHistory(5).simulatedNumberOfPeriods(10).sizeCap(sizeInUnitsOfBytesPerPeriod * bytesOutputPerPeriod+1000);
     generateDailyRollover(cp);
     checkFileCount(sizeInUnitsOfBytesPerPeriod+1);
+  }
+
+  @Test
+  public void checkThatSmallTotalSizeCapLeavesAtLeastOneArhcive() {
+    long WED_2016_03_23_T_131345_CET = WED_2016_03_23_T_230705_CET - 10 * CoreConstants.MILLIS_IN_ONE_HOUR;
+
+    //long bytesOutputPerPeriod = 15984;
+
+    cp = new ConfigParameters(WED_2016_03_23_T_131345_CET);
+    final int verySmallCapSize = 1;
+    cp.maxHistory(5).simulatedNumberOfPeriods(3).sizeCap(verySmallCapSize);
+    generateDailyRollover(cp);
+    checkFileCount(2);
+    // at least two archive files. See TimeBasedArchiveRemover.UNTOUCHABLE_ARCHIVE_FILE_COUNT
+    checker.assertNoMatch("Deleting.*clean-2016-03-25.txt");
+    // we don't want active file deleted
+    checker.assertNoMatch("Deleting.*clean-2016-03-26.txt");
   }
 
   @Test
@@ -392,7 +412,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   long logOverMultiplePeriods(ConfigParameters cp) {
     buildRollingFileAppender(cp, DO_NOT_CLEAN_HISTORY_ON_START);
     int runLength = cp.simulatedNumberOfPeriods * ticksPerPeriod;
-    int startInactivityIndex = 1 + cp.startInactivity * ticksPerPeriod;
+    int startInactivityIndex = cp.startInactivity * ticksPerPeriod;
     int endInactivityIndex = startInactivityIndex + cp.numInactivityPeriods * ticksPerPeriod;
     long tickDuration = cp.periodDurationInMillis / ticksPerPeriod;
 

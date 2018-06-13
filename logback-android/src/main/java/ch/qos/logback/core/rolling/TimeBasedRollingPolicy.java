@@ -256,7 +256,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
 
   @Override
   public String toString() {
-    return "c.q.l.core.rolling.TimeBasedRollingPolicy";
+    return "c.q.l.core.rolling.TimeBasedRollingPolicy@" + this.hashCode();
   }
 
   public void setTotalSizeCap(long totalSizeCap) {
