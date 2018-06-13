@@ -102,7 +102,7 @@ public class ReconfigureOnChangeTaskTest {
         jc.doConfigure(is);
     }
 
-    @Test
+    @Test(timeout = 4000L)
     public void checkBasicLifecyle() throws JoranException, InterruptedException {
         File file = new File(SCAN1_FILE_AS_STR).getAbsoluteFile();
         configure(file);
@@ -119,10 +119,7 @@ public class ReconfigureOnChangeTaskTest {
     }
 
     private void checkThatTaskHasRan() throws InterruptedException {
-        ReconfigureOnChangeTask roct = waitForReconfigureOnChangeTaskToRun();
-        CountDownLatch latch = new CountDownLatch(1);
-        roct.addListener(new RunMethodInvokedListener(latch));
-        latch.await();
+        waitForReconfigureOnChangeTaskToRun();
     }
 
     List<File> getConfigurationWatchList(LoggerContext context) {
@@ -135,7 +132,6 @@ public class ReconfigureOnChangeTaskTest {
         File topLevelFile = new File(INCLUSION_SCAN_TOPLEVEL0_AS_STR).getAbsoluteFile();
         File innerFile = new File(INCLUSION_SCAN_INNER0_AS_STR).getAbsoluteFile();
         configure(topLevelFile);
-        waitForReconfigureOnChangeTaskToRun();
         List<File> fileList = getConfigurationWatchList(loggerContext);
         assertThat(fileList, hasItems(topLevelFile, innerFile));
         checkThatTaskHasRan();
@@ -156,7 +152,7 @@ public class ReconfigureOnChangeTaskTest {
     }
 
     // See also http://jira.qos.ch/browse/LOGBACK-338
-    @Test
+    @Test(timeout = 4000L)
     public void reconfigurationIsNotPossibleInTheAbsenceOfATopFile() throws IOException, JoranException {
         String configurationStr = "<configuration scan=\"true\" scanPeriod=\"50 millisecond\"><include resource=\"asResource/inner1.xml\"/></configuration>";
         configure(new ByteArrayInputStream(configurationStr.getBytes("UTF-8")));
