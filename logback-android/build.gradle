@@ -52,6 +52,7 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
     testImplementation 'org.robolectric:robolectric:3.8'
     testImplementation 'org.mockito:mockito-core:2.21.0'
+    testImplementation 'joda-time:joda-time:2.10'
 
     // This dep is required when using Robolectric and targeting pre-21 SDKs.
     // Otherwise, tests fail with java.lang.NoClassDefFoundError.
