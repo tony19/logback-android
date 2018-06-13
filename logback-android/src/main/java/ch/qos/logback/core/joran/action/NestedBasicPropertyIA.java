@@ -94,6 +94,7 @@ public class NestedBasicPropertyIA extends ImplicitAction {
     case AS_BASIC_PROPERTY_COLLECTION:
       actionData.parentBean
           .addBasicProperty(actionData.propertyName, finalBody);
+      break;
     default:
       addError("Unexpected aggregationType " + actionData.aggregationType);
     }
