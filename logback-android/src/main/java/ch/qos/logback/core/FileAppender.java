@@ -110,12 +110,6 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
       file = getAbsoluteFilePath(file);
       addInfo("File property is set to [" + file + "]");
 
-      if (checkForFileCollisionInPreviousFileAppenders()) {
-        addError("Collisions detected with FileAppender/RollingAppender instances defined earlier. Aborting.");
-        addError(COLLISION_WITH_EARLIER_APPENDER_URL);
-        errors++;
-      }
-
       if (prudent) {
         if (!isAppend()) {
           setAppend(true);
@@ -124,11 +118,18 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
       }
 
       if (!lazyInit) {
-        try {
-          openFile(file);
-        } catch (IOException e) {
+        if (checkForFileCollisionInPreviousFileAppenders()) {
+          addError("Collisions detected with FileAppender/RollingAppender instances defined earlier. Aborting.");
+          addError(COLLISION_WITH_EARLIER_APPENDER_URL);
           errors++;
-          addError("openFile(" + file + "," + append + ") failed", e);
+        } else {
+          // file should be opened only if collision free
+          try {
+            openFile(file);
+          } catch (IOException e) {
+            errors++;
+            addError("openFile(" + file + "," + append + ") failed", e);
+          }
         }
       } else {
         // We'll initialize the file output stream later. Use a dummy for now
@@ -302,11 +303,18 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   protected void subAppend(E event) {
     if (!initialized && lazyInit) {
       initialized = true;
-      try {
-        openFile(getFile());
-      } catch (IOException e) {
-        this.started = false;
-        addError("openFile(" + fileName + "," + append + ") failed", e);
+
+      if (checkForFileCollisionInPreviousFileAppenders()) {
+        addError("Collisions detected with FileAppender/RollingAppender instances defined earlier. Aborting.");
+        addError(COLLISION_WITH_EARLIER_APPENDER_URL);
+      } else {
+        try {
+          openFile(getFile());
+          super.start();
+        } catch (IOException e) {
+          this.started = false;
+          addError("openFile(" + fileName + "," + append + ") failed", e);
+        }
       }
     }
 
