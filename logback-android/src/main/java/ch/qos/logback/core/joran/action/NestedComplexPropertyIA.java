@@ -185,6 +185,8 @@ public class NestedComplexPropertyIA extends ImplicitAction {
             .getNestedComplexProperty());
 
         break;
+      default:
+        addError("Unexpected aggregationType " + actionData.aggregationType);
       }
     }
   }

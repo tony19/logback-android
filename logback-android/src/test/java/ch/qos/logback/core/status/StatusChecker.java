@@ -52,5 +52,7 @@ public class StatusChecker extends StatusUtil {
     assertTrue(isErrorFree(0));
   }
 
-
+  public void assertIsWarningOrErrorFree() {
+    assertTrue(isWarningOrErrorFree(0));
+  }
 }

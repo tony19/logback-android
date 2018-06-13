@@ -17,6 +17,7 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.SpacePadder;
 import ch.qos.logback.core.rolling.helper.RollingCalendar;
 import ch.qos.logback.core.status.StatusChecker;
+import ch.qos.logback.core.util.FileSize;
 import ch.qos.logback.core.util.FixedRateInvocationGate;
 
 import org.junit.Before;
@@ -396,7 +397,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     tbrp.setContext(context);
     tbrp.setFileNamePattern(cp.fileNamePattern);
     tbrp.setMaxHistory(cp.maxHistory);
-    tbrp.setTotalSizeCap(cp.sizeCap);
+    tbrp.setTotalSizeCap(new FileSize(cp.sizeCap));
     tbrp.setParent(rfa);
     tbrp.setCleanHistoryOnStart(cleanHistoryOnStart);
     tbrp.timeBasedFileNamingAndTriggeringPolicy = tbfnatp;
