@@ -311,7 +311,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     }
 
     if (childrenList == null) {
-      childrenList = new ArrayList<Logger>();
+      childrenList = new CopyOnWriteArrayList<Logger>();
     }
     Logger childLogger;
     if (this.isRootLogger()) {
@@ -346,12 +346,6 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     }
   }
 
-  /**
-   * The default size of child list arrays. The JDK 1.5 default is 10. We use a
-   * smaller value to save a little space.
-   */
-  private static final int DEFAULT_CHILD_ARRAY_SIZE = 5;
-
   Logger createChildByName(final String childName) {
     int i_index = LoggerNameUtil.getSeparatorIndexOf(childName, this.name.length() + 1);
     if (i_index != -1) {
@@ -362,7 +356,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
     }
 
     if (childrenList == null) {
-      childrenList = new ArrayList<Logger>(DEFAULT_CHILD_ARRAY_SIZE);
+      childrenList = new CopyOnWriteArrayList<Logger>();
     }
     Logger childLogger;
     childLogger = new Logger(childName, this, this.loggerContext);
