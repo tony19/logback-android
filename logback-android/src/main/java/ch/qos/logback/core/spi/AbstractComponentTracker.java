@@ -219,7 +219,7 @@ abstract public class AbstractComponentTracker<C> implements ComponentTracker<C>
     return ((entry.timestamp + timeout) < now);
   }
 
-  private boolean isEntryDoneLingering(Entry entry, long now) {
+  private boolean isEntryDoneLingering(Entry<C> entry, long now) {
     return ((entry.timestamp + LINGERING_TIMEOUT) < now);
   }
 
@@ -288,7 +288,8 @@ abstract public class AbstractComponentTracker<C> implements ComponentTracker<C>
         return false;
       if (getClass() != obj.getClass())
         return false;
-      final Entry other = (Entry) obj;
+      @SuppressWarnings("unchecked")
+      final Entry<C> other = (Entry<C>) obj;
       if (key == null) {
         if (other.key != null)
           return false;
