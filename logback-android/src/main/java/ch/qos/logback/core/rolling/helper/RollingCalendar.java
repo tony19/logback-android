@@ -114,10 +114,10 @@ public class RollingCalendar extends GregorianCalendar {
         return true;
       case TOP_OF_WEEK:
         // WW
-        if(collision(31 * MILLIS_IN_ONE_DAY))
+        if(collision(34 * MILLIS_IN_ONE_DAY))
           return false;
         // isolated ww
-        if(collision(365 * MILLIS_IN_ONE_DAY))
+        if(collision(368 * MILLIS_IN_ONE_DAY))
           return false;
         return true;
       default:

@@ -55,6 +55,16 @@ public class RollingCalendarTest {
       RollingCalendar rc = new RollingCalendar("yyyy-MM");
       assertEquals(PeriodicityType.TOP_OF_MONTH, rc.getPeriodicityType());
     }
+
+    {
+      RollingCalendar rc = new RollingCalendar("yyyy-ww");
+      assertEquals(PeriodicityType.TOP_OF_WEEK, rc.getPeriodicityType());
+    }
+
+    {
+      RollingCalendar rc = new RollingCalendar("yyyy-WW");
+      assertEquals(PeriodicityType.TOP_OF_WEEK, rc.getPeriodicityType());
+    }
   }
 
   @Test
