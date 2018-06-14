@@ -117,6 +117,7 @@ public class SizeAndTimeBasedFNATP<E> extends
 
   InvocationGate invocationGate = new DefaultInvocationGate();
 
+  @Override
   public boolean isTriggeringEvent(File activeFile, final E event) {
 
     long time = getCurrentTime();
@@ -138,9 +139,11 @@ public class SizeAndTimeBasedFNATP<E> extends
 
     if (activeFile == null) {
       addWarn("activeFile == null");
+      return false;
     }
     if (maxFileSize == null) {
       addWarn("maxFileSize = null");
+      return false;
     }
     if (activeFile.length() >= maxFileSize.getSize()) {
       elapsedPeriodsFileName = tbrp.fileNamePatternWCS
