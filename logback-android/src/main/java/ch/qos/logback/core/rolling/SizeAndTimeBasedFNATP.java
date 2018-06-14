@@ -42,6 +42,8 @@ public class SizeAndTimeBasedFNATP<E> extends
     // in super.start()
     super.start();
 
+    addWarn("SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead");
+
     if (!super.isErrorFree()) {
       return;
     }

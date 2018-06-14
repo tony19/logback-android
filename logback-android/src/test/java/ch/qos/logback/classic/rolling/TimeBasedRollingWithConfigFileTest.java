@@ -173,6 +173,19 @@ public class TimeBasedRollingWithConfigFileTest extends
     assertFalse(rfa.isStarted());
   }
 
+  @Test
+  public void totalSizeCapSmallerThanMaxFileSize() throws Exception {
+    String testId = "totalSizeCapSmallerThanMaxFileSize";
+    lc.putProperty("testId", testId);
+    loadConfig(ClassicTestConstants.JORAN_INPUT_PREFIX + "rolling/" + testId + ".xml");
+    Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+    //expectedFilenameList.add(randomOutputDir + "z" + testId);
+    RollingFileAppender<ILoggingEvent> rfa = (RollingFileAppender<ILoggingEvent>) root.getAppender("ROLLING");
+
+    statusChecker.assertContainsMatch("totalSizeCap of \\[\\d* \\w*\\] is smaller than maxFileSize \\[\\d* \\w*\\] which is non-sensical");
+    assertFalse(rfa.isStarted());
+  }
+
   void addExpectedFileNamedIfItsTime(String testId, String msg,
                                      boolean gzExtension) {
     fileSize += msg.getBytes().length;
