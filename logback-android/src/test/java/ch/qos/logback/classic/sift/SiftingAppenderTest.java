@@ -39,6 +39,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.Context;
+import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.read.ListAppender;
@@ -71,6 +72,7 @@ public class SiftingAppenderTest {
   Logger root = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
   StatusChecker statusChecker = new StatusChecker(loggerContext);
   int diff = RandomUtil.getPositiveInt();
+  String randomOutputDir = CoreTestConstants.OUTPUT_DIR_PREFIX + diff + "/";
   int now = 0;
 
   protected void configure(String file) throws JoranException {
@@ -160,6 +162,39 @@ public class SiftingAppenderTest {
   }
 
   @Test
+  public void fileAppenderCollision() throws JoranException, InterruptedException {
+    loggerContext.putProperty("DIR_PREFIX", randomOutputDir);
+    String key = "collision";
+    configure(SIFT_FOLDER_PREFIX + "fileAppender.xml");
+    SiftingAppender sa = (SiftingAppender) root.getAppender("SIFT");
+
+    long timestamp = System.currentTimeMillis();
+
+    MDC.put(key, "A-" + diff);
+    logNewEventViaSiftingAppender(sa, timestamp);
+    FileAppender<ILoggingEvent> fileAppenderA = (FileAppender<ILoggingEvent>) sa.getAppenderTracker().find("A-" + diff);
+    assertNotNull(fileAppenderA);
+    assertTrue(fileAppenderA.isStarted());
+    timestamp += ComponentTracker.DEFAULT_TIMEOUT + 1;
+    MDC.put(key, "B-" + diff);
+    logNewEventViaSiftingAppender(sa, timestamp);
+    assertFalse(fileAppenderA.isStarted());
+
+    MDC.put(key, "A-" + diff);
+    timestamp += 1;
+    logNewEventViaSiftingAppender(sa, timestamp);
+    FileAppender<ILoggingEvent> fileAppenderA_2 = (FileAppender<ILoggingEvent>) sa.getAppenderTracker().find("A-" + diff);
+    assertTrue(fileAppenderA_2.isStarted());
+
+  }
+
+  private void logNewEventViaSiftingAppender(SiftingAppender sa, long timestamp) {
+    LoggingEvent le = new LoggingEvent("x", logger, Level.INFO, "hello", null, null);
+    le.setTimeStamp(timestamp + ComponentTracker.DEFAULT_TIMEOUT + 1);
+    sa.doAppend(le);
+  }
+
+  @Test
   public void testWholeCycle() throws JoranException {
     String mdcKey = "cycle";
     configure(SIFT_FOLDER_PREFIX + "completeCycle.xml");
@@ -175,10 +210,7 @@ public class SiftingAppenderTest {
     assertEquals("smoke", eventList.get(0).getMessage());
 
     MDC.remove(mdcKey);
-    LoggingEvent le = new LoggingEvent("x", logger, Level.INFO, "hello", null,
-            null);
-    le.setTimeStamp(timestamp + ComponentTracker.DEFAULT_TIMEOUT + 1);
-    sa.doAppend(le);
+    logNewEventViaSiftingAppender(sa, timestamp);
     assertFalse(listAppender.isStarted());
     assertEquals(1, sa.getAppenderTracker().allKeys().size());
     assertTrue(sa.getAppenderTracker().allKeys().contains("cycleDefault"));

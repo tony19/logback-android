@@ -1,6 +1,9 @@
 package ch.qos.logback.core.rolling;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Map;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
@@ -11,6 +14,8 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
+
+import static ch.qos.logback.core.CoreConstants.FA_FILENAME_COLLISION_MAP;
 
 public class CollisionDetectionTest {
 
@@ -54,6 +59,31 @@ public class CollisionDetectionTest {
         FileAppender<String> fileAppender = buildFileAppender("FA", "collisionImpossibleForSingleAppender");
         fileAppender.start();
         statusChecker.assertIsErrorFree();
+    }
+
+    @Test
+    public void appenderStopShouldClearEntryInCollisionMap() {
+        String key = "FA";
+        FileAppender<String> fileAppender = buildFileAppender(key, "collisionImpossibleForSingleAppender");
+        fileAppender.start();
+        assertCollisionMapHasEntry(FA_FILENAME_COLLISION_MAP, key);
+        fileAppender.stop();
+        assertCollisionMapHasNoEntry(FA_FILENAME_COLLISION_MAP, key);
+        statusChecker.assertIsErrorFree();
+    }
+
+    private void assertCollisionMapHasEntry(String mapName, String key) {
+        @SuppressWarnings("unchecked")
+        Map<String, ?> map = (Map<String, ?>) context.getObject(mapName);
+        Assert.assertNotNull(map);
+        Assert.assertNotNull(map.get(key));
+    }
+
+    private void assertCollisionMapHasNoEntry(String mapName, String key) {
+        @SuppressWarnings("unchecked")
+        Map<String, ?> map = (Map<String, ?>) context.getObject(mapName);
+        Assert.assertNotNull(map);
+        Assert.assertNull(map.get(key));
     }
 
     @Test

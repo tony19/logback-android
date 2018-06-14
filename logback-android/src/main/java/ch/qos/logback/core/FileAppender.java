@@ -20,6 +20,7 @@ import java.nio.channels.FileLock;
 import java.util.Map;
 
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
+import ch.qos.logback.core.util.ContextUtil;
 import ch.qos.logback.core.util.EnvUtil;
 import ch.qos.logback.core.util.FileUtil;
 
@@ -143,6 +144,17 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     if (errors == 0) {
       super.start();
     }
+  }
+
+  @Override
+  public void stop() {
+    super.stop();
+
+    Map<String, String> map = ContextUtil.getFilenameCollisionMap(context);
+    if (map == null || getName() == null)
+      return;
+
+    map.remove(getName());
   }
 
   protected boolean checkForFileCollisionInPreviousFileAppenders() {

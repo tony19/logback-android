@@ -15,6 +15,7 @@ package ch.qos.logback.core.util;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.rolling.helper.FileNamePattern;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
 import java.net.InetAddress;
@@ -23,7 +24,11 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+
+import static ch.qos.logback.core.CoreConstants.FA_FILENAME_COLLISION_MAP;
+import static ch.qos.logback.core.CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP;
 
 public class ContextUtil extends ContextAwareBase {
 
@@ -47,5 +52,23 @@ public class ContextUtil extends ContextAwareBase {
       String key = (String) i.next();
       context.putProperty(key, props.getProperty(key));
     }
+  }
+
+  public static Map<String, String> getFilenameCollisionMap(Context context) {
+    if (context == null) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    Map<String, String> map = (Map<String, String>) context.getObject(FA_FILENAME_COLLISION_MAP);
+    return map;
+  }
+
+  public static Map<String, FileNamePattern> getFilenamePatternCollisionMap(Context context) {
+    if (context == null) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    Map<String, FileNamePattern> map = (Map<String, FileNamePattern>) context.getObject(RFA_FILENAME_PATTERN_COLLISION_MAP);
+    return map;
   }
 }
