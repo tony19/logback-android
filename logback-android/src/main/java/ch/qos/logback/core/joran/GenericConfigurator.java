@@ -54,7 +54,7 @@ public abstract class GenericConfigurator extends ContextAwareBase {
 
       // this closes the stream for us
       in = urlConnection.getInputStream();
-      doConfigure(in);
+      doConfigure(in, url.toExternalForm());
     } catch (IOException ioe) {
       String errMsg = "Could not open URL [" + url + "].";
       addError(errMsg, ioe);
@@ -82,16 +82,23 @@ public abstract class GenericConfigurator extends ContextAwareBase {
   public final void doConfigure(File file) throws JoranException {
     FileInputStream fis = null;
     try {
-      informContextOfURLUsedForConfiguration(getContext(), file.toURI().toURL());
+      URL url = file.toURI().toURL();
+      informContextOfURLUsedForConfiguration(getContext(), url);
       fis = new FileInputStream(file);
 
       // this closes the stream for us
-      doConfigure(fis);
+      doConfigure(fis, url.toExternalForm());
     } catch (IOException ioe) {
       String errMsg = "Could not open [" + file.getPath() + "].";
       addError(errMsg, ioe);
       throw new JoranException(errMsg, ioe);
     }
+  }
+
+  public final void doConfigure(InputStream inputStream, String systemId) throws JoranException {
+    InputSource inputSource = new InputSource(inputStream);
+    inputSource.setSystemId(systemId);
+    doConfigure(inputSource);
   }
 
   /**
