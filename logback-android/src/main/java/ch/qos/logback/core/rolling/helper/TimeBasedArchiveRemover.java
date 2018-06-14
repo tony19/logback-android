@@ -26,7 +26,7 @@ import ch.qos.logback.core.pattern.LiteralConverter;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.FileSize;
 
-import static ch.qos.logback.core.CoreConstants.UNBOUND_TOTAL_SIZE;
+import static ch.qos.logback.core.CoreConstants.UNBOUNDED_TOTAL_SIZE_CAP;
 
 public class TimeBasedArchiveRemover extends ContextAwareBase implements ArchiveRemover {
 
@@ -38,7 +38,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
   final FileNamePattern fileNamePattern;
   final RollingCalendar rc;
   private int maxHistory = CoreConstants.UNBOUND_HISTORY;
-  private long totalSizeCap = UNBOUND_TOTAL_SIZE;
+  private long totalSizeCap = UNBOUNDED_TOTAL_SIZE_CAP;
   final boolean parentClean;
   long lastHeartBeat = UNINITIALIZED;
 
@@ -229,7 +229,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     @Override
     public void run() {
       clean(now);
-      if(totalSizeCap != UNBOUND_TOTAL_SIZE && totalSizeCap > 0) {
+      if (totalSizeCap != UNBOUNDED_TOTAL_SIZE_CAP && totalSizeCap > 0) {
         capTotalSize(now);
       }
     }

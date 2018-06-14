@@ -23,8 +23,8 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.rolling.helper.*;
 import ch.qos.logback.core.util.FileSize;
 
+import static ch.qos.logback.core.CoreConstants.UNBOUNDED_TOTAL_SIZE_CAP;
 import static ch.qos.logback.core.CoreConstants.UNBOUND_HISTORY;
-import static ch.qos.logback.core.CoreConstants.UNBOUND_TOTAL_SIZE;
 
 /**
  * <code>TimeBasedRollingPolicy</code> is both easy to configure and quite
@@ -49,7 +49,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   Future<?> cleanUpFuture;
 
   private int maxHistory = UNBOUND_HISTORY;
-  private FileSize totalSizeCap = new FileSize(UNBOUND_TOTAL_SIZE);
+  protected FileSize totalSizeCap = new FileSize(UNBOUNDED_TOTAL_SIZE_CAP);
 
   private ArchiveRemover archiveRemover;
 
@@ -111,11 +111,15 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
         Date now = new Date(timeBasedFileNamingAndTriggeringPolicy.getCurrentTime());
         cleanUpFuture = archiveRemover.cleanAsynchronously(now);
       }
-    } else if (totalSizeCap.getSize() != UNBOUND_TOTAL_SIZE) {
+    } else if (!isUnboundedTotalSizeCap()) {
       addWarn("'maxHistory' is not set, ignoring 'totalSizeCap' option with value ["+totalSizeCap+"]");
     }
 
     super.start();
+  }
+
+  protected boolean isUnboundedTotalSizeCap() {
+    return totalSizeCap.getSize() == UNBOUNDED_TOTAL_SIZE_CAP;
   }
 
   @Override
