@@ -17,13 +17,36 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import java.util.Date;
+import java.util.Locale;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.util.EnvUtil;
 
 public class RollingCalendarTest {
+
+  @Before
+  public void setUp() {
+
+    // Most surprisingly, in certain environments (e.g. Windows 7), setting the default locale
+    // allows certain tests to pass which otherwise fail.
+    //
+    // These tests are:
+    //
+    //  checkCollisionFreeness("yyyy-WW", false);
+    //  checkCollisionFreeness("yyyy-ww", true);
+    //  checkCollisionFreeness("ww", false);
+    //  {
+    //    RollingCalendar rc = new RollingCalendar("yyyy-ww");
+    //    assertEquals(PeriodicityType.TOP_OF_WEEK, rc.getPeriodicityType());
+    //  }
+    //
+
+    Locale oldLocale = Locale.getDefault();
+    Locale.setDefault(oldLocale);
+  }
 
   @Test
   public void testPeriodicity() {
