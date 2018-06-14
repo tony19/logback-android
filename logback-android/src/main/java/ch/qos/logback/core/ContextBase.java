@@ -14,6 +14,8 @@
 package ch.qos.logback.core;
 
 import static ch.qos.logback.core.CoreConstants.CONTEXT_NAME_KEY;
+import static ch.qos.logback.core.CoreConstants.FA_FILENAME_COLLISION_MAP;
+import static ch.qos.logback.core.CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
+import ch.qos.logback.core.rolling.helper.FileNamePattern;
 import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.spi.LogbackLock;
 import ch.qos.logback.core.status.StatusManager;
@@ -82,8 +85,8 @@ public class ContextBase implements Context, LifeCycle {
   }
 
   protected void initCollisionMaps() {
-    putObject(CoreConstants.RFA_FILENAME_COLLISION_MAP, new HashMap<String, String>());
-    putObject(CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP, new HashMap<String, String>());
+    putObject(FA_FILENAME_COLLISION_MAP, new HashMap<String, String>());
+    putObject(RFA_FILENAME_PATTERN_COLLISION_MAP, new HashMap<String, FileNamePattern>());
   }
 
   /**
