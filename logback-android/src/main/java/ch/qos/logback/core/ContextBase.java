@@ -82,7 +82,7 @@ public class ContextBase implements Context, LifeCycle {
   }
 
   protected void initCollisionMaps() {
-    putObject(CoreConstants.FA_FILENAME_COLLISION_MAP, new HashMap<String, String>());
+    putObject(CoreConstants.RFA_FILENAME_COLLISION_MAP, new HashMap<String, String>());
     putObject(CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP, new HashMap<String, String>());
   }
 

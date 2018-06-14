@@ -79,7 +79,7 @@ public class CoreConstants {
    * 
    * The collision map consists of enties of the type (appender name, File option) 
    */
-  public static final String FA_FILENAME_COLLISION_MAP = "RFA_FILENAME_COLLISION_MAP";
+  public static final String RFA_FILENAME_COLLISION_MAP = "RFA_FILENAME_COLLISION_MAP";
 
   /**
    * Key used to locate a collision map for RollingFileAppender instances in context's object map.
