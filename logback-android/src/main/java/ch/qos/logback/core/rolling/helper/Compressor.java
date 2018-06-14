@@ -164,7 +164,7 @@ public class Compressor extends ContextAwareBase {
   }
 
   ZipEntry computeZipEntry(String filename) {
-    String nameOfFileNestedWithinArchive = computeFileNameStr_WCS(filename, compressionMode);
+    String nameOfFileNestedWithinArchive = computeFileNameStrWithoutCompSuffix(filename, compressionMode);
     return new ZipEntry(nameOfFileNestedWithinArchive);
   }
 
@@ -237,8 +237,7 @@ public class Compressor extends ContextAwareBase {
     }
   }
 
-  static public String computeFileNameStr_WCS(String fileNamePatternStr,
-                                              CompressionMode compressionMode) {
+  static public String computeFileNameStrWithoutCompSuffix(String fileNamePatternStr, CompressionMode compressionMode) {
     int len = fileNamePatternStr.length();
     switch (compressionMode) {
       case GZ:

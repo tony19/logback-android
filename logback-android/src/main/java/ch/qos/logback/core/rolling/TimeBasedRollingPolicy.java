@@ -41,7 +41,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   static final String FNP_NOT_SET = "The FileNamePattern option must be set before using TimeBasedRollingPolicy. ";
 
   // WCS: without compression suffix
-  FileNamePattern fileNamePatternWCS;
+  FileNamePattern fileNamePatternWithoutCompSuffix;
 
   private Compressor compressor;
   private RenameUtil renameUtil = new RenameUtil();
@@ -76,11 +76,9 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     compressor.setContext(context);
 
     // wcs : without compression suffix
-    fileNamePatternWCS = new FileNamePattern(Compressor.computeFileNameStr_WCS(
-            fileNamePatternStr, compressionMode), this.context);
+    fileNamePatternWithoutCompSuffix = new FileNamePattern(Compressor.computeFileNameStrWithoutCompSuffix(fileNamePatternStr, compressionMode), this.context);
 
-    addInfo("Will use the pattern " + fileNamePatternWCS
-        + " for the active file");
+    addInfo("Will use the pattern " + fileNamePatternWithoutCompSuffix + " for the active file");
 
      if(compressionMode == CompressionMode.ZIP) {
       String zipEntryFileNamePatternStr = transformFileNamePattern2ZipEntry(fileNamePatternStr);
