@@ -19,6 +19,8 @@ import java.util.Date;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.rolling.helper.*;
 
+import static ch.qos.logback.core.CoreConstants.CODES_URL;
+
 /**
  * When rolling over, <code>FixedWindowRollingPolicy</code> renames files
  * according to a fixed window algorithm.
@@ -30,8 +32,8 @@ import ch.qos.logback.core.rolling.helper.*;
  */
 public class FixedWindowRollingPolicy extends RollingPolicyBase {
   static final String FNP_NOT_SET = "The \"FileNamePattern\" property must be set before using FixedWindowRollingPolicy. ";
-  static final String PRUDENT_MODE_UNSUPPORTED = "See also http://logback.qos.ch/codes.html#tbr_fnp_prudent_unsupported";
-  static final String SEE_PARENT_FN_NOT_SET = "Please refer to http://logback.qos.ch/codes.html#fwrp_parentFileName_not_set";
+  static final String PRUDENT_MODE_UNSUPPORTED = "See also "+CODES_URL+"#tbr_fnp_prudent_unsupported";
+  static final String SEE_PARENT_FN_NOT_SET = "Please refer to "+CODES_URL+"#fwrp_parentFileName_not_set";
   int maxIndex;
   int minIndex;
   RenameUtil util = new RenameUtil();

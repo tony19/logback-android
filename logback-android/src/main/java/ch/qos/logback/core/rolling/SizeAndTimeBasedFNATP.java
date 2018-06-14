@@ -26,9 +26,13 @@ import ch.qos.logback.core.util.DefaultInvocationGate;
 import ch.qos.logback.core.util.FileSize;
 import ch.qos.logback.core.util.InvocationGate;
 
+import static ch.qos.logback.core.CoreConstants.MANUAL_URL_PREFIX;
+
 @NoAutoStart
 public class SizeAndTimeBasedFNATP<E> extends
         TimeBasedFileNamingAndTriggeringPolicyBase<E> {
+
+  enum Usage {EMBEDDED, DIRECT};
 
   int currentPeriodsCounter = 0;
   FileSize maxFileSize;
@@ -36,13 +40,14 @@ public class SizeAndTimeBasedFNATP<E> extends
   static String MISSING_INT_TOKEN = "Missing integer token, that is %i, in FileNamePattern [";
   static String MISSING_DATE_TOKEN = "Missing date token, that is %d, in FileNamePattern [";
 
-  private final boolean embedded;
+  private final Usage usage;
+
   public SizeAndTimeBasedFNATP() {
-    this(false);
+    this(Usage.DIRECT);
   }
 
-  public SizeAndTimeBasedFNATP(boolean embedded) {
-    this.embedded = embedded;
+  public SizeAndTimeBasedFNATP(Usage usage) {
+    this.usage = usage;
   }
 
   @Override
@@ -51,8 +56,9 @@ public class SizeAndTimeBasedFNATP<E> extends
     // in super.start()
     super.start();
 
-    if (embedded) {
-      addWarn("SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead");
+    if (usage == Usage.DIRECT) {
+      addWarn(CoreConstants.SIZE_AND_TIME_BASED_FNATP_IS_DEPRECATED);
+      addWarn("For more information see "+MANUAL_URL_PREFIX+"appenders.html#SizeAndTimeBasedRollingPolicy");
     }
 
     if (!super.isErrorFree()) {
