@@ -49,7 +49,7 @@ import ch.qos.logback.core.joran.spi.RuleStore;
  * 
  * @author Ceki G&uuml;lc&uuml;
  */
-abstract public class JoranConfiguratorBase extends GenericConfigurator {
+abstract public class JoranConfiguratorBase<E> extends GenericConfigurator {
 
   public List getErrorList() {
     return null;
@@ -73,9 +73,8 @@ abstract public class JoranConfiguratorBase extends GenericConfigurator {
     rs.addRule(new ElementSelector("configuration/statusListener"),
         new StatusListenerAction());
 
-    rs.addRule(new ElementSelector("configuration/appender"), new AppenderAction());
-    rs.addRule(new ElementSelector("configuration/appender/appender-ref"),
-        new AppenderRefAction());
+    rs.addRule(new ElementSelector("configuration/appender"), new AppenderAction<E>());
+    rs.addRule(new ElementSelector("configuration/appender/appender-ref"), new AppenderRefAction<E>());
     rs.addRule(new ElementSelector("configuration/newRule"), new NewRuleAction());
     rs.addRule(new ElementSelector("*/param"), new ParamAction());
   }

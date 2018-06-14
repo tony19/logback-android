@@ -181,6 +181,7 @@ public class PropertySetter extends ContextAwareBase {
         return AggregationType.AS_BASIC_PROPERTY_COLLECTION;
       case AS_COMPLEX_PROPERTY:
         return AggregationType.AS_COMPLEX_PROPERTY_COLLECTION;
+      case AS_BASIC_PROPERTY_COLLECTION:
       case AS_COMPLEX_PROPERTY_COLLECTION:
         addError("Unexpected AggregationType " + type);
         break;
