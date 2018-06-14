@@ -190,7 +190,7 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
 
   @Test
   public void noCompression_FileSet_NoRestart_5() throws IOException {
-    defaultTest("test5", "test6", "", FILE_OPTION_SET, NO_RESTART);
+    defaultTest("test5", "test5", "", FILE_OPTION_SET, NO_RESTART);
   }
 
   @Test
@@ -201,7 +201,7 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
   // LOGBACK-168
   @Test
   public void withMissingTargetDirWithCompression() throws IOException {
-    defaultTest("test7", "%d{yyyy-MM-dd, aux}/", ".gz", FILE_OPTION_SET, NO_RESTART);
+    defaultTest("test8", "%d{yyyy-MM-dd, aux}/test8", ".zip", FILE_OPTION_SET, NO_RESTART);
   }
 
   @Test
