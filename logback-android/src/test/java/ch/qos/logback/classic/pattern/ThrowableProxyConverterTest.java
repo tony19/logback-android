@@ -168,11 +168,12 @@ public class ThrowableProxyConverterTest {
 
   @Test
   public void skipSelectedLine() throws Exception {
+    String nameOfContainingMethod = "skipSelectedLine";
     //given
     final Throwable t = TestHelper.makeNestedException(0);
     t.printStackTrace(pw);
     final ILoggingEvent le = createLoggingEvent(t);
-    tpc.setOptionList(Arrays.asList("full", "skipSelectedLines"));
+    tpc.setOptionList(Arrays.asList("full", nameOfContainingMethod));
     tpc.start();
 
     //when
@@ -180,7 +181,7 @@ public class ThrowableProxyConverterTest {
 
     //then
     assertThat(result, is(not(emptyString())));
-    assertThat(result, not(containsString("skipSelectedLines")));
+    assertThat(result, not(containsString(nameOfContainingMethod)));
   }
 
   @Test
