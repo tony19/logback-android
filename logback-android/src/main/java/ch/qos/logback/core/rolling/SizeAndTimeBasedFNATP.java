@@ -36,13 +36,24 @@ public class SizeAndTimeBasedFNATP<E> extends
   static String MISSING_INT_TOKEN = "Missing integer token, that is %i, in FileNamePattern [";
   static String MISSING_DATE_TOKEN = "Missing date token, that is %d, in FileNamePattern [";
 
+  private final boolean embedded;
+  public SizeAndTimeBasedFNATP() {
+    this(false);
+  }
+
+  public SizeAndTimeBasedFNATP(boolean embedded) {
+    this.embedded = embedded;
+  }
+
   @Override
   public void start() {
     // we depend on certain fields having been initialized
     // in super.start()
     super.start();
 
-    addWarn("SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead");
+    if (embedded) {
+      addWarn("SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead");
+    }
 
     if (!super.isErrorFree()) {
       return;
