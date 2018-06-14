@@ -68,7 +68,7 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
     if (!rc.isCollisionFree()) {
         addError("The date format in FileNamePattern will result in collisions in the names of archived log files.");
         addError(COLLIDING_DATE_FORMAT_URL);
-        errorFree = false;
+        withErrors();
         return;
     }
 
@@ -130,6 +130,10 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
 
   public ArchiveRemover getArchiveRemover() {
     return archiveRemover;
+  }
+
+  protected void withErrors() {
+    errorFree = false;
   }
 
   protected boolean isErrorFree() {

@@ -32,7 +32,6 @@ public class SizeAndTimeBasedFNATP<E> extends
 
   int currentPeriodsCounter = 0;
   FileSize maxFileSize;
-  String maxFileSizeAsString;
 
   static String MISSING_INT_TOKEN = "Missing integer token, that is %i, in FileNamePattern [";
   static String MISSING_DATE_TOKEN = "Missing date token, that is %d, in FileNamePattern [";
@@ -47,8 +46,13 @@ public class SizeAndTimeBasedFNATP<E> extends
       return;
     }
 
+    if (maxFileSize == null) {
+      addError("maxFileSize property is mandatory.");
+      withErrors();
+    }
+
     if (!validDateAndIntegerTokens()) {
-      started = false;
+      withErrors();
       return;
     }
 
@@ -64,7 +68,9 @@ public class SizeAndTimeBasedFNATP<E> extends
 
     computeCurrentPeriodsHighestCounterValue(stemRegex);
 
-    started = true;
+    if (isErrorFree()) {
+      started = true;
+    }
   }
 
   private boolean validDateAndIntegerTokens() {
@@ -128,6 +134,12 @@ public class SizeAndTimeBasedFNATP<E> extends
       return false;
     }
 
+    if (activeFile == null) {
+      addWarn("activeFile == null");
+    }
+    if (maxFileSize == null) {
+      addWarn("maxFileSize = null");
+    }
     if (activeFile.length() >= maxFileSize.getSize()) {
       elapsedPeriodsFileName = tbrp.fileNamePatternWCS
               .convertMultipleArguments(dateInCurrentPeriod, currentPeriodsCounter);
@@ -144,12 +156,7 @@ public class SizeAndTimeBasedFNATP<E> extends
             dateInCurrentPeriod, currentPeriodsCounter);
   }
 
-  public String getMaxFileSize() {
-    return maxFileSizeAsString;
-  }
-
-  public void setMaxFileSize(String maxFileSize) {
-    this.maxFileSizeAsString = maxFileSize;
-    this.maxFileSize = FileSize.valueOf(maxFileSize);
+  public void setMaxFileSize(FileSize aMaxFileSize) {
+    this.maxFileSize = aMaxFileSize;
   }
 }

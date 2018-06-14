@@ -17,6 +17,7 @@ import ch.qos.logback.core.encoder.EchoEncoder;
 import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.status.StatusManager;
+import ch.qos.logback.core.util.FileSize;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
                             long givenTime, long lastCheck) {
     sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<Object>();
     tbrp.setContext(context);
-    sizeAndTimeBasedFNATP.setMaxFileSize(Integer.toString(sizeThreshold));
+    sizeAndTimeBasedFNATP.setMaxFileSize(new FileSize(sizeThreshold));
     tbrp.setTimeBasedFileNamingAndTriggeringPolicy(sizeAndTimeBasedFNATP);
     tbrp.setFileNamePattern(filenamePattern);
     tbrp.setParent(rfa);
