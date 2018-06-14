@@ -184,11 +184,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     final int verySmallCapSize = 1;
     cp.maxHistory(5).simulatedNumberOfPeriods(3).sizeCap(verySmallCapSize);
     generateDailyRollover(cp);
-    checkFileCount(2);
-    // at least two archive files. See TimeBasedArchiveRemover.UNTOUCHABLE_ARCHIVE_FILE_COUNT
-    checker.assertNoMatch("Deleting.*clean-2016-03-25.txt");
-    // we don't want active file deleted
-    //checker.assertNoMatch("Deleting.*clean-2016-03-26.txt");
+    checkFileCountAtMost(1);
   }
 
   @Test
@@ -456,12 +452,20 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     assertTrue(msg, expectedDirCountMin <= dirList.size() && dirList.size() <= expectedDirCountMax);
   }
 
-
   void checkFileCount(int expectedCount) {
     File dir = new File(randomOutputDir);
     List<File> fileList = new ArrayList<File>();
     findAllDirsOrStringContainsFilesRecursively(dir, fileList, "clean");
     assertEquals(expectedCount, fileList.size());
+  }
+
+  void checkFileCountAtMost(int expectedCount) {
+    File dir = new File(randomOutputDir);
+    List<File> fileList = new ArrayList<File>();
+    findAllDirsOrStringContainsFilesRecursively(dir, fileList, "clean");
+    int fileListSize = fileList.size();
+
+    assertTrue("file list size " + fileListSize + ", expectedCount=" + expectedCount, fileListSize <= expectedCount);
   }
 
   int expectedCountWithoutFoldersWithInactivity(int maxHistory, int totalPeriods, int endOfInactivity) {
