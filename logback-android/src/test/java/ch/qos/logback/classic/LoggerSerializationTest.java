@@ -14,7 +14,10 @@
 package ch.qos.logback.classic;
 
 import java.io.*;
+import java.util.List;
 
+import ch.qos.logback.classic.net.server.LogbackClassicSerializationHelper;
+import ch.qos.logback.core.net.HardenedObjectInputStream;
 import ch.qos.logback.core.util.CoreTestConstants;
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +42,7 @@ public class LoggerSerializationTest {
   ByteArrayOutputStream bos;
   ObjectOutputStream oos;
   ObjectInputStream inputStream;
+  List<String> whitelist;
 
   @Before
   public void setUp() throws Exception {
@@ -48,6 +52,8 @@ public class LoggerSerializationTest {
     // create the byte output stream
     bos = new ByteArrayOutputStream();
     oos = new ObjectOutputStream(bos);
+    whitelist = LogbackClassicSerializationHelper.getWhilelist();
+    whitelist.add(Foo.class.getName());
   }
 
   @After
@@ -114,7 +120,7 @@ public class LoggerSerializationTest {
           ClassNotFoundException {
     writeObject(oos, foo);
     ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-    inputStream = new ObjectInputStream(bis);
+    inputStream =  new HardenedObjectInputStream(bis, whitelist);
     Foo fooBack = readFooObject(inputStream);
     inputStream.close();
     return fooBack;
