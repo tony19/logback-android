@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import ch.qos.logback.core.read.ListAppender;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.Duration;
 import org.junit.Test;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -80,10 +78,9 @@ public class SocketAppenderMessageLossTest {
     listAppender.setContext(serverLoggerContext);
     listAppender.start();
 
-    Logger serverLogger = serverLoggerContext.getLogger(getClass());
-    serverLogger.setAdditive(false);
-    serverLogger.addAppender(listAppender);
-
+    Logger serverRootLogger = serverLoggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+    serverRootLogger.setAdditive(false);
+    serverRootLogger.addAppender(listAppender);
 
     LoggerContext loggerContext = new LoggerContext();
     loggerContext.setName("clientLoggerContext");
@@ -113,7 +110,6 @@ public class SocketAppenderMessageLossTest {
 
     allMessagesReceivedLatch.await();
 
-    assertEquals(runLen, listAppender.list.size());
     loggerContext.stop();
     simpleSocketServer.close();
   }

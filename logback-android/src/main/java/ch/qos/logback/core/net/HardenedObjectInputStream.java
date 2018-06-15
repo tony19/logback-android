@@ -6,22 +6,38 @@ import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
+ * HardenedObjectInputStream restricts the set of classes that can be deserialized to a set of
+ * explicitly whitelisted classes. This prevents certain type of attacks from being successful.
+ * 
+ * <p>It is assumed that classes in the "java.lang" and  "java.util" packages are
+ * always authorized.</p>
  *
  * @author Ceki G&uuml;lc&uuml;
  * @since 1.2.0
  */
 public class HardenedObjectInputStream extends ObjectInputStream {
 
-    List<String> whitelistedClassNames;
-    String[] javaPackages = new String[] {"java.lang", "java.util"};
+    final List<String> whitelistedClassNames;
+    final static String[] JAVA_PACKAGES = new String[] { "java.lang", "java.util" };
 
-    public HardenedObjectInputStream(InputStream in, List<String> whilelist) throws IOException {
+    public HardenedObjectInputStream(InputStream in, String[] whilelist) throws IOException {
         super(in);
-        this.whitelistedClassNames = Collections.synchronizedList(new ArrayList<String>(whilelist));
+
+        this.whitelistedClassNames = new ArrayList<String>();
+        if (whilelist != null) {
+            for (int i = 0; i < whilelist.length; i++) {
+                this.whitelistedClassNames.add(whilelist[i]);
+            }
+        }
+    }
+
+    public HardenedObjectInputStream(InputStream in, List<String> whitelist) throws IOException {
+        super(in);
+        this.whitelistedClassNames = new ArrayList<String>();
+        this.whitelistedClassNames.addAll(whitelist);
     }
 
     @Override
@@ -35,14 +51,20 @@ public class HardenedObjectInputStream extends ObjectInputStream {
     }
 
     private boolean isWhitelisted(String incomingClassName) {
-        for(int i = 0; i < javaPackages.length; i++) {
-            if(incomingClassName.startsWith(javaPackages[i]))
+        for (int i = 0; i < JAVA_PACKAGES.length; i++) {
+            if (incomingClassName.startsWith(JAVA_PACKAGES[i])) {
                 return true;
+            }
         }
-        for(String className: whitelistedClassNames) {
-            if(incomingClassName.equals(className))
+        for (String whiteListed : whitelistedClassNames) {
+            if (incomingClassName.equals(whiteListed)) {
                 return true;
+            }
         }
         return false;
+    }
+
+    protected void addToWhitelist(List<String> additionalAuthorizedClasses) {
+        whitelistedClassNames.addAll(additionalAuthorizedClasses);
     }
 }
