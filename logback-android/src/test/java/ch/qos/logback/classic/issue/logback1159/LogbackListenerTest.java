@@ -20,16 +20,17 @@ import org.slf4j.impl.StaticLoggerBinderFriend;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.CoreTestConstants;
 
 @RunWith(RobolectricTestRunner.class)
 public class LogbackListenerTest {
-    private File logFile = new File("target/test.log");
+    private File logFile = new File(CoreTestConstants.OUTPUT_DIR_PREFIX, "test.log");
 
     private void doConfigure() throws JoranException {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(context);
-        configurator.doConfigure(new File("src/test/input/issue/logback-1159.xml"));
+        configurator.doConfigure(new File(CoreTestConstants.TEST_DIR_PREFIX, "input/issue/logback-1159.xml"));
     }
 
     @After
