@@ -28,6 +28,8 @@ import java.util.Map;
 
 abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
 
+  static final int INTIAL_STRING_BUILDER_SIZE = 256;
+
   Converter<E> head;
   String pattern;
   protected PostCompileProcessor<E> postCompileProcessor;
@@ -113,7 +115,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   }
 
   protected String writeLoopOnConverters(E event) {
-    StringBuilder buf = new StringBuilder(128);
+    StringBuilder buf = new StringBuilder(INTIAL_STRING_BUILDER_SIZE);
     Converter<E> c = head;
     while (c != null) {
       c.write(buf, event);
