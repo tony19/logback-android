@@ -31,7 +31,7 @@ import static ch.qos.logback.core.CoreConstants.UNBOUNDED_TOTAL_SIZE_CAP;
 public class TimeBasedArchiveRemover extends ContextAwareBase implements ArchiveRemover {
 
   static protected final long UNINITIALIZED = -1;
-  // aim for 64 days, except in case of hourly rollover
+  // aim for 32 days, except in case of hourly rollover
   static protected final long INACTIVITY_TOLERANCE_IN_MILLIS = 32L * (long) CoreConstants.MILLIS_IN_ONE_DAY;
   static final int MAX_VALUE_FOR_INACTIVITY_PERIODS = 14 * 24; // 14 days in case of hourly rollover
 

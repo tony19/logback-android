@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,8 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.util.EnvUtil;
 
 public class RollingCalendarTest {
+
+  String dailyPattern = "yyyy-MM-dd";
 
   @Before
   public void setUp() {
@@ -179,5 +182,36 @@ public class RollingCalendarTest {
     } else {
       assertFalse(rc.isCollisionFree());
     }
+  }
+
+  @Test
+  public void basicPeriodBarriersCrossed() {
+    RollingCalendar rc = new RollingCalendar(dailyPattern, TimeZone.getTimeZone("CET"), Locale.US);
+    // Thu Jan 26 19:46:58 CET 2017, GMT offset = -1h
+    long start = 1485456418969L;
+    // Fri Jan 27 19:46:58 CET 2017,  GMT offset = -1h
+    long end = start + CoreConstants.MILLIS_IN_ONE_DAY;
+    assertEquals(1, rc.periodBarriersCrossed(start, end));
+  }
+
+  @Test
+  public void testPeriodBarriersCrossedWhenGoingIntoDaylightSaving() {
+    RollingCalendar rc = new RollingCalendar(dailyPattern, TimeZone.getTimeZone("CET"), Locale.US);
+    // Sun Mar 26 00:02:03 CET  2017, GMT offset = -1h
+    long start = 1490482923333L;
+    // Mon Mar 27 00:02:03 CEST 2017,  GMT offset = -2h
+    long end = 1490565723333L;
+
+    assertEquals(1, rc.periodBarriersCrossed(start, end));
+  }
+
+  @Test
+  public void testPeriodBarriersCrossedWhenLeavingDaylightSaving() {
+    RollingCalendar rc = new RollingCalendar(dailyPattern, TimeZone.getTimeZone("CET"), Locale.US);
+    // Sun Oct 29 00:02:03 CEST 2017, GMT offset = -2h
+    long start = 1509228123333L;//1490482923333L+217*CoreConstants.MILLIS_IN_ONE_DAY-CoreConstants.MILLIS_IN_ONE_HOUR;
+    // Mon Oct 30 00:02:03 CET  2017,  GMT offset = -1h
+    long end = 1509228123333L + 25 * CoreConstants.MILLIS_IN_ONE_HOUR;
+    assertEquals(1, rc.periodBarriersCrossed(start, end));
   }
 }

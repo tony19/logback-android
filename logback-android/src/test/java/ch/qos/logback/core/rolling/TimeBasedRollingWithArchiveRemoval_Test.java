@@ -417,9 +417,13 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
 
     for (int i = 0; i <= runLength; i++) {
       if (i < startInactivityIndex || i > endInactivityIndex) {
+        Date currentDate = new Date(tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime());
         StringBuilder sb = new StringBuilder("Hello");
+        String currentDateStr = currentDate.toString();
         String iAsString = Integer.toString(i);
-        SpacePadder.spacePad(sb, 66 + (6 - iAsString.length()));
+        sb.append(currentDateStr);
+        SpacePadder.spacePad(sb, 66 + (3 - iAsString.length() - currentDateStr.length()));
+        sb.append(iAsString);
         rfa.doAppend(sb.toString());
       }
       tbrp.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(addTime(tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime(),
@@ -427,6 +431,13 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       add(tbrp.compressionFuture);
       add(tbrp.cleanUpFuture);
       waitForJobsToComplete();
+    }
+
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
     rfa.stop();
     return tbrp.timeBasedFileNamingAndTriggeringPolicy.getCurrentTime();

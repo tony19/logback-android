@@ -179,10 +179,10 @@ public class RollingCalendar extends GregorianCalendar {
     if (start > end)
       throw new IllegalArgumentException("Start cannot come before end");
 
-    Date startFloored = getsStartOfCurrentPeriod(start);
-    Date endFloored = getsStartOfCurrentPeriod(end);
+    long startFloored = getStartOfCurrentPeriodWithGMTOffsetCorrection(start, getTimeZone());
+    long endFloored = getStartOfCurrentPeriodWithGMTOffsetCorrection(end, getTimeZone());
 
-    long diff = endFloored.getTime() - startFloored.getTime();
+    long diff = endFloored - startFloored;
 
     switch (periodicityType) {
 
@@ -287,9 +287,11 @@ public class RollingCalendar extends GregorianCalendar {
     return getEndOfNextNthPeriod(now, 1);
   }
 
-  public Date getsStartOfCurrentPeriod(long now) {
-    Calendar aCal = Calendar.getInstance(getTimeZone());
+  public long getStartOfCurrentPeriodWithGMTOffsetCorrection(long now, TimeZone timezone) {
+    Calendar aCal = Calendar.getInstance(timezone);
     aCal.setTimeInMillis(now);
-    return getEndOfNextNthPeriod(aCal.getTime(), 0);
+    Date d = getEndOfNextNthPeriod(aCal.getTime(), 0);
+    long gmtOffset = aCal.get(Calendar.ZONE_OFFSET) + aCal.get(Calendar.DST_OFFSET);
+    return d.getTime() + gmtOffset;
   }
 }
