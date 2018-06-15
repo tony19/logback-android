@@ -214,4 +214,14 @@ public class RollingCalendarTest {
     long end = 1509228123333L + 25 * CoreConstants.MILLIS_IN_ONE_HOUR;
     assertEquals(1, rc.periodBarriersCrossed(start, end));
   }
+
+  @Test
+  public void testPeriodBarriersCrosseJustBeforeEnteringDaylightSaving() {
+    RollingCalendar rc = new RollingCalendar(dailyPattern, TimeZone.getTimeZone("CET"), Locale.US);
+    // Sun Mar 26 22:18:38 CEST 2017, GMT offset = +2h
+    long start = 1490559518333L;
+    // Mon Mar 27 00:05:18 CEST 2017, GMT offset = +2h
+    long end = 1490565918333L;
+    assertEquals(1, rc.periodBarriersCrossed(start, end));
+  }
 }
