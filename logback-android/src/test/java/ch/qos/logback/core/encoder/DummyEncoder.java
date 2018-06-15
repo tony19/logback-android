@@ -13,8 +13,6 @@
  */
 package ch.qos.logback.core.encoder;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import ch.qos.logback.core.CoreConstants;
@@ -42,7 +40,7 @@ public class DummyEncoder<E> extends EncoderBase<E> {
     this.val = val;
   }
 
-  public byte[] doEncode(E event) throws IOException {
+  public byte[] encode(E event) {
     return encodeString(val);
   }
 
@@ -72,11 +70,11 @@ public class DummyEncoder<E> extends EncoderBase<E> {
     return encodeString(sb.toString());
   }
 
-  public byte[] init() {
+  public byte[] headerBytes() {
     return header();
   }
 
-  public byte[] close() throws IOException {
+  public byte[] footerBytes() {
     if (fileFooter == null) {
       return null;
     }

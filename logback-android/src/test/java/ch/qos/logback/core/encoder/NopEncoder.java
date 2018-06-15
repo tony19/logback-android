@@ -13,20 +13,17 @@
  */
 package ch.qos.logback.core.encoder;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 public class NopEncoder<E> extends EncoderBase<E> {
-  
-  public byte[] close() throws IOException {
+
+  public byte[] encode(E event) {
     return null;
   }
 
-  public byte[] doEncode(E event) throws IOException {
+  public byte[] headerBytes() {
     return null;
   }
 
-  public byte[] init() throws IOException {
+  public byte[] footerBytes() {
     return null;
   }
 }

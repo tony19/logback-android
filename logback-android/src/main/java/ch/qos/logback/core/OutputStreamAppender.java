@@ -142,7 +142,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   void encoderInit() {
     if (encoder != null && this.outputStream != null) {
       try {
-        byte[] header = encoder.init();
+        byte[] header = encoder.headerBytes();
         writeBytes(header);
       } catch (IOException ioe) {
         this.started = false;
@@ -156,7 +156,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   void encoderClose() {
     if (encoder != null && this.outputStream != null) {
       try {
-        byte[] footer = encoder.close();
+        byte[] footer = encoder.footerBytes();
         writeBytes(footer);
       } catch (IOException ioe) {
         this.started = false;
@@ -195,11 +195,11 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   }
 
   protected void writeOut(E event) throws IOException {
-    byte[] byteArray = this.encoder.doEncode(event);
+    byte[] byteArray = this.encoder.encode(event);
     writeBytes(byteArray);
   }
 
-  void writeBytes(byte[] byteArray) throws IOException {
+  private void writeBytes(byte[] byteArray) throws IOException {
     if (byteArray == null)
       return;
 
@@ -236,7 +236,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
       // are writing. It also prevents multiple threads from entering the same
       // converter. Converters assume that they are in a synchronized block.
       //lock.lock();
-      byte[] byteArray = this.encoder.doEncode(event);
+      byte[] byteArray = this.encoder.encode(event);
       writeBytes(byteArray);
 
     } catch (IOException ioe) {

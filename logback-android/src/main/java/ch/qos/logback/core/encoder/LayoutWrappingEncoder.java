@@ -79,11 +79,8 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
     this.charset = charset;
   }
 
-  public byte[] init() throws IOException {
-    return headerBytes();
-  }
-
-  byte[] headerBytes() throws IOException {
+  @Override
+  public byte[] headerBytes() {
     if (layout == null) {
       return null;
     }
@@ -99,11 +96,8 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
     return convertToBytes(sb.toString());
   }
 
-  public byte[] close() throws IOException {
-    return footerBytes();
-  }
-
-  byte[] footerBytes() throws IOException {
+  @Override
+  public byte[] footerBytes() {
     if (layout == null) {
       return null;
     }
@@ -121,7 +115,7 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
     }
   }
 
-  public byte[] doEncode(E event) throws IOException {
+  public byte[] encode(E event) {
     String txt = layout.doLayout(event);
     return convertToBytes(txt);
   }
