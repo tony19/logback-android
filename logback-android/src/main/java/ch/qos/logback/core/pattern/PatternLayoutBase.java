@@ -30,15 +30,12 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
 
   static final int INTIAL_STRING_BUILDER_SIZE = 256;
 
-  private static final int MAX_STRING_BUILDER_LENGTH = 16 * INTIAL_STRING_BUILDER_SIZE;
-
   Converter<E> head;
   String pattern;
   protected PostCompileProcessor<E> postCompileProcessor;
 
   Map<String, String> instanceConverterMap = new HashMap<String, String>();
   protected boolean outputPatternAsHeader = false;
-  StringBuilder recycledStringBuilder = new StringBuilder(INTIAL_STRING_BUILDER_SIZE);
 
   /**
    * Concrete implementations of this class are responsible for elaborating the
@@ -118,21 +115,13 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
   }
 
   protected String writeLoopOnConverters(E event) {
-    StringBuilder strBuilder = getRecycledStringBuilder();
+    StringBuilder strBuilder = new StringBuilder(INTIAL_STRING_BUILDER_SIZE);
     Converter<E> c = head;
     while (c != null) {
       c.write(strBuilder, event);
       c = c.getNext();
     }
     return strBuilder.toString();
-  }
-
-  private StringBuilder getRecycledStringBuilder() {
-    if (recycledStringBuilder.length() > MAX_STRING_BUILDER_LENGTH) {
-      recycledStringBuilder = new StringBuilder(INTIAL_STRING_BUILDER_SIZE);
-    }
-    recycledStringBuilder.setLength(0);
-    return recycledStringBuilder;
   }
 
   public String getPattern() {
