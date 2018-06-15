@@ -52,6 +52,8 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
    */
   private OutputStream outputStream;
 
+  private boolean immediateFlush = true;
+
   /**
    * The underlying output stream used by this appender.
    *
@@ -140,7 +142,8 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   void encoderInit() {
     if (encoder != null && this.outputStream != null) {
       try {
-        encoder.init(outputStream);
+        byte[] header = encoder.init();
+        writeBytes(header);
       } catch (IOException ioe) {
         this.started = false;
         addStatus(new ErrorStatus(
@@ -153,7 +156,8 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   void encoderClose() {
     if (encoder != null && this.outputStream != null) {
       try {
-        encoder.close();
+        byte[] footer = encoder.close();
+        writeBytes(footer);
       } catch (IOException ioe) {
         this.started = false;
         addStatus(new ErrorStatus("Failed to write footer for appender named ["
@@ -191,7 +195,23 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
   }
 
   protected void writeOut(E event) throws IOException {
-    this.encoder.doEncode(event);
+    byte[] byteArray = this.encoder.doEncode(event);
+    writeBytes(byteArray);
+  }
+
+  void writeBytes(byte[] byteArray) throws IOException {
+    if (byteArray == null)
+      return;
+
+    lock.lock();
+    try {
+      this.outputStream.write(byteArray);
+      if (immediateFlush) {
+        this.outputStream.flush();
+      }
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
@@ -216,11 +236,9 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
       // are writing. It also prevents multiple threads from entering the same
       // converter. Converters assume that they are in a synchronized block.
       //lock.lock();
-      //try {
-        writeOut(event);
-      //} finally {
-      //  lock.unlock();
-      //}
+      byte[] byteArray = this.encoder.doEncode(event);
+      writeBytes(byteArray);
+
     } catch (IOException ioe) {
       // as soon as an exception occurs, move to non-started state
       // and add a single ErrorStatus to the SM.
@@ -237,4 +255,11 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
     this.encoder = encoder;
   }
 
+  public boolean isImmediateFlush() {
+    return immediateFlush;
+  }
+
+  public void setImmediateFlush(boolean immediateFlush) {
+    this.immediateFlush = immediateFlush;
+  }
 }

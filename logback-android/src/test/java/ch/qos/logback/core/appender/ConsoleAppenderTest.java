@@ -18,6 +18,7 @@ import static junit.framework.Assert.assertFalse;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import org.junit.After;
 import org.junit.Before;
@@ -131,12 +132,12 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
   public void testUTF16BE() throws UnsupportedEncodingException {
     ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
     DummyEncoder<Object> dummyEncoder = new DummyEncoder<Object>();
-    String encodingName = "UTF-16BE";
-    dummyEncoder.setEncodingName(encodingName);
+    Charset utf16BE = Charset.forName("UTF-16BE");
+    dummyEncoder.setCharset(utf16BE);
     ca.setEncoder(dummyEncoder);
     ca.start();
     ca.doAppend(new Object());
-    assertEquals(DummyLayout.DUMMY, new String(tee.toByteArray(), encodingName));
+    assertEquals(DummyLayout.DUMMY, new String(tee.toByteArray(), utf16BE));
   }
 
   @Test

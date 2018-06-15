@@ -42,10 +42,9 @@ public interface Encoder<E> extends ContextAware, LifeCycle {
    * rollover. Implementing encoders should at the very least remember the
    * OutputStream passed as argument and use it in future operations.
    *
-   * @param os the output stream
    * @throws IOException failed to initialize the stream
    */
-  void init(OutputStream os) throws IOException;
+  byte[] init() throws IOException;
 
   /**
    * Encode and write an event to the appropriate {@link OutputStream}.
@@ -55,7 +54,7 @@ public interface Encoder<E> extends ContextAware, LifeCycle {
    * @param event the log event
    * @throws IOException failed to write log event to stream
    */
-  void doEncode(E event) throws IOException;
+  byte[] doEncode(E event) throws IOException;
 
   /**
    * This method is called prior to the closing of the underling
@@ -64,5 +63,5 @@ public interface Encoder<E> extends ContextAware, LifeCycle {
    *
    * @throws IOException failed to close output stream
    */
-  void close() throws IOException;
+  byte[] close() throws IOException;
 }
