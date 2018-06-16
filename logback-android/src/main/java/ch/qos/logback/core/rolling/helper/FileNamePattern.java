@@ -190,6 +190,8 @@ public class FileNamePattern extends ContextAwareBase {
    *
    * Used to compute sub-regex when the pattern has both %d and %i, and the
    * date is known.
+   *
+   * @param date - date to be converted
    */
   public String toRegexForFixedDate(Date date) {
     StringBuilder buf = new StringBuilder();
