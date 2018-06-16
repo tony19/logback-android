@@ -23,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -79,6 +80,8 @@ public class ReconfigureOnChangeTaskTest {
     final static String INCLUSION_SCAN_INNER0_AS_STR = JORAN_INPUT_PREFIX + "roct/inclusion/inner0.xml";
 
     final static String INCLUSION_SCAN_INNER1_AS_STR = ".+/asResource/inner1.xml$";
+
+    private static final String SCAN_PERIOD_DEFAULT_FILE_AS_STR = JORAN_INPUT_PREFIX + "roct/scan_period_default.xml";
 
     LoggerContext loggerContext = new LoggerContext();
     Logger logger = loggerContext.getLogger(this.getClass());
@@ -302,6 +305,16 @@ public class ReconfigureOnChangeTaskTest {
             rArray[i] = new LoggingRunnable(logger);
         }
         return rArray;
+    }
+
+    @Test
+    public void checkReconfigureTaskScheduledWhenDefaultScanPeriodUsed() throws JoranException {
+        File file = new File(SCAN_PERIOD_DEFAULT_FILE_AS_STR);
+        configure(file);
+
+        final List<ScheduledFuture<?>> scheduledFutures = loggerContext.getScheduledFutures();
+        assertFalse(scheduledFutures.isEmpty());
+        StatusPrinter.print(loggerContext);
     }
 
     // check for deadlocks
