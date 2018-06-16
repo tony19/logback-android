@@ -42,6 +42,14 @@ public class EnvUtilTest {
 
     @Test
     public void testJava1_5() {
+        System.setProperty("java.version", "1.5");
+
+        assertTrue(EnvUtil.isJDK5());
+        assertFalse(EnvUtil.isJDK7OrHigher());
+    }
+
+    @Test
+    public void testJava1_5_x() {
         System.setProperty("java.version", "1.5.xx");
 
         assertTrue(EnvUtil.isJDK5());
@@ -74,6 +82,14 @@ public class EnvUtilTest {
 
     @Test
     public void testJava9() {
+        System.setProperty("java.version", "9");
+
+        assertTrue(EnvUtil.isJDK5());
+        assertTrue(EnvUtil.isJDK7OrHigher());
+    }
+
+    @Test
+    public void testJava9_1() {
         System.setProperty("java.version", "9.xx");
 
         assertTrue(EnvUtil.isJDK5());

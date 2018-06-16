@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  */
 public class EnvUtil {
 
-  private static final Pattern versionPattern = Pattern.compile("^(1.)?([0-9]+)");
+  private static final Pattern versionPattern = Pattern.compile("^(1\\.)?([0-9]+)");
 
   private EnvUtil() {}
 
