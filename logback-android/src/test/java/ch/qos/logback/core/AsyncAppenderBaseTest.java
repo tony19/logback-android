@@ -97,6 +97,7 @@ public class AsyncAppenderBaseTest {
     asyncAppenderBase.stop();
     verify(delayingListAppender, 1);
     assertTrue(delayingListAppender.interrupted);
+    Thread.interrupted();
   }
 
   @Test(timeout = 2000)
@@ -233,7 +234,25 @@ public class AsyncAppenderBaseTest {
     Thread.currentThread().interrupt();
     asyncAppenderBase.doAppend(new Integer(0));
     assertTrue(Thread.currentThread().isInterrupted());
-    // clear flag for next test
+    // clear interrupt flag for subsequent tests
+    Thread.interrupted();
+  }
+
+  // Interruption of current thread should not prevent logging.
+  // See also http://jira.qos.ch/browse/LOGBACK-910
+  // and https://jira.qos.ch/browse/LOGBACK-1247
+  @Test
+  public void verifyInterruptionDoesNotPreventLogging() {
+    asyncAppenderBase.addAppender(listAppender);
+    asyncAppenderBase.start();
+    asyncAppenderBase.doAppend(new Integer(0));
+    Thread.currentThread().interrupt();
+    asyncAppenderBase.doAppend(new Integer(1));
+    asyncAppenderBase.doAppend(new Integer(1));
+    assertTrue(Thread.currentThread().isInterrupted());
+    asyncAppenderBase.stop();
+    verify(listAppender, 3);
+    // clear interrupt flag for subsequent tests
     Thread.interrupted();
   }
 
