@@ -55,7 +55,7 @@ public class Parser<E> extends ContextAwareBase {
              ReplacingCompositeConverter.class.getName());
   }
 
-  final List tokenList;
+  final List<Token> tokenList;
   int pointer = 0;
 
   Parser(TokenStream ts) throws ScanException {
@@ -83,7 +83,7 @@ public class Parser<E> extends ContextAwareBase {
    * @param converterMap converter map
    * @return the converter chain
    */
-  public Converter<E> compile(final Node top, Map converterMap) {
+  public Converter<E> compile(final Node top, Map<String, String> converterMap) {
     Compiler<E> compiler = new Compiler<E>(top, converterMap);
     compiler.setContext(context);
     //compiler.setStatusManager(statusManager);
