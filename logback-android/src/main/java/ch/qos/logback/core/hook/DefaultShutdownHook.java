@@ -21,7 +21,7 @@ import ch.qos.logback.core.util.Duration;
  *
  * @author Mike Reinhold
  */
-public class DelayingShutdownHook extends ShutdownHookBase {
+public class DefaultShutdownHook extends ShutdownHookBase {
     /**
      * Default delay before shutdown. The default is 0 (immediate).
      */
@@ -31,7 +31,7 @@ public class DelayingShutdownHook extends ShutdownHookBase {
      * The delay in milliseconds before the ShutdownHook stops the
      * logback context
      */
-    private Duration delay;
+    private Duration delay = DEFAULT_DELAY;
 
     public Duration getDelay() {
         return delay;
@@ -47,12 +47,13 @@ public class DelayingShutdownHook extends ShutdownHookBase {
     }
 
     public void run() {
-        addInfo("Sleeping for "+delay);
-        try {
-            Thread.sleep(delay.getMilliseconds());
-        } catch (InterruptedException e) {
+        if (delay.getMilliseconds() > 0) {
+            addInfo("Sleeping for " + delay);
+            try {
+                Thread.sleep(delay.getMilliseconds());
+            } catch (InterruptedException e) {
+            }
         }
-
         super.stop();
     }
 }

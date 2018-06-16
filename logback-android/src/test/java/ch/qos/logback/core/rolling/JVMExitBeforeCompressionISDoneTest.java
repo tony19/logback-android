@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.encoder.EchoEncoder;
-import ch.qos.logback.core.hook.DelayingShutdownHook;
+import ch.qos.logback.core.hook.DefaultShutdownHook;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.StatusListenerConfigHelper;
@@ -20,7 +20,7 @@ public class JVMExitBeforeCompressionISDoneTest extends ScaffoldingForRollingTes
 
     RollingFileAppender<Object> rfa = new RollingFileAppender<Object>();
     TimeBasedRollingPolicy<Object> tbrp = new TimeBasedRollingPolicy<Object>();
-    DelayingShutdownHook delayingShutdownHook = new DelayingShutdownHook();
+    DefaultShutdownHook delayingShutdownHook = new DefaultShutdownHook();
 
     static final long FRI_2016_05_13_T_170415_GMT = 1463159055630L;
 
