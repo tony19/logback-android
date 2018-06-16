@@ -263,6 +263,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
   }
 
   public void setTotalSizeCap(FileSize totalSizeCap) {
+    addInfo("setting totalSizeCap to "+totalSizeCap.toString());
     this.totalSizeCap = totalSizeCap;
   }
 }
