@@ -286,11 +286,10 @@ public class SMTPAppender_SubethaSMTPTest {
     assertEquals(1, wiserMsgList.size());
   }
 
-  static String GMAIL_USER_NAME = "@@gmail.com";
+  static String GMAIL_USER_NAME = "xx@gmail.com";
   static String GMAIL_PASSWORD = "xxx";
 
   @Test
-  @Ignore
   public void authenticatedGmailStartTLS() throws Exception {
     smtpAppender.setSMTPHost("smtp.gmail.com");
     smtpAppender.setSMTPPort(587);
