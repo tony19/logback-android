@@ -145,14 +145,15 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       addError("Both SSL and StartTLS cannot be enabled simultaneously");
     } else {
       if (isSTARTTLS()) {
-        // see also http://jira.qos.ch/browse/LBCORE-225
+        // see also http://jira.qos.ch/browse/LOGBACK-193
         props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.transport.protocol", "true");
       }
       if (isSSL()) {
         String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
         props.put("mail.smtp.socketFactory.port", Integer.toString(smtpPort));
         props.put("mail.smtp.socketFactory.class", SSL_FACTORY);
-        props.put("mail.smtp.socketFactory.fallback", "true");
+        props.put("mail.smtp.ssl.enable", "true");
       }
     }
 
@@ -186,7 +187,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
         if (asynchronousSending) {
           // perform actual sending asynchronously
           SenderRunnable senderRunnable = new SenderRunnable(cbClone, eventObject);
-          context.getExecutorService().execute(senderRunnable);
+          context.getScheduledExecutorService().execute(senderRunnable);
         } else {
           // synchronous sending
           sendBuffer(cbClone, eventObject);
@@ -554,7 +555,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
 
   public List<String> getToAsListOfString() {
     List<String> toList = new ArrayList<String>();
-    for (PatternLayoutBase plb : toPatternLayoutList) {
+    for (PatternLayoutBase<E> plb : toPatternLayoutList) {
       toList.add(plb.getPattern());
     }
     return toList;

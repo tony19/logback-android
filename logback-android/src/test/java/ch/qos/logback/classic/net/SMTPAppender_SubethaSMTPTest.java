@@ -286,23 +286,28 @@ public class SMTPAppender_SubethaSMTPTest {
     assertEquals(1, wiserMsgList.size());
   }
 
+  static String GMAIL_USER_NAME = "@@gmail.com";
+  static String GMAIL_PASSWORD = "xxx";
+
   @Test
   @Ignore
   public void authenticatedGmailStartTLS() throws Exception {
     smtpAppender.setSMTPHost("smtp.gmail.com");
     smtpAppender.setSMTPPort(587);
+    smtpAppender.setAsynchronousSending(false);
+    smtpAppender.addTo(GMAIL_USER_NAME);
 
-    smtpAppender.addTo("XXX@gmail.com");
     smtpAppender.setSTARTTLS(true);
-    smtpAppender.setUsername("XXX@gmail.com");
-    smtpAppender.setPassword("XXX");
+    smtpAppender.setUsername(GMAIL_USER_NAME);
+    smtpAppender.setPassword(GMAIL_PASSWORD);
 
     smtpAppender.setLayout(buildPatternLayout(loggerContext));
+    smtpAppender.setSubject("authenticatedGmailStartTLS - %level %logger{20} - %m");
     smtpAppender.start();
     Logger logger = loggerContext.getLogger("authenticatedGmailSTARTTLS");
     logger.addAppender(smtpAppender);
-    logger.debug("hello");
-    logger.error("en error", new Exception("an exception"));
+    logger.debug("authenticatedGmailStartTLS =- hello");
+    logger.error("an error", new Exception("an exception"));
 
     StatusPrinter.print(loggerContext);
   }
@@ -313,17 +318,18 @@ public class SMTPAppender_SubethaSMTPTest {
     smtpAppender.setSMTPHost("smtp.gmail.com");
     smtpAppender.setSMTPPort(465);
 
-    smtpAppender.addTo("XXX@gmail.com");
+    smtpAppender.setSubject("authenticatedGmail_SSL - %level %logger{20} - %m");
+    smtpAppender.addTo(GMAIL_USER_NAME);
     smtpAppender.setSSL(true);
-    smtpAppender.setUsername("XXX@gmail.com");
-    smtpAppender.setPassword("XXX");
-
+    smtpAppender.setUsername(GMAIL_USER_NAME);
+    smtpAppender.setPassword(GMAIL_PASSWORD);
+    smtpAppender.setAsynchronousSending(false);
     smtpAppender.setLayout(buildPatternLayout(loggerContext));
     smtpAppender.start();
     Logger logger = loggerContext.getLogger("authenticatedGmail_SSL");
     logger.addAppender(smtpAppender);
-    logger.debug("hello");
-    logger.error("en error", new Exception("an exception"));
+    logger.debug("hello"+new java.util.Date());
+    logger.error("an error", new Exception("an exception"));
 
     StatusPrinter.print(loggerContext);
   }
