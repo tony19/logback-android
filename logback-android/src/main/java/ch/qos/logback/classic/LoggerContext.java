@@ -114,7 +114,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
     return getLogger(clazz.getName());
   }
 
-  public final Logger getLogger(final String name) {
+  public Logger getLogger(final String name) {
 
     if (name == null) {
       throw new IllegalArgumentException("name argument cannot be null");
