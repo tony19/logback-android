@@ -21,6 +21,10 @@ import java.util.regex.Pattern;
  */
 public class EnvUtil {
 
+  private static final Pattern versionPattern = Pattern.compile("^(1.)?([0-9]+)");
+
+  private EnvUtil() {}
+
   /**
    * Heuristically determines whether the current OS is Android
    */
@@ -35,7 +39,6 @@ public class EnvUtil {
   }
 
   static private boolean isJDK_N_OrHigher(int n) {
-    Pattern versionPattern = Pattern.compile("^(1.)?([0-9]+)");
     Matcher matcher = versionPattern.matcher(System.getProperty("java.version", ""));
     if (matcher.find()) {
       return n <= Integer.parseInt(matcher.group(2));
