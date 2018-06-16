@@ -208,30 +208,32 @@ public final class Level implements java.io.Serializable {
    * @param defaultLevel default level if sArg could not be converted
    * @return the corresponding level
    */
-  public static Level toLevel(String sArg, Level defaultLevel) {
+  public static Level toLevel(final String sArg, Level defaultLevel) {
     if (sArg == null) {
       return defaultLevel;
     }
 
-    if (sArg.equalsIgnoreCase("ALL")) {
+    final String in = sArg.trim();
+
+    if (in.equalsIgnoreCase("ALL")) {
       return Level.ALL;
     }
-    if (sArg.equalsIgnoreCase("TRACE")) {
+    if (in.equalsIgnoreCase("TRACE")) {
       return Level.TRACE;
     }
-    if (sArg.equalsIgnoreCase("DEBUG")) {
+    if (in.equalsIgnoreCase("DEBUG")) {
       return Level.DEBUG;
     }
-    if (sArg.equalsIgnoreCase("INFO")) {
+    if (in.equalsIgnoreCase("INFO")) {
       return Level.INFO;
     }
-    if (sArg.equalsIgnoreCase("WARN")) {
+    if (in.equalsIgnoreCase("WARN")) {
       return Level.WARN;
     }
-    if (sArg.equalsIgnoreCase("ERROR")) {
+    if (in.equalsIgnoreCase("ERROR")) {
       return Level.ERROR;
     }
-    if (sArg.equalsIgnoreCase("OFF")) {
+    if (in.equalsIgnoreCase("OFF")) {
       return Level.OFF;
     }
     return defaultLevel;
