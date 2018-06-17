@@ -143,7 +143,7 @@ public class SocketReceiver extends ReceiverBase
 
   private Future<Socket> activateConnector(SocketConnector connector) {
     try {
-      return getContext().getExecutorService().submit(connector);
+      return getContext().getScheduledExecutorService().submit(connector);
     } catch (RejectedExecutionException ex) {
       return null;
     }

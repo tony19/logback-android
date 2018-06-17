@@ -86,7 +86,7 @@ public class SocketReceiverTest {
   @After
   public void tearDown() throws Exception {
     receiver.stop();
-    ExecutorService executor = lc.getExecutorService();
+    ExecutorService executor = lc.getScheduledExecutorService();
     executor.shutdownNow();
     assertTrue(executor.awaitTermination(DELAY, TimeUnit.MILLISECONDS));
     socket.close();
