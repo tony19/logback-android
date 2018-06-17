@@ -319,11 +319,11 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   }
 
 
-  void logTwiceAndStop(long currentTime, String fileNamePattern, int maxHistory) {
+  void logTwiceAndStop(long currentTime, String fileNamePattern, int maxHistory, long timePeriod) {
     ConfigParameters params = new ConfigParameters(currentTime).fileNamePattern(fileNamePattern).maxHistory(maxHistory);
     buildRollingFileAppender(params, DO_CLEAN_HISTORY_ON_START);
     rfa.doAppend("Hello ----------------------------------------------------------" + new Date(currentTime));
-    currentTime += MILLIS_IN_DAY/2;
+    currentTime += timePeriod/2;
     add(tbrp.compressionFuture);
     add(tbrp.cleanUpFuture);
     waitForJobsToComplete();
@@ -333,12 +333,12 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   }
 
   @Test
-  public void cleanHistoryOnStart() {
+  public void cleanHistoryOnStartWithDayPattern() {
     long simulatedTime = WED_2016_03_23_T_230705_CET;
     String fileNamePattern = randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt";
     int maxHistory = 3;
     for (int i = 0; i <= 5; i++) {
-      logTwiceAndStop(simulatedTime, fileNamePattern, maxHistory);
+      logTwiceAndStop(simulatedTime, fileNamePattern, maxHistory, MILLIS_IN_DAY);
       simulatedTime += MILLIS_IN_DAY;
     }
     //StatusPrinter.print(context);
@@ -346,13 +346,13 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   }
 
   @Test
-  public void cleanHistoryOnStartWithDayPattern() {
+  public void cleanHistoryOnStartWithHourDayPattern() {
     long simulatedTime = WED_2016_03_23_T_230705_CET;
-    String fileNamePattern = randomOutputDir + "clean-%d{yyyy-MM-dd}.txt";
+    String fileNamePattern = randomOutputDir + "clean-%d{yyyy-MM-dd-HH}.txt";
     int maxHistory = 3;
     for (int i = 0; i <= 5; i++) {
-      logTwiceAndStop(simulatedTime, fileNamePattern, maxHistory);
-      simulatedTime += MILLIS_IN_DAY;
+      logTwiceAndStop(simulatedTime, fileNamePattern, maxHistory, MILLIS_IN_HOUR);
+      simulatedTime += MILLIS_IN_HOUR;
     }
     //StatusPrinter.print(context);
     checkFileCount(expectedCountWithoutFolders(maxHistory));
@@ -369,7 +369,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     String fileNamePattern = randomOutputDir + "clean-%d{HH}.txt";
     int maxHistory = 3;
     for (int i = 0; i <= 5; i++) {
-      logTwiceAndStop(now, fileNamePattern, maxHistory);
+      logTwiceAndStop(now, fileNamePattern, maxHistory, MILLIS_IN_HOUR);
       now = now + MILLIS_IN_HOUR;
     }
     //StatusPrinter.print(context);
