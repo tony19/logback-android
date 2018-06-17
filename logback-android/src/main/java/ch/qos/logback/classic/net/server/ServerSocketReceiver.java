@@ -43,15 +43,15 @@ public class ServerSocketReceiver extends ReceiverBase {
   private int backlog = DEFAULT_BACKLOG;
   private String address;
 
-  private ServerSocket serverSocket;
   private ServerRunner runner;
 
   /**
    * Starts the server.
    */
   protected boolean shouldStart() {
+    ServerSocket serverSocket = null;
     try {
-      ServerSocket serverSocket = getServerSocketFactory().createServerSocket(
+      serverSocket = getServerSocketFactory().createServerSocket(
           getPort(), getBacklog(), getInetAddress());
 
       ServerListener<RemoteAppenderClient> listener =
