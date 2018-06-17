@@ -206,7 +206,7 @@ public class CorpusModel {
     }
     Object[] argumentArray = new Object[numOfArguments];
     for (int i = 0; i < numOfArguments; i++) {
-      argumentArray[i] = new Long(random.nextLong());
+      argumentArray[i] = random.nextLong();
     }
     return argumentArray;
   }

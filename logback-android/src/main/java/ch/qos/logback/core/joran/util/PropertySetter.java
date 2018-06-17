@@ -15,6 +15,7 @@
 package ch.qos.logback.core.joran.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
@@ -252,7 +253,7 @@ public class PropertySetter extends ContextAwareBase {
     // returns null.
     Object o;
     try {
-      o = clazz.newInstance();
+      o = clazz.getDeclaredConstructor().newInstance();
       if (o != null) {
         return true;
       } else {
@@ -261,6 +262,10 @@ public class PropertySetter extends ContextAwareBase {
     } catch (InstantiationException e) {
       return false;
     } catch (IllegalAccessException e) {
+      return false;
+    } catch (NoSuchMethodException e) {
+      return false;
+    } catch (InvocationTargetException e) {
       return false;
     }
   }

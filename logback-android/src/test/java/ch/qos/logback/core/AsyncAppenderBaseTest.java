@@ -232,7 +232,7 @@ public class AsyncAppenderBaseTest {
     asyncAppenderBase.addAppender(delayingListAppender);
     asyncAppenderBase.start();
     Thread.currentThread().interrupt();
-    asyncAppenderBase.doAppend(new Integer(0));
+    asyncAppenderBase.doAppend(0);
     assertTrue(Thread.currentThread().isInterrupted());
     // clear interrupt flag for subsequent tests
     Thread.interrupted();
@@ -245,10 +245,10 @@ public class AsyncAppenderBaseTest {
   public void verifyInterruptionDoesNotPreventLogging() {
     asyncAppenderBase.addAppender(listAppender);
     asyncAppenderBase.start();
-    asyncAppenderBase.doAppend(new Integer(0));
+    asyncAppenderBase.doAppend(0);
     Thread.currentThread().interrupt();
-    asyncAppenderBase.doAppend(new Integer(1));
-    asyncAppenderBase.doAppend(new Integer(1));
+    asyncAppenderBase.doAppend(1);
+    asyncAppenderBase.doAppend(1);
     assertTrue(Thread.currentThread().isInterrupted());
     asyncAppenderBase.stop();
     verify(listAppender, 3);

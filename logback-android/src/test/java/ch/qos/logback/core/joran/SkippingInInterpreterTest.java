@@ -108,11 +108,11 @@ public class SkippingInInterpreterTest {
 
   @Test
   public void testSkippingRuntimeExInBadEnd() throws Exception {
-    doTest("badEnd1.xml", new Integer(2), IllegalStateException.class);
+    doTest("badEnd1.xml", 2, IllegalStateException.class);
   }
 
   @Test
   public void testSkippingActionExInBadEnd() throws Exception {
-    doTest("badEnd2.xml", new Integer(2), ActionException.class);
+    doTest("badEnd2.xml", 2, ActionException.class);
   }
 }

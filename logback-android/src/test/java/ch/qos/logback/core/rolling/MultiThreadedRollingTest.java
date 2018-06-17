@@ -93,7 +93,7 @@ public class MultiThreadedRollingTest {
 
   public void setUpTimeBasedTriggeringPolicy(RollingFileAppender<Object> rfa) {
     String datePattern = "yyyy-MM-dd'T'HH_mm_ss_SSS";
-    TimeBasedRollingPolicy tbrp = new TimeBasedRollingPolicy();
+    TimeBasedRollingPolicy<Object> tbrp = new TimeBasedRollingPolicy();
     tbrp.setFileNamePattern(outputDirStr + "test-%d{" + datePattern + "}");
     tbrp.setContext(context);
     tbrp.setParent(rfa);

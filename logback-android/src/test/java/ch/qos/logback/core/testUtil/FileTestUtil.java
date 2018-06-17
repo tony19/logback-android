@@ -17,7 +17,7 @@ import ch.qos.logback.core.util.CoreTestConstants;
 
 import java.io.File;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ceki G&uuml;c&uuml;

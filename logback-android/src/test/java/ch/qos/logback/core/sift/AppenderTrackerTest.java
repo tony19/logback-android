@@ -77,7 +77,7 @@ public class AppenderTrackerTest {
 
   @Test
   public void endOfLivedAppendersShouldBeRemovedAfterLingeringTimeout() {
-    Appender a = appenderTracker.getOrCreate(key, now);
+    Appender<Object> a = appenderTracker.getOrCreate(key, now);
     appenderTracker.endOfLife(key);
     now += AppenderTracker.LINGERING_TIMEOUT + 1;
     appenderTracker.removeStaleComponents(now);
@@ -88,11 +88,11 @@ public class AppenderTrackerTest {
 
   @Test
   public void endOfLivedAppenderShouldBeAvailableDuringLingeringPeriod() {
-    Appender a = appenderTracker.getOrCreate(key, now);
+    Appender<Object> a = appenderTracker.getOrCreate(key, now);
     appenderTracker.endOfLife(key);
     // clean
     appenderTracker.removeStaleComponents(now);
-    Appender lingering = appenderTracker.getOrCreate(key, now);
+    Appender<Object> lingering = appenderTracker.getOrCreate(key, now);
     assertTrue(lingering.isStarted());
     assertTrue(a == lingering);
     now += AppenderTracker.LINGERING_TIMEOUT + 1;

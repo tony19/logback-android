@@ -23,7 +23,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class FileFilterUtilTest {
 

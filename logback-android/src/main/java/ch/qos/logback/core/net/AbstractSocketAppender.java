@@ -147,7 +147,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
       deque = queueFactory.newLinkedBlockingDeque(queueSize);
       peerId = "remote peer " + remoteHost + ":" + port + ": ";
       connector = createConnector(address, port, 0, reconnectionDelay.getMilliseconds());
-      task = getContext().getExecutorService().submit(new Runnable() {
+      task = getContext().getScheduledExecutorService().submit(new Runnable() {
         public void run() {
           connectSocketAndDispatchEvents();
         }

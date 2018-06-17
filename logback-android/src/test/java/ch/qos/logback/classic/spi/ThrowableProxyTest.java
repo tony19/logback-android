@@ -131,6 +131,8 @@ public class ThrowableProxyTest {
   @Test
   public void nullSTE() {
     Throwable t = new Exception("someMethodWithNullException") {
+      private static final long serialVersionUID = 1L;
+
       @Override
       public StackTraceElement[] getStackTrace() {
         return null;
@@ -164,6 +166,8 @@ public class ThrowableProxyTest {
 
   void someMethodWithNullException() throws Exception {
     throw new Exception("someMethodWithNullException") {
+      private static final long serialVersionUID = -2419053636101615373L;
+
       @Override
       public StackTraceElement[] getStackTrace() {
         return null;

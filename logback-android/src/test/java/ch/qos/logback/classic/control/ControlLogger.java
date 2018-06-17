@@ -171,15 +171,15 @@ public class ControlLogger extends MarkerIgnoringBase {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
-  public void trace(String format, Object[] argArray) {
+  public void trace(String format, Object... argArray) {
   }
-  public void debug(String format, Object[] argArray) {
+  public void debug(String format, Object... argArray) {
   }
-  public void info(String format, Object[] argArray) {
+  public void info(String format, Object... argArray) {
   }
-  public void warn(String format, Object[] argArray) {
+  public void warn(String format, Object... argArray) {
   }
-  public void error(String format, Object[] argArray) {
+  public void error(String format, Object... argArray) {
   }
 
 }
