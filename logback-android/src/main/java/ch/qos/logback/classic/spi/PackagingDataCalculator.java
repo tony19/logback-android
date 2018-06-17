@@ -42,7 +42,7 @@ public class PackagingDataCalculator {
     }
   }
 
-  void populateFrames(StackTraceElementProxy[] stepArray) {
+  private void populateFrames(StackTraceElementProxy[] stepArray) {
     // in the initial part of this method we populate package information for
     // common stack frames
     final Throwable t = new Throwable("local stack reference");
@@ -62,7 +62,7 @@ public class PackagingDataCalculator {
     populateUncommonFrames(commonFrames, stepArray, firsExactClassLoader);
   }
 
-  void populateUncommonFrames(int commonFrames,
+  private void populateUncommonFrames(int commonFrames,
                               StackTraceElementProxy[] stepArray, ClassLoader firstExactClassLoader) {
     int uncommonFrames = stepArray.length - commonFrames;
     for (int i = 0; i < uncommonFrames; i++) {
@@ -87,7 +87,7 @@ public class PackagingDataCalculator {
     return cpd;
   }
 
-  String getImplementationVersion(Class<?> type) {
+  private String getImplementationVersion(Class<?> type) {
     if (type == null) {
       return "na";
     }
@@ -104,7 +104,7 @@ public class PackagingDataCalculator {
 
   }
 
-  String getCodeLocation(Class<?> type) {
+  private String getCodeLocation(Class<?> type) {
     try {
       if (type != null) {
         // file:/C:/java/maven-2.0.8/repo/com/icegreen/greenmail/1.3/greenmail-1.3.jar

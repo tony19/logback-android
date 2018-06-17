@@ -96,7 +96,7 @@ public class JVMExitBeforeCompressionISDoneTest extends ScaffoldingForRollingTes
             tbrp.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(currentTime);
         }
 
-        String nameOfExpectedZipFile = randomOutputDir + patternPrefix+"-2016-05-13.zip";;
+        // String nameOfExpectedZipFile = randomOutputDir + patternPrefix+"-2016-05-13.zip";;
 
         // File expectedZipFile = new File(nameOfExpectedZipFile);
         // assertTrue("expecting file ["+nameOfExpectedZipFile+"] to exist", expectedZipFile.exists());
