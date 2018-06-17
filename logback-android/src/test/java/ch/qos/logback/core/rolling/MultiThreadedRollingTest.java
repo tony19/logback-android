@@ -91,6 +91,7 @@ public class MultiThreadedRollingTest {
     rfa.stop();
   }
 
+  @SuppressWarnings("unchecked")
   public void setUpTimeBasedTriggeringPolicy(RollingFileAppender<Object> rfa) {
     String datePattern = "yyyy-MM-dd'T'HH_mm_ss_SSS";
     TimeBasedRollingPolicy<Object> tbrp = new TimeBasedRollingPolicy();

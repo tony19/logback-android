@@ -56,6 +56,7 @@ public class SafeModeRollingFileAppender {
     System.exit(1);
   }
 
+  @SuppressWarnings("unchecked")
   static LoggerContext buildLoggerContext(String stamp, String filename,
       boolean safetyMode) {
     LoggerContext loggerContext = new LoggerContext();

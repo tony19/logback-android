@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import ch.qos.logback.core.pattern.FormatInfo;
 
+@SuppressWarnings("unchecked")
 public class ParserTest {
 
   String BARE = Token.BARE_COMPOSITE_KEYWORD_TOKEN.getValue().toString();
