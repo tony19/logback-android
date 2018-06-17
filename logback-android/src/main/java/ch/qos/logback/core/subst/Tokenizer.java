@@ -85,6 +85,13 @@ public class Tokenizer {
         stringBuilder.setLength(0);
         state = TokenizerState.START_STATE;
         break;
+      case CoreConstants.CURLY_LEFT:
+        stringBuilder.append(CoreConstants.COLON_CHAR);
+        addLiteralToken(tokenList, stringBuilder);
+        stringBuilder.setLength(0);
+        tokenList.add(Token.CURLY_LEFT_TOKEN);
+        state = TokenizerState.LITERAL_STATE;
+        break;
       default:
         stringBuilder.append(CoreConstants.COLON_CHAR).append(c);
         state = TokenizerState.LITERAL_STATE;
@@ -102,26 +109,30 @@ public class Tokenizer {
   }
 
   private void handleLiteralState(char c, List<Token> tokenList, StringBuilder stringBuilder) {
-    if (c == CoreConstants.DOLLAR) {
-      addLiteralToken(tokenList, stringBuilder);
-      stringBuilder.setLength(0);
-      state = TokenizerState.START_STATE;
-    } else if (c == CoreConstants.COLON_CHAR) {
-      addLiteralToken(tokenList, stringBuilder);
-      stringBuilder.setLength(0);
-      state = TokenizerState.DEFAULT_VAL_STATE;
-    } else if (c == CoreConstants.CURLY_LEFT) {
-      addLiteralToken(tokenList, stringBuilder);
-      tokenList.add(Token.CURLY_LEFT_TOKEN);
-      stringBuilder.setLength(0);
-    } else  if (c == CoreConstants.CURLY_RIGHT) {
-      addLiteralToken(tokenList, stringBuilder);
-      tokenList.add(Token.CURLY_RIGHT_TOKEN);
-      stringBuilder.setLength(0);
-    } else {
-      stringBuilder.append(c);
+    switch (c) {
+      case CoreConstants.DOLLAR:
+        addLiteralToken(tokenList, stringBuilder);
+        stringBuilder.setLength(0);
+        state = TokenizerState.START_STATE;
+        break;
+      case CoreConstants.COLON_CHAR:
+        addLiteralToken(tokenList, stringBuilder);
+        stringBuilder.setLength(0);
+        state = TokenizerState.DEFAULT_VAL_STATE;
+        break;
+      case CoreConstants.CURLY_LEFT:
+        addLiteralToken(tokenList, stringBuilder);
+        tokenList.add(Token.CURLY_LEFT_TOKEN);
+        stringBuilder.setLength(0);
+        break;
+      case CoreConstants.CURLY_RIGHT:
+        addLiteralToken(tokenList, stringBuilder);
+        tokenList.add(Token.CURLY_RIGHT_TOKEN);
+        stringBuilder.setLength(0);
+        break;
+      default:
+        stringBuilder.append(c);
     }
-
   }
 
   private void addLiteralToken(List<Token> tokenList, StringBuilder stringBuilder) {
