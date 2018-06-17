@@ -16,15 +16,16 @@ package ch.qos.logback.classic.net.testObjectBuilders;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 
-public class TrivialLoggingEventBuilder implements Builder {
+public class TrivialLoggingEventBuilder implements Builder<ILoggingEvent> {
 
   LoggerContext loggerContext = new LoggerContext();
 
   private Logger logger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
 
-  public Object build(int i) {
+  public ILoggingEvent build(int i) {
     LoggingEvent le = new LoggingEvent();
     le.setTimeStamp(System.currentTimeMillis());
     le.setLevel(Level.DEBUG);

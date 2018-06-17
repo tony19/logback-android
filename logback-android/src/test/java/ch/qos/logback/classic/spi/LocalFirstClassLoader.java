@@ -49,7 +49,7 @@ public class LocalFirstClassLoader extends URLClassLoader {
       throws ClassNotFoundException {
 
     // First, check if the class has already been loaded
-    Class c = findLoadedClass(name);
+    Class<?> c = findLoadedClass(name);
 
     // if not loaded, search the local (child) resources
     if (c == null) {

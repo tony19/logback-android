@@ -73,9 +73,9 @@ public class CyclicBufferTrackerT<E> implements ComponentTracker<CyclicBuffer<E>
 
   public Set<String> allKeys() {
     HashSet<String> allKeys = new HashSet<String>();
-    for (TEntry e : liveList)
+    for (TEntry<E> e : liveList)
       allKeys.add(e.key);
-    for (TEntry e : lingererList)
+    for (TEntry<E> e : lingererList)
       allKeys.add(e.key);
     return allKeys;
   }
