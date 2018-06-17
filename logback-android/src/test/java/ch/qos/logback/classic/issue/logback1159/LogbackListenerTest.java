@@ -30,7 +30,7 @@ public class LogbackListenerTest {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(context);
-        configurator.doConfigure(new File(CoreTestConstants.TEST_DIR_PREFIX, "input/issue/logback-1159.xml"));
+        configurator.doConfigure(new File(CoreTestConstants.TEST_INPUT_PREFIX, "issue/logback-1159.xml"));
     }
 
     @After
@@ -40,6 +40,7 @@ public class LogbackListenerTest {
     }
 
     private void disableLogFileAccess() throws IOException {
+        logFile.getParentFile().mkdirs();
         logFile.createNewFile();
         logFile.deleteOnExit();
         Path path = Paths.get(logFile.toURI());

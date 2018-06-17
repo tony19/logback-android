@@ -1,8 +1,8 @@
 <configuration debug="true">
 	<appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>target/test-output/valueOfConvention_${diff}/infoLog.log</file>
+		<file>build/test-output/valueOfConvention_${diff}/infoLog.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>target/test-output/valueOfConvention_${diff}/infoLogs.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>build/test-output/valueOfConvention_${diff}/infoLogs.%d{yyyy-MM-dd}.log</fileNamePattern>
 
 			<maxHistory>30</maxHistory>
 			<totalSizeCap>3GB</totalSizeCap>
@@ -17,8 +17,6 @@
 			</pattern>
 		</encoder>
 	</appender>
-
-
 
 	<root level="DEBUG">
 		<appender-ref ref="FILE_INFO" />

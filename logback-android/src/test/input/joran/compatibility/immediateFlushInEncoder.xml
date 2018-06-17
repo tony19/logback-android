@@ -1,7 +1,7 @@
 <configuration>
 
   <appender name="LIOE" class="ch.qos.logback.core.FileAppender">
-    <file>target/test-output/layoutInsteadOfEncoder.log</file>
+    <file>build/test-output/layoutInsteadOfEncoder.log</file>
     <append>true</append>
 
     <encoder>
