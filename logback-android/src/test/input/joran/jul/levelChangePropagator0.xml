@@ -1,9 +1,0 @@
-<configuration debug="false">
-
-  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
-    <resetJUL>true</resetJUL>
-  </contextListener>
-  <logger name="a.b.c.${diff}" level="WARN" />
-  <root level="TRACE"/>
-
-</configuration>
