@@ -38,13 +38,6 @@ public class OptionHelper {
     return instantiateByClassName(className, superClass, classLoader);
   }
 
-  public static Object instantiateByClassNameAndParameter(String className,
-                                                          Class<?> superClass, Context context, Class<?> type, Object param) throws IncompatibleClassException,
-          DynamicClassLoadingException {
-    ClassLoader classLoader = Loader.getClassLoaderOfObject(context);
-    return instantiateByClassNameAndParameter(className, superClass, classLoader, type, param);
-  }
-
   public static Object instantiateByClassName(String className,
                                               Class<?> superClass, ClassLoader classLoader)
           throws IncompatibleClassException, DynamicClassLoadingException {
@@ -78,31 +71,8 @@ public class OptionHelper {
     }
   }
 
-  /**
-   * Find the value corresponding to <code>key</code> in <code>props</code>.
-   * Then perform variable substitution on the found value.
-   */
-  // public static String findAndSubst(String key, Properties props) {
-  // String value = props.getProperty(key);
-  //
-  // if (value == null) {
-  // return null;
-  // }
-  //
-  // try {
-  // return substVars(value, props);
-  // } catch (IllegalArgumentException e) {
-  // return value;
-  // }
-  // }
-  final static String DELIM_START = "${";
-  final static char DELIM_STOP = '}';
   final static String DELIM_DEFAULT = ":-";
-
-  final static int DELIM_START_LEN = 2;
-  final static int DELIM_STOP_LEN = 1;
   final static int DELIM_DEFAULT_LEN = 2;
-
   final static String _IS_UNDEFINED = "_IS_UNDEFINED";
 
   /**
@@ -128,26 +98,6 @@ public class OptionHelper {
     } catch (ScanException e) {
       throw new IllegalArgumentException("Failed to parse input [" + input + "]", e);
     }
-  }
-
-  public static String propertyLookup(String key, PropertyContainer pc1,
-                                      PropertyContainer pc2) {
-    String value = null;
-    // first try the props passed as parameter
-    value = pc1.getProperty(key);
-
-    // then try  the pc2
-    if (value == null && pc2 != null) {
-      value = pc2.getProperty(key);
-    }
-    // then try in System properties
-    if (value == null) {
-      value = getSystemProperty(key, null);
-    }
-    if (value == null) {
-      value = getEnv(key);
-    }
-    return value;
   }
 
   /**
