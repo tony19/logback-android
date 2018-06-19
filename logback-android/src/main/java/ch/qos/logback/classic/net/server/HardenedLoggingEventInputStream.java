@@ -36,8 +36,6 @@ import ch.qos.logback.core.net.HardenedObjectInputStream;
 
 public class HardenedLoggingEventInputStream extends HardenedObjectInputStream {
 
-    static final String ARRAY_PREFIX = "[L";
-
     static public List<String> getWhilelist() {
         List<String> whitelist = new ArrayList<String>();
         whitelist.add(LoggingEventVO.class.getName());
