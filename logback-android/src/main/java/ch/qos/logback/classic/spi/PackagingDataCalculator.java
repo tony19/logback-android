@@ -27,8 +27,6 @@ import java.util.HashMap;
  */
 public class PackagingDataCalculator {
 
-  final static StackTraceElementProxy[] STEP_ARRAY_TEMPLATE = new StackTraceElementProxy[0];
-
   HashMap<String, ClassPackagingData> cache = new HashMap<String, ClassPackagingData>();
 
   public void calculate(IThrowableProxy tp) {
