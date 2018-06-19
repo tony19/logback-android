@@ -21,22 +21,11 @@ import ch.qos.logback.core.rolling.RolloverFailure;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class FileUtil extends ContextAwareBase {
 
   public FileUtil(Context context) {
     setContext(context);
-  }
-
-  public static URL fileToURL(File file) {
-    try {
-      return file.toURI().toURL();
-    } catch (MalformedURLException e) {
-      throw new RuntimeException("Unexpected exception on file [" + file + "]", e);
-    }
   }
 
   /**
