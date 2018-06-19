@@ -42,10 +42,10 @@ public class ContextBase implements Context, LifeCycle {
   // TODO propertyMap should be observable so that we can be notified
   // when it changes so that a new instance of propertyMap can be
   // serialized. For the time being, we ignore this shortcoming.
-  Map<String, String> propertyMap = new HashMap<String, String>();
-  Map<String, Object> objectMap = new HashMap<String, Object>();
+  private Map<String, String> propertyMap = new HashMap<String, String>();
+  private Map<String, Object> objectMap = new HashMap<String, Object>();
 
-  LogbackLock configurationLock = new LogbackLock();
+  private LogbackLock configurationLock = new LogbackLock();
 
   private ScheduledExecutorService scheduledExecutorService;
   protected List<ScheduledFuture<?>> scheduledFutures = new ArrayList<ScheduledFuture<?>>(1);
