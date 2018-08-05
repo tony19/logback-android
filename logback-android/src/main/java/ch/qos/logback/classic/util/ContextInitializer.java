@@ -96,7 +96,7 @@ public class ContextInitializer {
 
   /**
    * Uses the given classloader to search for a resource
-   * @return the URL to the resource; or {@code null} if not found
+   * @return the URL of the resource; or {@code null} if not found
    */
   private URL getResource(String filename, ClassLoader myClassLoader, boolean updateStatus) {
     URL url = myClassLoader.getResource(filename);
@@ -141,9 +141,9 @@ public class ContextInitializer {
 
     // search assets
     if (!configured) {
-      URL assetsConfigUrl = findConfigFileURLFromAssets(verbose);
-      if (assetsConfigUrl != null) {
-        configurator.doConfigure(assetsConfigUrl);
+      URL assetsConfigXml = findConfigFileURLFromAssets(verbose);
+      if (assetsConfigXml != null) {
+        configurator.doConfigure(assetsConfigXml);
         configured = true;
       }
     }
