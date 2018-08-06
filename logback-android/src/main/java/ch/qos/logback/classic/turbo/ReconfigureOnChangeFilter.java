@@ -195,10 +195,10 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
 
     private void performXMLConfiguration(LoggerContext lc) {
       JoranConfigurator jc = new JoranConfigurator();
-      jc.setContext(context);
-      StatusUtil statusUtil = new StatusUtil(context);
+      jc.setContext(lc);
+      StatusUtil statusUtil = new StatusUtil(lc);
       List<SaxEvent> eventList = jc.recallSafeConfiguration();
-      URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(context);
+      URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(lc);
       lc.reset();
       long threshold = System.currentTimeMillis();
       try {
@@ -213,12 +213,12 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
 
     private void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList, URL mainURL) {
       JoranConfigurator joranConfigurator = new JoranConfigurator();
-      joranConfigurator.setContext(context);
+      joranConfigurator.setContext(lc);
       if (eventList != null) {
         addWarn("Falling back to previously registered safe configuration.");
         try {
           lc.reset();
-          JoranConfigurator.informContextOfURLUsedForConfiguration(context, mainURL);
+          JoranConfigurator.informContextOfURLUsedForConfiguration(lc, mainURL);
           joranConfigurator.doConfigure(eventList);
           addInfo("Re-registering previous fallback configuration once more as a fallback configuration point");
           joranConfigurator.registerSafeConfiguration();
