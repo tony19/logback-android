@@ -14,7 +14,6 @@
 package ch.qos.logback.classic.util;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -87,26 +86,26 @@ public class ContextInitializer {
 
   /**
    * Finds a configuration file in the application's assets directory
-   * @return the file; or {@code null} if not found
+   * @return the URL of the file; or {@code null} if not found
    */
-  private InputStream findConfigFileURLFromAssets(boolean updateStatus) {
+  private URL findConfigFileURLFromAssets(boolean updateStatus) {
     return getResource(AUTOCONFIG_FILE, this.classLoader, updateStatus);
   }
 
   /**
    * Uses the given classloader to search for a resource
-   * @return the input stream to the resource; or {@code null} if not found
+   * @return the URL to the resource; or {@code null} if not found
    */
-  private InputStream getResource(String filename, ClassLoader myClassLoader, boolean updateStatus) {
-    InputStream stream = myClassLoader.getResourceAsStream(filename);
+  private URL getResource(String filename, ClassLoader myClassLoader, boolean updateStatus) {
+    URL url = myClassLoader.getResource(filename);
     if (updateStatus) {
       String resourcePath = null;
-      if (stream != null) {
+      if (url != null) {
         resourcePath = filename;
       }
       statusOnResourceSearch(filename, myClassLoader, resourcePath);
     }
-    return stream;
+    return url;
   }
 
   /**
@@ -140,9 +139,9 @@ public class ContextInitializer {
 
     // search assets
     if (!configured) {
-      InputStream assetsConfigXml = findConfigFileURLFromAssets(verbose);
-      if (assetsConfigXml != null) {
-        configurator.doConfigure(assetsConfigXml);
+      URL assetsConfigUrl = findConfigFileURLFromAssets(verbose);
+      if (assetsConfigUrl != null) {
+        configurator.doConfigure(assetsConfigUrl);
         configured = true;
       }
     }
