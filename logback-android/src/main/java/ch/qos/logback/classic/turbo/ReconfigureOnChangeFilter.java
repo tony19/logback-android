@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.List;
 
 import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.android.AndroidContextUtil;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.ConfigurationWatchList;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
@@ -200,6 +201,7 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
       List<SaxEvent> eventList = jc.recallSafeConfiguration();
       URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(lc);
       lc.reset();
+      new AndroidContextUtil().setupProperties(lc);
       long threshold = System.currentTimeMillis();
       try {
         jc.doConfigure(mainConfigurationURL);
@@ -218,6 +220,7 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
         addWarn("Falling back to previously registered safe configuration.");
         try {
           lc.reset();
+          new AndroidContextUtil().setupProperties(lc);
           JoranConfigurator.informContextOfURLUsedForConfiguration(lc, mainURL);
           joranConfigurator.doConfigure(eventList);
           addInfo("Re-registering previous fallback configuration once more as a fallback configuration point");
