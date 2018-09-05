@@ -8,4 +8,5 @@
     <issue id="TrulyRandom">
         <ignore path="*/SecureRandomFactoryBean.java" />
     </issue>
+    <issue id="MinSdkTooLow" severity="ignore" />
 </lint>
