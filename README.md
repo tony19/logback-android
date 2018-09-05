@@ -12,7 +12,7 @@ Overview
  * syslog
  * email
 
-Runs on Android 2.1 or higher. See [Wiki][4] for documentation.
+Runs on Android 2.3 (SDK 9) or higher. See [Wiki][4] for documentation.
 
 Quick Start
 -----------
