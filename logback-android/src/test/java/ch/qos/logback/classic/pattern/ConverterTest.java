@@ -405,7 +405,7 @@ public class ConverterTest {
   }
 
   private void assumeStackTraceDetailsAvailable() {
-    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+    StackTraceElement[] stackTraceElements = new Throwable().getStackTrace();
     assumeThat(stackTraceElements[0].getLineNumber(), is(greaterThan(-1)));
   }
 }
