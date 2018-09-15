@@ -2,10 +2,48 @@
 
 . gradle.properties
 
+
+function nextVersion() {
+    target=$1
+    ver=$2
+    case "$target" in
+        "major")
+            baseVer=${ver%*.*-*}
+            majorVer=${baseVer%*.*}
+            nextMajor=$(($majorVer + 1))
+            nextVer="${nextMajor}.0.0-1-SNAPSHOT"
+            echo $nextVer
+        ;;
+
+        "minor")
+            baseVer=${ver%*.*-*}
+            minorVer=${baseVer##*.}
+            nextMinor=$(($minorVer + 1))
+            nextVer="${baseVer%*.*}.${nextMinor}.0-1-SNAPSHOT"
+            echo $nextVer
+        ;;
+
+        "build")
+            baseVer=${ver%*-*}
+            baseVer=${baseVer%*-*}
+            buildVer=${baseVer##*.}
+            nextBuild=$(($buildVer + 1))
+            nextVer="${baseVer%*.*}.${nextBuild}-1-SNAPSHOT"
+            echo $nextVer
+        ;;
+
+        *)
+            baseVer=${ver%*-}
+            patchVer=${baseVer##*-}
+            nextPatch=$(($patchVer + 1))
+            nextVer="${baseVer%*-*}-${nextPatch}-SNAPSHOT"
+            echo $nextVer
+        ;;
+    esac
+}
+
 version=${VERSION_NAME%*-SNAPSHOT}
-baseVersion=${version%*-*}
-nextBuild=$((${version##*-} + 1))
-nextVersion="${baseVersion}-${nextBuild}-SNAPSHOT"
+nextVersion=$(nextVersion "$1" "$version")
 
 echo "Starting release for logback-android-${version} ..."
 
