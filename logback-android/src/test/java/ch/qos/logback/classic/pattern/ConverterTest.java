@@ -33,8 +33,10 @@ import ch.qos.logback.core.net.SyslogConstants;
 import ch.qos.logback.core.pattern.DynamicConverter;
 import ch.qos.logback.core.pattern.FormatInfo;
 
+import static org.junit.Assume.assumeThat;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.greaterThan;
 
 public class ConverterTest {
 
@@ -68,13 +70,12 @@ public class ConverterTest {
 
   @Test
   public void testLineOfCaller() {
-    {
-      DynamicConverter<ILoggingEvent> converter = new LineOfCallerConverter();
-      StringBuilder buf = new StringBuilder();
-      converter.write(buf, le);
-      // the number below should be the line number of the previous line
-      assertEquals("74", buf.toString());
-    }
+    assumeStackTraceDetailsAvailable();
+    DynamicConverter<ILoggingEvent> converter = new LineOfCallerConverter();
+    StringBuilder buf = new StringBuilder();
+    converter.write(buf, le);
+    // the number below should be the line number of the previous line
+    assertEquals("76", buf.toString());
   }
 
   @Test
@@ -218,6 +219,7 @@ public class ConverterTest {
 
   @Test
   public void testFileOfCaller() {
+    assumeStackTraceDetailsAvailable();
     DynamicConverter<ILoggingEvent> converter = new FileOfCallerConverter();
     StringBuilder buf = new StringBuilder();
     converter.write(buf, le);
@@ -400,5 +402,10 @@ public class ConverterTest {
 
     String result = converter.convert(event);
     assertEquals("v", result);
+  }
+
+  private void assumeStackTraceDetailsAvailable() {
+    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+    assumeThat(stackTraceElements[0].getLineNumber(), is(greaterThan(-1)));
   }
 }
