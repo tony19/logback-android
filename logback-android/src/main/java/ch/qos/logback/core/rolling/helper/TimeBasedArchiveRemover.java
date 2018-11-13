@@ -64,18 +64,16 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
   }
 
   protected File[] getFilesInPeriod(Date dateOfPeriodToClean) {
-    String filenameToDelete = fileNamePattern.convert(dateOfPeriodToClean);
-    File file2Delete = new File(filenameToDelete);
-
-    if (fileExistsAndIsFile(file2Delete)) {
-      return new File[] { file2Delete };
-    } else {
-      return new File[0];
-    }
+    File archive0 = new File(fileNamePattern.convertMultipleArguments(dateOfPeriodToClean, 0));
+    File parentDir = getParentDir(archive0);
+    String stemRegex = createStemRegex(dateOfPeriodToClean);
+    File[] matchingFileArray = FileFilterUtil.filesInFolderMatchingStemRegex(parentDir, stemRegex);
+    return matchingFileArray;
   }
 
-  private boolean fileExistsAndIsFile(File file2Delete) {
-    return file2Delete.exists() && file2Delete.isFile();
+  protected String createStemRegex(final Date dateOfPeriodToClean) {
+    String regex = fileNamePattern.toRegexForFixedDate(dateOfPeriodToClean);
+    return FileFilterUtil.afterLastSlash(regex);
   }
 
   public void cleanPeriod(Date dateOfPeriodToClean) {

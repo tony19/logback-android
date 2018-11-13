@@ -28,19 +28,6 @@ public class SizeAndTimeBasedArchiveRemover extends TimeBasedArchiveRemover {
     super(fileNamePattern, rc);
   }
 
-  protected File[] getFilesInPeriod(Date dateOfPeriodToClean) {
-    File archive0 = new File(fileNamePattern.convertMultipleArguments(dateOfPeriodToClean, 0));
-    File parentDir = getParentDir(archive0);
-    String stemRegex = createStemRegex(dateOfPeriodToClean);
-    File[] matchingFileArray = FileFilterUtil.filesInFolderMatchingStemRegex(parentDir, stemRegex);
-    return matchingFileArray;
-  }
-
-  private String createStemRegex(final Date dateOfPeriodToClean) {
-    String regex = fileNamePattern.toRegexForFixedDate(dateOfPeriodToClean);
-    return FileFilterUtil.afterLastSlash(regex);
-  }
-
   @Override
   protected void descendingSort(File[] matchingFileArray, Date date) {
 

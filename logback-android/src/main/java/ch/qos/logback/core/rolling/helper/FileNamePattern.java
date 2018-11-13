@@ -202,7 +202,12 @@ public class FileNamePattern extends ContextAwareBase {
       } else if (p instanceof IntegerTokenConverter) {
         buf.append("(\\d+)");
       } else if (p instanceof DateTokenConverter) {
-        buf.append(p.convert(date));
+        DateTokenConverter<Object> dtc = (DateTokenConverter<Object>) p;
+        if (dtc.isPrimary()) {
+          buf.append(p.convert(date));
+        } else {
+          buf.append(dtc.toRegex());
+        }
       }
       p = p.getNext();
     }
