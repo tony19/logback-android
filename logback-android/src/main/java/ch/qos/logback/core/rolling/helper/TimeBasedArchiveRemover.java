@@ -30,17 +30,17 @@ import static ch.qos.logback.core.CoreConstants.UNBOUNDED_TOTAL_SIZE_CAP;
 
 public class TimeBasedArchiveRemover extends ContextAwareBase implements ArchiveRemover {
 
-  static protected final long UNINITIALIZED = -1;
+  static private final long UNINITIALIZED = -1;
   // aim for 32 days, except in case of hourly rollover
-  static protected final long INACTIVITY_TOLERANCE_IN_MILLIS = 32L * (long) CoreConstants.MILLIS_IN_ONE_DAY;
-  static final int MAX_VALUE_FOR_INACTIVITY_PERIODS = 14 * 24; // 14 days in case of hourly rollover
+  static private final long INACTIVITY_TOLERANCE_IN_MILLIS = 32L * (long) CoreConstants.MILLIS_IN_ONE_DAY;
+  static private final int MAX_VALUE_FOR_INACTIVITY_PERIODS = 14 * 24; // 14 days in case of hourly rollover
 
-  final FileNamePattern fileNamePattern;
-  final RollingCalendar rc;
+  private final FileNamePattern fileNamePattern;
+  private final RollingCalendar rc;
   private int maxHistory = CoreConstants.UNBOUND_HISTORY;
   private long totalSizeCap = UNBOUNDED_TOTAL_SIZE_CAP;
-  final boolean parentClean;
-  long lastHeartBeat = UNINITIALIZED;
+  private final boolean parentClean;
+  private long lastHeartBeat = UNINITIALIZED;
 
   public TimeBasedArchiveRemover(FileNamePattern fileNamePattern, RollingCalendar rc) {
     this.fileNamePattern = fileNamePattern;
@@ -76,7 +76,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     return FileFilterUtil.afterLastSlash(regex);
   }
 
-  public void cleanPeriod(Date dateOfPeriodToClean) {
+  private void cleanPeriod(Date dateOfPeriodToClean) {
     File[] matchingFileArray = getFilesInPeriod(dateOfPeriodToClean);
 
     for (File f : matchingFileArray) {
@@ -90,7 +90,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     }
   }
 
-  void capTotalSize(Date now) {
+  private void capTotalSize(Date now) {
     long totalSize = 0;
     long totalRemoved = 0;
     for (int offset = 0; offset < maxHistory; offset++) {
@@ -114,13 +114,13 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     // nothing to do in super class
   }
 
-  File getParentDir(File file) {
+  protected File getParentDir(File file) {
     File absolute = file.getAbsoluteFile();
     File parentDir = absolute.getParentFile();
     return parentDir;
   }
 
-  int computeElapsedPeriodsSinceLastClean(long nowInMillis) {
+  private int computeElapsedPeriodsSinceLastClean(long nowInMillis) {
     long periodsElapsed = 0;
     if (lastHeartBeat == UNINITIALIZED) {
       addInfo("first clean up after appender initialization");
@@ -138,7 +138,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
    * @param fileNamePattern
    * @return
    */
-  boolean computeParentCleaningFlag(FileNamePattern fileNamePattern) {
+  private boolean computeParentCleaningFlag(FileNamePattern fileNamePattern) {
     DateTokenConverter<Object> dtc = fileNamePattern.getPrimaryDateTokenConverter();
     // if the date pattern has a /, then we need parent cleaning
     if (dtc.getDatePattern().indexOf('/') != -1) {
@@ -171,7 +171,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     return false;
   }
 
-  void removeFolderIfEmpty(File dir) {
+  private void removeFolderIfEmpty(File dir) {
     removeFolderIfEmpty(dir, 0);
   }
 
@@ -199,7 +199,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     this.maxHistory = maxHistory;
   }
 
-  protected int getPeriodOffsetForDeletionTarget() {
+  private int getPeriodOffsetForDeletionTarget() {
     return -maxHistory - 1;
   }
 
@@ -218,7 +218,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     return future;
   }
 
-  public class ArhiveRemoverRunnable implements Runnable {
+  private class ArhiveRemoverRunnable implements Runnable {
     Date now;
     ArhiveRemoverRunnable(Date now) {
       this.now = now;
