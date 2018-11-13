@@ -81,7 +81,9 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
 
     for (File f : matchingFileArray) {
       addInfo("deleting " + f);
-      f.delete();
+      if (!f.delete()) {
+        addError("unspecified error occurred while deleting " + f);
+      }
     }
 
     if (parentClean && matchingFileArray.length > 0) {
