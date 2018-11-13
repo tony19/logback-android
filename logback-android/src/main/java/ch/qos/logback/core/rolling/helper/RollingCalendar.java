@@ -67,23 +67,20 @@ public class RollingCalendar extends GregorianCalendar {
   // logic is based on comparisons relative to 1970-01-01 00:00:00
   // GMT (the epoch).
   public PeriodicityType computePeriodicityType() {
-
-    GregorianCalendar calendar = new GregorianCalendar(GMT_TIMEZONE, Locale.US);
-
-    // set sate to 1970-01-01 00:00:00 GMT
-    Date epoch = new Date(0);
-
     if (datePattern != null) {
+      GregorianCalendar calendar = new GregorianCalendar(GMT_TIMEZONE, Locale.US);
+
+      // set sate to 1970-01-01 00:00:00 GMT
+      Date epoch = new Date(0);
+
+      final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern, Locale.US);
+      simpleDateFormat.setTimeZone(GMT_TIMEZONE); // all date formatting done in GMT
+      final String r0 = simpleDateFormat.format(epoch);
+
       for (PeriodicityType i : PeriodicityType.VALID_ORDERED_LIST) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern, Locale.US);
-        simpleDateFormat.setTimeZone(GMT_TIMEZONE); // all date formatting done in GMT
-
-        String r0 = simpleDateFormat.format(epoch);
-
         Date next = innerGetEndOfThisPeriod(calendar, i, epoch);
         String r1 = simpleDateFormat.format(next);
 
-        // System.out.println("Type = "+i+", r0 = "+r0+", r1 = "+r1);
         if ((r0 != null) && (r1 != null) && !r0.equals(r1)) {
           return i;
         }
