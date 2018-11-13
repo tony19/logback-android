@@ -20,6 +20,8 @@ import ch.qos.logback.core.joran.spi.*;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.status.StatusUtil;
+import ch.qos.logback.core.util.CloseUtil;
+
 import org.xml.sax.InputSource;
 
 import java.io.File;
@@ -59,6 +61,8 @@ public abstract class GenericConfigurator extends ContextAwareBase {
       String errMsg = "Could not open URL [" + url + "].";
       addError(errMsg, ioe);
       throw new JoranException(errMsg, ioe);
+    } finally {
+      CloseUtil.closeQuietly(in);
     }
   }
 
@@ -92,6 +96,8 @@ public abstract class GenericConfigurator extends ContextAwareBase {
       String errMsg = "Could not open [" + file.getPath() + "].";
       addError(errMsg, ioe);
       throw new JoranException(errMsg, ioe);
+    } finally {
+      CloseUtil.closeQuietly(fis);
     }
   }
 
