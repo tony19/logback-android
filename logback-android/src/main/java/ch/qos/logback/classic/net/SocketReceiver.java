@@ -192,11 +192,11 @@ public class SocketReceiver extends ReceiverBase
    */
   public void connectionFailed(SocketConnector connector, Exception ex) {
     if (ex instanceof InterruptedException) {
-      addInfo("connector interrupted");
+      addWarn("connector interrupted", ex);
     } else if (ex instanceof ConnectException) {
-      addInfo(receiverId + "connection refused");
+      addWarn(receiverId + "connection refused", ex);
     } else {
-      addInfo(receiverId + ex);
+      addWarn(receiverId + "unspecified error", ex);
     }
   }
 
