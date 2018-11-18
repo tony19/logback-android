@@ -7,7 +7,7 @@ android:
 sudo: false
 
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f $HOME/.gradle/caches/modules-3/modules-3.lock
 cache:
   directories:
     - $HOME/.gradle/caches/
