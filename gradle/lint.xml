@@ -9,4 +9,7 @@
         <ignore path="*/SecureRandomFactoryBean.java" />
     </issue>
     <issue id="MinSdkTooLow" severity="ignore" />
+    <issue id="KotlinPropertyAccess" severity="ignore" /> <!-- Kotlin interop error -->
+    <issue id="LambdaLast" severity="ignore" /> <!-- Kotlin interop error -->
+    <issue id="UnknownNullness" severity="ignore" /> <!-- Kotlin interop error -->
 </lint>
