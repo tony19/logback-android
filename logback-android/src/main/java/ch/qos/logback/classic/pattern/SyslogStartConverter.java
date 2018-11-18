@@ -77,7 +77,7 @@ public class SyslogStartConverter extends ClassicConverter {
     return sb.toString();
   }
 
-  String computeTimeStampString(long now) {
+  private String computeTimeStampString(long now) {
     synchronized (this) {
       // Since the formatted output is only precise to the second, we can use the same cached string if the current
       // second is the same (stripping off the milliseconds).
@@ -85,7 +85,7 @@ public class SyslogStartConverter extends ClassicConverter {
         lastTimestamp = now / 1000;
         Date nowDate = new Date(now);
         calendar.setTime(nowDate);
-        timesmapStr = String.format("%s %2d %s", simpleMonthFormat.format(nowDate),
+        timesmapStr = String.format(Locale.US, "%s %2d %s", simpleMonthFormat.format(nowDate),
             calendar.get(Calendar.DAY_OF_MONTH), simpleTimeFormat.format(nowDate));
       }
       return timesmapStr;
