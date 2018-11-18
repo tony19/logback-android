@@ -50,7 +50,7 @@ dependencies {
         exclude(module: 'hamcrest-core')
     }
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
-    testImplementation 'org.robolectric:robolectric:3.8'
+    testImplementation 'org.robolectric:robolectric:4.0.2'
     testImplementation 'org.mockito:mockito-core:2.21.0'
     testImplementation 'joda-time:joda-time:2.10'
 

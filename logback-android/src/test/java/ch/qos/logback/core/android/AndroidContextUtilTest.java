@@ -49,14 +49,14 @@ public class AndroidContextUtilTest {
   public void getMountedExternalStorageDirectoryPath_returnsPathWhenMounted() {
     ShadowEnvironment.setExternalStorageState(Environment.MEDIA_MOUNTED);
     assertThat(contextUtil.getMountedExternalStorageDirectoryPath(),
-               is(ShadowEnvironment.getExternalStorageDirectory().getAbsolutePath()));
+               is(Environment.getExternalStorageDirectory().getAbsolutePath()));
   }
 
   @Test
   public void getMountedExternalStorageDirectoryPathReturnsPathWhenMountedReadOnly() {
     ShadowEnvironment.setExternalStorageState(Environment.MEDIA_MOUNTED_READ_ONLY);
     assertThat(contextUtil.getMountedExternalStorageDirectoryPath(),
-            is(ShadowEnvironment.getExternalStorageDirectory().getAbsolutePath()));
+            is(Environment.getExternalStorageDirectory().getAbsolutePath()));
   }
 
   @Test
@@ -110,7 +110,7 @@ public class AndroidContextUtilTest {
   @Test
   public void getExternalStorageDirectoryPathIsNotEmpty() {
     assertThat(contextUtil.getExternalStorageDirectoryPath(),
-            is(ShadowEnvironment.getExternalStorageDirectory().getAbsolutePath()));
+            is(Environment.getExternalStorageDirectory().getAbsolutePath()));
   }
 
   @Test
@@ -145,7 +145,7 @@ public class AndroidContextUtilTest {
 
   @Test
   public void getPackageName() {
-    assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android"));
+    assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android.test"));
   }
 
   @Test
