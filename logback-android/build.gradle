@@ -7,7 +7,7 @@ apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_5
@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode VERSION_CODE.toInteger()
         versionName VERSION_NAME
     }
