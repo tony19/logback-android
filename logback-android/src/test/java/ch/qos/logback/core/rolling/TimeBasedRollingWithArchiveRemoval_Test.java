@@ -32,42 +32,42 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRollingTests {
-
-  private RollingFileAppender<Object> rfa = new RollingFileAppender<Object>();
-  private TimeBasedRollingPolicy<Object> tbrp = new TimeBasedRollingPolicy<Object>();
-  private TimeBasedFileNamingAndTriggeringPolicy<Object> tbfnatp = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>();
-
   static long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
-  private static long MILLIS_IN_MONTH = (long) ((365.242199 / 12) * MILLIS_IN_DAY);
 
-  private int ticksPerPeriod = 216;
-  private ConfigParameters cp; // initialized in setup
-
-  private FixedRateInvocationGate fixedRateInvocationGate = new FixedRateInvocationGate(ticksPerPeriod/2);
+  private RollingFileAppender<Object> rfa;
+  private TimeBasedRollingPolicy<Object> tbrp;
+  private TimeBasedFileNamingAndTriggeringPolicy<Object> tbfnatp;
+  private ConfigParameters cp;
+  private FixedRateInvocationGate fixedRateInvocationGate = new FixedRateInvocationGate();
 
   @Before
   @Override
   public void setUp() throws ParseException {
     super.setUp();
+    this.rfa = new RollingFileAppender<Object>();
+    this.tbrp = new TimeBasedRollingPolicy<Object>();
+    this.tbfnatp = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>();
     this.cp = new ConfigParameters(currentTime);
   }
 
   @Test
   public void monthlyRolloverOverManyPeriods() {
-    final String fileNamePattern = randomOutputDir + "/%d{yyyy/MM}/clean.txt.zip";
+    final String fileNamePattern = randomOutputDir + "/%d{yyyy/MM, GMT}/clean.txt.zip";
+    final long MILLIS_IN_MONTH = (long) ((365.242199 / 12) * MILLIS_IN_DAY);
     cp.maxHistory(2).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(30).periodDurationInMillis(MILLIS_IN_MONTH);
 
     logOverMultiplePeriods(cp);
 
     final File ROOT_DIR = new File(randomOutputDir);
-    assertThat(Arrays.asList(ROOT_DIR.list()), contains("2020"));
-    assertThat(Arrays.asList(new File(ROOT_DIR, "2020").list()), contains("11", "12"));
+    assertThat(Arrays.asList(ROOT_DIR.list()), containsInAnyOrder("2020", "2021"));
+    assertThat(Arrays.asList(new File(ROOT_DIR, "2020").list()), containsInAnyOrder("11", "12"));
     assertThat(Arrays.asList(new File(ROOT_DIR, "2020/11").list()), contains("clean.txt.zip"));
-    assertThat(Arrays.asList(new File(ROOT_DIR, "2020/12").list()), contains("clean.txt"));
+    assertThat(Arrays.asList(new File(ROOT_DIR, "2020/12").list()), contains("clean.txt.zip"));
+    assertThat(Arrays.asList(new File(ROOT_DIR, "2021/01").list()), contains("clean.txt"));
   }
 
   private long generateDailyRollover(ConfigParameters cp) {
-    cp.fileNamePattern(randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt");
+    cp.fileNamePattern(randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + ", GMT}.txt");
     return logOverMultiplePeriods(cp);
   }
 
@@ -83,6 +83,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "clean-2018-08-07.txt",
       "clean-2018-08-08.txt",
       "clean-2018-08-09.txt",
+      "clean-2018-08-10.txt",
       "clean-2018-08-05.txt"));
   }
 
@@ -96,9 +97,9 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
 
     final File ROOT_DIR = new File(randomOutputDir);
     assertThat(Arrays.asList(ROOT_DIR.list()), containsInAnyOrder(
-      "clean-2018-07-18.txt",
       "clean-2018-07-19.txt",
-      "clean-2018-07-20.txt"));
+      "clean-2018-07-20.txt",
+      "clean-2018-07-21.txt"));
   }
 
   @Test
@@ -113,7 +114,8 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "clean-2018-09-15.txt",
       "clean-2018-09-16.txt",
       "clean-2018-09-17.txt",
-      "clean-2018-09-18.txt"));
+      "clean-2018-09-18.txt",
+      "clean-2018-09-19.txt"));
   }
 
   // Since the duration of a month (in seconds) varies from month to month, tests with inactivity period must
@@ -129,7 +131,8 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "clean-2018-07-22.txt",
       "clean-2018-07-23.txt",
       "clean-2018-07-24.txt",
-      "clean-2018-07-25.txt"));
+      "clean-2018-07-25.txt",
+      "clean-2018-07-26.txt"));
   }
 
   @Test
@@ -140,7 +143,8 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     final File ROOT_DIR = new File(randomOutputDir);
     assertThat(Arrays.asList(ROOT_DIR.list()), containsInAnyOrder(
       "clean-2018-08-08.txt",
-      "clean-2018-08-09.txt"));
+      "clean-2018-08-09.txt",
+      "clean-2018-08-10.txt"));
   }
 
   @Test
@@ -155,13 +159,14 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "clean-2018-07-17.txt",
       "clean-2018-07-18.txt",
       "clean-2018-07-19.txt",
-      "clean-2018-07-20.txt"));
+      "clean-2018-07-20.txt",
+      "clean-2018-07-21.txt"));
   }
 
   @Test
   public void checkCleanupForDailyRolloverWithSecondPhase() {
     final int maxHistory = 5;
-    final String fileNamePattern = randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + "}.txt";
+    final String fileNamePattern = randomOutputDir + "clean-%d{" + DAILY_DATE_PATTERN + ", GMT}.txt";
 
     ConfigParameters cp0 = new ConfigParameters(currentTime).maxHistory(maxHistory).fileNamePattern(fileNamePattern)
             .simulatedNumberOfPeriods(maxHistory * 2);
@@ -177,7 +182,8 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "clean-2018-08-01.txt",
       "clean-2018-08-02.txt",
       "clean-2018-08-03.txt",
-      "clean-2018-08-04.txt"));
+      "clean-2018-08-04.txt",
+      "clean-2018-08-05.txt"));
   }
 
   @Test
@@ -186,7 +192,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     sizeAndTimeBasedFNATP.invocationGate = fixedRateInvocationGate;
     sizeAndTimeBasedFNATP.setMaxFileSize(new FileSize(10000));
     tbfnatp = sizeAndTimeBasedFNATP;
-    final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}-clean.%i.zip";
+    final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + ", GMT}-clean.%i.zip";
     cp.maxHistory(5).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(5 * 4);
     logOverMultiplePeriods(cp);
 
@@ -200,7 +206,9 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "2018-07-28-clean.1.zip",
       "2018-07-29-clean.0.zip",
       "2018-07-29-clean.1.zip",
-      "2018-07-30-clean.0"));
+      "2018-07-30-clean.0.zip",
+      "2018-07-30-clean.1.zip",
+      "2018-07-31-clean.0"));
   }
 
   @Test
@@ -209,7 +217,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     sizeAndTimeBasedFNATP.setMaxFileSize(new FileSize(10000));
     sizeAndTimeBasedFNATP.invocationGate = fixedRateInvocationGate;
     tbfnatp = sizeAndTimeBasedFNATP;
-    final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i.zip";
+    final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + ", GMT}/clean.%i.zip";
     cp.maxHistory(5).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(5 * 3);
     logOverMultiplePeriods(cp);
 
@@ -218,7 +226,8 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "2018-07-22",
       "2018-07-23",
       "2018-07-24",
-      "2018-07-25"
+      "2018-07-25",
+      "2018-07-26"
     };
     final File ROOT_DIR = new File(randomOutputDir);
     assertThat(Arrays.asList(ROOT_DIR.list()), containsInAnyOrder(dirNames));
@@ -226,7 +235,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     Stream.of(dirNames)
       .limit(dirNames.length - 1) // the last dir contains the active file (not zipped)
       .forEach(dir -> assertThat(Arrays.asList(new File(ROOT_DIR, dir).list()), containsInAnyOrder("clean.0.zip", "clean.1.zip")));
-    assertThat(Arrays.asList(new File(ROOT_DIR, "2018-07-25").list()), contains("clean.0"));
+    assertThat(Arrays.asList(new File(ROOT_DIR, "2018-07-26").list()), contains("clean.0"));
   }
 
   @Test
@@ -236,7 +245,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     sizeAndTimeBasedFNATP.invocationGate = fixedRateInvocationGate;
     tbfnatp = sizeAndTimeBasedFNATP;
 
-    final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + "}/clean.%i";
+    final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + ", GMT}/clean.%i";
     final int maxHistory = 5;
     cp.maxHistory(maxHistory).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(3);
     final long endTime = logOverMultiplePeriods(cp);
@@ -251,13 +260,14 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
       "2018-08-07",
       "2018-08-08",
       "2018-08-09",
+      "2018-08-10"
     };
     final File ROOT_DIR = new File(randomOutputDir);
     assertThat(Arrays.asList(ROOT_DIR.list()), containsInAnyOrder(dirNames));
     Stream.of(dirNames)
       .limit(dirNames.length - 1) // the last dir contains the active file
       .forEach(dir -> assertThat(Arrays.asList(new File(ROOT_DIR, dir).list()), containsInAnyOrder("clean.0", "clean.1")));
-    assertThat(Arrays.asList(new File(ROOT_DIR, "2018-08-09").list()), contains("clean.0"));
+    assertThat(Arrays.asList(new File(ROOT_DIR, "2018-08-10").list()), contains("clean.0"));
   }
 
   private void buildRollingFileAppender(ConfigParameters cp) {
@@ -278,6 +288,7 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
 
   private long logOverMultiplePeriods(ConfigParameters cp) {
     buildRollingFileAppender(cp);
+    final int ticksPerPeriod = 216;
     int runLength = cp.simulatedNumberOfPeriods * ticksPerPeriod;
     int startInactivityIndex = cp.startInactivity * ticksPerPeriod;
     int endInactivityIndex = startInactivityIndex + cp.numInactivityPeriods * ticksPerPeriod;
