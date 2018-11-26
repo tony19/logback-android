@@ -32,17 +32,12 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRollingTests {
-  private String MONTHLY_CRONOLOG_DATE_PATTERN = "yyyy/MM";
 
   private RollingFileAppender<Object> rfa = new RollingFileAppender<Object>();
   private TimeBasedRollingPolicy<Object> tbrp = new TimeBasedRollingPolicy<Object>();
-
-  // by default tbfnatp is an instance of DefaultTimeBasedFileNamingAndTriggeringPolicy
   private TimeBasedFileNamingAndTriggeringPolicy<Object> tbfnatp = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>();
 
-  private static long MILLIS_IN_MINUTE = 60 * 1000;
-  private static long MILLIS_IN_HOUR = 60 * MILLIS_IN_MINUTE;
-  static long MILLIS_IN_DAY = 24 * MILLIS_IN_HOUR;
+  static long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
   private static long MILLIS_IN_MONTH = (long) ((365.242199 / 12) * MILLIS_IN_DAY);
 
   private int ticksPerPeriod = 216;
@@ -57,12 +52,9 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     this.cp = new ConfigParameters(currentTime);
   }
 
-  // test that the number of files at the end of the test is same as the expected number taking into account end dates
-  // near the beginning of a new year. This test has been run in a loop with start date varying over a two years
-  // with success.
   @Test
   public void monthlyRolloverOverManyPeriods() {
-    final String fileNamePattern = randomOutputDir + "/%d{" + MONTHLY_CRONOLOG_DATE_PATTERN + "}/clean.txt.zip";
+    final String fileNamePattern = randomOutputDir + "/%d{yyyy/MM}/clean.txt.zip";
     cp.maxHistory(2).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(30).periodDurationInMillis(MILLIS_IN_MONTH);
 
     logOverMultiplePeriods(cp);
