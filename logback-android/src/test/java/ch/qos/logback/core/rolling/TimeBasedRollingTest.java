@@ -90,7 +90,7 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
     String fileName = fileOptionIsSet ? testId2FileName(testId) : null;
     initRFA(rfa1, fileName);
 
-    String fileNamePatternStr = randomOutputDir + patternPrefix + "-%d{" + DATE_PATTERN_WITH_SECONDS + "}" + compressionSuffix;
+    String fileNamePatternStr = randomOutputDir + patternPrefix + "-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}" + compressionSuffix;
 
     initTRBP(rfa1, tbrp1, fileNamePatternStr, currentTime);
 
@@ -134,7 +134,7 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
 
     incCurrentTime(waitDuration);
 
-    String filePatternStr = randomOutputDir + patternPart + "-%d{" + DATE_PATTERN_WITH_SECONDS + "}";
+    String filePatternStr = randomOutputDir + patternPart + "-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}";
 
     String fileName = fileOptionIsSet ? testId2FileName(testId) : null;
     initRFA(rfa2, fileName);

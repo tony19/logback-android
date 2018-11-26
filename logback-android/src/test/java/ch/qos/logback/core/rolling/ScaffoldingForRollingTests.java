@@ -53,7 +53,10 @@ public class ScaffoldingForRollingTests {
   static public final String DATE_PATTERN_WITH_SECONDS = "yyyy-MM-dd_HH_mm_ss";
   static public final String DATE_PATTERN_BY_DAY = "yyyy-MM-dd";
   static public final SimpleDateFormat SDF = new SimpleDateFormat(
-          DATE_PATTERN_WITH_SECONDS);
+          DATE_PATTERN_WITH_SECONDS, Locale.US);
+  static {
+    SDF.setTimeZone(TimeZone.getTimeZone("GMT"));
+  }
 
   int diff = RandomUtil.getPositiveInt();
   protected String randomOutputDir = CoreTestConstants.OUTPUT_DIR_PREFIX + diff

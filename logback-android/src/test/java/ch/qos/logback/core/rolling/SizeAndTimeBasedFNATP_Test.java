@@ -37,9 +37,9 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
   private TimeBasedRollingPolicy<Object> tbrp2 = new TimeBasedRollingPolicy<Object>();
 
   private EchoEncoder<Object> encoder = new EchoEncoder<Object>();
-  int fileSize = 0;
-  int fileIndexCounter = 0;
-  int sizeThreshold = 0;
+  private int fileSize = 0;
+  private int fileIndexCounter = 0;
+  private int sizeThreshold = 0;
 
   private void initRollingFileAppender(RollingFileAppender<Object> rfa, String filename) {
     rfa.setContext(context);
@@ -52,7 +52,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
   private void initPolicies(RollingFileAppender<Object> rfa,
                             TimeBasedRollingPolicy<Object> tbrp,
                             String filenamePattern, int sizeThreshold,
-                            long givenTime, long lastCheck) {
+                            long givenTime) {
     sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<Object>();
     tbrp.setContext(context);
     sizeAndTimeBasedFNATP.setMaxFileSize(new FileSize(sizeThreshold));
@@ -86,12 +86,11 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     }
   }
 
-
-  void generic(String testId, String stem, boolean withSecondPhase, String compressionSuffix) throws IOException, InterruptedException, ExecutionException {
+  private void generic(String testId, String stem, boolean withSecondPhase, String compressionSuffix) throws IOException {
     String file = (stem != null) ? randomOutputDir + stem : null;
     initRollingFileAppender(rfa1, file);
     sizeThreshold = 300;
-    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + "}-%i.txt" + compressionSuffix, sizeThreshold, currentTime, 0);
+    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt" + compressionSuffix, sizeThreshold, currentTime);
     addExpectedFileName_ByFileIndexCounter(randomOutputDir, testId, getMillisOfCurrentPeriodsStart(), fileIndexCounter, compressionSuffix);
     incCurrentTime(100);
     tbrp1.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(currentTime);
@@ -125,7 +124,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     sortedContentCheck(randomOutputDir, runLength, prefix);
   }
 
-  void secondPhase(String testId, String file, String stem, String compressionSuffix, int runLength, String prefix) {
+  private void secondPhase(String testId, String file, String stem, String compressionSuffix, int runLength, String prefix) {
     rfa1.stop();
 
     if (stem != null) {
@@ -139,7 +138,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
 
     initRollingFileAppender(rfa2, file);
     initPolicies(rfa2, tbrp2, randomOutputDir + testId + "-%d{"
-            + DATE_PATTERN_WITH_SECONDS + "}-%i.txt" + compressionSuffix, sizeThreshold, currentTime, 0);
+            + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt" + compressionSuffix, sizeThreshold, currentTime);
 
     for (int i = runLength; i < runLength * 2; i++) {
       incCurrentTime(100);
@@ -150,9 +149,9 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     }
   }
 
-  static final boolean FIRST_PHASE_ONLY = false;
-  static final boolean WITH_SECOND_PHASE = true;
-  static final String DEFAULT_COMPRESSION_SUFFIX = "";
+  private static final boolean FIRST_PHASE_ONLY = false;
+  private static final boolean WITH_SECOND_PHASE = true;
+  private static final String DEFAULT_COMPRESSION_SUFFIX = "";
 
   @Test
   public void noCompression_FileSet_NoRestart_1() throws InterruptedException, ExecutionException, IOException {
@@ -200,7 +199,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     String file = (stem != null) ? randomOutputDir + stem : null;
     initRollingFileAppender(rfa1, file);
     sizeThreshold = 300;
-    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + "}.txt" + compressionSuffix, sizeThreshold, currentTime, 0);
+    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}.txt" + compressionSuffix, sizeThreshold, currentTime);
 
     //StatusPrinter.print(context);
     assertFalse(rfa1.isStarted());
@@ -216,7 +215,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     String file = (stem != null) ? randomOutputDir + stem : null;
     initRollingFileAppender(rfa1, file);
     sizeThreshold = 300;
-    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{EE}.txt" + compressionSuffix, sizeThreshold, currentTime, 0);
+    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{EE, GMT}.txt" + compressionSuffix, sizeThreshold, currentTime);
     //StatusPrinter.print(context);
     assertFalse(rfa1.isStarted());
     StatusChecker checker = new StatusChecker(context);
@@ -229,7 +228,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
 //    int maxHistory = 10;
 //    initRollingFileAppender(rfa1, randomOutputDir + "~" + testId );
 //    sizeThreshold = 50;
-//    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + "}-%i.txt", sizeThreshold, currentTime, 0, maxHistory, true);
+//    initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt", sizeThreshold, currentTime, 0, maxHistory, true);
 //
 //    incCurrentTime(100);
 //    tbrp1.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(currentTime);
