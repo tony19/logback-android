@@ -1,5 +1,6 @@
 package ch.qos.logback.core.rolling;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import org.junit.After;
@@ -28,7 +29,7 @@ public class JVMExitBeforeCompressionISDoneTest extends ScaffoldingForRollingTes
 
     @Before
     @Override
-    public void setUp() {
+    public void setUp() throws ParseException {
         super.setUp();
         StatusListenerConfigHelper.addOnConsoleListenerInstance(context, new OnConsoleStatusListener());
         delayingShutdownHook.setContext(context);

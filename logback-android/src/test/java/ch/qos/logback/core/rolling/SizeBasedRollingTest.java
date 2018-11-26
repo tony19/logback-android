@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,8 @@ public class SizeBasedRollingTest extends ScaffoldingForRollingTests {
 
 
   @Before
-  public void setUp() {
+  @Override
+  public void setUp() throws ParseException {
     super.setUp();
     fwrp.setContext(context);
     fwrp.setParent(rfa);

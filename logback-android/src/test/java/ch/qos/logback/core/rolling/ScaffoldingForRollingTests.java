@@ -13,6 +13,8 @@
  */
 package ch.qos.logback.core.rolling;
 
+import org.junit.Before;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -27,14 +29,15 @@ import ch.qos.logback.core.util.CoreTestConstants;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -61,12 +64,11 @@ public class ScaffoldingForRollingTests {
   protected long currentTime; // initialized in setUp()
   protected List<Future<?>> futureList = new ArrayList<Future<?>>();
 
-  Calendar calendar = Calendar.getInstance();
-
-  public void setUp() {
-    context.setName("test");
-    calendar.set(Calendar.MILLISECOND, 333);
-    currentTime = calendar.getTimeInMillis();
+  @Before
+  public void setUp() throws ParseException {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+    currentTime = dateFormat.parse("2018-07-11").getTime();
     recomputeRolloverThreshold(currentTime);
   }
 

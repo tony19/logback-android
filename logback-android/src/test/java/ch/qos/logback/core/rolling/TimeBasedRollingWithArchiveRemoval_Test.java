@@ -15,7 +15,6 @@ package ch.qos.logback.core.rolling;
 
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.SpacePadder;
-import ch.qos.logback.core.rolling.helper.RollingCalendar;
 import ch.qos.logback.core.util.FileSize;
 import ch.qos.logback.core.util.FixedRateInvocationGate;
 
@@ -24,8 +23,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -67,7 +66,8 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   private FixedRateInvocationGate fixedRateInvocationGate = new FixedRateInvocationGate(ticksPerPeriod/2);
 
   @Before
-  public void setUp() {
+  @Override
+  public void setUp() throws ParseException {
     super.setUp();
     this.cp = new ConfigParameters(currentTime);
   }

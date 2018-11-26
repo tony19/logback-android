@@ -17,8 +17,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.encoder.EchoEncoder;
@@ -65,16 +63,6 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
   EchoEncoder<Object> encoder = new EchoEncoder<Object>();
 
   RolloverChecker rolloverChecker;
-
-  @Before
-  @Override
-  public void setUp() {
-    super.setUp();
-  }
-
-  @After
-  public void tearDown() {
-  }
 
   void initRFA(RollingFileAppender<Object> rfa, String filename) {
     rfa.setContext(context);

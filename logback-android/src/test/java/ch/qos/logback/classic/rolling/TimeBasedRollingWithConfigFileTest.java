@@ -13,6 +13,7 @@
  */
 package ch.qos.logback.classic.rolling;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import org.junit.After;
@@ -51,7 +52,7 @@ public class TimeBasedRollingWithConfigFileTest extends
 
   @Before
   @Override
-  public void setUp() {
+  public void setUp() throws ParseException {
     lc.setName("test");
     super.setUp();
     lc.putProperty("randomOutputDir", randomOutputDir);

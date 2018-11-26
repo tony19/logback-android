@@ -19,7 +19,6 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.util.FileSize;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -28,7 +27,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
@@ -42,11 +40,6 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
   int fileSize = 0;
   int fileIndexCounter = 0;
   int sizeThreshold = 0;
-
-  @Before
-  public void setUp() {
-    super.setUp();
-  }
 
   private void initRollingFileAppender(RollingFileAppender<Object> rfa, String filename) {
     rfa.setContext(context);
