@@ -73,7 +73,7 @@ public abstract class ScaffoldingForRollingTests {
   public void setUp() throws ParseException {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     dateFormat.setTimeZone(SDF.getTimeZone());
-    currentTime = SDF.parse("2018-07-11").getTime();
+    currentTime = dateFormat.parse("2018-07-11").getTime();
     recomputeRolloverThreshold(currentTime);
   }
 
