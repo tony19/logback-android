@@ -49,7 +49,7 @@ import java.util.zip.ZipFile;
  *
  * @author Ceki G&uuml;lc&uuml;
  */
-public class ScaffoldingForRollingTests {
+public abstract class ScaffoldingForRollingTests {
 
   static protected final String DATE_PATTERN_WITH_SECONDS = "yyyy-MM-dd_HH_mm_ss";
   static protected final String DATE_PATTERN_BY_DAY = "yyyy-MM-dd";
@@ -70,7 +70,9 @@ public class ScaffoldingForRollingTests {
   private List<Future<?>> futureList = new ArrayList<Future<?>>();
 
   @Before
-  protected void setUp() throws ParseException {
+  public void setUp() throws ParseException {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    dateFormat.setTimeZone(SDF.getTimeZone());
     currentTime = SDF.parse("2018-07-11").getTime();
     recomputeRolloverThreshold(currentTime);
   }
