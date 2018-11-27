@@ -22,44 +22,12 @@ import java.util.regex.Pattern;
 
 public class FileFilterUtil {
 
-  public static void sortFileArrayByName(File[] fileArray) {
-    Arrays.sort(fileArray, new Comparator<File>() {
-      public int compare(File o1, File o2) {
-        String o1Name = o1.getName();
-        String o2Name = o2.getName();
-        return (o1Name.compareTo(o2Name));
-      }
-    });
-  }
-
-  public static void reverseSortFileArrayByName(File[] fileArray) {
-    Arrays.sort(fileArray, new Comparator<File>() {
-      public int compare(File o1, File o2) {
-        String o1Name = o1.getName();
-        String o2Name = o2.getName();
-        return (o2Name.compareTo(o1Name));
-      }
-    });
-  }
-
   public static String afterLastSlash(String sregex) {
     int i = sregex.lastIndexOf('/');
     if (i == -1) {
       return sregex;
     } else {
       return sregex.substring(i + 1);
-    }
-  }
-
-  static public boolean isEmptyDirectory(File dir) {
-    if (!dir.isDirectory()) {
-      throw new IllegalArgumentException("[" + dir + "] must be a directory");
-    }
-    String[] filesInDir = dir.list();
-    if (filesInDir == null || filesInDir.length == 0) {
-      return true;
-    } else {
-      return false;
     }
   }
 

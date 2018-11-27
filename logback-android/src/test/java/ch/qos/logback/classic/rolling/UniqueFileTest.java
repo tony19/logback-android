@@ -22,14 +22,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import java.io.File;
+
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.rolling.ScaffoldingForRollingTests;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.util.CoreTestConstants;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test that we can create time-stamped log files with the help of
@@ -74,7 +77,8 @@ public class UniqueFileTest {
 
     Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
     root.info("hello");
-    
-    ScaffoldingForRollingTests.existenceCheck(CoreTestConstants.OUTPUT_DIR_PREFIX + "UNIK_" + timestamp + diffAsStr + "log.txt");
+
+    File file = new File(CoreTestConstants.OUTPUT_DIR_PREFIX + "UNIK_" + timestamp + diffAsStr + "log.txt");
+    assertTrue(file.exists());
   }
 }
