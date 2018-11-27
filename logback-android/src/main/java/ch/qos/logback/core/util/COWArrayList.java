@@ -103,7 +103,7 @@ public class COWArrayList<E> implements List<E> {
      * If the list is modified, subsequent calls to this method will return different/modified
      * array instances.
      *
-     * @return
+     * @return an array of type E[]
      */
     public E[] asTypedArray() {
         refreshCopyIfNecessary();

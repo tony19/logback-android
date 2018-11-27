@@ -151,7 +151,7 @@ public class AndroidContextUtil {
    * Returns the absolute path to the directory on the Android
    * filesystem similar to {@link #getFilesDirectoryPath()}.
    * The difference is these files are excluded from automatic
-   * backup to remote storage by {@link android.app.backup.BackupAgent}.
+   * backup to remote storage by {@code android.app.backup.BackupAgent}.
    * This API is only available on SDK 21+. On older versions,
    * this function returns an empty string.
    *
