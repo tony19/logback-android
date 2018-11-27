@@ -7,7 +7,7 @@
             <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>c:/tmp/logs/rolling-test-%d{yyyy-MM-dd}.%i.log
+            <fileNamePattern>c:/tmp/logs/rolling-test-%d{yyyy-MM-dd, GMT}.%i.log
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                 class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP" />

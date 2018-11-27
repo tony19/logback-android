@@ -6,7 +6,7 @@
     <rollingPolicy
       class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>
-        ${randomOutputDir}${testId}-%d{yyyy-MM-dd_HH_mm_ss}
+        ${randomOutputDir}${testId}-%d{yyyy-MM-dd_HH_mm_ss, GMT}
       </FileNamePattern>
     </rollingPolicy>
     <encoder>
