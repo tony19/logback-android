@@ -92,7 +92,7 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     sizeThreshold = 300;
     initPolicies(rfa1, tbrp1, randomOutputDir + testId + "-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt" + compressionSuffix, sizeThreshold, currentTime);
     addExpectedFileName_ByFileIndexCounter(randomOutputDir, testId, getMillisOfCurrentPeriodsStart(), fileIndexCounter, compressionSuffix);
-    incCurrentTime(100);
+    incCurrentTime(400);
     tbrp1.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(currentTime);
     int runLength = 100;
     String prefix = "Hello -----------------";
