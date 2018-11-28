@@ -141,7 +141,7 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
     for (int i = 0; i < 3; i++) {
       rfa2.doAppend("World---" + i);
       addExpectedFileNamedIfItsTime_ByDate(filePatternStr);
-      incCurrentTime(100);
+      incCurrentTime(400);
       tbrp2.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(currentTime);
       add(tbrp2.compressionFuture);
       add(tbrp2.cleanUpFuture);
