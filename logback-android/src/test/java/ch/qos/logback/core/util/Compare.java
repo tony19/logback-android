@@ -15,7 +15,6 @@ package ch.qos.logback.core.util;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -81,9 +80,6 @@ public class Compare {
             + "] differ on line " + lineCounter);
         System.out.println("One reads:  [" + s1 + "].");
         System.out.println("Other reads:[" + s2 + "].");
-        outputFile(file1);
-        outputFile(file2);
-
         return false;
       }
     }
@@ -92,48 +88,10 @@ public class Compare {
     if (in2.read() != -1) {
       System.out.println("File [" + file2 + "] longer than file [" + file1
           + "].");
-      outputFile(file1);
-      outputFile(file2);
-
       return false;
     }
 
     return true;
-  }
-
-  /**
-   * 
-   * Prints file on the console.
-   * 
-   */
-  private static void outputFile(String file) throws IOException {
-    BufferedReader in1 = null;
-
-    try {
-      String s1;
-      int lineCounter = 0;
-      System.out.println("--------------------------------");
-      System.out.println("Contents of " + file + ":");
-
-      while ((s1 = in1.readLine()) != null) {
-        lineCounter++;
-        System.out.print(lineCounter);
-
-        if (lineCounter < 10) {
-          System.out.print("   : ");
-        } else if (lineCounter < 100) {
-          System.out.print("  : ");
-        } else if (lineCounter < 1000) {
-          System.out.print(" : ");
-        } else {
-          System.out.print(": ");
-        }
-
-        System.out.println(s1);
-      }
-    } finally {
-      close(in1);
-    }
   }
 
   public static boolean gzCompare(String file1, String file2) throws IOException {
@@ -159,9 +117,6 @@ public class Compare {
                   + "] differ on line " + lineCounter);
           System.out.println("One reads:  [" + s1 + "].");
           System.out.println("Other reads:[" + s2 + "].");
-          outputFile(file1);
-          outputFile(file2);
-
           return false;
         }
       }
@@ -170,9 +125,6 @@ public class Compare {
       if (in2.read() != -1) {
         System.out.println("File [" + file2 + "] longer than file [" + file1
                 + "].");
-        outputFile(file1);
-        outputFile(file2);
-
         return false;
       }
 

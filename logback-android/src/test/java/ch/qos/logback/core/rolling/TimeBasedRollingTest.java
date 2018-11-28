@@ -46,25 +46,25 @@ import ch.qos.logback.core.util.StatusPrinter;
  */
 public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
 
-  static final int NO_RESTART = 0;
-  static final int WITH_RESTART = 1;
-  static final int WITH_RESTART_AND_LONG_WAIT = 2000;
+  private static final int NO_RESTART = 0;
+  private static final int WITH_RESTART = 1;
+  private static final int WITH_RESTART_AND_LONG_WAIT = 2000;
 
-  static final boolean FILE_OPTION_SET = true;
-  static final boolean FILE_OPTION_BLANK = false;
+  private static final boolean FILE_OPTION_SET = true;
+  private static final boolean FILE_OPTION_BLANK = false;
 
 
-  RollingFileAppender<Object> rfa1 = new RollingFileAppender<Object>();
-  TimeBasedRollingPolicy<Object> tbrp1 = new TimeBasedRollingPolicy<Object>();
+  private RollingFileAppender<Object> rfa1 = new RollingFileAppender<Object>();
+  private TimeBasedRollingPolicy<Object> tbrp1 = new TimeBasedRollingPolicy<Object>();
 
-  RollingFileAppender<Object> rfa2 = new RollingFileAppender<Object>();
-  TimeBasedRollingPolicy<Object> tbrp2 = new TimeBasedRollingPolicy<Object>();
+  private RollingFileAppender<Object> rfa2 = new RollingFileAppender<Object>();
+  private TimeBasedRollingPolicy<Object> tbrp2 = new TimeBasedRollingPolicy<Object>();
 
-  EchoEncoder<Object> encoder = new EchoEncoder<Object>();
+  private EchoEncoder<Object> encoder = new EchoEncoder<Object>();
 
-  RolloverChecker rolloverChecker;
+  private RolloverChecker rolloverChecker;
 
-  void initRFA(RollingFileAppender<Object> rfa, String filename) {
+  private void initRFA(RollingFileAppender<Object> rfa, String filename) {
     rfa.setContext(context);
     rfa.setEncoder(encoder);
     if (filename != null) {
@@ -72,7 +72,7 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
     }
   }
 
-  void initTRBP(RollingFileAppender<Object> rfa,
+  private void initTRBP(RollingFileAppender<Object> rfa,
                 TimeBasedRollingPolicy<Object> tbrp, String filenamePattern,
                 long givenTime) {
     tbrp.setContext(context);
@@ -85,8 +85,7 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
     rfa.start();
   }
 
-
-  void genericTest(String testId, String patternPrefix, String compressionSuffix, boolean fileOptionIsSet, int waitDuration) throws IOException {
+  private void genericTest(String testId, String patternPrefix, String compressionSuffix, boolean fileOptionIsSet, int waitDuration) throws IOException {
     String fileName = fileOptionIsSet ? testId2FileName(testId) : null;
     initRFA(rfa1, fileName);
 
@@ -121,13 +120,13 @@ public class TimeBasedRollingTest extends ScaffoldingForRollingTests {
     rolloverChecker.check(expectedFilenameList);
   }
 
-  void defaultTest(String testId, String patternPrefix, String compressionSuffix, boolean fileOptionIsSet, int waitDuration) throws IOException {
+  private void defaultTest(String testId, String patternPrefix, String compressionSuffix, boolean fileOptionIsSet, int waitDuration) throws IOException {
     boolean withCompression = compressionSuffix.length() > 0;
     rolloverChecker = new DefaultRolloverChecker(testId, withCompression, compressionSuffix);
     genericTest(testId, patternPrefix, compressionSuffix, fileOptionIsSet, waitDuration);
   }
 
-  void doRestart(String testId, String patternPart, boolean fileOptionIsSet, int waitDuration) {
+  private void doRestart(String testId, String patternPart, boolean fileOptionIsSet, int waitDuration) {
     // change the timestamp of the currently actively file
     File activeFile = new File(rfa1.getFile());
     activeFile.setLastModified(currentTime);
