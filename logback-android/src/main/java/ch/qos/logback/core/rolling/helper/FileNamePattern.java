@@ -177,7 +177,7 @@ public class FileNamePattern extends ContextAwareBase {
   public void setPattern(String pattern) {
     if (pattern != null) {
       // Trailing spaces in the pattern are assumed to be undesired.
-      this.pattern = pattern.trim();
+      this.pattern = pattern.trim().replace("//", "/");
     }
   }
 
@@ -200,13 +200,13 @@ public class FileNamePattern extends ContextAwareBase {
       if (p instanceof LiteralConverter) {
         buf.append(p.convert(null));
       } else if (p instanceof IntegerTokenConverter) {
-        buf.append("(\\d+)");
+        buf.append(FileFinder.regexEscapePath("(\\d+)"));
       } else if (p instanceof DateTokenConverter) {
         DateTokenConverter<Object> dtc = (DateTokenConverter<Object>) p;
         if (dtc.isPrimary()) {
           buf.append(p.convert(date));
         } else {
-          buf.append(dtc.toRegex());
+          buf.append(FileFinder.regexEscapePath(dtc.toRegex()));
         }
       }
       p = p.getNext();
@@ -218,16 +218,25 @@ public class FileNamePattern extends ContextAwareBase {
    * Given date, convert this instance to a regular expression
    */
   public String toRegex() {
+    return toRegex(false);
+  }
+
+  public String toRegex(boolean capturePrimaryDate) {
     StringBuilder buf = new StringBuilder();
     Converter<Object> p = headTokenConverter;
     while (p != null) {
       if (p instanceof LiteralConverter) {
         buf.append(p.convert(null));
       } else if (p instanceof IntegerTokenConverter) {
-        buf.append("\\d+");
+        buf.append(FileFinder.regexEscapePath("\\d+"));
       } else if (p instanceof DateTokenConverter) {
         DateTokenConverter<Object> dtc = (DateTokenConverter<Object>) p;
-        buf.append(dtc.toRegex());
+        if (capturePrimaryDate && dtc.isPrimary()) {
+          buf.append(FileFinder.regexEscapePath("(" + dtc.toRegex() + ")"));
+        } else {
+          buf.append(FileFinder.regexEscapePath(dtc.toRegex()));
+        }
+
       }
       p = p.getNext();
     }

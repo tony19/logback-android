@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.Date;
 
 import ch.qos.logback.core.joran.spi.NoAutoStart;
+import ch.qos.logback.core.rolling.helper.DefaultFileProvider;
 import ch.qos.logback.core.rolling.helper.TimeBasedArchiveRemover;
 
 /**
@@ -41,7 +42,7 @@ public class DefaultTimeBasedFileNamingAndTriggeringPolicy<E> extends
               + "] contains an integer token converter, i.e. %i, INCOMPATIBLE with this configuration. Remove it.");
       return;
     }
-    archiveRemover = new TimeBasedArchiveRemover(tbrp.fileNamePattern, rc);
+    archiveRemover = new TimeBasedArchiveRemover(tbrp.fileNamePattern, rc, new DefaultFileProvider());
     archiveRemover.setContext(context);
     started = true;
   }

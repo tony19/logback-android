@@ -113,17 +113,4 @@ public class FileFilterUtil {
   public static String slashify(String in) {
     return in.replace('\\', '/');
   }
-
-  public static void removeEmptyParentDirectories(File file,
-      int recursivityCount) {
-    // we should never go more than 3 levels higher
-    if (recursivityCount >= 3) {
-      return;
-    }
-    File parent = file.getParentFile();
-    if (parent.isDirectory() && FileFilterUtil.isEmptyDirectory(parent)) {
-      parent.delete();
-      removeEmptyParentDirectories(parent, recursivityCount + 1);
-    }
-  }
 }

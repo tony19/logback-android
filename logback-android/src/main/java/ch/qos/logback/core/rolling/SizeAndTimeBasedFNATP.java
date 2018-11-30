@@ -20,6 +20,7 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.NoAutoStart;
 import ch.qos.logback.core.rolling.helper.ArchiveRemover;
 import ch.qos.logback.core.rolling.helper.CompressionMode;
+import ch.qos.logback.core.rolling.helper.DefaultFileProvider;
 import ch.qos.logback.core.rolling.helper.FileFilterUtil;
 import ch.qos.logback.core.rolling.helper.SizeAndTimeBasedArchiveRemover;
 import ch.qos.logback.core.util.DefaultInvocationGate;
@@ -108,7 +109,7 @@ public class SizeAndTimeBasedFNATP<E> extends
   }
 
   protected ArchiveRemover createArchiveRemover() {
-    return new SizeAndTimeBasedArchiveRemover(tbrp.fileNamePattern, rc);
+    return new SizeAndTimeBasedArchiveRemover(tbrp.fileNamePattern, rc, new DefaultFileProvider());
   }
 
   void computeCurrentPeriodsHighestCounterValue(final String stemRegex) {
