@@ -11,8 +11,8 @@ public class FixedRateInvocationGate implements InvocationGate {
 
     @Override
     public boolean isTooSoon(long currentTime) {
-        if (invocationCount++ % rate != 0)
-            return true;
+//        if (invocationCount++ % rate != 0)
+//            return true;
         return false;
     }
 
