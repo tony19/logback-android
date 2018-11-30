@@ -45,7 +45,7 @@ public class AndroidContextUtilTest {
   }
 
   @Test
-  public void getMountedExternalStorageDirectoryPath_returnsPathWhenMounted() {
+  public void getMountedExternalStorageDirectoryPathReturnsPathWhenMounted() {
     ShadowEnvironment.setExternalStorageState(Environment.MEDIA_MOUNTED);
     assertThat(contextUtil.getMountedExternalStorageDirectoryPath(),
                is(Environment.getExternalStorageDirectory().getAbsolutePath()));
