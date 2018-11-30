@@ -144,7 +144,7 @@ public class AndroidContextUtilTest {
 
   @Test
   public void getPackageName() {
-    assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android.test"));
+    assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android"));
   }
 
   @Test

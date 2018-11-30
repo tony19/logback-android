@@ -1,10 +1,8 @@
 package ch.qos.logback.core.rolling.helper;
 
+import org.junit.Before;
 import org.junit.Rule;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,23 +17,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class FileFinderTest {
+public class FileFinderTest {
 
-  @EnableRuleMigrationSupport
-  @Nested
-  class FindFiles {
+  public static class FindFiles {
     File[] files;
 
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
 
-    @BeforeEach
-    void setup() throws IOException {
+    @Before
+    public void setup() throws IOException {
       setupTmpDir(tmpDir);
     }
 
     @Test
-    void findsFilesAcrossMultipleDirs() {
+    public void findsFilesAcrossMultipleDirs() {
       FileFinder finder = new FileFinder(new DefaultFileProvider());
       String pathPattern = tmpDir.getRoot() + File.separator + FileFinder.regexEscapePath("\\d{4}/\\d{2}/app_\\d{4}\\d{2}\\d{2}.log");
       String[] actualFiles = finder.findFiles(pathPattern);
@@ -62,27 +58,26 @@ class FileFinderTest {
     }
   }
 
-  @Nested
-  class SplitPath {
+  public static class SplitPath {
     FileFinder finder;
 
-    @BeforeEach
-    void setup() {
+    @Before
+    public void setup() {
       finder = new FileFinder(new DefaultFileProvider());
     }
 
     @Test
-    void doesNotSplitBaseFilename() {
+    public void doesNotSplitBaseFilename() {
       assertThat(splitPath("foo.log"), contains("foo.log"));
     }
 
     @Test
-    void doesNotSplitPathOfLiterals() {
+    public void doesNotSplitPathOfLiterals() {
       assertThat(splitPath("/a/b/c.log"), contains("/a/b/c.log"));
     }
 
     @Test
-    void doesNotSplitPathOfRawRegex() {
+    public void doesNotSplitPathOfRawRegex() {
       String[] inputs = new String[] {
         "/\\d{4}/\\d{2}/c.log",
         "/logs (.)[x]{1}.+?/\\d{4}/\\d{2}/c.log",
@@ -93,7 +88,7 @@ class FileFinderTest {
     }
 
     @Test
-    void splitsPathOfEscapedRegex() {
+    public void splitsPathOfEscapedRegex() {
       assertThat(splitPath(FileFinder.regexEscapePath("/\\d{4}/\\d{2}/c.log")), contains("", "\\d{4}", "\\d{2}", "c.log"));
       HashMap<String, String[]> inputs = new HashMap<>();
       inputs.put("/\\d{4}/\\d{2}/c.log", new String[] { "", "\\d{4}", "\\d{2}", "c.log" });
