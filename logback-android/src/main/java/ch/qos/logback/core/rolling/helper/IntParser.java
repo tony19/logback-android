@@ -1,6 +1,5 @@
 package ch.qos.logback.core.rolling.helper;
 
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,7 +8,7 @@ class IntParser implements FilenameParser<Integer> {
   private final Pattern pathPattern;
 
   IntParser(FileNamePattern fileNamePattern) {
-    String pathRegexString = fileNamePattern.toRegexForFixedDate(new Date());
+    String pathRegexString = fileNamePattern.toRegex(false, true);
     pathRegexString = FileFinder.unescapePath(pathRegexString);
     this.pathPattern = Pattern.compile(pathRegexString);
   }

@@ -14,7 +14,7 @@ class DateParser implements FilenameParser<Date> {
 
   DateParser(FileNamePattern fileNamePattern) {
     this.dateFormatter = getDateFormatter(fileNamePattern);
-    String pathRegexString = fileNamePattern.toRegex(true);
+    String pathRegexString = fileNamePattern.toRegex(true, false);
     this.pathPattern = Pattern.compile(pathRegexString);
   }
 

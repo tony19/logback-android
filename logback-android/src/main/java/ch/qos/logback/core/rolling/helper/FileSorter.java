@@ -15,9 +15,20 @@ class FileSorter {
   void sort(String[] filenames) {
     Arrays.sort(filenames, (f1, f2) -> {
       int result = 0;
+
       for (FilenameParser p : parsers) {
-        result += p.parseFilename(f2).compareTo(p.parseFilename(f1));
+        Comparable c2 = p.parseFilename(f2);
+        Comparable c1 = p.parseFilename(f1);
+        if (c2 != null && c1 != null) {
+          result += c2.compareTo(c1);
+        }
       }
+
+      // fallback to raw filename comparison
+      if (result == 0) {
+        result = f2.compareTo(f1);
+      }
+
       return result;
     });
   }

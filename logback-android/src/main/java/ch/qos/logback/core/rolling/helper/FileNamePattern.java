@@ -218,17 +218,21 @@ public class FileNamePattern extends ContextAwareBase {
    * Given date, convert this instance to a regular expression
    */
   public String toRegex() {
-    return toRegex(false);
+    return toRegex(false, false);
   }
 
-  public String toRegex(boolean capturePrimaryDate) {
+  public String toRegex(boolean capturePrimaryDate, boolean captureInteger) {
     StringBuilder buf = new StringBuilder();
     Converter<Object> p = headTokenConverter;
     while (p != null) {
       if (p instanceof LiteralConverter) {
         buf.append(p.convert(null));
       } else if (p instanceof IntegerTokenConverter) {
-        buf.append(FileFinder.regexEscapePath("\\d+"));
+        if (captureInteger) {
+          buf.append(FileFinder.regexEscapePath("(\\d+)"));
+        } else {
+          buf.append(FileFinder.regexEscapePath("\\d+"));
+        }
       } else if (p instanceof DateTokenConverter) {
         DateTokenConverter<Object> dtc = (DateTokenConverter<Object>) p;
         if (capturePrimaryDate && dtc.isPrimary()) {
