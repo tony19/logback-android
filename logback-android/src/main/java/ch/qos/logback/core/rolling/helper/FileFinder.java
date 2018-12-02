@@ -113,6 +113,10 @@ class FileFinder {
       return REGEX_MARKER_START + path + REGEX_MARKER_END;
     }
   }
+
+  static String unescapePath(String path) {
+    return path.replace(REGEX_MARKER_START, "").replace(REGEX_MARKER_END, "");
+  }
 }
 
 abstract class PathPart {
