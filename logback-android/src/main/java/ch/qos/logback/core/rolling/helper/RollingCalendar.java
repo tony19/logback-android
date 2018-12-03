@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.spi.ContextAwareBase;
@@ -217,58 +218,38 @@ public class RollingCalendar extends GregorianCalendar {
     return yearDiff * 12 + monthDiff;
   }
 
-  static private Date innerGetEndOfThisPeriod(Calendar cal, PeriodicityType periodicityType, Date now) {
-    return innerGetEndOfNextNthPeriod(cal, periodicityType, now, 1);
-  }
-
-  static private Date innerGetEndOfNextNthPeriod(Calendar cal, PeriodicityType periodicityType, Date now, int numPeriods) {
+  private Date innerGetEndOfNextNthPeriod(Calendar cal, PeriodicityType periodicityType, Date now, int numPeriods) {
     cal.setTime(now);
+
+    roundDownTime(cal, this.datePattern);
+
     switch (periodicityType) {
       case TOP_OF_MILLISECOND:
         cal.add(Calendar.MILLISECOND, numPeriods);
         break;
 
       case TOP_OF_SECOND:
-        cal.set(Calendar.MILLISECOND, 0);
         cal.add(Calendar.SECOND, numPeriods);
         break;
 
       case TOP_OF_MINUTE:
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
         cal.add(Calendar.MINUTE, numPeriods);
         break;
 
       case TOP_OF_HOUR:
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
         cal.add(Calendar.HOUR_OF_DAY, numPeriods);
         break;
 
       case TOP_OF_DAY:
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
         cal.add(Calendar.DATE, numPeriods);
         break;
 
       case TOP_OF_WEEK:
-        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
         cal.add(Calendar.WEEK_OF_YEAR, numPeriods);
         break;
 
       case TOP_OF_MONTH:
         cal.set(Calendar.DATE, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
         cal.add(Calendar.MONTH, numPeriods);
         break;
 
@@ -301,5 +282,29 @@ public class RollingCalendar extends GregorianCalendar {
     secondCalendar.setTimeInMillis(toppedDate.getTime());
     long gmtOffset = secondCalendar.get(Calendar.ZONE_OFFSET) + secondCalendar.get(Calendar.DST_OFFSET);
     return toppedDate.getTime() + gmtOffset;
+  }
+
+  private void roundDownTime(Calendar cal, String datePattern) {
+    if (datePattern.indexOf('S') == -1) {
+      cal.set(Calendar.MILLISECOND, 0);
+    }
+    if (datePattern.indexOf('s') == -1) {
+      cal.set(Calendar.SECOND, 0);
+    }
+    if (datePattern.indexOf('m') == -1) {
+      cal.set(Calendar.MINUTE, 0);
+    }
+    final Pattern hourOfDayPattern = Pattern.compile("[hKkH]");
+    if (!hourOfDayPattern.matcher(datePattern).find()) {
+      cal.set(Calendar.HOUR_OF_DAY, 0);
+    }
+    final Pattern dayOfMonthPattern = Pattern.compile("[uEFdD]");
+    if (!dayOfMonthPattern.matcher(datePattern).find()) {
+      cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+      cal.set(Calendar.DAY_OF_MONTH, 1);
+    }
+    if (datePattern.indexOf('M') == -1) {
+      cal.set(Calendar.MONTH, Calendar.JANUARY);
+    }
   }
 }

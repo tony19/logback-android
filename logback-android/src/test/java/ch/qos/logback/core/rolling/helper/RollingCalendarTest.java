@@ -13,14 +13,18 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
+import static ch.qos.logback.core.rolling.helper.RollingCalendar.GMT_TIMEZONE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.CoreConstants;
@@ -28,27 +32,62 @@ import ch.qos.logback.core.util.EnvUtil;
 
 public class RollingCalendarTest {
 
-  String dailyPattern = "yyyy-MM-dd";
+  private final String dailyPattern = "yyyy-MM-dd";
 
-  @Before
-  public void setUp() {
+  @Test
+  public void roundsDateWithMissingMonthDayUnits() throws ParseException {
+    final Date REF_DATE = parseDate("yyyy-MM-dd HH:mm:ss.SSS", "2000-12-25 09:30:49.876");
+    Calendar cal = getEndOfNextNthPeriod("yyyy-SSS", REF_DATE, -1);
 
-    // Most surprisingly, in certain environments (e.g. Windows 7), setting the default locale
-    // allows certain tests to pass which otherwise fail.
-    //
-    // These tests are:
-    //
-    //  checkCollisionFreeness("yyyy-WW", false);
-    //  checkCollisionFreeness("yyyy-ww", true);
-    //  checkCollisionFreeness("ww", false);
-    //  {
-    //    RollingCalendar rc = new RollingCalendar("yyyy-ww");
-    //    assertEquals(PeriodicityType.TOP_OF_WEEK, rc.getPeriodicityType());
-    //  }
-    //
+    assertEquals(2000, cal.get(Calendar.YEAR));
+    assertEquals(Calendar.JANUARY, cal.get(Calendar.MONTH));
+    assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+    assertEquals(0, cal.get(Calendar.HOUR_OF_DAY));
+    assertEquals(0, cal.get(Calendar.MINUTE));
+    assertEquals(0, cal.get(Calendar.SECOND));
+    assertEquals(875, cal.get(Calendar.MILLISECOND));
+  }
 
-    Locale oldLocale = Locale.getDefault();
-    Locale.setDefault(oldLocale);
+  @Test
+  public void roundsDateWithMissingMonthUnits() throws ParseException {
+    final Date REF_DATE = parseDate("yyyy-MM-dd HH:mm:ss.SSS", "2000-12-25 09:30:49.876");
+    Calendar cal = getEndOfNextNthPeriod("yyyy-dd", REF_DATE, -1);
+
+    assertEquals(2000, cal.get(Calendar.YEAR));
+    assertEquals(Calendar.JANUARY, cal.get(Calendar.MONTH));
+    assertEquals(24, cal.get(Calendar.DAY_OF_MONTH));
+    assertEquals(0, cal.get(Calendar.HOUR_OF_DAY));
+    assertEquals(0, cal.get(Calendar.MINUTE));
+    assertEquals(0, cal.get(Calendar.SECOND));
+    assertEquals(0, cal.get(Calendar.MILLISECOND));
+  }
+
+  @Test
+  public void roundsDateWithMissingTimeUnits() throws ParseException {
+    final Date REF_DATE = parseDate("yyyy-MM-dd HH:mm:ss.SSS", "2000-12-25 09:30:49.876");
+    Calendar cal = getEndOfNextNthPeriod("yyyy-MM-dd-ss", REF_DATE, -1);
+
+    assertEquals(2000, cal.get(Calendar.YEAR));
+    assertEquals(Calendar.DECEMBER, cal.get(Calendar.MONTH));
+    assertEquals(25, cal.get(Calendar.DAY_OF_MONTH));
+    assertEquals(0, cal.get(Calendar.HOUR_OF_DAY));
+    assertEquals(0, cal.get(Calendar.MINUTE));
+    assertEquals(48, cal.get(Calendar.SECOND));
+    assertEquals(0, cal.get(Calendar.MILLISECOND));
+  }
+
+  private Calendar getEndOfNextNthPeriod(String dateFormat, Date date, int n) {
+    RollingCalendar rc = new RollingCalendar(dateFormat);
+    Date nextDate = rc.getEndOfNextNthPeriod(date, n);
+    Calendar cal = Calendar.getInstance(GMT_TIMEZONE, Locale.US);
+    cal.setTime(nextDate);
+    return cal;
+  }
+
+  private Date parseDate(String dateFormat, String dateString) throws ParseException {
+    SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat, Locale.US);
+    dateFormatter.setTimeZone(GMT_TIMEZONE);
+    return dateFormatter.parse(dateString);
   }
 
   @Test
