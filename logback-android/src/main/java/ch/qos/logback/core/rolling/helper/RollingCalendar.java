@@ -206,7 +206,7 @@ public class RollingCalendar extends GregorianCalendar {
     }
   }
 
-  public static int diffInMonths(long startTime, long endTime) {
+  private static int diffInMonths(long startTime, long endTime) {
     if (startTime > endTime)
       throw new IllegalArgumentException("startTime cannot be larger than endTime");
     Calendar startCal = Calendar.getInstance();
@@ -268,7 +268,7 @@ public class RollingCalendar extends GregorianCalendar {
     return getEndOfNextNthPeriod(now, 1);
   }
 
-  public long getStartOfCurrentPeriodWithGMTOffsetCorrection(long now, TimeZone timezone) {
+  private long getStartOfCurrentPeriodWithGMTOffsetCorrection(long now, TimeZone timezone) {
     Date toppedDate;
 
     // there is a bug in Calendar which prevents it from
