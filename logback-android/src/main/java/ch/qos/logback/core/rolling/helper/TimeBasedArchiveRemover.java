@@ -65,6 +65,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
   }
 
   private boolean delete(File file) {
+    addInfo("deleting " + file);
     boolean ok = this.fileProvider.deleteFile(file);
     if (!ok) {
       addWarn("cannot delete " + file);
