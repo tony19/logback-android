@@ -20,7 +20,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 import ch.qos.logback.core.CoreConstants;
@@ -44,6 +47,28 @@ public class RollingCalendar extends GregorianCalendar {
   PeriodicityType periodicityType = PeriodicityType.ERRONEOUS;
   String datePattern;
 
+  private static final HashMap<Character, PeriodicityType> PATTERN_LETTER_TO_PERIODICITY = new LinkedHashMap<>();
+  static {
+    // ordered from smallest to largest time unit
+    PATTERN_LETTER_TO_PERIODICITY.put('S', PeriodicityType.TOP_OF_MILLISECOND); // Millisecond
+    PATTERN_LETTER_TO_PERIODICITY.put('s', PeriodicityType.TOP_OF_SECOND); // Second in minute
+    PATTERN_LETTER_TO_PERIODICITY.put('m', PeriodicityType.TOP_OF_MINUTE); // Minute in hour
+    PATTERN_LETTER_TO_PERIODICITY.put('h', PeriodicityType.TOP_OF_HOUR); // Hour in am/pm (1-12)
+    PATTERN_LETTER_TO_PERIODICITY.put('K', PeriodicityType.TOP_OF_HOUR); // Hour in am/pm (0-11)
+    PATTERN_LETTER_TO_PERIODICITY.put('k', PeriodicityType.TOP_OF_HOUR); // Hour in day (1-24)
+    PATTERN_LETTER_TO_PERIODICITY.put('H', PeriodicityType.TOP_OF_HOUR); // Hour in day (0-23)
+    PATTERN_LETTER_TO_PERIODICITY.put('a', PeriodicityType.HALF_DAY); // Am/pm marker
+    PATTERN_LETTER_TO_PERIODICITY.put('u', PeriodicityType.TOP_OF_DAY); // Day number of week
+    PATTERN_LETTER_TO_PERIODICITY.put('E', PeriodicityType.TOP_OF_DAY); // Day name in week
+    PATTERN_LETTER_TO_PERIODICITY.put('F', PeriodicityType.TOP_OF_DAY); // Day of week in month
+    PATTERN_LETTER_TO_PERIODICITY.put('d', PeriodicityType.TOP_OF_DAY); // Day in month
+    PATTERN_LETTER_TO_PERIODICITY.put('D', PeriodicityType.TOP_OF_DAY); // Day in year
+    PATTERN_LETTER_TO_PERIODICITY.put('W', PeriodicityType.TOP_OF_WEEK); // Week in month
+    PATTERN_LETTER_TO_PERIODICITY.put('w', PeriodicityType.TOP_OF_WEEK); // Week in year
+    PATTERN_LETTER_TO_PERIODICITY.put('M', PeriodicityType.TOP_OF_MONTH); // Month in year (context sensitive)
+    PATTERN_LETTER_TO_PERIODICITY.put('Y', PeriodicityType.TOP_OF_WEEK); // Week year
+  }
+
   public RollingCalendar(String datePattern) {
     this(datePattern, GMT_TIMEZONE, Locale.US);
   }
@@ -58,31 +83,11 @@ public class RollingCalendar extends GregorianCalendar {
     return periodicityType;
   }
 
-  // This method computes the roll over period by looping over the
-  // periods, starting with the shortest, and stopping when the r0 is
-  // different from from r1, where r0 is the epoch formatted according
-  // the datePattern (supplied by the user) and r1 is the
-  // epoch+nextMillis(i) formatted according to datePattern. All date
-  // formatting is done in GMT and not local format because the test
-  // logic is based on comparisons relative to 1970-01-01 00:00:00
-  // GMT (the epoch).
   public PeriodicityType computePeriodicityType() {
     if (datePattern != null) {
-      GregorianCalendar calendar = new GregorianCalendar(GMT_TIMEZONE, Locale.US);
-
-      // set sate to 1970-01-01 00:00:00 GMT
-      Date epoch = new Date(0);
-
-      final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern, Locale.US);
-      simpleDateFormat.setTimeZone(GMT_TIMEZONE); // all date formatting done in GMT
-      final String r0 = simpleDateFormat.format(epoch);
-
-      for (PeriodicityType i : PeriodicityType.VALID_ORDERED_LIST) {
-        Date next = innerGetEndOfThisPeriod(calendar, i, epoch);
-        String r1 = simpleDateFormat.format(next);
-
-        if ((r0 != null) && (r1 != null) && !r0.equals(r1)) {
-          return i;
+      for (Map.Entry<Character, PeriodicityType> entry : PATTERN_LETTER_TO_PERIODICITY.entrySet()) {
+        if (datePattern.indexOf(entry.getKey()) > -1) {
+          return entry.getValue();
         }
       }
     }

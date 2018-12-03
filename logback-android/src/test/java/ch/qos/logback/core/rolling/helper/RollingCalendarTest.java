@@ -52,6 +52,29 @@ public class RollingCalendarTest {
   }
 
   @Test
+  public void testMillisecondPeriodicity() {
+    // The length of the 'S' pattern letter matters on different platforms,
+    // and can render different results on different versions of Android.
+    // This test verifies that the periodicity is correct for different
+    // pattern lengths.
+
+    {
+      RollingCalendar rc = new RollingCalendar("yyyy-MM-dd-S");
+      assertEquals(PeriodicityType.TOP_OF_MILLISECOND, rc.getPeriodicityType());
+    }
+
+    {
+      RollingCalendar rc = new RollingCalendar("yyyy-MM-dd-SS");
+      assertEquals(PeriodicityType.TOP_OF_MILLISECOND, rc.getPeriodicityType());
+    }
+
+    {
+      RollingCalendar rc = new RollingCalendar("yyyy-MM-dd-SSS");
+      assertEquals(PeriodicityType.TOP_OF_MILLISECOND, rc.getPeriodicityType());
+    }
+  }
+
+  @Test
   public void testPeriodicity() {
     {
       RollingCalendar rc = new RollingCalendar("yyyy-MM-dd_HH_mm_ss");
