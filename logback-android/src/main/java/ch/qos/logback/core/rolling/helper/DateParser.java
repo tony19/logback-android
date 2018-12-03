@@ -41,9 +41,9 @@ class DateParser implements FilenameParser<Date> {
 
   private SimpleDateFormat getDateFormatter(FileNamePattern fileNamePattern) {
     final DateTokenConverter<Object> dateStringConverter = fileNamePattern.getPrimaryDateTokenConverter();
-    final String datePattern = dateStringConverter != null ? dateStringConverter.getDatePattern() : "yyyyMMdd";
+    final String datePattern = dateStringConverter != null ? dateStringConverter.getDatePattern() : DateTokenConverter.DEFAULT_DATE_PATTERN;
     final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern, Locale.US);
-    TimeZone timeZone = dateStringConverter != null ? dateStringConverter.getTimeZone() : TimeZone.getTimeZone("GMT");
+    TimeZone timeZone = dateStringConverter != null ? dateStringConverter.getTimeZone() : TimeZone.getDefault();
     if (timeZone != null) {
       dateFormatter.setTimeZone(timeZone);
     }
