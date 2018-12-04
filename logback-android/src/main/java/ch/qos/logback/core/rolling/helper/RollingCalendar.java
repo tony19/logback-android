@@ -247,7 +247,8 @@ public class RollingCalendar extends GregorianCalendar {
     if (!dayOfMonthPattern.matcher(datePattern).find()) {
       cal.set(Calendar.DAY_OF_MONTH, 1);
     }
-    if (datePattern.indexOf('M') == -1) {
+    final Pattern monthPattern = Pattern.compile("[MDw]");
+    if (!monthPattern.matcher(datePattern).find()) {
       cal.set(Calendar.MONTH, Calendar.JANUARY);
     }
   }

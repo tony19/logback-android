@@ -45,6 +45,21 @@ public class RollingCalendarTest {
   }
 
   @Test
+  public void roundsDateWithOnlyDayInYear() throws ParseException {
+    final Date REF_DATE = parseDate("yyyy-MM-dd HH:mm:ss.SSS", "2000-12-25 09:30:49.876");
+    Calendar cal = getEndOfNextNthPeriod("yyyy-DD", REF_DATE, -1);
+
+    assertEquals(2000, cal.get(Calendar.YEAR));
+    assertEquals(Calendar.DECEMBER, cal.get(Calendar.MONTH));
+    assertEquals(24, cal.get(Calendar.DAY_OF_MONTH));
+    assertEquals(359, cal.get(Calendar.DAY_OF_YEAR));
+    assertEquals(0, cal.get(Calendar.HOUR_OF_DAY));
+    assertEquals(0, cal.get(Calendar.MINUTE));
+    assertEquals(0, cal.get(Calendar.SECOND));
+    assertEquals(0, cal.get(Calendar.MILLISECOND));
+  }
+
+  @Test
   public void roundsDateWithMissingMonthUnits() throws ParseException {
     final Date REF_DATE = parseDate("yyyy-MM-dd HH:mm:ss.SSS", "2000-12-25 09:30:49.876");
     Calendar cal = getEndOfNextNthPeriod("yyyy-dd", REF_DATE, -1);
