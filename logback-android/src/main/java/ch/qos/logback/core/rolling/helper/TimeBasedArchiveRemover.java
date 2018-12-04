@@ -120,19 +120,22 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     return createFileFilter(baseDate, true);
   }
 
-  private FilenameFilter createFileFilter(Date baseDate, boolean before) {
-    return (File unused, String path) -> {
-      Date fileDate = this.dateParser.parseFilename(path);
-      fileDate = rc.normalizeDate(fileDate);
-      Date refDate = rc.getEndOfNextNthPeriod(baseDate, -maxHistory);
-      refDate = rc.normalizeDate(refDate);
-      int comparison = fileDate.compareTo(refDate);
-      return before ? (comparison < 0) : (comparison >= 0);
+  private FilenameFilter createFileFilter(final Date baseDate, final boolean before) {
+    return new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String path) {
+        Date fileDate = dateParser.parseFilename(path);
+        fileDate = rc.normalizeDate(fileDate);
+        Date refDate = rc.getEndOfNextNthPeriod(baseDate, -maxHistory);
+        refDate = rc.normalizeDate(refDate);
+        int comparison = fileDate.compareTo(refDate);
+        return before ? (comparison < 0) : (comparison >= 0);
+      }
     };
   }
 
   private String[] filterFiles(String[] filenames, FilenameFilter filter) {
-    ArrayList<String> matchedFiles = new ArrayList<>();
+    ArrayList<String> matchedFiles = new ArrayList<String>();
     for (String f : filenames) {
       if (filter.accept(null, f)) {
         matchedFiles.add(f);
@@ -154,7 +157,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     // to succeed).
     List<String> dirList = Arrays.asList(dirs);
     Collections.reverse(dirList);
-    ArrayDeque<String> emptyDirs = new ArrayDeque<>();
+    ArrayDeque<String> emptyDirs = new ArrayDeque<String>();
     for (String dir : dirList) {
       int childSize = this.fileProvider.list(new File(dir), null).length;
       if (childSize == 0 || (childSize == 1 && emptyDirs.size() > 0 && dir.equals(emptyDirs.peekLast()))) {

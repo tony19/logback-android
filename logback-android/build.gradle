@@ -10,8 +10,8 @@ android {
     compileSdkVersion 28
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_5
+        targetCompatibility JavaVersion.VERSION_1_5
     }
 
     defaultConfig {
@@ -31,6 +31,11 @@ android {
         lintConfig rootProject.file('gradle/lint.xml')
     }
     testOptions {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
         unitTests {
             includeAndroidResources = true
 

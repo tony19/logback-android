@@ -28,13 +28,13 @@ class FileFinder {
   String[] findDirs(String pathPattern) {
     List<PathPart> pathParts = this.splitPath(pathPattern);
     PathPart pathPart = pathParts.get(0);
-    List<File> dirs = new ArrayList<>();
+    List<File> dirs = new ArrayList<File>();
     findDirs(pathPart.listFiles(fileProvider), pathParts, 1, dirs);
     return toAbsolutePaths(dirs);
   }
 
   private String[] toAbsolutePaths(List<File> files) {
-    List<String> filenames = new ArrayList<>();
+    List<String> filenames = new ArrayList<String>();
     for (File f : files) {
       filenames.add(f.getAbsolutePath());
     }
@@ -42,7 +42,7 @@ class FileFinder {
   }
 
   private List<File> findFiles(List<File> files, List<PathPart> pathParts, int index) {
-    List<File> matchedFiles = new ArrayList<>();
+    List<File> matchedFiles = new ArrayList<File>();
 
     PathPart pathPart = pathParts.get(index);
     if (index >= pathParts.size() - 1) {
@@ -79,8 +79,8 @@ class FileFinder {
   }
 
   List<PathPart> splitPath(String pattern) {
-    List<PathPart> parts = new ArrayList<>();
-    List<String> literals = new ArrayList<>();
+    List<PathPart> parts = new ArrayList<PathPart>();
+    List<String> literals = new ArrayList<String>();
     for (String p : pattern.split(File.separator)) {
       final boolean isRegex = p.contains(REGEX_MARKER_START) && p.contains(REGEX_MARKER_END);
       p = p.replace(REGEX_MARKER_START, "").replace(REGEX_MARKER_END, "");

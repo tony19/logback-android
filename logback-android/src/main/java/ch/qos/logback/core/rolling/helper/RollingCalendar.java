@@ -47,7 +47,7 @@ public class RollingCalendar extends GregorianCalendar {
   private PeriodicityType periodicityType = PeriodicityType.ERRONEOUS;
   private String datePattern;
 
-  private static final HashMap<Character, PeriodicityType> PATTERN_LETTER_TO_PERIODICITY = new LinkedHashMap<>();
+  private static final HashMap<Character, PeriodicityType> PATTERN_LETTER_TO_PERIODICITY = new LinkedHashMap<Character, PeriodicityType>();
   static {
     // ordered from smallest to largest time unit
     PATTERN_LETTER_TO_PERIODICITY.put('S', PeriodicityType.TOP_OF_MILLISECOND); // Millisecond
