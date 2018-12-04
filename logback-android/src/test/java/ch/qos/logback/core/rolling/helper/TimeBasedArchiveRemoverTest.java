@@ -28,7 +28,7 @@ public class TimeBasedArchiveRemoverTest {
   private final String TIMEZONE_NAME = "GMT";
   private final String DATE_FORMAT = "yyyyMMdd";
   private final Date EXPIRY = parseDate(DATE_FORMAT, "20191104");
-  private final String FILENAME_PATTERN = "%d{yyyy/MM, aux}/app_%d{" + DATE_FORMAT + ", " + TIMEZONE_NAME + "}.log";
+  private final String FILENAME_PATTERN = "%d{yyyy/MM," + TIMEZONE_NAME + ", aux}/app_%d{" + DATE_FORMAT + ", " + TIMEZONE_NAME + "}.log";
   private final int MAX_HISTORY = 4;
   private final int NUM_FILES_TO_KEEP = 3;
   private File[] expiredFiles;
