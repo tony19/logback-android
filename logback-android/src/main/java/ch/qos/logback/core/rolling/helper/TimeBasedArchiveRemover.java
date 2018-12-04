@@ -123,8 +123,10 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
   private FilenameFilter createFileFilter(Date baseDate, boolean before) {
     return (File unused, String path) -> {
       Date fileDate = this.dateParser.parseFilename(path);
-      Date adjustedDate = rc.getEndOfNextNthPeriod(baseDate, -maxHistory);
-      int comparison = fileDate.compareTo(adjustedDate);
+      fileDate = rc.normalizeDate(fileDate);
+      Date refDate = rc.getEndOfNextNthPeriod(baseDate, -maxHistory);
+      refDate = rc.normalizeDate(refDate);
+      int comparison = fileDate.compareTo(refDate);
       return before ? (comparison < 0) : (comparison >= 0);
     };
   }

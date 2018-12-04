@@ -203,11 +203,11 @@ public class RollingCalendar extends GregorianCalendar {
         break;
 
       case TOP_OF_WEEK:
+        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
         cal.add(Calendar.WEEK_OF_YEAR, numPeriods);
         break;
 
       case TOP_OF_MONTH:
-        cal.set(Calendar.DATE, 1);
         cal.add(Calendar.MONTH, numPeriods);
         break;
 
@@ -218,47 +218,33 @@ public class RollingCalendar extends GregorianCalendar {
     return cal.getTime();
   }
 
-  public Date getEndOfNextNthPeriod(Date now, int periods) {
-    return innerGetEndOfNextNthPeriod(this, this.periodicityType, now, periods);
-  }
-
   public Date getNextTriggeringDate(Date now) {
     return getEndOfNextNthPeriod(now, 1);
   }
 
-  private long getStartOfCurrentPeriodWithGMTOffsetCorrection(long now, TimeZone timezone) {
-    Date toppedDate;
-
-    // there is a bug in Calendar which prevents it from
-    // computing the correct DST_OFFSET when the time changes
-    {
-      Calendar aCal = Calendar.getInstance(timezone);
-      aCal.setTimeInMillis(now);
-      toppedDate = getEndOfNextNthPeriod(aCal.getTime(), 0);
-    }
-    Calendar secondCalendar = Calendar.getInstance(timezone);
-    secondCalendar.setTimeInMillis(toppedDate.getTime());
-    long gmtOffset = secondCalendar.get(Calendar.ZONE_OFFSET) + secondCalendar.get(Calendar.DST_OFFSET);
-    return toppedDate.getTime() + gmtOffset;
+  public Date normalizeDate(Date date) {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    roundDownTime(cal, this.datePattern);
+    return cal.getTime();
   }
 
   private void roundDownTime(Calendar cal, String datePattern) {
     if (datePattern.indexOf('S') == -1) {
-      cal.set(Calendar.MILLISECOND, 0);
+      cal.roll(Calendar.MILLISECOND, -cal.get(Calendar.MILLISECOND));
     }
     if (datePattern.indexOf('s') == -1) {
-      cal.set(Calendar.SECOND, 0);
+      cal.roll(Calendar.SECOND, -cal.get(Calendar.SECOND));
     }
     if (datePattern.indexOf('m') == -1) {
-      cal.set(Calendar.MINUTE, 0);
+      cal.roll(Calendar.MINUTE, -cal.get(Calendar.MINUTE));
     }
     final Pattern hourOfDayPattern = Pattern.compile("[hKkH]");
     if (!hourOfDayPattern.matcher(datePattern).find()) {
-      cal.set(Calendar.HOUR_OF_DAY, 0);
+      cal.roll(Calendar.HOUR_OF_DAY, -cal.get(Calendar.HOUR_OF_DAY));
     }
     final Pattern dayOfMonthPattern = Pattern.compile("[uEFdD]");
     if (!dayOfMonthPattern.matcher(datePattern).find()) {
-      cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
       cal.set(Calendar.DAY_OF_MONTH, 1);
     }
     if (datePattern.indexOf('M') == -1) {
