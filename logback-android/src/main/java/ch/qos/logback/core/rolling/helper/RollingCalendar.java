@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
 /**
@@ -45,8 +44,8 @@ public class RollingCalendar extends GregorianCalendar {
   // The gmtTimeZone is used only in computeCheckPeriod() method.
   static final TimeZone GMT_TIMEZONE = TimeZone.getTimeZone("GMT");
 
-  PeriodicityType periodicityType = PeriodicityType.ERRONEOUS;
-  String datePattern;
+  private PeriodicityType periodicityType = PeriodicityType.ERRONEOUS;
+  private String datePattern;
 
   private static final HashMap<Character, PeriodicityType> PATTERN_LETTER_TO_PERIODICITY = new LinkedHashMap<>();
   static {
@@ -176,54 +175,13 @@ public class RollingCalendar extends GregorianCalendar {
     }
   }
 
-  public long periodBarriersCrossed(long start, long end) {
-    if (start > end)
-      throw new IllegalArgumentException("Start cannot come before end");
-
-    long startFloored = getStartOfCurrentPeriodWithGMTOffsetCorrection(start, getTimeZone());
-    long endFloored = getStartOfCurrentPeriodWithGMTOffsetCorrection(end, getTimeZone());
-
-    long diff = endFloored - startFloored;
-
-    switch (periodicityType) {
-
-      case TOP_OF_MILLISECOND:
-        return diff;
-      case TOP_OF_SECOND:
-        return diff / CoreConstants.MILLIS_IN_ONE_SECOND;
-      case TOP_OF_MINUTE:
-        return diff / CoreConstants.MILLIS_IN_ONE_MINUTE;
-      case TOP_OF_HOUR:
-        return diff / CoreConstants.MILLIS_IN_ONE_HOUR;
-      case TOP_OF_DAY:
-        return diff / CoreConstants.MILLIS_IN_ONE_DAY;
-      case TOP_OF_WEEK:
-        return diff / CoreConstants.MILLIS_IN_ONE_WEEK;
-      case TOP_OF_MONTH:
-        return diffInMonths(start, end);
-      default:
-        throw new IllegalStateException("Unknown periodicity type.");
-    }
-  }
-
-  private static int diffInMonths(long startTime, long endTime) {
-    if (startTime > endTime)
-      throw new IllegalArgumentException("startTime cannot be larger than endTime");
-    Calendar startCal = Calendar.getInstance();
-    startCal.setTimeInMillis(startTime);
-    Calendar endCal = Calendar.getInstance();
-    endCal.setTimeInMillis(endTime);
-    int yearDiff = endCal.get(Calendar.YEAR) - startCal.get(Calendar.YEAR);
-    int monthDiff = endCal.get(Calendar.MONTH) - startCal.get(Calendar.MONTH);
-    return yearDiff * 12 + monthDiff;
-  }
-
-  private Date innerGetEndOfNextNthPeriod(Calendar cal, PeriodicityType periodicityType, Date now, int numPeriods) {
+  public Date getEndOfNextNthPeriod(Date now, int numPeriods) {
+    Calendar cal = this;
     cal.setTime(now);
 
     roundDownTime(cal, this.datePattern);
 
-    switch (periodicityType) {
+    switch (this.periodicityType) {
       case TOP_OF_MILLISECOND:
         cal.add(Calendar.MILLISECOND, numPeriods);
         break;
