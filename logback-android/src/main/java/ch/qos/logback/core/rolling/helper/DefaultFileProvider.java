@@ -16,10 +16,6 @@ public class DefaultFileProvider implements FileProvider {
     return file.delete();
   }
 
-  public boolean isFile(File file) {
-    return file.isFile();
-  }
-
   public long length(File file) {
     return file.length();
   }

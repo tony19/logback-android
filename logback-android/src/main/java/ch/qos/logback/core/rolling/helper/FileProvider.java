@@ -7,7 +7,6 @@ public interface FileProvider {
   File[] listFiles(File dir, FilenameFilter filter);
   String[] list(File dir, FilenameFilter filter);
   boolean deleteFile(File file);
-  boolean isFile(File file);
   long length(File file);
   boolean exists(File file);
   boolean isDirectory(File file);
