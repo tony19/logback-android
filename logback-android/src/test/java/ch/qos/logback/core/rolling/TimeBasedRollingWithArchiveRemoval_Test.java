@@ -24,7 +24,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.stream.Stream;
+import java.util.List;
 
 import static ch.qos.logback.core.CoreConstants.DAILY_DATE_PATTERN;
 import static org.hamcrest.Matchers.contains;
@@ -232,9 +232,11 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     final File ROOT_DIR = new File(randomOutputDir);
     assertThat(Arrays.asList(ROOT_DIR.list()), containsInAnyOrder(dirNames));
 
-    Stream.of(dirNames)
-      .limit(dirNames.length - 1) // the last dir contains the active file (not zipped)
-      .forEach(dir -> assertThat(Arrays.asList(new File(ROOT_DIR, dir).list()), containsInAnyOrder("clean.0.zip", "clean.1.zip")));
+    // the last dir contains the active file
+    List<String> dirs = Arrays.asList(dirNames).subList(0, dirNames.length - 1);
+    for (String dir : dirs) {
+      assertThat(Arrays.asList(new File(ROOT_DIR, dir).list()), containsInAnyOrder("clean.0.zip", "clean.1.zip"));
+    }
     assertThat(Arrays.asList(new File(ROOT_DIR, "2018-07-26").list()), contains("clean.0"));
   }
 
@@ -264,9 +266,12 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
     };
     final File ROOT_DIR = new File(randomOutputDir);
     assertThat(Arrays.asList(ROOT_DIR.list()), containsInAnyOrder(dirNames));
-    Stream.of(dirNames)
-      .limit(dirNames.length - 1) // the last dir contains the active file
-      .forEach(dir -> assertThat(Arrays.asList(new File(ROOT_DIR, dir).list()), containsInAnyOrder("clean.0", "clean.1")));
+
+    // the last dir contains the active file
+    List<String> dirs = Arrays.asList(dirNames).subList(0, dirNames.length - 1);
+    for (String dir : dirs) {
+      assertThat(Arrays.asList(new File(ROOT_DIR, dir).list()), containsInAnyOrder("clean.0", "clean.1"));
+    }
     assertThat(Arrays.asList(new File(ROOT_DIR, "2018-08-10").list()), contains("clean.0"));
   }
 

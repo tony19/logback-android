@@ -47,18 +47,18 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
   }
 
   public void clean(final Date now) {
-    String[] files = this.findFiles();
-    String[] expiredFiles = this.filterFiles(files, this.createExpiredFileFilter(now));
+    List<String> files = this.findFiles();
+    List<String> expiredFiles = this.filterFiles(files, this.createExpiredFileFilter(now));
     for (String f : expiredFiles) {
       this.delete(new File(f));
     }
 
     if (this.totalSizeCap != CoreConstants.UNBOUNDED_TOTAL_SIZE_CAP && this.totalSizeCap > 0) {
-      String[] recentFiles = this.filterFiles(files, this.createRecentFileFilter(now));
+      List<String> recentFiles = this.filterFiles(files, this.createRecentFileFilter(now));
       this.capTotalSize(recentFiles);
     }
 
-    String[] emptyDirs = this.findEmptyDirs();
+    List<String> emptyDirs = this.findEmptyDirs();
     for (String dir : emptyDirs) {
       this.delete(new File(dir));
     }
@@ -73,12 +73,13 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     return ok;
   }
 
-  private void capTotalSize(String[] filenames) {
+  private void capTotalSize(List<String> filenames) {
     long totalSize = 0;
     long totalRemoved = 0;
 
-    this.fileSorter.sort(filenames);
-    for (String name : filenames) {
+    String[] fnames = filenames.toArray(new String[0]);
+    this.fileSorter.sort(fnames);
+    for (String name : fnames) {
       File f = new File(name);
       long size = this.fileProvider.length(f);
       if (totalSize + size > this.totalSizeCap) {
@@ -134,28 +135,27 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     };
   }
 
-  private String[] filterFiles(String[] filenames, FilenameFilter filter) {
+  private List<String> filterFiles(List<String> filenames, FilenameFilter filter) {
     ArrayList<String> matchedFiles = new ArrayList<String>();
     for (String f : filenames) {
       if (filter.accept(null, f)) {
         matchedFiles.add(f);
       }
     }
-    return matchedFiles.toArray(new String[0]);
+    return matchedFiles;
   }
 
-  private String[] findFiles() {
+  private List<String> findFiles() {
     return new FileFinder(this.fileProvider).findFiles(this.fileNamePattern.toRegex());
   }
 
-  private String[] findEmptyDirs() {
-    String[] dirs = new FileFinder(this.fileProvider).findDirs(this.fileNamePattern.toRegex());
+  private List<String> findEmptyDirs() {
+    List<String> dirList = new FileFinder(this.fileProvider).findDirs(this.fileNamePattern.toRegex());
 
     // Assuming directories were already sorted, let's reverse it
     // so we can iterate the list deepest first (deletes deepest
     // dirs first so their parents would be empty for deletion
     // to succeed).
-    List<String> dirList = Arrays.asList(dirs);
     Collections.reverse(dirList);
     ArrayDeque<String> emptyDirs = new ArrayDeque<String>();
     for (String dir : dirList) {
@@ -164,7 +164,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
         emptyDirs.add(dir);
       }
     }
-    return emptyDirs.toArray(new String[0]);
+    return Arrays.asList(emptyDirs.toArray(new String[0]));
   }
 
   private class ArchiveRemoverRunnable implements Runnable {

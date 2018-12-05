@@ -6,16 +6,14 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FileFinderTest {
 
@@ -34,9 +32,12 @@ public class FileFinderTest {
     public void findsFilesAcrossMultipleDirs() {
       FileFinder finder = new FileFinder(new DefaultFileProvider());
       String pathPattern = tmpDir.getRoot() + File.separator + FileFinder.regexEscapePath("\\d{4}/\\d{2}/app_\\d{4}\\d{2}\\d{2}.log");
-      String[] actualFiles = finder.findFiles(pathPattern);
-      String[] expectedFiles = Stream.of(files).map(File::getAbsolutePath).toArray(String[]::new);
-      assertThat(actualFiles, is(arrayContainingInAnyOrder(expectedFiles)));
+      List<String> actualFiles = finder.findFiles(pathPattern);
+      List<String> expectedFileList = new ArrayList<String>();
+      for (File f : files) {
+        expectedFileList.add(f.getAbsolutePath());
+      }
+      assertThat(actualFiles, containsInAnyOrder(expectedFileList.toArray(new String[0])));
     }
 
     private void setupTmpDir(TemporaryFolder tmpDir) throws IOException {
@@ -54,7 +55,12 @@ public class FileFinderTest {
         tmpDir.newFile("2017/12/app_20171225.log"),
         tmpDir.newFile("2016/02/app_20160214.log"),
       };
-      Stream.concat(Stream.of(dirs), Stream.of(files)).forEach(File::deleteOnExit);
+      for (File f : dirs) {
+        f.deleteOnExit();
+      }
+      for (File f : files) {
+        f.deleteOnExit();
+      }
     }
   }
 
@@ -90,7 +96,7 @@ public class FileFinderTest {
     @Test
     public void splitsPathOfEscapedRegex() {
       assertThat(splitPath(FileFinder.regexEscapePath("/\\d{4}/\\d{2}/c.log")), contains("", "\\d{4}", "\\d{2}", "c.log"));
-      HashMap<String, String[]> inputs = new HashMap<>();
+      HashMap<String, String[]> inputs = new HashMap<String, String[]>();
       inputs.put("/\\d{4}/\\d{2}/c.log", new String[] { "", "\\d{4}", "\\d{2}", "c.log" });
       inputs.put("/logs (.)[x]{1}.+?/\\d{4}/\\d{2}/c.log", new String[] { "", "logs (.)[x]{1}.+?", "\\d{4}", "\\d{2}", "c.log" });
 
@@ -100,10 +106,11 @@ public class FileFinderTest {
     }
 
     private List<String> splitPath(String pattern) {
-      return finder.splitPath(pattern)
-              .stream()
-              .map(p -> p.part)
-              .collect(Collectors.toList());
+      List<String> parts = new ArrayList<String>();
+      for (PathPart p : finder.splitPath(pattern)) {
+        parts.add(p.part);
+      }
+      return parts;
     }
   }
 }

@@ -31,11 +31,6 @@ android {
         lintConfig rootProject.file('gradle/lint.xml')
     }
     testOptions {
-        compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
-
         unitTests {
             includeAndroidResources = true
 

@@ -9,10 +9,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.stream.Stream;
 
 import ch.qos.logback.classic.LoggerContext;
 
@@ -49,10 +49,12 @@ public class TimeBasedArchiveRemoverTest {
   @Test
   public void removesOnlyExpiredFiles() {
     remover.clean(EXPIRY);
-    Stream.of(expiredFiles)
-      .forEach(f -> verify(fileProvider).deleteFile(f));
-    Stream.of(recentFiles)
-      .forEach(f -> verify(fileProvider, never()).deleteFile(f));
+    for (File f : expiredFiles) {
+      verify(fileProvider).deleteFile(f);
+    }
+    for (File f : recentFiles) {
+      verify(fileProvider, never()).deleteFile(f);
+    }
   }
 
   @Test
@@ -61,12 +63,12 @@ public class TimeBasedArchiveRemoverTest {
     remover.setMaxHistory(MAX_HISTORY);
     remover.clean(EXPIRY);
 
-    Stream.of(expiredFiles)
-      .skip(MAX_HISTORY)
-      .forEach(f -> verify(fileProvider).deleteFile(f));
-    Stream.of(expiredFiles)
-      .limit(MAX_HISTORY)
-      .forEach(f -> verify(fileProvider, never()).deleteFile(f));
+    for (File f : Arrays.asList(expiredFiles).subList(MAX_HISTORY, expiredFiles.length)) {
+      verify(fileProvider).deleteFile(f);
+    }
+    for (File f : Arrays.asList(expiredFiles).subList(0, MAX_HISTORY)) {
+      verify(fileProvider, never()).deleteFile(f);
+    }
   }
 
   @Test
@@ -76,12 +78,16 @@ public class TimeBasedArchiveRemoverTest {
       tmpDir.newFolder("empty_2018", "12"),
       tmpDir.newFolder("empty_2019", "01"),
     };
-    Stream.of(emptyDirs).forEach(File::deleteOnExit);
+    for (File d : emptyDirs) {
+      d.deleteOnExit();
+    }
 
     remover = mockArchiveRemover(tmpDir.getRoot().getAbsolutePath() + File.separator + "empty_%d{yyyy/MM}" + File.separator + "%d.log", fileProvider);
     remover.clean(EXPIRY);
 
-    Stream.of(emptyDirs).forEach(d -> verify(fileProvider).deleteFile(d));
+    for (File d : emptyDirs) {
+      verify(fileProvider).deleteFile(d);
+    }
   }
 
   @Test
@@ -96,17 +102,22 @@ public class TimeBasedArchiveRemoverTest {
   public void removesOlderFilesThatExceedTotalSizeCap() {
     setupSizeCapTest();
     remover.clean(EXPIRY);
-    Stream.of(expiredFiles)
-      .skip(MAX_HISTORY - NUM_FILES_TO_KEEP)
-      .forEach(f -> verify(fileProvider).deleteFile(f));
+    for (File f : Arrays.asList(expiredFiles).subList(MAX_HISTORY - NUM_FILES_TO_KEEP, expiredFiles.length)) {
+      verify(fileProvider).deleteFile(f);
+    }
   }
 
   @Test
   public void keepsRecentFilesAndOlderFilesWithinTotalSizeCap() {
     setupSizeCapTest();
     remover.clean(EXPIRY);
-    Stream.concat(Stream.of(recentFiles), Stream.of(expiredFiles).limit(MAX_HISTORY - NUM_FILES_TO_KEEP))
-      .forEach(f -> verify(fileProvider, never()).deleteFile(f));
+
+    for (File f : recentFiles) {
+      verify(fileProvider, never()).deleteFile(f);
+    }
+    for (File f : Arrays.asList(expiredFiles).subList(0, MAX_HISTORY - NUM_FILES_TO_KEEP)) {
+      verify(fileProvider, never()).deleteFile(f);
+    }
   }
 
   private void setupSizeCapTest() {
@@ -140,9 +151,16 @@ public class TimeBasedArchiveRemoverTest {
       tmpDir.newFile("2017/12/app_20171225.log"),
       tmpDir.newFile("2016/02/app_20160214.log"),
     };
-    Stream.of(dirs).forEach(File::deleteOnExit);
-    Stream.of(recentFiles).forEach(File::deleteOnExit);
-    Stream.of(expiredFiles).forEach(File::deleteOnExit);
+
+    for (File d : dirs) {
+      d.deleteOnExit();
+    }
+    for (File f : recentFiles) {
+      f.deleteOnExit();
+    }
+    for (File f : expiredFiles) {
+      f.deleteOnExit();
+    }
   }
 
   private Date parseDate(String format, String value) {

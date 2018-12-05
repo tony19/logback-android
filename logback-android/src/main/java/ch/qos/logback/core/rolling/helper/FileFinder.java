@@ -18,14 +18,14 @@ class FileFinder {
     this.fileProvider = fileProvider;
   }
 
-  String[] findFiles(String pathPattern) {
+  List<String> findFiles(String pathPattern) {
     List<PathPart> pathParts = this.splitPath(pathPattern);
     PathPart pathPart = pathParts.get(0);
     List<File> foundFiles = findFiles(pathPart.listFiles(fileProvider), pathParts, 1);
     return toAbsolutePaths(foundFiles);
   }
 
-  String[] findDirs(String pathPattern) {
+  List<String> findDirs(String pathPattern) {
     List<PathPart> pathParts = this.splitPath(pathPattern);
     PathPart pathPart = pathParts.get(0);
     List<File> dirs = new ArrayList<File>();
@@ -33,12 +33,12 @@ class FileFinder {
     return toAbsolutePaths(dirs);
   }
 
-  private String[] toAbsolutePaths(List<File> files) {
+  private List<String> toAbsolutePaths(List<File> files) {
     List<String> filenames = new ArrayList<String>();
     for (File f : files) {
       filenames.add(f.getAbsolutePath());
     }
-    return filenames.toArray(new String[0]);
+    return filenames;
   }
 
   private List<File> findFiles(List<File> files, List<PathPart> pathParts, int index) {
