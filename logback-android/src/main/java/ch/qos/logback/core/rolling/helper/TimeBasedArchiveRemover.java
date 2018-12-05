@@ -54,8 +54,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     }
 
     if (this.totalSizeCap != CoreConstants.UNBOUNDED_TOTAL_SIZE_CAP && this.totalSizeCap > 0) {
-      List<String> recentFiles = this.filterFiles(files, this.createRecentFileFilter(now));
-      this.capTotalSize(recentFiles);
+      this.capTotalSize(files);
     }
 
     List<String> emptyDirs = this.findEmptyDirs();
@@ -113,15 +112,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     return executorService.submit(runnable);
   }
 
-  private FilenameFilter createRecentFileFilter(Date baseDate) {
-    return createFileFilter(baseDate, false);
-  }
-
-  private FilenameFilter createExpiredFileFilter(Date baseDate) {
-    return createFileFilter(baseDate, true);
-  }
-
-  private FilenameFilter createFileFilter(final Date baseDate, final boolean before) {
+  private FilenameFilter createExpiredFileFilter(final Date baseDate) {
     return new FilenameFilter() {
       @Override
       public boolean accept(File dir, String path) {
@@ -129,19 +120,20 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
         fileDate = rc.normalizeDate(fileDate);
         Date refDate = rc.getEndOfNextNthPeriod(baseDate, -maxHistory);
         refDate = rc.normalizeDate(refDate);
-        int comparison = fileDate.compareTo(refDate);
-        return before ? (comparison < 0) : (comparison >= 0);
+        return fileDate.compareTo(refDate) < 0;
       }
     };
   }
 
   private List<String> filterFiles(List<String> filenames, FilenameFilter filter) {
-    ArrayList<String> matchedFiles = new ArrayList<String>();
-    for (String f : filenames) {
+    List<String> matchedFiles = new ArrayList<String>();
+    for (String f : filenames.toArray(new String[0])) {
       if (filter.accept(null, f)) {
         matchedFiles.add(f);
+        filenames.remove(f);
       }
     }
+
     return matchedFiles;
   }
 
