@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import ch.qos.logback.core.net.mock.MockContext;
 import ch.qos.logback.core.spi.PreSerializationTransformer;
+import ch.qos.logback.core.testUtil.NetworkTestUtil;
 import ch.qos.logback.core.util.Duration;
 import ch.qos.logback.core.util.ExecutorServiceUtil;
 
@@ -152,6 +153,8 @@ public class AbstractSocketAppenderTest {
 
   @Test
   public void failsToStartWithUnresolvableRemoteHost() throws Exception {
+
+    new NetworkTestUtil().assumeNoUnresolvedUrlFallback();
 
     // given
     appender.setRemoteHost("NOT.A.VALID.REMOTE.HOST.NAME");

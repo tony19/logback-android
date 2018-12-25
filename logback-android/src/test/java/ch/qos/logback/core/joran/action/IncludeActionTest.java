@@ -45,6 +45,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.joran.spi.ElementSelector;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
+import ch.qos.logback.core.testUtil.NetworkTestUtil;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
@@ -199,12 +200,7 @@ public class IncludeActionTest {
 
   @Test
   public void unknownURL() throws JoranException {
-    // FIXME: This test fails when the ISP does not return 404 for
-    // unknown URLs (required to cause an exception upon opening
-    // the URL request). This was observed when running tests
-    // while tethered to bluetooth mobile hotspot. The fix would
-    // be to refactor AbstractIncludeAction to inject a URL opener.
-
+    new NetworkTestUtil().assumeNoUnresolvedUrlFallback();
     System.setProperty(INCLUDE_KEY, "http://logback2345.qos.ch");
     tc.doConfigure(TOP_BY_URL);
     assertEquals(Status.WARN, statusChecker.getHighestLevel(0));

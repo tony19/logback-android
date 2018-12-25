@@ -41,6 +41,7 @@ import ch.qos.logback.core.joran.spi.ElementSelector;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.FileTestUtil;
+import ch.qos.logback.core.testUtil.NetworkTestUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 
 @RunWith(RobolectricTestRunner.class)
@@ -281,11 +282,7 @@ public class ConditionalIncludeActionTest {
 
   @Test
   public void ignoresUnknownUrl() throws JoranException {
-    // FIXME: This test fails when the ISP does not return 404 for
-    // unknown URLs (required to cause an exception upon opening
-    // the URL request). This was observed when running tests
-    // while tethered to bluetooth mobile hotspot. The fix would
-    // be to refactor AbstractIncludeAction to inject a URL opener.
+    new NetworkTestUtil().assumeNoUnresolvedUrlFallback();
 
     final String xml =
         "<x>" +

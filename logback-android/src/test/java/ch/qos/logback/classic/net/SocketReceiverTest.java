@@ -46,6 +46,7 @@ import ch.qos.logback.classic.spi.LoggingEventVO;
 import ch.qos.logback.core.net.SocketConnector;
 import ch.qos.logback.core.net.server.ServerSocketUtil;
 import ch.qos.logback.core.status.Status;
+import ch.qos.logback.core.testUtil.NetworkTestUtil;
 
 /**
  * Unit tests for {@link SocketReceiver}.
@@ -117,6 +118,7 @@ public class SocketReceiverTest {
 
   @Test
   public void testStartUnknownHost() throws Exception {
+    new NetworkTestUtil().assumeNoUnresolvedUrlFallback();
     receiver.setPort(6000);
     receiver.setRemoteHost(TEST_HOST_NAME);
     receiver.start();
