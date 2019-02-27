@@ -14,6 +14,8 @@ Overview
 
 Runs on Android 2.3 (SDK 9) or higher. See [Wiki][4] for documentation.
 
+*For `v1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
+
 Quick Start
 -----------
 1. Create a new "Basic Activity" app in [Android Studio][3].
