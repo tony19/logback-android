@@ -36,6 +36,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -58,6 +59,7 @@ import static org.junit.Assert.*;
  *
  * http://www.icegreen.com/greenmail/
  */
+@Ignore
 @RunWith(RobolectricTestRunner.class)
 public class SMTPAppender_GreenTest {
 
@@ -75,7 +77,6 @@ public class SMTPAppender_GreenTest {
   SMTPAppender smtpAppender;
   LoggerContext loggerContext = new LoggerContext();
   Logger logger = loggerContext.getLogger(this.getClass());
-
 
   @Before
   public void setUp() throws Exception {

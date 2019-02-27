@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.qos.logback.core.net.SocketConnector.ExceptionHandler;
@@ -41,12 +42,12 @@ import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 /**
  * Unit tests for {@link DefaultSocketConnector}.
  *
  * @author Carl Harris
  */
+@Ignore
 public class DefaultSocketConnectorTest {
 
   private static final int DELAY = 1000;

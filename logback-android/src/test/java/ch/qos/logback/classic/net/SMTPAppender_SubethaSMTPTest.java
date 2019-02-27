@@ -49,6 +49,7 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.util.StatusPrinter;
 
+@Ignore
 @RunWith(RobolectricTestRunner.class)
 public class SMTPAppender_SubethaSMTPTest {
   static final String TEST_SUBJECT = "test subject";
