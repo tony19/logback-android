@@ -90,7 +90,7 @@ repositories {
 
 dependencies {
   compile 'org.slf4j:slf4j-api:1.7.25'
-  compile 'com.github.tony19:logback-android:2.0.0-SNAPSHOT'
+  compile 'com.github.tony19:logback-android:2.0.1-SNAPSHOT'
 }
 ```
 
