@@ -1,5 +1,5 @@
 # logback-android [![CircleCI branch](https://img.shields.io/circleci/project/github/tony19/logback-android/master.svg)](https://circleci.com/gh/tony19/logback-android) [![Codacy Badge](https://api.codacy.com/project/badge/grade/c1d818d1911440e3b6d685c20a425856)](https://www.codacy.com/app/tony19/logback-android)
-<sup>v1.3.0-3</sup>
+<sup>v2.0.0</sup>
 
 Overview
 --------
@@ -14,6 +14,8 @@ Overview
 
 Runs on Android 2.3 (SDK 9) or higher. See [Wiki][4] for documentation.
 
+*For `v1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
+
 Quick Start
 -----------
 1. Create a new "Basic Activity" app in [Android Studio][3].
@@ -22,7 +24,7 @@ Quick Start
     ```groovy
     dependencies {
       compile 'org.slf4j:slf4j-api:1.7.25'
-      compile 'com.github.tony19:logback-android:1.3.0-3'
+      compile 'com.github.tony19:logback-android:2.0.0'
     }
     ```
 
@@ -75,7 +77,7 @@ _Gradle_ **release**
 ```groovy
 dependencies {
   compile 'org.slf4j:slf4j-api:1.7.25'
-  compile 'com.github.tony19:logback-android:1.3.0-3'
+  compile 'com.github.tony19:logback-android:2.0.0'
 }
 ```
 
@@ -88,7 +90,7 @@ repositories {
 
 dependencies {
   compile 'org.slf4j:slf4j-api:1.7.25'
-  compile 'com.github.tony19:logback-android:1.3.0-4-SNAPSHOT'
+  compile 'com.github.tony19:logback-android:2.0.0-SNAPSHOT'
 }
 ```
 
@@ -100,7 +102,7 @@ Use these commands to create the AAR:
     cd logback-android
     scripts/makejar.sh
 
-The file is output to: `./build/logback-android-1.3.0-3-debug.aar`
+The file is output to: `./build/logback-android-2.0.0-debug.aar`
 
  [1]: http://logback.qos.ch
  [2]: http://tony19.github.com/logback-android
