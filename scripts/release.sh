@@ -1,51 +1,49 @@
 #!/usr/bin/env bash -e
+# Usage:
+#  ./release.sh [TARGET]
+#
+# Options:
+#   TARGET         "major", "minor", or "build" (default: "build")
 
 . gradle.properties
-
 
 function nextVersion() {
     target=$1
     ver=$2
     case "$target" in
         "major")
-            baseVer=${ver%*.*-*}
+            baseVer=${ver%*.*}
             majorVer=${baseVer%*.*}
             nextMajor=$(($majorVer + 1))
-            nextVer="${nextMajor}.0.0-1-SNAPSHOT"
+            nextVer="${nextMajor}.0.0-SNAPSHOT"
             echo $nextVer
         ;;
 
         "minor")
-            baseVer=${ver%*.*-*}
+            baseVer=${ver%*.*}
             minorVer=${baseVer##*.}
             nextMinor=$(($minorVer + 1))
-            nextVer="${baseVer%*.*}.${nextMinor}.0-1-SNAPSHOT"
+            nextVer="${baseVer%*.*}.${nextMinor}.0-SNAPSHOT"
             echo $nextVer
         ;;
 
         "build")
-            baseVer=${ver%*-*}
-            baseVer=${baseVer%*-*}
+            baseVer=${ver%*}
+            baseVer=${baseVer%*}
             buildVer=${baseVer##*.}
             nextBuild=$(($buildVer + 1))
-            nextVer="${baseVer%*.*}.${nextBuild}-1-SNAPSHOT"
-            echo $nextVer
-        ;;
-
-        *)
-            baseVer=${ver%*-}
-            patchVer=${baseVer##*-}
-            nextPatch=$(($patchVer + 1))
-            nextVer="${baseVer%*-*}-${nextPatch}-SNAPSHOT"
+            nextVer="${baseVer%*.*}.${nextBuild}-SNAPSHOT"
             echo $nextVer
         ;;
     esac
 }
 
+versionTarget=${1:-build}
 version=${VERSION_NAME%*-SNAPSHOT}
-nextVersion=$(nextVersion "$1" "$version")
+nextVersion=$(nextVersion "$versionTarget" "$version")
 
 echo "Starting release for logback-android-${version} ..."
+echo "nextVersion ${nextVersion}"
 
 fail() {
     echo "error: $1" >&2
