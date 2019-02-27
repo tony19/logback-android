@@ -4,7 +4,7 @@ if (!rootProject.hasProperty('license')) {
   return
 }
 
-apply plugin: 'license'
+apply plugin: 'com.github.hierynomus.license'
 
 license {
   header rootProject.file('config/licenseHeader.txt')
