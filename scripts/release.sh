@@ -43,7 +43,6 @@ version=${VERSION_NAME%*-SNAPSHOT}
 nextVersion=$(nextVersion "$versionTarget" "$version")
 
 echo "Starting release for logback-android-${version} ..."
-echo "nextVersion ${nextVersion}"
 
 fail() {
     echo "error: $1" >&2
