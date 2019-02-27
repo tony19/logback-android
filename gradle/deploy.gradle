@@ -29,9 +29,7 @@ bintray {
         repo = 'generic'
         name = "${GROUP}:${POM_NAME}"
         desc = POM_DESCRIPTION
-        // TODO: Use license config from gradle.properties when ready to switch to Apache License.
-        //licenses = [POM_LICENCE_ID]
-        licenses = ['EPL-1.0', 'LGPL-2.1']
+        licenses = [POM_LICENCE_ID]
         labels = ['android', 'logging']
         websiteUrl = POM_URL
         issueTrackerUrl = POM_SCM_ISSUES_URL
@@ -101,22 +99,11 @@ afterEvaluate { project ->
                     }
 
                     licenses {
-// TODO: Use license config from gradle.properties when ready to switch to Apache License.
-//                        license {
-//                            name POM_LICENCE_NAME
-//                            url POM_LICENCE_URL
-//                            distribution POM_LICENCE_DIST
-//                        }
-                        license {
-                            name 'Eclipse Public License, Version 1.0'
-                            url 'https://www.eclipse.org/legal/epl-v10.html'
-                            distribution POM_LICENCE_DIST
-                        }
-                        license {
-                            name 'GNU Lesser General Public License, Version 2.1'
-                            url 'http://www.gnu.org/licenses/lgpl-2.1.html'
-                            distribution POM_LICENCE_DIST
-                        }
+                       license {
+                           name POM_LICENCE_NAME
+                           url POM_LICENCE_URL
+                           distribution POM_LICENCE_DIST
+                       }
                     }
 
                     developers {
