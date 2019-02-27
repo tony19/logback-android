@@ -90,7 +90,7 @@ repositories {
 
 dependencies {
   compile 'org.slf4j:slf4j-api:${slf4jVersion}'
-  compile 'com.github.tony19:logback-android:${version - ~/\d+(-SNAPSHOT)?$/ + ((version =~ /-(\d+)(-SNAPSHOT)?/)[0][1].toInteger() + 1) + "-SNAPSHOT"}'
+  compile 'com.github.tony19:logback-android:${version - ~/(-SNAPSHOT)?$/ + "-SNAPSHOT"}'
 }
 ```
 
