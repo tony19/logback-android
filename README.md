@@ -1,6 +1,10 @@
 # logback-android [![CircleCI branch](https://img.shields.io/circleci/project/github/tony19/logback-android/master.svg)](https://circleci.com/gh/tony19/logback-android) [![Codacy Badge](https://api.codacy.com/project/badge/grade/c1d818d1911440e3b6d685c20a425856)](https://www.codacy.com/app/tony19/logback-android)
 <sup>v2.0.0</sup>
 
+<a href="https://opencollective.com/logback-android/donate" target="_blank">
+  <img src="https://opencollective.com/logback-android/donate/button@2x.png?color=blue" width=250 />
+</a>
+
 Overview
 --------
 [`logback-android`][2] brings the power of [`logback`][1] to Android. This library provides a highly configurable logging framework for Android apps, supporting multiple log destinations simultaneously:
