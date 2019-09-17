@@ -94,8 +94,8 @@ public class AndroidContextUtil {
   public String getMountedExternalStorageDirectoryPath() {
     String path = null;
     String state = Environment.getExternalStorageState();
-    if (state.equals(Environment.MEDIA_MOUNTED) ||
-        state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+    if (Environment.MEDIA_MOUNTED.equals(state) ||
+        Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
       path = absPath(Environment.getExternalStorageDirectory());
     }
     return path;
