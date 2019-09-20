@@ -107,7 +107,7 @@ public class AndroidContextUtil {
    * @return the absolute path to the external storage directory
    */
   public String getExternalStorageDirectoryPath() {
-    return Environment.getExternalStorageDirectory().getAbsolutePath();
+    return absPath(Environment.getExternalStorageDirectory());
   }
 
   public String getExternalFilesDirectoryPath() {
