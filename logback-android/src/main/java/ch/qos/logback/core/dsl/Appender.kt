@@ -7,20 +7,20 @@ import ch.qos.logback.core.Appender
 
 fun <T> Configuration.appender(appender: () -> T, block: T.() -> Unit = {})
     where T: Appender<ILoggingEvent> {
-    val apndr: T = appender()
-    apndr.apply(block)
-    this.appenders.add(apndr)
+    appenders.add(appender().apply(block))
 }
 
 fun LogcatAppender.encoder(pattern: String) {
-    this.encoder = PatternLayoutEncoder().apply {
+    encoder = PatternLayoutEncoder().apply {
         this.pattern = pattern
+        start()
     }
 }
 
 fun LogcatAppender.tagEncoder(pattern: String) {
-    this.tagEncoder = PatternLayoutEncoder().apply {
+    tagEncoder = PatternLayoutEncoder().apply {
         this.pattern = pattern
+        start()
     }
 }
 

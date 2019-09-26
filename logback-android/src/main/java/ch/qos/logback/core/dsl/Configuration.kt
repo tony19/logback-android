@@ -7,7 +7,7 @@ import ch.qos.logback.core.Appender
 import ch.qos.logback.core.status.OnConsoleStatusListener
 import ch.qos.logback.core.util.StatusListenerConfigHelper
 
-open class Configuration(val context: LoggerContext = LoggerContext(), block : Configuration.() -> Unit) {
+open class Configuration(val context: LoggerContext = LoggerContext(), block : Configuration.() -> Unit = {}) {
     val appenders = mutableListOf<Appender<ILoggingEvent>>()
 
     init {
@@ -24,12 +24,16 @@ open class Configuration(val context: LoggerContext = LoggerContext(), block : C
 val x = Configuration {
     debug(true)
 
-    appender(::LogcatAppender) {
-        name = "logcat"
-        encoder("%d - %msg%n")
-        tagEncoder("%logger [%thread]")
+//    appender(::LogcatAppender) {
+//        name = "logcat"
+//        encoder("%d - %msg%n")
+//        tagEncoder("%logger [%thread]")
+//    }
+//
+//    logcatAppender()
+
+    root {
+//        appenderRef("logcat", this@Configuration)
+        logcatAppender()
     }
-
-    logcatAppender()
-
 }
