@@ -30,8 +30,6 @@ val x = Configuration {
         tagEncoder("%logger [%thread]")
     }
 
-    logcatAppender {
-        encoder("%d - %msg%n")
-        tagEncoder("%logger [%thread]")
-    }
+    logcatAppender()
+
 }
