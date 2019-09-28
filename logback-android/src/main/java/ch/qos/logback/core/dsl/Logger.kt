@@ -19,6 +19,7 @@ fun Logger.appenderRef(name: String, config: Configuration) {
 fun Logger.logcatAppender(name: String = "logcat", block: () -> Unit = {}) {
     val appender = LogcatAppender().apply {
         this.name = name
+        context = loggerContext
         encoder("%d - %msg%n")
         tagEncoder("%logger [%thread]")
         block()

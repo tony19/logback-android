@@ -11,15 +11,19 @@ fun <T> Configuration.appender(appender: () -> T, block: T.() -> Unit = {})
 }
 
 fun LogcatAppender.encoder(pattern: String) {
+    val context = this.context
     encoder = PatternLayoutEncoder().apply {
         this.pattern = pattern
+        this.context = context
         start()
     }
 }
 
 fun LogcatAppender.tagEncoder(pattern: String) {
+    val context = this.context
     tagEncoder = PatternLayoutEncoder().apply {
         this.pattern = pattern
+        this.context = context
         start()
     }
 }
