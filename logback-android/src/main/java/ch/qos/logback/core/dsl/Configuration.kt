@@ -20,20 +20,3 @@ open class Configuration(val context: LoggerContext = LoggerContext(), block : C
         }
     }
 }
-
-val x = Configuration {
-    debug(true)
-
-//    appender(::LogcatAppender) {
-//        name = "logcat"
-//        encoder("%d - %msg%n")
-//        tagEncoder("%logger [%thread]")
-//    }
-//
-//    logcatAppender()
-
-    root {
-//        appenderRef("logcat", this@Configuration)
-        logcatAppender()
-    }
-}
