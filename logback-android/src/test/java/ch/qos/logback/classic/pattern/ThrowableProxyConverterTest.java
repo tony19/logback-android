@@ -39,10 +39,9 @@ import ch.qos.logback.classic.util.TestHelper;
 import ch.qos.logback.core.CoreConstants;
 
 import static ch.qos.logback.classic.util.TestHelper.addSuppressed;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.text.IsEmptyString.isEmptyString;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
@@ -182,7 +181,7 @@ public class ThrowableProxyConverterTest {
     final String result = tpc.convert(le);
 
     //then
-    assertThat(result, is(not(emptyString())));
+    assertThat(result, not(isEmptyString()));
     assertThat(result, not(containsString(nameOfContainingMethod)));
   }
 
