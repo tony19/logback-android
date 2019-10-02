@@ -22,6 +22,8 @@ fun Logger.logcatAppender(name: String = "logcat", block: () -> Unit = {}) {
         context = loggerContext
         encoder("%d - %msg%n")
         tagEncoder("%logger [%thread]")
+        start()
+
         block()
     }
     addAppender(appender)
