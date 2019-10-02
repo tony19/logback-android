@@ -2,6 +2,8 @@ plugins {
     id 'net.researchgate.release' version '2.6.0'
 }
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
 apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
@@ -79,6 +81,7 @@ dependencies {
 
     testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
     testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 allprojects {
