@@ -28,9 +28,15 @@ fun LogcatAppender.tagEncoder(pattern: String) {
     }
 }
 
-fun Configuration.logcatAppender(name: String = "logcat", block: LogcatAppender.() -> Unit = {}) = appender(::LogcatAppender) {
-    this.name = name
-    encoder("%d - %msg%n")
-    tagEncoder("%logger [%thread]")
-    block()
+fun Configuration.logcatAppender(name: String = "logcat", block: LogcatAppender.() -> Unit = {}) {
+    val loggerContext = context
+    appender(::LogcatAppender) {
+        this.name = name
+        this.context = loggerContext
+        encoder("%d - %msg%n")
+        tagEncoder("%logger [%thread]")
+        start()
+
+        block()
+    }
 }
