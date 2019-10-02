@@ -60,8 +60,8 @@ dependencies {
     testImplementation('junit:junit:4.12') {
         exclude(module: 'hamcrest-core')
     }
-
     testImplementation 'org.hamcrest:hamcrest:2.1'
+    testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'org.mockito:mockito-core:2.24.0'
     testImplementation 'joda-time:joda-time:2.10.1'
