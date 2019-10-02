@@ -47,8 +47,16 @@ android {
     }
 }
 
-dependencies {
+repositories {
+    maven {
+        url  "https://dl.bintray.com/tony19/maven"
+    }
+}
 
+dependencies {
+    testImplementation('io.kotlintest:kotlintest-runner-junit4:3.5.0') {
+        exclude(module: 'junit:junit')
+    }
     testImplementation('junit:junit:4.12') {
         exclude(module: 'hamcrest-core')
     }
