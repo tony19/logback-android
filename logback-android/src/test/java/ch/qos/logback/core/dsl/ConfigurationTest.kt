@@ -111,7 +111,7 @@ class ConfigurationTest: FreeSpec({
                     logcatAppender()
                 }
             }
-            x.appendersList should haveAppenderOfType<LogcatAppender>()
+            x.appendersList() should haveAppenderOfType<LogcatAppender>()
         }
     }
 
@@ -133,7 +133,7 @@ class ConfigurationTest: FreeSpec({
                     appenderRef("myAppender", this@Configuration)
                 }
             }
-            val appendersList = x.context.getLogger("myLogger").iteratorForAppenders().asSequence().toList()
+            val appendersList = x.appendersList("myLogger")
             appendersList shouldHaveSize 1
             appendersList[0].name shouldBe "myAppender"
         }

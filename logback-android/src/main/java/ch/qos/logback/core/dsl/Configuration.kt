@@ -21,6 +21,5 @@ open class Configuration(val context: LoggerContext = LoggerContext(), block : C
         }
     }
 
-    val appendersList
-        get() = context.getLogger(Logger.ROOT_LOGGER_NAME).iteratorForAppenders().asSequence().toList()
+    fun appendersList(name: String = Logger.ROOT_LOGGER_NAME) = context.getLogger(name).iteratorForAppenders().asSequence().toList()
 }
