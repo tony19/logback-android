@@ -11,9 +11,10 @@ fun Configuration.logger(name: String, block: Logger.() -> Unit = {}) {
 fun Configuration.root(block: Logger.() -> Unit = {}) = logger(ROOT_LOGGER_NAME, block)
 
 fun Logger.appenderRef(name: String, config: Configuration) {
-    val appender = config.appenders.find { it.name == name }
-    appender?.start()
-    addAppender(appender)
+    config.appenders.find { it.name == name }?.let {
+        it.start()
+        addAppender(it)
+    }
 }
 
 fun Logger.logcatAppender(name: String = "logcat", block: () -> Unit = {}) {

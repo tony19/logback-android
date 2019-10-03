@@ -1,5 +1,6 @@
 package ch.qos.logback.core.dsl
 
+import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.android.LogcatAppender
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -19,4 +20,7 @@ open class Configuration(val context: LoggerContext = LoggerContext(), block : C
             StatusListenerConfigHelper.addOnConsoleListenerInstance(context, OnConsoleStatusListener())
         }
     }
+
+    val appendersList
+        get() = context.getLogger(Logger.ROOT_LOGGER_NAME).iteratorForAppenders().asSequence().toList()
 }
