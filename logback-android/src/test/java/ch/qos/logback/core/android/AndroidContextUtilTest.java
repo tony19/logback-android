@@ -21,12 +21,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowEnvironment;
+
+import java.io.File;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.CoreConstants;
@@ -116,37 +119,37 @@ public class AndroidContextUtilTest {
 
   @Test
   public void getFilesDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getFilesDirectoryPath(), endsWith("/files"));
+    assertThat(contextUtil.getFilesDirectoryPath(), endsWith(File.separator + "files"));
   }
 
   @Test
   public void getExternalFilesDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getExternalFilesDirectoryPath(), endsWith("/external-files"));
+    assertThat(contextUtil.getExternalFilesDirectoryPath(), endsWith(File.separator + "external-files"));
   }
 
   @Test
   public void getNoBackupFilesDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getNoBackupFilesDirectoryPath(), endsWith("/no_backup"));
+    assertThat(contextUtil.getNoBackupFilesDirectoryPath(), endsWith(File.separator + "no_backup"));
   }
 
   @Test
   public void getCacheDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getCacheDirectoryPath(), endsWith("/cache"));
+    assertThat(contextUtil.getCacheDirectoryPath(), endsWith(File.separator + "cache"));
   }
 
   @Test
   public void getExternalCacheDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getExternalCacheDirectoryPath(), endsWith("/external-cache"));
+    assertThat(contextUtil.getExternalCacheDirectoryPath(), endsWith(File.separator + "external-cache"));
   }
 
   @Test
   public void getDatabaseDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getDatabaseDirectoryPath(), endsWith("/databases"));
+    assertThat(contextUtil.getDatabaseDirectoryPath(), endsWith(File.separator + "databases"));
   }
 
   @Test
   public void getPackageName() {
-    assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android"));
+    assertThat(contextUtil.getPackageName(), startsWith("com.github.tony19.logback.android"));
   }
 
   @Test
