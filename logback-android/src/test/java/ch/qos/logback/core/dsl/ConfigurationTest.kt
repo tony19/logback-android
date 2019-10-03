@@ -8,6 +8,7 @@ import com.github.tony19.kotlintest.haveStatusListenerOfType
 import io.kotlintest.matchers.collections.shouldHaveSize
 import io.kotlintest.matchers.string.beEmpty
 import io.kotlintest.matchers.types.beNull
+import io.kotlintest.matchers.types.shouldBeInstanceOf
 import io.kotlintest.should
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNot
@@ -136,6 +137,7 @@ class ConfigurationTest: FreeSpec({
             val appendersList = x.appendersList("myLogger")
             appendersList shouldHaveSize 1
             appendersList[0].name shouldBe "myAppender"
+            appendersList[0].shouldBeInstanceOf<LogcatAppender>()
         }
     }
 })
