@@ -2,7 +2,6 @@ package ch.qos.logback.core.dsl
 
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
-import ch.qos.logback.classic.android.LogcatAppender
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.status.OnConsoleStatusListener
