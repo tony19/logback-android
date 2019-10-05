@@ -163,7 +163,7 @@ class ConfigurationTest: FreeSpec({
             x.appenders should haveAppenderOfType<LogcatAppender>()
         }
 
-        "has default name `logcat`" {
+        "has default name" {
             val x = Configuration {
                 logcatAppender()
             }
@@ -221,7 +221,7 @@ class ConfigurationTest: FreeSpec({
     }
 
     "root" - {
-        "has default name `${Logger.ROOT_LOGGER_NAME}`" {
+        "has default name" {
             val x = Configuration {
                 root()
             }
