@@ -52,6 +52,7 @@ fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggi
         this.name = name
         this.context = loggerContext
         encoder("%d - %msg%n")
+        file("/tmp/logback%d.log")
 
         start()
 
@@ -72,8 +73,8 @@ fun Configuration.rollingFileAppender(name: String = "rollingFile", block: Rolli
             setParent(parent)
 
             // TODO: Make this an absolute path to the app's data dir
-            fileNamePattern = "/sdcard/%d-%i.log.gz"
-            file("/sdcard/%d.log")
+            fileNamePattern = "/tmp/logback%d-%i.log.gz"
+            file("/tmp/logback/%d.log")
 
             context = loggerContext
             start()
