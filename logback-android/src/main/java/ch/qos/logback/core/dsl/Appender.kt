@@ -6,9 +6,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.FileAppender
 import ch.qos.logback.core.encoder.Encoder
-import ch.qos.logback.core.rolling.RollingFileAppender
-import ch.qos.logback.core.rolling.RollingPolicy
-import ch.qos.logback.core.rolling.TriggeringPolicy
+import ch.qos.logback.core.rolling.*
+import ch.qos.logback.core.util.FileSize
 
 fun <T> Configuration.appender(appender: () -> T, block: T.() -> Unit = {})
     where T: Appender<ILoggingEvent> {
@@ -40,6 +39,51 @@ fun Configuration.logcatAppender(name: String = "logcat", block: LogcatAppender.
         this.context = loggerContext
         encoder("%d - %msg%n")
         tagEncoder("%logger [%thread]")
+        start()
+
+        block()
+    }
+}
+
+typealias MyFileAppender = FileAppender<ILoggingEvent>
+fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}) {
+    val loggerContext = context
+    appender(::MyFileAppender) {
+        this.name = name
+        this.context = loggerContext
+        encoder("%d - %msg%n")
+
+        start()
+
+        block()
+    }
+}
+
+typealias MyRollingFileAppender = RollingFileAppender<ILoggingEvent>
+fun Configuration.rollingFileAppender(name: String = "rollingFile", block: RollingFileAppender<ILoggingEvent>.() -> Unit = {}) {
+    val loggerContext = context
+    appender(::MyRollingFileAppender) {
+        this.name = name
+        this.context = loggerContext
+        encoder("%d - %msg%n")
+
+        val parent = this
+        rollingPolicy(::FixedWindowRollingPolicy) {
+            setParent(parent)
+
+            // TODO: Make this an absolute path to the app's data dir
+            fileNamePattern = "/sdcard/%d-%i.log.gz"
+            file("/sdcard/%d.log")
+
+            context = loggerContext
+            start()
+        }
+        triggeringPolicy(::SizeBasedTriggeringPolicy) {
+            val policy = this as SizeBasedTriggeringPolicy
+            policy.maxFileSize = FileSize.valueOf("1MB")
+            context = loggerContext
+            start()
+        }
         start()
 
         block()
@@ -82,6 +126,7 @@ fun <E: ILoggingEvent, R: RollingPolicy> RollingFileAppender<E>.rollingPolicy(po
     rollingPolicy = policy().apply(block)
 }
 
+typealias MySizeBasedTriggeringPolicy = SizeBasedTriggeringPolicy<ILoggingEvent>
 fun <E: ILoggingEvent, R: TriggeringPolicy<E>> RollingFileAppender<E>.triggeringPolicy(policy: () -> R, block: R.() -> Unit = {}) {
     triggeringPolicy = policy().apply(block)
 }

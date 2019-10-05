@@ -2,7 +2,13 @@ package ch.qos.logback.core.dsl
 
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.android.LogcatAppender
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.FileAppender
+import ch.qos.logback.core.rolling.FixedWindowRollingPolicy
+import ch.qos.logback.core.rolling.RollingFileAppender
 import ch.qos.logback.core.status.OnConsoleStatusListener
+import ch.qos.logback.core.util.FileSize
 import com.github.tony19.kotlintest.haveAppenderOfType
 import com.github.tony19.kotlintest.haveStatusListenerOfType
 import io.kotlintest.matchers.collections.shouldHaveSize
@@ -28,6 +34,123 @@ class ConfigurationTest: FreeSpec({
                 debug(false)
             }
             x.context.statusManager.copyOfStatusListenerList shouldNot haveStatusListenerOfType<OnConsoleStatusListener>()
+        }
+    }
+
+    "fileAppender" - {
+        "queues FileAppender" {
+            val x = Configuration {
+                fileAppender()
+            }
+            x.appenders shouldHaveSize 1
+            x.appenders should haveAppenderOfType<FileAppender<ILoggingEvent>>()
+        }
+
+        "has default name" {
+            val x = Configuration {
+                fileAppender()
+            }
+            x.appenders[0].name shouldBe "file"
+        }
+
+        "has default message encoder" {
+            val x = Configuration {
+                fileAppender()
+            }
+            val appender = x.appenders[0] as FileAppender<ILoggingEvent>
+            appender.encoder shouldNot beNull()
+            appender.encoder.shouldBeInstanceOf<PatternLayoutEncoder>()
+            (appender.encoder as PatternLayoutEncoder).pattern shouldNot beEmpty()
+        }
+
+        "receives filename" {
+            val filename = "foo/bar.log"
+            val x = Configuration {
+                fileAppender {
+                    file(filename)
+                }
+            }
+            val appender = x.appenders[0] as FileAppender<ILoggingEvent>
+            appender.file shouldBe filename
+        }
+    }
+
+    "rollingFileAppender" - {
+        "queues RollingFileAppender" {
+            val x = Configuration {
+                rollingFileAppender()
+            }
+            x.appenders shouldHaveSize 1
+            x.appenders should haveAppenderOfType<RollingFileAppender<ILoggingEvent>>()
+        }
+
+        "has default name" {
+            val x = Configuration {
+                rollingFileAppender()
+            }
+            x.appenders[0].name shouldBe "rollingFile"
+        }
+
+        "has default message encoder" {
+            val x = Configuration {
+                rollingFileAppender()
+            }
+            val appender = x.appenders[0] as RollingFileAppender<ILoggingEvent>
+            appender.encoder shouldNot beNull()
+            appender.encoder.shouldBeInstanceOf<PatternLayoutEncoder>()
+            (appender.encoder as PatternLayoutEncoder).pattern shouldNot beEmpty()
+        }
+
+        "has default rolling policy" {
+            val x = Configuration {
+                rollingFileAppender()
+            }
+            val appender = x.appenders[0] as RollingFileAppender<ILoggingEvent>
+            appender.rollingPolicy shouldNot beNull()
+        }
+
+        "has default triggering policy" {
+            val x = Configuration {
+                rollingFileAppender()
+            }
+            val appender = x.appenders[0] as RollingFileAppender<ILoggingEvent>
+            appender.triggeringPolicy shouldNot beNull()
+        }
+
+        "receives filename" {
+            val filename = "foo/bar.log"
+            val x = Configuration {
+                rollingFileAppender {
+                    file(filename)
+                }
+            }
+            val appender = x.appenders[0] as RollingFileAppender<ILoggingEvent>
+            appender.file shouldBe filename
+        }
+
+        "receives rollingPolicy" {
+            val x = Configuration {
+                rollingFileAppender {
+                    rollingPolicy(::FixedWindowRollingPolicy)
+                }
+            }
+            val appender = x.appenders[0] as RollingFileAppender<ILoggingEvent>
+            appender.rollingPolicy shouldNot beNull()
+            appender.rollingPolicy.shouldBeInstanceOf<FixedWindowRollingPolicy>()
+        }
+
+        "receives triggeringPolicy" {
+            val x = Configuration {
+                rollingFileAppender {
+                    triggeringPolicy(::MySizeBasedTriggeringPolicy) {
+                        val policy = this as MySizeBasedTriggeringPolicy
+                        policy.maxFileSize = FileSize.valueOf("1MB")
+                    }
+                }
+            }
+            val appender = x.appenders[0] as RollingFileAppender<ILoggingEvent>
+            appender.triggeringPolicy shouldNot beNull()
+            appender.triggeringPolicy.shouldBeInstanceOf<MySizeBasedTriggeringPolicy>()
         }
     }
 
