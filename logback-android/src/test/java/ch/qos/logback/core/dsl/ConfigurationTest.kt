@@ -174,18 +174,18 @@ class ConfigurationTest: FreeSpec({
             val x = Configuration {
                 logcatAppender()
             }
-            val logcat = x.appenders[0] as LogcatAppender
-            logcat.encoder shouldNot beNull()
-            logcat.encoder.pattern shouldNot beEmpty()
+            val appender = x.appenders[0] as LogcatAppender
+            appender.encoder shouldNot beNull()
+            appender.encoder.pattern shouldNot beEmpty()
         }
 
         "has default tag encoder" {
             val x = Configuration {
                 logcatAppender()
             }
-            val logcat = x.appenders[0] as LogcatAppender
-            logcat.tagEncoder shouldNot beNull()
-            logcat.tagEncoder.pattern shouldNot beEmpty()
+            val appender = x.appenders[0] as LogcatAppender
+            appender.tagEncoder shouldNot beNull()
+            appender.tagEncoder.pattern shouldNot beEmpty()
         }
 
         "accepts name param" {
@@ -202,9 +202,9 @@ class ConfigurationTest: FreeSpec({
                     encoder(pattern)
                 }
             }
-            val logcat = x.appenders[0] as LogcatAppender
-            logcat.encoder shouldNot beNull()
-            logcat.encoder.pattern shouldBe pattern
+            val appender = x.appenders[0] as LogcatAppender
+            appender.encoder shouldNot beNull()
+            appender.encoder.pattern shouldBe pattern
         }
 
         "receives tag encoder" {
@@ -214,9 +214,9 @@ class ConfigurationTest: FreeSpec({
                     tagEncoder(pattern)
                 }
             }
-            val logcat = x.appenders[0] as LogcatAppender
-            logcat.tagEncoder shouldNot beNull()
-            logcat.tagEncoder.pattern shouldBe pattern
+            val appender = x.appenders[0] as LogcatAppender
+            appender.tagEncoder shouldNot beNull()
+            appender.tagEncoder.pattern shouldBe pattern
         }
     }
 
