@@ -1,5 +1,6 @@
 package ch.qos.logback.core.dsl
 
+import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.FileAppender
@@ -19,6 +20,19 @@ fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggi
 
         block()
     }
+}
+
+fun Logger.fileAppender(name: String = "file", block: () -> Unit = {}) {
+    val appender = FileAppender<ILoggingEvent>().apply {
+        this.name = name
+        context = loggerContext
+        encoder("%d - %msg%n")
+        file("/tmp/logback%d.log")
+        start()
+
+        block()
+    }
+    addAppender(appender)
 }
 
 fun <E: ILoggingEvent> FileAppender<E>.encoder(pattern: String) {
