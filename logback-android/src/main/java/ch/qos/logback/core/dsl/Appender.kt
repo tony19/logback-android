@@ -45,33 +45,3 @@ fun Configuration.logcatAppender(name: String = "logcat", block: LogcatAppender.
     }
 }
 
-typealias MyFileAppender = FileAppender<ILoggingEvent>
-fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}) {
-    val loggerContext = context
-    appender(::MyFileAppender) {
-        this.name = name
-        this.context = loggerContext
-        encoder("%d - %msg%n")
-        file("/tmp/logback%d.log")
-
-        start()
-
-        block()
-    }
-}
-
-fun <E: ILoggingEvent> FileAppender<E>.encoder(pattern: String) {
-    val context = this.context
-    @Suppress("UNCHECKED_CAST")
-    encoder = PatternLayoutEncoder().apply {
-        this.pattern = pattern
-        this.context = context
-        start()
-    } as Encoder<E>
-}
-
-fun <E: ILoggingEvent> FileAppender<E>.file(name: String) {
-    // TODO: Automatically convert relative path to absolute local-file path
-    // Android requires absolute path
-    file = name
-}
