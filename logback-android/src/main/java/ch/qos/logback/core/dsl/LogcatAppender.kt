@@ -1,5 +1,6 @@
 package ch.qos.logback.core.dsl
 
+import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.android.LogcatAppender
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 
@@ -35,3 +36,15 @@ fun Configuration.logcatAppender(name: String = "logcat", block: LogcatAppender.
     }
 }
 
+fun Logger.logcatAppender(name: String = "logcat", block: () -> Unit = {}) {
+    val appender = LogcatAppender().apply {
+        this.name = name
+        context = loggerContext
+        encoder("%d - %msg%n")
+        tagEncoder("%logger [%thread]")
+        start()
+
+        block()
+    }
+    addAppender(appender)
+}
