@@ -3,10 +3,7 @@ package ch.qos.logback.core.dsl
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.encoder.Encoder
-import ch.qos.logback.core.rolling.RollingFileAppender
-import ch.qos.logback.core.rolling.RollingPolicy
-import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
-import ch.qos.logback.core.rolling.TriggeringPolicy
+import ch.qos.logback.core.rolling.*
 import ch.qos.logback.core.util.FileSize
 import ch.qos.logback.core.util.OptionHelper
 
@@ -20,7 +17,7 @@ fun Configuration.rollingFileAppender(name: String = "rollingFile", block: Rolli
         encoder("%d - %msg%n")
 
         val parent = this
-        rollingPolicy(ch.qos.logback.core.rolling::FixedWindowRollingPolicy) {
+        rollingPolicy(::FixedWindowRollingPolicy) {
             setParent(parent)
 
             // TODO: Make this an absolute path to the app's data dir
