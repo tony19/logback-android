@@ -40,6 +40,48 @@ class ConfigurationTest: FreeSpec() {
             }
         }
 
+        "property" - {
+            "sets local prop by default" {
+                val key = "logDir"
+                val dirPath = "/path/to/log"
+                val x = Configuration {
+                    property(key, dirPath)
+                }
+                x.props.entries shouldHaveSize 1
+                x.props[key] shouldBe dirPath
+            }
+
+            "sets local prop" {
+                val key = "logDir"
+                val dirPath = "/path/to/log"
+                val x = Configuration {
+                    property(key, dirPath, "local")
+                }
+                x.props.entries shouldHaveSize 1
+                x.props[key] shouldBe dirPath
+            }
+
+            "sets system prop" {
+                val key = "logDir"
+                val dirPath = "/path/to/log"
+                val x = Configuration {
+                    property(key, dirPath, "system")
+                }
+                x.props shouldBe emptyMap<String, String>()
+                System.getProperty(key) shouldBe dirPath
+            }
+
+            "sets context prop" {
+                val key = "logDir"
+                val dirPath = "/path/to/log"
+                val x = Configuration {
+                    property(key, dirPath, "context")
+                }
+                x.props shouldBe emptyMap<String, String>()
+                x.context.getProperty(key) shouldBe dirPath
+            }
+        }
+
         "fileAppender" - {
             "queues FileAppender" {
                 val x = Configuration {
