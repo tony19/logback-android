@@ -2,7 +2,7 @@ package ch.qos.logback.core.dsl
 
 import io.kotlintest.specs.FreeSpec
 
-class ConfigurationIntegrationTest: FreeSpec({
+class LogbackTest: FreeSpec({
     "logs events to logcat" {
         val x = Configuration {
             debug(true)
@@ -10,7 +10,7 @@ class ConfigurationIntegrationTest: FreeSpec({
                 logcatAppender()
             }
         }
-        x.context.getLogger(ConfigurationIntegrationTest::class.simpleName).info("hello world")
+        Logback(x).getLogger(LogbackTest::class.simpleName).info("hello world")
     }
 
     "logs events to file" {
@@ -20,7 +20,7 @@ class ConfigurationIntegrationTest: FreeSpec({
                 fileAppender()
             }
         }
-        x.context.getLogger(ConfigurationIntegrationTest::class.simpleName).info("hello world")
+        Logback(x).getLogger(LogbackTest::class.simpleName).info("hello world")
     }
 
     "logs events to rolling files" {
