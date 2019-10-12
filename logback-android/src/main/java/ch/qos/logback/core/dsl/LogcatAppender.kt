@@ -36,7 +36,7 @@ fun Configuration.logcatAppender(name: String = "logcat", block: LogcatAppender.
     }
 }
 
-fun Logger.logcatAppender(name: String = "logcat", block: () -> Unit = {}) {
+fun Logger.logcatAppender(name: String = "logcat", block: LogcatAppender.() -> Unit = {}) {
     val appender = LogcatAppender().apply {
         this.name = name
         context = loggerContext

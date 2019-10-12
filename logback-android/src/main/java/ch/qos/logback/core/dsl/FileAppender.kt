@@ -21,7 +21,7 @@ fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggi
     }
 }
 
-fun Logger.fileAppender(name: String = "file", block: () -> Unit = {}) {
+fun Logger.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}) {
     val appender = FileAppender<ILoggingEvent>().apply {
         this.name = name
         context = loggerContext
