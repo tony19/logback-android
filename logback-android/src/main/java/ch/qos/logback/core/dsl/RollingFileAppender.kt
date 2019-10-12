@@ -7,8 +7,9 @@ import ch.qos.logback.core.rolling.*
 import ch.qos.logback.core.util.FileSize
 import ch.qos.logback.core.util.OptionHelper
 
+
 typealias MyRollingFileAppender = RollingFileAppender<ILoggingEvent>
-fun Configuration.rollingFileAppender(name: String = "rollingFile", block: () -> Unit = {}) {
+fun Configuration.rollingFileAppender(name: String = "rollingFile", block: RollingFileAppender<ILoggingEvent>.() -> Unit = {}) {
     val loggerContext = context
     appender(::MyRollingFileAppender) {
         this.name = name

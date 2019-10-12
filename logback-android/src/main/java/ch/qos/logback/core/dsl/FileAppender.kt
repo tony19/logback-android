@@ -8,7 +8,7 @@ import ch.qos.logback.core.encoder.Encoder
 import ch.qos.logback.core.util.OptionHelper
 
 typealias MyFileAppender = FileAppender<ILoggingEvent>
-fun Configuration.fileAppender(name: String = "file", block: () -> Unit = {}) {
+fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}) {
     val loggerContext = context
     appender(::MyFileAppender) {
         this.name = name
