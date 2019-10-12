@@ -56,7 +56,7 @@ class SocketAppenderTest: FreeSpec() {
                     }
                 }
                 val socket = x.appenders[0] as SocketAppender
-                socket.eventDelayLimit shouldBe Duration(1000)
+                socket.eventDelayLimit.milliseconds shouldBe 1000
             }
 
             "receives queue size" {
@@ -76,7 +76,7 @@ class SocketAppenderTest: FreeSpec() {
                     }
                 }
                 val socket = x.appenders[0] as SocketAppender
-                socket.reconnectionDelay shouldBe Duration(2000)
+                socket.reconnectionDelay.milliseconds shouldBe 2000
             }
         }
 
