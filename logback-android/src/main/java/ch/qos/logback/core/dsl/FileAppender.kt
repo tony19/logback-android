@@ -16,9 +16,8 @@ fun Configuration.fileAppender(name: String = "file", block: () -> Unit = {}) {
         encoder("%d - %msg%n")
         file("/tmp/logback%d.log")
 
-        start()
-
         block()
+        start()
     }
 }
 
@@ -28,9 +27,9 @@ fun Logger.fileAppender(name: String = "file", block: () -> Unit = {}) {
         context = loggerContext
         encoder("%d - %msg%n")
         file("/tmp/logback%d.log")
-        start()
 
         block()
+        start()
     }
     addAppender(appender)
 }

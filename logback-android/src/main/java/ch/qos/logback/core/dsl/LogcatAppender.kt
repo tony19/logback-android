@@ -29,9 +29,9 @@ fun Configuration.logcatAppender(name: String = "logcat", block: () -> Unit = {}
         this.context = loggerContext
         encoder("%d - %msg%n")
         tagEncoder("%logger [%thread]")
-        start()
 
         block()
+        start()
     }
 }
 
@@ -41,9 +41,9 @@ fun Logger.logcatAppender(name: String = "logcat", block: () -> Unit = {}) {
         context = loggerContext
         encoder("%d - %msg%n")
         tagEncoder("%logger [%thread]")
-        start()
 
         block()
+        start()
     }
     addAppender(appender)
 }

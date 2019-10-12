@@ -32,9 +32,9 @@ fun Configuration.rollingFileAppender(name: String = "rollingFile", block: () ->
             context = loggerContext
             start()
         }
-        start()
 
         block()
+        start()
     }
 }
 
