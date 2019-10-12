@@ -11,7 +11,7 @@ import ch.qos.logback.core.util.StatusListenerConfigHelper
 import java.util.*
 import kotlin.collections.HashMap
 
-open class Configuration(val context: LoggerContext = LoggerContext(), block : Configuration.() -> Unit = {}) {
+open class Configuration(val context: LoggerContext = LoggerContext(), block : () -> Unit = {}) {
     val appenders = mutableListOf<Appender<ILoggingEvent>>()
     val props = HashMap<String, String>()
 

@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.android.LogcatAppender
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 
-
 fun LogcatAppender.encoder(pattern: String) {
     val context = this.context
     encoder = PatternLayoutEncoder().apply {
@@ -23,7 +22,7 @@ fun LogcatAppender.tagEncoder(pattern: String) {
     }
 }
 
-fun Configuration.logcatAppender(name: String = "logcat", block: LogcatAppender.() -> Unit = {}) {
+fun Configuration.logcatAppender(name: String = "logcat", block: () -> Unit = {}) {
     val loggerContext = context
     appender(::LogcatAppender) {
         this.name = name
