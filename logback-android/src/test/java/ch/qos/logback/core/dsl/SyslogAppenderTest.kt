@@ -27,6 +27,56 @@ class SyslogAppenderTest: FreeSpec() {
                 }
                 x.appenders[0].name shouldBe "syslog"
             }
+
+            "receives port number" {
+                val x = Configuration {
+                    syslogAppender {
+                        port = 3456
+                    }
+                }
+                val syslog = x.appenders[0] as SyslogAppender
+                syslog.port shouldBe 3456
+            }
+
+            "receives remote host" {
+                val x = Configuration {
+                    syslogAppender {
+                        syslogHost = "foo.syslog.net"
+                    }
+                }
+                val syslog = x.appenders[0] as SyslogAppender
+                syslog.syslogHost shouldBe "foo.syslog.net"
+            }
+
+            "receives max message size" {
+                val x = Configuration {
+                    syslogAppender {
+                        maxMessageSize = 123456
+                    }
+                }
+                val syslog = x.appenders[0] as SyslogAppender
+                syslog.maxMessageSize shouldBe 123456
+            }
+
+            "receives suffix pattern" {
+                val x = Configuration {
+                    syslogAppender {
+                        suffixPattern = "\n\n"
+                    }
+                }
+                val syslog = x.appenders[0] as SyslogAppender
+                syslog.suffixPattern shouldBe "\n\n"
+            }
+
+            "receives stack trace pattern" {
+                val x = Configuration {
+                    syslogAppender {
+                        stackTracePattern = "\t\t\t"
+                    }
+                }
+                val syslog = x.appenders[0] as SyslogAppender
+                syslog.stackTracePattern shouldBe "\t\t\t"
+            }
         }
 
         "root" - {
