@@ -1,29 +1,27 @@
 package ch.qos.logback.core.dsl
 
+import ch.qos.logback.classic.Logger
 import io.kotlintest.specs.FreeSpec
 
 class LogbackTest: FreeSpec({
-    "logs events to logcat" {
-        val x = Configuration {
+    fun logback(block: Logger.() -> Unit): Logback {
+        return Logback(Configuration {
             debug(true)
             root {
-                logcatAppender()
+                block()
             }
-        }
-        Logback(x).getLogger(LogbackTest::class.simpleName).info("hello world")
+        })
+    }
+
+    "logs events to logcat" {
+        logback { logcatAppender() }.logger.info("hello world")
     }
 
     "logs events to file" {
-        val x = Configuration {
-            debug(true)
-            root {
-                fileAppender()
-            }
-        }
-        Logback(x).getLogger(LogbackTest::class.simpleName).info("hello world")
+        logback { fileAppender() }.logger.info("hello world")
     }
 
     "logs events to rolling files" {
-
+        logback { rollingFileAppender() }.logger.info("hello world")
     }
 })
