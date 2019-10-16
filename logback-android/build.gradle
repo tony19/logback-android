@@ -16,6 +16,8 @@ android {
         targetCompatibility JavaVersion.VERSION_1_5
     }
 
+    sourceSets["main"].java.srcDir("src/main/kotlin")
+
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 28
