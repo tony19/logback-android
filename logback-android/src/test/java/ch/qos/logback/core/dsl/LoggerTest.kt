@@ -32,11 +32,11 @@ class LoggerTest: FreeSpec() {
 
             "receives appender refs" {
                 val x = Configuration {
-                    appender(::LogcatAppender) {
+                    val apdr = appender(::LogcatAppender) {
                         name = "myAppender"
                     }
                     logger("myLogger") {
-                        appenderRef("myAppender", this@Configuration)
+                        appenderRef(apdr.name, this@Configuration)
                     }
                 }
                 val appendersList = x.appendersList("myLogger")
