@@ -11,9 +11,9 @@ import ch.qos.logback.core.util.OptionHelper
 
 
 typealias MyRollingFileAppender = RollingFileAppender<ILoggingEvent>
-fun Configuration.rollingFileAppender(name: String = "rollingFile", block: RollingFileAppender<ILoggingEvent>.() -> Unit = {}) {
+fun Configuration.rollingFileAppender(name: String = "rollingFile", block: RollingFileAppender<ILoggingEvent>.() -> Unit = {}): RollingFileAppender<ILoggingEvent> {
     val loggerContext = context
-    appender(::MyRollingFileAppender) {
+    return appender(::MyRollingFileAppender) {
         this.name = name
         this.context = loggerContext
         encoder("%d - %msg%n")
@@ -41,7 +41,7 @@ fun Configuration.rollingFileAppender(name: String = "rollingFile", block: Rolli
     }
 }
 
-fun Logger.rollingFileAppender(name: String = "file", block: RollingFileAppender<ILoggingEvent>.() -> Unit = {}) {
+fun Logger.rollingFileAppender(name: String = "file", block: RollingFileAppender<ILoggingEvent>.() -> Unit = {}): RollingFileAppender<ILoggingEvent> {
     val appender = RollingFileAppender<ILoggingEvent>().apply {
         this.name = name
         context = loggerContext
@@ -68,6 +68,7 @@ fun Logger.rollingFileAppender(name: String = "file", block: RollingFileAppender
         start()
     }
     addAppender(appender)
+    return appender
 }
 
 fun <E: ILoggingEvent> RollingFileAppender<E>.encoder(pattern: String) {

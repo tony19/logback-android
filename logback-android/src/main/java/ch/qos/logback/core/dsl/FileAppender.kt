@@ -8,9 +8,9 @@ import ch.qos.logback.core.encoder.Encoder
 import ch.qos.logback.core.util.OptionHelper
 
 typealias MyFileAppender = FileAppender<ILoggingEvent>
-fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}) {
+fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}): FileAppender<ILoggingEvent> {
     val loggerContext = context
-    appender(::MyFileAppender) {
+    return appender(::MyFileAppender) {
         this.name = name
         this.context = loggerContext
         encoder("%d - %msg%n")
@@ -21,7 +21,7 @@ fun Configuration.fileAppender(name: String = "file", block: FileAppender<ILoggi
     }
 }
 
-fun Logger.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}) {
+fun Logger.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent>.() -> Unit = {}): FileAppender<ILoggingEvent> {
     val appender = FileAppender<ILoggingEvent>().apply {
         this.name = name
         context = loggerContext
@@ -32,6 +32,7 @@ fun Logger.fileAppender(name: String = "file", block: FileAppender<ILoggingEvent
         start()
     }
     addAppender(appender)
+    return appender
 }
 
 fun <E: ILoggingEvent> FileAppender<E>.encoder(pattern: String) {

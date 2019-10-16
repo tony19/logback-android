@@ -3,9 +3,9 @@ package ch.qos.logback.core.dsl
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.net.SyslogAppender
 
-fun Configuration.syslogAppender(name: String = "syslog", block: SyslogAppender.() -> Unit = {}) {
+fun Configuration.syslogAppender(name: String = "syslog", block: SyslogAppender.() -> Unit = {}): SyslogAppender {
     val loggerContext = context
-    appender(::SyslogAppender) {
+    return appender(::SyslogAppender) {
         this.name = name
         context = loggerContext
         facility = "syslog"
@@ -15,7 +15,7 @@ fun Configuration.syslogAppender(name: String = "syslog", block: SyslogAppender.
     }
 }
 
-fun Logger.syslogAppender(name: String = "syslog", block: SyslogAppender.() -> Unit = {}) {
+fun Logger.syslogAppender(name: String = "syslog", block: SyslogAppender.() -> Unit = {}): SyslogAppender {
     val appender = SyslogAppender().apply {
         this.name = name
         context = loggerContext
@@ -25,4 +25,5 @@ fun Logger.syslogAppender(name: String = "syslog", block: SyslogAppender.() -> U
         start()
     }
     addAppender(appender)
+    return appender
 }
