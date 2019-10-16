@@ -1,4 +1,4 @@
-package ch.qos.logback.core.dsl
+package com.github.tony19.logback.dsl
 
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent

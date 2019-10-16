@@ -1,4 +1,4 @@
-package ch.qos.logback.core.dsl
+package com.github.tony19.logback.dsl
 
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
@@ -7,7 +7,6 @@ import ch.qos.logback.core.encoder.Encoder
 import ch.qos.logback.core.rolling.*
 import ch.qos.logback.core.util.FileSize
 import ch.qos.logback.core.util.OptionHelper
-
 
 typealias MyRollingFileAppender = RollingFileAppender<ILoggingEvent>
 fun Configuration.rollingFileAppender(name: String = "rollingFile", block: RollingFileAppender<ILoggingEvent>.() -> Unit = {}): RollingFileAppender<ILoggingEvent> {

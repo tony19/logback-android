@@ -1,7 +1,7 @@
-package ch.qos.logback.core
+package com.github.tony19.logback
 
 import ch.qos.logback.classic.Logger
-import ch.qos.logback.core.dsl.Logback
+import com.github.tony19.logback.dsl.Logback
 import kotlin.reflect.full.companionObject
 
 fun <R: Any> R.logger(): Lazy<Logger> {

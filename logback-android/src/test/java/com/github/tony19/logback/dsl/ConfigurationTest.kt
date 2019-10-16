@@ -1,4 +1,4 @@
-package ch.qos.logback.core.dsl
+package com.github.tony19.logback.dsl
 
 import ch.qos.logback.core.status.OnConsoleStatusListener
 import com.github.tony19.kotlintest.haveStatusListenerOfType
