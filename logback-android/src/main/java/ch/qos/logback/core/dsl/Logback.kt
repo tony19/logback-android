@@ -3,11 +3,15 @@ package ch.qos.logback.core.dsl
 import ch.qos.logback.classic.Logger
 
 class Logback(val config: Configuration) {
-    init {
-
+    companion object {
+        fun getLogger(name: String): Logger {
+            return Logback(DefaultConfig).logger(name)
+        }
     }
 
-    fun getLogger(name: String?): Logger {
+    val logger get() = logger()
+
+    fun logger(name: String? = null): Logger {
         return config.context.getLogger(name ?: Logger.ROOT_LOGGER_NAME)
     }
 }
