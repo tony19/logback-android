@@ -1,6 +1,7 @@
 package com.github.tony19.logback.dsl
 
 import ch.qos.logback.classic.Logger
+import com.github.tony19.logback.Logback
 import io.kotlintest.specs.FreeSpec
 
 class LogbackTest: FreeSpec({
