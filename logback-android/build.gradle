@@ -83,6 +83,8 @@ dependencies {
         exclude(module: 'slf4j-api')
     }
 
+    implementation 'com.gitlab.mvysny.konsume-xml:konsume-xml:0.8'
+
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
 
     // For SMTPAppender
