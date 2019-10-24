@@ -27,7 +27,7 @@ data class Configuration (
                 timestamps = k.children("timestamp") { Timestamp.xml(this) },
                 includes = k.children("include") { Include.xml(this) },
                 optionalIncludes = k.children("includes") { Includes.xml(this) },
-                loggers = k.children("loggers") { Logger.xml(this) },
+                loggers = k.children("logger") { Logger.xml(this) },
                 root = k.childOpt("root") { Root.xml(this) }
             )
         }
