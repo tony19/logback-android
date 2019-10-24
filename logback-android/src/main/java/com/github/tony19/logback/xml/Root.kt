@@ -4,7 +4,8 @@ import com.gitlab.mvysny.konsumexml.Konsumer
 
 data class Root(
     var name: String? = "root",
-    var level: String? = null
+    var level: String? = null,
+    var appenderRefs: List<AppenderRef>
 ) {
     companion object {
         fun xml(k: Konsumer): Root {
@@ -12,7 +13,8 @@ data class Root(
 
             return Root(
                 name = k.attributes.getValueOpt("name"),
-                level = k.attributes.getValueOpt("level")
+                level = k.attributes.getValueOpt("level"),
+                appenderRefs = k.children("appenderRef") { AppenderRef.xml(this) }
             )
         }
     }
