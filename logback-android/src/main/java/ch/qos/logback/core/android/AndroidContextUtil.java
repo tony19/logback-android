@@ -67,7 +67,7 @@ public class AndroidContextUtil {
     context.putProperties(props);
   }
 
-  private static ContextWrapper getContext() {
+  protected static ContextWrapper getContext() {
     try {
       Class<?> c = Class.forName("android.app.AppGlobals");
       Method method = c.getDeclaredMethod("getInitialApplication");
@@ -96,7 +96,7 @@ public class AndroidContextUtil {
     String state = Environment.getExternalStorageState();
     if (state.equals(Environment.MEDIA_MOUNTED) ||
         state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-      path = absPath(Environment.getExternalStorageDirectory());
+      path = this.context != null ? this.context.getExternalFilesDir(null).getAbsolutePath() :  null;
     }
     return path;
   }
@@ -107,7 +107,9 @@ public class AndroidContextUtil {
    * @return the absolute path to the external storage directory
    */
   public String getExternalStorageDirectoryPath() {
-    return Environment.getExternalStorageDirectory().getAbsolutePath();
+    return this.context != null
+            ? this.context.getExternalFilesDir(null).getAbsolutePath()
+            : null;
   }
 
   public String getExternalFilesDirectoryPath() {
