@@ -50,14 +50,14 @@ public class AndroidContextUtilTest {
   public void getMountedExternalStorageDirectoryPathReturnsPathWhenMounted() {
     ShadowEnvironment.setExternalStorageState(Environment.MEDIA_MOUNTED);
     assertThat(contextUtil.getMountedExternalStorageDirectoryPath(),
-               is(Environment.getExternalStorageDirectory().getAbsolutePath()));
+            is(contextUtil.getContext().getExternalFilesDir(null).getAbsolutePath()));
   }
 
   @Test
   public void getMountedExternalStorageDirectoryPathReturnsPathWhenMountedReadOnly() {
     ShadowEnvironment.setExternalStorageState(Environment.MEDIA_MOUNTED_READ_ONLY);
     assertThat(contextUtil.getMountedExternalStorageDirectoryPath(),
-            is(Environment.getExternalStorageDirectory().getAbsolutePath()));
+            is(contextUtil.getContext().getExternalFilesDir(null).getAbsolutePath()));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class AndroidContextUtilTest {
   @Test
   public void getExternalStorageDirectoryPathIsNotEmpty() {
     assertThat(contextUtil.getExternalStorageDirectoryPath(),
-            is(Environment.getExternalStorageDirectory().getAbsolutePath()));
+            is(contextUtil.getContext().getExternalFilesDir(null).getAbsolutePath()));
   }
 
   @Test

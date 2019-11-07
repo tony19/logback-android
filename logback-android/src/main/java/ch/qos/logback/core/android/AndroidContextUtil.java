@@ -67,7 +67,7 @@ public class AndroidContextUtil {
     context.putProperties(props);
   }
 
-  private static ContextWrapper getContext() {
+  protected static ContextWrapper getContext() {
     try {
       Class<?> c = Class.forName("android.app.AppGlobals");
       Method method = c.getDeclaredMethod("getInitialApplication");
@@ -96,7 +96,7 @@ public class AndroidContextUtil {
     String state = Environment.getExternalStorageState();
     if (state.equals(Environment.MEDIA_MOUNTED) ||
         state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-      path = absPath(Environment.getExternalStorageDirectory());
+      path = getExternalStorageDirectoryPath();
     }
     return path;
   }
@@ -104,12 +104,33 @@ public class AndroidContextUtil {
   /**
    * Gets the path to the external storage directory
    *
+   * This API is available on SDK 8+. On API versions 29 onwards,
+   * this function uses the implementation in
+   * {@link android.content.Context#getExternalFilesDir(java.lang.String)}
+   * which is the proposed replacement for
+   * {@link android.os.Environment#getExternalStorageDirectory()}.
+   *
    * @return the absolute path to the external storage directory
    */
+  @TargetApi(8)
+  @SuppressWarnings("deprecation")
   public String getExternalStorageDirectoryPath() {
-    return Environment.getExternalStorageDirectory().getAbsolutePath();
+    if (Build.VERSION.SDK_INT >= 29) {
+      return getExternalFilesDirectoryPath();
+    } else {
+      return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
   }
 
+  /**
+   * Gets the path to the external storage directory
+   *
+   * This API is available on SDK 8+. This function uses the implementation in
+   * {@link android.content.Context#getExternalFilesDir(java.lang.String)}.
+   *
+   * @return the absolute path to the external storage directory
+   */
+  @TargetApi(8)
   public String getExternalFilesDirectoryPath() {
     return this.context != null
             ? absPath(this.context.getExternalFilesDir(null))

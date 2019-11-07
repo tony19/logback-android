@@ -7,7 +7,7 @@ apply from: "${rootProject.projectDir}/gradle/docs.gradle"
 apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_5
@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode VERSION_CODE.toInteger()
         versionName VERSION_NAME
     }
@@ -52,7 +52,7 @@ dependencies {
     }
 
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
-    testImplementation 'org.robolectric:robolectric:4.0.2'
+    testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'org.mockito:mockito-core:2.23.4'
     testImplementation 'joda-time:joda-time:2.10.1'
 
