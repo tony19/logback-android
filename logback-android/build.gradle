@@ -33,6 +33,7 @@ android {
     lintOptions {
         checkAllWarnings true
         lintConfig rootProject.file('gradle/lint.xml')
+        abortOnError false
     }
     testOptions {
         unitTests {
