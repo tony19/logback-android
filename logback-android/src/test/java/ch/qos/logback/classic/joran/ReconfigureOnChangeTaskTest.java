@@ -150,10 +150,10 @@ public class ReconfigureOnChangeTaskTest {
         List<File> fileList = getConfigurationWatchList(loggerContext);
         List<String> filenameList = new ArrayList<String>();
         for (File f : fileList) {
-            filenameList.add(f.getAbsolutePath());
+            filenameList.add(f.getAbsolutePath().replace(File.separator, "/"));
         }
         assertThat(filenameList, hasItem(matchesPattern(INCLUSION_SCAN_INNER1_AS_STR)));
-        assertThat(filenameList, hasItem(topLevelFile.getAbsolutePath()));
+        assertThat(filenameList, hasItem(topLevelFile.getAbsolutePath().replace(File.separator, "/")));
     }
 
     // See also http://jira.qos.ch/browse/LOGBACK-338
