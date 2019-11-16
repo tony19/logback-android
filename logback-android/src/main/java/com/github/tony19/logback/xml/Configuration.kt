@@ -32,4 +32,15 @@ data class Configuration (
             )
         }
     }
+
+    fun getUsedAppenderRefs(): List<String> {
+        val rootAppenderRefs = root?.appenderRefs?.map { it.ref!! }
+        val loggerAppenderRefs = loggers?.flatMap { logger -> logger.appenderRefs.map { it.ref!! } }
+        return rootAppenderRefs!! + loggerAppenderRefs!!
+    }
+
+    fun resolveAppenderRef(appender: Appender) {
+        val appenderInst = Class.forName(appender.className!!).newInstance()
+
+    }
 }
