@@ -15,6 +15,7 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,7 +42,7 @@ class DateParser implements FilenameParser<Date> {
     Date date = null;
 
     try {
-      date = parseDate(findToken(filename));
+      date = parseDate(findToken(filename.replace(File.separator, "/")));
     } catch (ParseException e) {
       // ignore
     }

@@ -28,6 +28,7 @@ class FileFinder {
   private static final String REGEX_MARKER_START = "(?:\uFFFE)?";
   private static final String REGEX_MARKER_END = "(?:\uFFFF)?";
   private FileProvider fileProvider;
+  private static final String PATH_SEP = "/"; // File.separator.replace("\\", "\\\\");
 
   FileFinder(FileProvider fileProvider) {
     this.fileProvider = fileProvider;
@@ -96,12 +97,13 @@ class FileFinder {
   List<PathPart> splitPath(String pattern) {
     List<PathPart> parts = new ArrayList<PathPart>();
     List<String> literals = new ArrayList<String>();
-    for (String p : pattern.split(File.separator)) {
+    final String PATH_SEP_LINUX = "/";
+    for (String p : pattern.split(PATH_SEP_LINUX)) {
       final boolean isRegex = p.contains(REGEX_MARKER_START) && p.contains(REGEX_MARKER_END);
       p = p.replace(REGEX_MARKER_START, "").replace(REGEX_MARKER_END, "");
       if (isRegex) {
         if (!literals.isEmpty()) {
-          parts.add(new LiteralPathPart(TextUtils.join(File.separator, literals)));
+          parts.add(new LiteralPathPart(TextUtils.join(PATH_SEP_LINUX, literals)));
           literals.clear();
         }
         parts.add(new RegexPathPart(p));
@@ -110,20 +112,20 @@ class FileFinder {
       }
     }
     if (!literals.isEmpty()) {
-      parts.add(new LiteralPathPart(TextUtils.join(File.separator, literals)));
+      parts.add(new LiteralPathPart(TextUtils.join(PATH_SEP_LINUX, literals)));
     }
     return parts;
   }
 
   static String regexEscapePath(String path) {
-    if (path.contains(File.separator)) {
-      String[] parts = path.split(File.separator);
+    if (path.contains(PATH_SEP)) {
+      String[] parts = path.split(PATH_SEP);
       for (int i = 0; i < parts.length; i++) {
         if (parts[i].length() > 0) {
           parts[i] = REGEX_MARKER_START + parts[i] + REGEX_MARKER_END;
         }
       }
-      return TextUtils.join(File.separator, parts);
+      return TextUtils.join(PATH_SEP, parts);
     } else {
       return REGEX_MARKER_START + path + REGEX_MARKER_END;
     }
