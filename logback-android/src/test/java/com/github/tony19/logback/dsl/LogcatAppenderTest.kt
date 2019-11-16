@@ -69,7 +69,7 @@ class LogcatAppenderTest: FreeSpec() {
             }
 
             "receives tag encoder" {
-                val pattern = "[%l]"
+                val pattern = "[%l]%nopex" // tag encoder pattern always ends with %nopex
                 val x = Configuration {
                     logcatAppender {
                         tagEncoder(pattern)
