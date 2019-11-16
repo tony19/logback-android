@@ -46,7 +46,7 @@ public class FileFinderTest {
     @Test
     public void findsFilesAcrossMultipleDirs() {
       FileFinder finder = new FileFinder(new DefaultFileProvider());
-      String pathPattern = tmpDir.getRoot() + File.separator + FileFinder.regexEscapePath("\\d{4}/\\d{2}/app_\\d{4}\\d{2}\\d{2}.log");
+      String pathPattern = tmpDir.getRoot().getAbsolutePath().replace(File.separator, "/") + "/" + FileFinder.regexEscapePath("\\d{4}/\\d{2}/app_\\d{4}\\d{2}\\d{2}.log");
       List<String> actualFiles = finder.findFiles(pathPattern);
       List<String> expectedFileList = new ArrayList<String>();
       for (File f : files) {
