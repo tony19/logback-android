@@ -1,5 +1,6 @@
 package com.github.tony19.logback.xml
 
+import ch.qos.logback.classic.spi.ILoggingEvent
 import com.gitlab.mvysny.konsumexml.Konsumer
 
 data class Configuration (
@@ -12,7 +13,8 @@ data class Configuration (
     var includes: List<Include>? = emptyList(),
     var optionalIncludes: List<Includes>?,
     var loggers: List<Logger>?,
-    var root: Root?
+    var root: Root?,
+    var resolvedAppenders: Map<String, ch.qos.logback.core.Appender<ILoggingEvent>> = emptyMap()
 ) {
     companion object {
         fun xml(k: Konsumer): Configuration {
@@ -29,7 +31,23 @@ data class Configuration (
                 optionalIncludes = k.children("includes") { Includes.xml(this) },
                 loggers = k.children("logger") { Logger.xml(this) },
                 root = k.childOpt("root") { Root.xml(this) }
-            )
+            ).apply {
+                val appenderRefs = getAppenderRefs().map {ref ->
+                    appenders?.find { it.name == ref }
+                }
+
+                resolvedAppenders = resolveAppenders(k, appenderRefs)
+            }
         }
+    }
+
+    private fun getAppenderRefs(): List<String?> {
+        val rootAppenderRefs = root?.appenderRefs?.map { it.ref }
+        val loggerAppenderRefs = loggers?.flatMap { logger -> logger.appenderRefs?.map { it.ref } }
+        return rootAppenderRefs!! + loggerAppenderRefs!!
+    }
+
+    private fun resolveAppenders(k: Konsumer, appenderRefs: List<String?>) : Map<String, ch.qos.logback.core.Appender<ILoggingEvent>> {
+        return appenderRefs.map { appenders.find { appender -> appender.name == it } }
     }
 }
