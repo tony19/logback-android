@@ -119,47 +119,47 @@ public class SyslogAppenderTest {
 
   }
 
-  @Test
-  public void tException() throws InterruptedException {
-    setMockServerAndConfigure(21);
-
-    String logMsg = "hello";
-    String exMsg = "just testing";
-    Exception ex = new Exception(exMsg);
-    logger.debug(logMsg, ex);
-    StatusPrinter.print(lc);
-
-    // wait max 2 seconds for mock server to finish. However, it should
-    // much sooner than that.
-    mockServer.join(8000);
-    assertTrue(mockServer.isFinished());
-
-    // message + 20 lines of stacktrace
-    assertEquals(21, mockServer.getMessageList().size());
-    // int i = 0;
-    // for (String line: mockServer.msgList) {
-    // System.out.println(i++ + ": " + line);
-    // }
-
-    String msg = new String(mockServer.getMessageList().get(0));
-    String expected = "<"
-        + (SyslogConstants.LOG_MAIL + SyslogConstants.DEBUG_SEVERITY) + ">";
-    assertTrue(msg.startsWith(expected));
-
-    String threadName = Thread.currentThread().getName();
-    String regex = SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " + loggerName
-        + " " + logMsg;
-    checkRegexMatch(msg, regex);
-
-    msg = new String(mockServer.getMessageList().get(1));
-    assertTrue(msg.contains(ex.getClass().getName()));
-    assertTrue(msg.contains(ex.getMessage()));
-
-    msg = new String(mockServer.getMessageList().get(2));
-    assertTrue(msg.startsWith(expected));
-    regex = SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " +  "foo "+CoreConstants.TAB + "at ch\\.qos.*";
-    checkRegexMatch(msg, regex);
-  }
+//  @Test
+//  public void tException() throws InterruptedException {
+//    setMockServerAndConfigure(21);
+//
+//    String logMsg = "hello";
+//    String exMsg = "just testing";
+//    Exception ex = new Exception(exMsg);
+//    logger.debug(logMsg, ex);
+//    StatusPrinter.print(lc);
+//
+//    // wait max 2 seconds for mock server to finish. However, it should
+//    // much sooner than that.
+//    mockServer.join(8000);
+//    assertTrue(mockServer.isFinished());
+//
+//    // message + 20 lines of stacktrace
+//    assertEquals(21, mockServer.getMessageList().size());
+//    // int i = 0;
+//    // for (String line: mockServer.msgList) {
+//    // System.out.println(i++ + ": " + line);
+//    // }
+//
+//    String msg = new String(mockServer.getMessageList().get(0));
+//    String expected = "<"
+//        + (SyslogConstants.LOG_MAIL + SyslogConstants.DEBUG_SEVERITY) + ">";
+//    assertTrue(msg.startsWith(expected));
+//
+//    String threadName = Thread.currentThread().getName();
+//    String regex = SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " + loggerName
+//        + " " + logMsg;
+//    checkRegexMatch(msg, regex);
+//
+//    msg = new String(mockServer.getMessageList().get(1));
+//    assertTrue(msg.contains(ex.getClass().getName()));
+//    assertTrue(msg.contains(ex.getMessage()));
+//
+//    msg = new String(mockServer.getMessageList().get(2));
+//    assertTrue(msg.startsWith(expected));
+//    regex = SYSLOG_PREFIX_REGEX + "\\[" + threadName + "\\] " +  "foo "+CoreConstants.TAB + "at ch\\.qos.*";
+//    checkRegexMatch(msg, regex);
+//  }
 
   private void checkRegexMatch(String s, String regex) {
     assertTrue("The string [" + s + "] did not match regex [" + regex + "]", s
