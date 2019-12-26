@@ -2,6 +2,7 @@ package com.github.tony19.logback.xml
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import com.gitlab.mvysny.konsumexml.Konsumer
+import com.gitlab.mvysny.konsumexml.anyName
 
 data class Configuration (
     var debug: Boolean? = false,
@@ -32,22 +33,38 @@ data class Configuration (
                 loggers = k.children("logger") { Logger.xml(this) },
                 root = k.childOpt("root") { Root.xml(this) }
             ).apply {
-                val appenderRefs = getAppenderRefs().map {ref ->
-                    appenders?.find { it.name == ref }
+                val (matchedAppenders, unknownAppenders) = getAppenderRefs().map { appenderName ->
+                    appenders?.find { it.name == appenderName }
+                }.partition { it !== null }
+
+                unknownAppenders.forEach {
+                    System.err.println("unknown appender ref: ${it!!.name}")
                 }
 
-                resolvedAppenders = resolveAppenders(k, appenderRefs)
+                resolvedAppenders = matchedAppenders
+                        .map { resolveAppender(k, it!!.className) }
+                        .map { it.name to it }.toMap()
             }
         }
     }
 
-    private fun getAppenderRefs(): List<String?> {
-        val rootAppenderRefs = root?.appenderRefs?.map { it.ref }
-        val loggerAppenderRefs = loggers?.flatMap { logger -> logger.appenderRefs?.map { it.ref } }
-        return rootAppenderRefs!! + loggerAppenderRefs!!
+    private fun getAppenderRefs(): List<String> {
+        val rootAppenderRefs = root?.appenderRefs?.map { it.ref!! }
+        val loggerAppenderRefs = loggers?.flatMap { logger -> logger.appenderRefs.map { it.ref!! } }
+        return (rootAppenderRefs ?: emptyList()) + (loggerAppenderRefs ?: emptyList())
     }
 
-    private fun resolveAppenders(k: Konsumer, appenderRefs: List<String?>) : Map<String, ch.qos.logback.core.Appender<ILoggingEvent>> {
-        return appenderRefs.map { appenders.find { appender -> appender.name == it } }
+    private fun resolveAppender(k: Konsumer, className: String) : ch.qos.logback.core.Appender<ILoggingEvent> {
+        val clazz = Class.forName(className)
+        @Suppress("UNCHECKED_CAST")
+        return (clazz.getDeclaredConstructor().newInstance() as ch.qos.logback.core.Appender<ILoggingEvent>).apply {
+            k.children(anyName) {
+                val rawValue = k.text()
+                if (rawValue.isNotBlank()) {
+                    val method = clazz.methods.find { it.name == "set${k.name.toString().capitalize()}" && it.parameterCount == 1 }
+                    method?.invoke(rawValue to method.parameterTypes[0])
+                }
+            }
+        }
     }
 }
