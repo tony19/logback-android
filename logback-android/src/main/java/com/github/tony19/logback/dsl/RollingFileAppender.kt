@@ -86,7 +86,10 @@ fun <E: ILoggingEvent> RollingFileAppender<E>.file(name: String) {
 }
 
 fun <E: ILoggingEvent, R: RollingPolicy> RollingFileAppender<E>.rollingPolicy(policy: () -> R, block: R.() -> Unit = {}) {
-    rollingPolicy = policy().apply(block)
+    val parent = this
+    rollingPolicy = policy().apply(block).apply {
+        setParent(parent)
+    }
 }
 
 typealias MySizeBasedTriggeringPolicy = SizeBasedTriggeringPolicy<ILoggingEvent>

@@ -31,6 +31,7 @@ import org.apache.log4j.MDC;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -87,6 +88,7 @@ public class XMLLayoutTest {
         MDC.clear();
     }
 
+    @Ignore("requires network connection")
     @Test
     public void testDoLayout() throws Exception {
         ILoggingEvent le = createLoggingEvent();

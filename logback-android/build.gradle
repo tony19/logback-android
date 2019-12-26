@@ -33,6 +33,7 @@ android {
     lintOptions {
         checkAllWarnings true
         lintConfig rootProject.file('gradle/lint.xml')
+        abortOnError false
     }
     testOptions {
         unitTests {
@@ -83,6 +84,7 @@ dependencies {
         exclude(module: 'slf4j-api')
     }
 
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1"
     implementation 'com.gitlab.mvysny.konsume-xml:konsume-xml:0.8'
 
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
