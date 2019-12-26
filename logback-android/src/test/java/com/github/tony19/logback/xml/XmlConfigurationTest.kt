@@ -147,6 +147,9 @@ class XmlConfigurationTest: FreeSpec({
                 |     <pattern>[%-20thread] %msg</pattern>
                 |   </encoder>
                 |</appender>
+                |<root>
+                |  <appender-ref ref="logcat" />
+                |</root>
                 |</configuration>""".trimMargin())
 
             config.appenders!! shouldHaveSize 1

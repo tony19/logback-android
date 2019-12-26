@@ -7,7 +7,7 @@ data class AppenderRef (
 ) {
     companion object {
         fun xml(k: Konsumer): AppenderRef {
-            k.checkCurrent("appenderRef")
+            k.checkCurrent("appender-ref")
             return AppenderRef(ref = k.attributes.getValue("ref"))
         }
     }

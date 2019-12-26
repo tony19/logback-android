@@ -14,7 +14,7 @@ data class Root(
             return Root(
                 name = k.attributes.getValueOpt("name"),
                 level = k.attributes.getValueOpt("level"),
-                appenderRefs = k.children("appenderRef") { AppenderRef.xml(this) }
+                appenderRefs = k.children("appender-ref") { AppenderRef.xml(this) }
             )
         }
     }
