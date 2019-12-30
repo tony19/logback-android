@@ -1,8 +1,6 @@
 package com.github.tony19.logback.xml
 
-import ch.qos.logback.classic.spi.ILoggingEvent
 import com.gitlab.mvysny.konsumexml.Konsumer
-import com.gitlab.mvysny.konsumexml.anyName
 
 data class Configuration (
     var debug: Boolean? = false,
@@ -15,7 +13,7 @@ data class Configuration (
     var optionalIncludes: List<Includes>?,
     var loggers: List<Logger>?,
     var root: Root?,
-    var resolvedAppenders: Map<String, ch.qos.logback.core.Appender<ILoggingEvent>> = emptyMap()
+    var resolvedAppenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf()
 ) {
     companion object {
         fun xml(k: Konsumer): Configuration {
@@ -41,9 +39,18 @@ data class Configuration (
                     System.err.println("unknown appender ref: ${it!!.name}")
                 }
 
-                resolvedAppenders = matchedAppenders
-                        .map { resolveAppender(k, it!!.className) }
-                        .map { it.name to it }.toMap()
+                val resolver = XmlResolver()
+                val matchedAppenderNames = matchedAppenders.map { it!!.name!! }
+
+                // FIXME: XML stream is already read at this point, so we can't re-read it.
+                // A solution would be to re-instantiate Konsumer instance from string.
+                // Is that more expensive that just parsing everything in one pass?
+                k.children("appender") {
+                    val meta = Appender.xml(this)
+                    if (meta.name in matchedAppenderNames) {
+                        resolvedAppenders.add(resolver.resolve(this, meta.className))
+                    }
+                }
             }
         }
     }
@@ -52,19 +59,5 @@ data class Configuration (
         val rootAppenderRefs = root?.appenderRefs?.map { it.ref!! }
         val loggerAppenderRefs = loggers?.flatMap { logger -> logger.appenderRefs.map { it.ref!! } }
         return (rootAppenderRefs ?: emptyList()) + (loggerAppenderRefs ?: emptyList())
-    }
-
-    private fun resolveAppender(k: Konsumer, className: String) : ch.qos.logback.core.Appender<ILoggingEvent> {
-        val clazz = Class.forName(className)
-        @Suppress("UNCHECKED_CAST")
-        return (clazz.getDeclaredConstructor().newInstance() as ch.qos.logback.core.Appender<ILoggingEvent>).apply {
-            k.children(anyName) {
-                val rawValue = k.text()
-                if (rawValue.isNotBlank()) {
-                    val method = clazz.methods.find { it.name == "set${k.name.toString().capitalize()}" && it.parameterCount == 1 }
-                    method?.invoke(rawValue to method.parameterTypes[0])
-                }
-            }
-        }
     }
 }
