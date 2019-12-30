@@ -8,7 +8,7 @@ data class Configuration (
     var debug: Boolean? = false,
     var scan: Boolean? = false,
     var scanPeriod: String? = null,
-    var appenders: List<Appender>? = emptyList(),
+    var appenderMeta: List<Appender>? = emptyList(),
     var properties: List<Property>? = emptyList(),
     var timestamps: List<Timestamp>? = emptyList(),
     var includes: List<Include>? = emptyList(),
@@ -25,7 +25,7 @@ data class Configuration (
                 debug = k.attributes.getValueOpt("debug")?.toBoolean(),
                 scan = k.attributes.getValueOpt("scan")?.toBoolean(),
                 scanPeriod = k.attributes.getValueOpt("scanPeriod"),
-                appenders = k.children("appender") { Appender.xml(this) },
+                appenderMeta = k.children("appender") { Appender.xml(this) },
                 properties = k.children("property") { Property.xml(this) },
                 timestamps = k.children("timestamp") { Timestamp.xml(this) },
                 includes = k.children("include") { Include.xml(this) },
@@ -34,7 +34,7 @@ data class Configuration (
                 root = k.childOpt("root") { Root.xml(this) }
             ).apply {
                 val (matchedAppenders, unknownAppenders) = getAppenderRefs().map { appenderName ->
-                    appenders?.find { it.name == appenderName }
+                    appenderMeta?.find { it.name == appenderName }
                 }.partition { it !== null }
 
                 unknownAppenders.forEach {

@@ -152,8 +152,8 @@ class XmlConfigurationTest: FreeSpec({
                 |</root>
                 |</configuration>""".trimMargin())
 
-            config.appenders!! shouldHaveSize 1
-            config.appenders!!.find { it.name == "logcat" && it.className == "ch.qos.logback.classic.android.LogcatAppender" } shouldNot beNull()
+            config.appenderMeta!! shouldHaveSize 1
+            config.appenderMeta!!.find { it.name == "logcat" && it.className == "ch.qos.logback.classic.android.LogcatAppender" } shouldNot beNull()
 
 
         }
