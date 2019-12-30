@@ -141,11 +141,11 @@ class XmlConfigurationTest: FreeSpec({
             val config = XmlParser.parse("""<configuration>
                 |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
                 |  <tagEncoder>
-                |     <pattern>%logger{12}</pattern>
-                |   </tagEncoder>
-                |   <encoder>
-                |     <pattern>[%-20thread] %msg</pattern>
-                |   </encoder>
+                |    <pattern>%logger{12}</pattern>
+                |  </tagEncoder>
+                |  <encoder>
+                |    <pattern>[%-20thread] %msg</pattern>
+                |  </encoder>
                 |</appender>
                 |<root>
                 |  <appender-ref ref="logcat" />
