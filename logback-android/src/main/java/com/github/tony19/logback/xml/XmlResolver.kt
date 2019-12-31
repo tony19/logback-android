@@ -33,7 +33,16 @@ class XmlResolver {
                             paramType.name == "java.nio.charset.Charset" -> text { Charset.forName(it) }
                             paramType.isPrimitive -> text { parsePrimitive(paramType, it)!! }
                             else -> {
-                                val paramInst = paramType.getDeclaredConstructor().newInstance()
+                                val className = attributes["class"]
+                                val param = if (className.isNotEmpty()) Class.forName(className) else paramType
+
+                                val paramInst = try {
+                                    param.getDeclaredConstructor().newInstance()
+                                } catch(e: NoSuchMethodException) {
+                                    println("warning: missing default constructor for \"${param.name}\"")
+                                    throw e
+                                }
+
                                 resolve(this, paramInst).apply {
                                     // FIXME: We need to have LoggerContext set before calling start()
                                     //javaClass.methods.find { it.name == "start" }?.invoke(this)

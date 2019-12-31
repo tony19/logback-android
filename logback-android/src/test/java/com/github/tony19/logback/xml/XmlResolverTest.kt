@@ -48,4 +48,26 @@ class XmlResolverTest: FreeSpec({
         "Double" { resolve { doubleVal shouldBe 123.5e10 } }
         "Charset" { resolve { charsetVal shouldBe StandardCharsets.UTF_16BE } }
     }
+
+    "sets subclassed property" - {
+        open class Animal(var says: String = "")
+        class Dog(var color: String): Animal("woof") {
+            constructor(): this("brown") // explicit default constructor required by resolver
+        }
+        class Dummy(var pet: Animal = Animal())
+
+        val xmlDoc = """<doc>
+            |  <pet class="${Dog::class.java.name}">
+            |    <says>grrrr</says>
+            |    <color>tan</color>
+            |  </pet>
+            |</doc>
+        """.trimMargin()
+
+        xmlDoc.konsumeXml().child("doc") {
+            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            dummy.pet.says shouldBe "grrrr"
+            (dummy.pet as Dog).color shouldBe "tan"
+        }
+    }
 })
