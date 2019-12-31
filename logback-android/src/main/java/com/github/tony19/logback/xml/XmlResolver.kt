@@ -9,44 +9,60 @@ class XmlResolver {
     fun <T> resolve(k: Konsumer, className: String): T {
         val inst = Class.forName(className).getDeclaredConstructor().newInstance()
         @Suppress("UNCHECKED_CAST")
-        return resolveAny(k, inst) as T
+        return resolve(k, inst) as T
     }
 
-    private fun resolveAny(k: Konsumer, inst: Any): Any {
+    fun resolve(k: Konsumer, inst: Any): Any {
         return inst.apply {
             val instMethods = inst.javaClass.methods
             k.children(anyName) {
                 if (name?.localPart?.isNotEmpty()!!) {
                     val elemName = name?.localPart?.toLowerCase(Locale.US)
-                    instMethods
+                    val setterMethod = instMethods
                             .find {
                                 it.name.toLowerCase(Locale.US) in arrayOf("set${elemName}", "add${elemName}")
                                         && it.parameterTypes.size == 1 }
-                            ?.let { setterMethod ->
-                                val paramType = setterMethod.parameterTypes[0]
-                                val value = when {
-                                    paramType.name == "java.lang.String" -> text()
-                                    paramType.name == "java.lang.Charset" -> text { Charset.forName(it) }
-                                    paramType.isPrimitive -> text { convertString(paramType, it)!! }
-                                    else -> {
-                                        val paramInst = paramType.getDeclaredConstructor().newInstance()
-                                        resolveAny(this, paramInst).apply {
-                                            // FIXME: We need to have LoggerContext set before calling start()
-                                            //javaClass.methods.find { it.name == "start" }?.invoke(this)
-                                        }
-                                    }
+
+                    if (setterMethod == null) {
+                        println("warning: no setter found for \"${name!!.localPart}\"")
+
+                    } else {
+                        val paramType = setterMethod.parameterTypes[0]
+                        val value = when {
+                            paramType.name == "java.lang.String" -> text()
+                            paramType.name == "java.nio.charset.Charset" -> text { Charset.forName(it) }
+                            paramType.isPrimitive -> text { parsePrimitive(paramType, it)!! }
+                            else -> {
+                                val paramInst = paramType.getDeclaredConstructor().newInstance()
+                                resolve(this, paramInst).apply {
+                                    // FIXME: We need to have LoggerContext set before calling start()
+                                    //javaClass.methods.find { it.name == "start" }?.invoke(this)
                                 }
-                                setterMethod.invoke(inst, value)
                             }
+                        }
+                        setterMethod.invoke(inst, value)
+                    }
                 }
             }
         }
     }
 
-    private fun convertString(paramType: Class<*>, rawValue: String): Any? {
-        val paramTypeName = paramType.name.toLowerCase(Locale.US)
-        return String::class.java.methods
-                .find { it.name.toLowerCase(Locale.US) == "to${paramTypeName}" }
-                ?.invoke(rawValue)
+    private val stringConverters by lazy {
+        mapOf(
+                "string" to String::toString,
+                "byte" to String::toByte,
+                "int" to String::toInt,
+                "short" to String::toShort,
+                "long" to String::toLong,
+                "float" to String::toFloat,
+                "double" to String::toDouble,
+                "boolean" to String::toBoolean,
+                "biginteger" to String::toBigInteger,
+                "bigdecimal" to String::toBigDecimal
+        )
+    }
+
+    private fun parsePrimitive(paramType: Class<*>, rawValue: String): Any? {
+        return stringConverters[paramType.name.toLowerCase(Locale.US)]?.invoke(rawValue)
     }
 }
