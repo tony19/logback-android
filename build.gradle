@@ -8,7 +8,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.5.0'
+    classpath 'com.android.tools.build:gradle:3.5.3'
     classpath 'org.ajoberstar:grgit:2.1.1'
     classpath 'com.novoda:gradle-static-analysis-plugin:0.5.1'
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
