@@ -70,6 +70,7 @@ public class AndroidContextUtil {
   private static ContextWrapper getContext() {
     try {
       Class<?> c = Class.forName("android.app.AppGlobals");
+      // noinspection DiscouragedPrivateApi
       Method method = c.getDeclaredMethod("getInitialApplication");
       return (ContextWrapper)method.invoke(c);
     } catch (ClassNotFoundException e) {
