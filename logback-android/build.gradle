@@ -30,6 +30,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dexOptions {
+        javaMaxHeapSize '4G'
+    }
     lintOptions {
         checkAllWarnings true
         lintConfig rootProject.file('gradle/lint.xml')
