@@ -21,7 +21,7 @@ import ch.qos.logback.core.contention.*;
 import org.junit.Before;
 import org.junit.Test;
 
-@org.junit.Ignore
+@org.junit.Ignore("Only run manually")
 public class LoggerContextPerfTest {
 
   static int THREAD_COUNT = 10000;
