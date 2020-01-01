@@ -4,9 +4,9 @@ afterEvaluate { project ->
   project.android.libraryVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
       description "Generates Javadoc for $variant.name."
-      source = variant.javaCompile.source
+      source = variant.javaCompileProvider.get().source
       ext.androidJar = "${project.android.sdkDirectory}/platforms/${project.android.compileSdkVersion}/android.jar"
-      classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+      classpath = files(variant.javaCompileProvider.get().classpath.files) + files(ext.androidJar)
       options.links("https://docs.oracle.com/javase/6/docs/api/")
       options.linksOffline("https://d.android.com/reference", "${project.android.sdkDirectory}/docs/reference")
 
