@@ -12,4 +12,12 @@
     <issue id="KotlinPropertyAccess" severity="ignore" /> <!-- Kotlin interop error -->
     <issue id="LambdaLast" severity="ignore" /> <!-- Kotlin interop error -->
     <issue id="UnknownNullness" severity="ignore" /> <!-- Kotlin interop error -->
+
+    <issue id="InvalidPackage">
+        <!-- jaxb-api and javax.actvation are somehow inserted by Android test framework -->
+        <ignore regexp=".*javax.activation-api.*.jar" />
+        <ignore regexp=".*jaxb-api.*.jar" />
+
+        <ignore regexp=".*konsume-xml.*.jar" /> <!-- uses javax.xml.stream -->
+    </issue>
 </lint>
