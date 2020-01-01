@@ -47,11 +47,11 @@ import ch.qos.logback.core.util.CoreTestConstants;
 @RunWith(RobolectricTestRunner.class)
 public class ConditionalIncludeActionTest {
 
-  Context context = new ContextBase();
-  StatusChecker statusChecker = new StatusChecker(context);
-  TrivialConfigurator tc;
+  private Context context = new ContextBase();
+  private StatusChecker statusChecker = new StatusChecker(context);
+  private TrivialConfigurator tc;
 
-  StackAction stackAction;
+  private StackAction stackAction;
 
   static private final String INCLUSION_DIR_PREFIX = CoreTestConstants.JORAN_INPUT_PREFIX
       + "inclusion/";
@@ -312,7 +312,7 @@ public class ConditionalIncludeActionTest {
     verifyConfig("IA", "IB", "C");
   }
 
-  void verifyConfig(String... expected) {
+  private void verifyConfig(String... expected) {
     Stack<String> witness = new Stack<String>();
     witness.addAll(Arrays.asList(expected));
     assertEquals(witness, stackAction.getStack());
