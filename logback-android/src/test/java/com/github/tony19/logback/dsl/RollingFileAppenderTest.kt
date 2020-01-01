@@ -88,8 +88,7 @@ class RollingFileAppenderTest: FreeSpec() {
                 val x = Configuration {
                     rollingFileAppender {
                         triggeringPolicy(::MySizeBasedTriggeringPolicy) {
-                            val policy = this as MySizeBasedTriggeringPolicy
-                            policy.maxFileSize = FileSize.valueOf("1MB")
+                            maxFileSize = FileSize.valueOf("1MB")
                         }
                     }
                 }
