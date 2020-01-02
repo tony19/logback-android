@@ -126,6 +126,7 @@ public class PubLoggingEventVO implements ILoggingEvent, Serializable {
     return mdcPropertyMap;
   }
 
+  @Deprecated
   public Map<String, String> getMdc() {
     return mdcPropertyMap;
   }
