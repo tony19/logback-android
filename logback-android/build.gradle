@@ -79,9 +79,6 @@ dependencies {
     // For SMTPAppender
     compileOnly 'com.sun.mail:android-mail:1.6.7'
     compileOnly 'com.sun.mail:android-activation:1.6.7'
-
-    testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
-    testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
 }
 
 allprojects {
