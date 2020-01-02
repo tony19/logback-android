@@ -21,7 +21,6 @@ import java.net.Socket;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.qos.logback.classic.net.testObjectBuilders.Builder;
@@ -32,7 +31,7 @@ import ch.qos.logback.classic.spi.LoggingEventVO;
 
 import static org.junit.Assert.fail;
 
-@Ignore("Only run manually")
+// XXX: Junit 4's @Ignore rule for this test barfs
 public class SerializationPerfTest {
 
   ObjectOutputStream oos;
@@ -112,7 +111,7 @@ public class SerializationPerfTest {
          *
          */
 
-  @Before
+  //@Before
   public void setUp() throws Exception {
     if (runWithExternalMockServer) {
       oos = new ObjectOutputStream(new Socket("localhost",
@@ -122,13 +121,13 @@ public class SerializationPerfTest {
     }
   }
 
-  @After
+  //@After
   public void tearDown() throws Exception {
     oos.close();
     oos = null;
   }
 
-  @Test
+  //@Test
   public void runPerfTest(Builder<?> builder, String label) throws Exception {
     // long time1 = System.nanoTime();
 
@@ -195,7 +194,7 @@ public class SerializationPerfTest {
   // runPerfTest(builder, "Minimal object externalization");
   // }
 
-  @Test
+  //@Test
   public void testWithMinimalSerialization() throws Exception {
     Builder<MinimalSer> builder = new MinimalSerBuilder();
     runPerfTest(builder, "Minimal object serialization");
@@ -207,7 +206,7 @@ public class SerializationPerfTest {
   // runPerfTest(builder, "LoggingEvent object externalization");
   // }
 
-  @Test
+  //@Test
   public void testWithSerialization() throws Exception {
     Builder<LoggingEventVO> builder = new TrivialLoggingEventVOBuilder();
     runPerfTest(builder, "LoggingEventVO object serialization");
