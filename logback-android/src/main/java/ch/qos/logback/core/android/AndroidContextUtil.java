@@ -189,16 +189,20 @@ public class AndroidContextUtil {
             : "";
   }
 
+  @SuppressWarnings("deprecation")
   public String getVersionCode() {
-    String versionCode = "";
+    long versionCode = 0;
     if (this.context != null) {
       try {
         PackageInfo pkgInfo = this.context.getPackageManager().getPackageInfo(getPackageName(), 0);
-        versionCode = "" + pkgInfo.versionCode;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+          versionCode = pkgInfo.getLongVersionCode();
+        }
+        versionCode = pkgInfo.versionCode;
       } catch (PackageManager.NameNotFoundException e) {
       }
     }
-    return versionCode;
+    return "" + versionCode;
   }
 
   public String getVersionName() {
