@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.classic.issue.logback416;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

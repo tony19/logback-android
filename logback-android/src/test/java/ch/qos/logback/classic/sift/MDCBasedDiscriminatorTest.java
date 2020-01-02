@@ -27,8 +27,8 @@ import org.junit.Test;
 
 import org.slf4j.MDC;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ceki G&uuml;c&uuml;

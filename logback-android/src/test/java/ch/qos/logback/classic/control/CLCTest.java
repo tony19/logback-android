@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.classic.control;
 
-import junit.framework.TestCase;
+import org.junit.TestCase;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.control.ControlLogger;

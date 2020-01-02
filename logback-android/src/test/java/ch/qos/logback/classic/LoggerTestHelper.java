@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.classic;
 
-import junit.framework.*;
+import org.junit.*;
 
 import org.junit.Ignore;
 

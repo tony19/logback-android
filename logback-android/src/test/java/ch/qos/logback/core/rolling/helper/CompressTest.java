@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;

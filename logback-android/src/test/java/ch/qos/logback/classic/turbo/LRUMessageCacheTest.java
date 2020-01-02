@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.classic.turbo;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

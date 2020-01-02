@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import junit.framework.TestCase;
+import org.junit.TestCase;
 
 import org.junit.Ignore;
 

@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.core.util;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

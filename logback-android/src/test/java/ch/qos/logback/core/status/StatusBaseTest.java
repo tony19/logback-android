@@ -17,7 +17,7 @@ package ch.qos.logback.core.status;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
+import org.junit.TestCase;
 
 public class StatusBaseTest extends TestCase {
 

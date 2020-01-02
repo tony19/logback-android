@@ -15,9 +15,9 @@
  */
 package ch.qos.logback.classic.issue.lbclassic36;
 
-import junit.framework.TestCase;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.TestCase;
+import org.junit.Test;
+import org.junit.TestSuite;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

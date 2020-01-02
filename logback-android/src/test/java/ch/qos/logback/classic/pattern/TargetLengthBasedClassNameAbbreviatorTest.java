@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.classic.pattern;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 

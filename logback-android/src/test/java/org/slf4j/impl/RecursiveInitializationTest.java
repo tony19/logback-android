@@ -15,7 +15,7 @@
  */
 package org.slf4j.impl;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import ch.qos.logback.classic.ClassicTestConstants;
 import ch.qos.logback.core.status.StatusChecker;

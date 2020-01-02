@@ -16,7 +16,7 @@
 package ch.qos.logback.classic.encoder;
 
 import static ch.qos.logback.core.CoreConstants.CODES_URL;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;

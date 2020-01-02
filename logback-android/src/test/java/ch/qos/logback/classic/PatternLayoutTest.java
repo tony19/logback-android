@@ -17,8 +17,8 @@ package ch.qos.logback.classic;
 
 import static ch.qos.logback.classic.ClassicTestConstants.ISO_REGEX;
 import static ch.qos.logback.classic.ClassicTestConstants.MAIN_REGEX;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.*;

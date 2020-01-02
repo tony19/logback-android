@@ -47,7 +47,7 @@ import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.StringListAppender;
 
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 @RunWith(RobolectricTestRunner.class)
 public class JoranConfiguratorTest {
