@@ -18,7 +18,6 @@ package ch.qos.logback.classic.issue.lbclassic135.lbclassic139;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.qos.logback.classic.BasicConfigurator;
 import ch.qos.logback.classic.LoggerContext;
 
 public class LB139_DeadlockTest {
@@ -29,7 +28,7 @@ public class LB139_DeadlockTest {
   @Before
   public void setUp() {
     loggerContext.setName("LB139");
-    BasicConfigurator bc = new BasicConfigurator();
+    ch.qos.logback.classic.BasicConfigurator bc = new ch.qos.logback.classic.BasicConfigurator();
     bc.setContext(loggerContext);
     bc.configure(loggerContext);
   }

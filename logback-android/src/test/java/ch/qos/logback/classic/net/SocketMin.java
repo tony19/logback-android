@@ -19,7 +19,6 @@ import java.io.InputStreamReader;
 
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.BasicConfigurator;
 import ch.qos.logback.classic.Logger;
 
 public class SocketMin {
@@ -55,7 +54,7 @@ public class SocketMin {
   @SuppressWarnings("deprecation")
   static void init(String host, String portStr) {
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-    BasicConfigurator bc = new BasicConfigurator();
+    ch.qos.logback.classic.BasicConfigurator bc = new ch.qos.logback.classic.BasicConfigurator();
     bc.setContext(root.getLoggerContext());
     bc.configure(root.getLoggerContext());
     try {
