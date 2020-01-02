@@ -91,4 +91,18 @@ class XmlResolverTest: FreeSpec({
             dummy.stringVal shouldContainExactlyInAnyOrder arrayOf("a", "b", "x", "y", "z")
         }
     }
+
+    "does not set readonly property" {
+        data class Dummy(val stringVal: String = "initial")
+
+        val xmlDoc = """<doc>
+            |  <stringVal>bob</stringVal>
+            |</doc>
+        """.trimMargin()
+
+        xmlDoc.konsumeXml().child("doc") {
+            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            dummy.stringVal shouldBe "initial"
+        }
+    }
 })

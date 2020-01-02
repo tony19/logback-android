@@ -26,6 +26,7 @@ class XmlResolver {
                                 && it.parameterTypes.size == 1 }
 
                     if (setterMethod == null) {
+                        skipContents()
                         println("warning: setter not found: \"set${name!!.localPart.capitalize()}\" or \"add${name!!.localPart.capitalize()}\"")
 
                     } else {
