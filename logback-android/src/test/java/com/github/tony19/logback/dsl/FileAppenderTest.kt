@@ -45,14 +45,15 @@ class FileAppenderTest: FreeSpec() {
             }
 
             "receives filename" {
-                val filename = "foo/bar.log"
+                val tmpFile = createTempFile("logback-android-test", "log")
+                tmpFile.deleteOnExit()
                 val x = Configuration {
                     fileAppender {
-                        file(filename)
+                        file(tmpFile.absolutePath)
                     }
                 }
                 val appender = x.appenders[0] as FileAppender<ILoggingEvent>
-                appender.file shouldBe filename
+                appender.file shouldBe tmpFile.absolutePath
             }
         }
 
