@@ -1,6 +1,7 @@
 package com.github.tony19.logback.xml
 
 import com.gitlab.mvysny.konsumexml.konsumeXml
+import io.kotlintest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 import java.nio.charset.Charset
@@ -68,6 +69,26 @@ class XmlResolverTest: FreeSpec({
             val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
             dummy.pet.says shouldBe "grrrr"
             (dummy.pet as Dog).color shouldBe "tan"
+        }
+    }
+
+    "set array items" {
+        data class Dummy(var stringVal: Array<String> = arrayOf("a", "b")) {
+            fun addStringVal(value: String) { // explicit adder method required by resolver
+                stringVal += value
+            }
+        }
+
+        val xmlDoc = """<doc>
+            |  <stringVal>x</stringVal>
+            |  <stringVal>y</stringVal>
+            |  <stringVal>z</stringVal>
+            |</doc>
+        """.trimMargin()
+
+        xmlDoc.konsumeXml().child("doc") {
+            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            dummy.stringVal shouldContainExactlyInAnyOrder arrayOf("a", "b", "x", "y", "z")
         }
     }
 })

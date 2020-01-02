@@ -20,11 +20,13 @@ class XmlResolver {
                     val elemName = name?.localPart?.toLowerCase(Locale.US)
                     val setterMethod = instMethods
                             .find {
-                                it.name.toLowerCase(Locale.US) in arrayOf("set${elemName}", "add${elemName}")
-                                        && it.parameterTypes.size == 1 }
+                                // Prioritize adder in case a setter exists for an array. The
+                                // adder adds a single param, which works with the flow below.
+                                it.name.toLowerCase(Locale.US) in arrayOf("add${elemName}", "set${elemName}")
+                                && it.parameterTypes.size == 1 }
 
                     if (setterMethod == null) {
-                        println("warning: no setter found for \"${name!!.localPart}\"")
+                        println("warning: setter not found: \"set${name!!.localPart.capitalize()}\" or \"add${name!!.localPart.capitalize()}\"")
 
                     } else {
                         val paramType = setterMethod.parameterTypes[0]
