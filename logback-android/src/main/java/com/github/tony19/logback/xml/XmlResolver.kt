@@ -36,8 +36,8 @@ class XmlResolver {
                             paramType.name == "java.nio.charset.Charset" -> text { Charset.forName(it) }
                             paramType.isPrimitive -> text { parsePrimitive(paramType, it)!! }
                             else -> {
-                                val className = attributes["class"]
-                                val param = if (className.isNotEmpty()) Class.forName(className) else paramType
+                                val className = attributes.getValueOpt("class")
+                                val param = if (className != null && className.isNotEmpty()) Class.forName(className) else paramType
 
                                 val paramInst = try {
                                     param.getDeclaredConstructor().newInstance()
