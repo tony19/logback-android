@@ -133,8 +133,8 @@ public class SMTPAppender_SubethaSMTPTest {
 
   void waitUntilEmailIsSent() throws Exception {
     System.out.println("About to wait for sending thread to finish");
-    loggerContext.getExecutorService().shutdown();
-    loggerContext.getExecutorService().awaitTermination(3000, TimeUnit.MILLISECONDS);
+    loggerContext.getScheduledExecutorService().shutdown();
+    loggerContext.getScheduledExecutorService().awaitTermination(3000, TimeUnit.MILLISECONDS);
   }
 
   private static String getBody(Part msg) {
@@ -153,7 +153,7 @@ public class SMTPAppender_SubethaSMTPTest {
     logger.error("en error", new Exception("an exception"));
 
     waitUntilEmailIsSent();
-    System.out.println("*** " + ((ThreadPoolExecutor) loggerContext.getExecutorService()).getCompletedTaskCount());
+    System.out.println("*** " + ((ThreadPoolExecutor) loggerContext.getScheduledExecutorService()).getCompletedTaskCount());
     List<WiserMessage> wiserMsgList = WISER.getMessages();
 
     assertNotNull(wiserMsgList);

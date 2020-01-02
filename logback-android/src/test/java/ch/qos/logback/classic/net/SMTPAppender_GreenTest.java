@@ -150,9 +150,9 @@ public class SMTPAppender_GreenTest {
   }
 
   private void waitUntilEmailIsSent() throws InterruptedException {
-    loggerContext.getExecutorService().shutdown();
+    loggerContext.getScheduledExecutorService().shutdown();
     assertTrue("no emails sent",
-            loggerContext.getExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS));
+            loggerContext.getScheduledExecutorService().awaitTermination(1000, TimeUnit.MILLISECONDS));
   }
 
   @Test

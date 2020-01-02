@@ -51,11 +51,6 @@ public class MockContext extends ContextBase {
   }
 
   @Override
-  public ExecutorService getExecutorService() {
-    return executorService;
-  }
-
-  @Override
   public ScheduledExecutorService getScheduledExecutorService() {
     return (MockScheduledExecutorService)executorService;
   }
