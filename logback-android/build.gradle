@@ -98,8 +98,6 @@ dependencies {
     compileOnly 'com.sun.mail:android-mail:1.6.4'
     compileOnly 'com.sun.mail:android-activation:1.6.4'
 
-    testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
-    testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     testImplementation "org.jetbrains.kotlin:kotlin-test"
