@@ -15,17 +15,19 @@
  */
 package ch.qos.logback.classic.control;
 
-import org.junit.TestCase;
+import org.junit.Test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.control.ControlLogger;
 import ch.qos.logback.classic.control.ControlLoggerContext;
 
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * This class is for testing ControlLoggerContext which is a control class for testing HLoggerContext.
  */
-public class CLCTest extends TestCase {
+public class CLCTest {
   ControlLoggerContext clc;
 
 
@@ -33,6 +35,7 @@ public class CLCTest extends TestCase {
     clc = new ControlLoggerContext();
   }
 
+  @Test
   public void test1() {
     ControlLogger x = clc.getLogger("x");
     assertEquals("x", x.getName());

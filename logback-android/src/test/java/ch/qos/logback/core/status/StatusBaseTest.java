@@ -15,12 +15,18 @@
  */
 package ch.qos.logback.core.status;
 
+import org.junit.Test;
+
 import java.util.Iterator;
 
-import org.junit.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class StatusBaseTest extends TestCase {
+public class StatusBaseTest {
 
+  @Test
   public void testAddStatus() {
     {
       InfoStatus status = new InfoStatus("testing", this);
@@ -40,6 +46,7 @@ public class StatusBaseTest extends TestCase {
     }
   }
 
+  @Test
   public void testRemoveStatus() {
     {
       InfoStatus status = new InfoStatus("testing", this);
@@ -61,6 +68,7 @@ public class StatusBaseTest extends TestCase {
     }
   }
 
+  @Test
   public void testEffectiveLevel() {
     {
       // effective level = 0 level deep

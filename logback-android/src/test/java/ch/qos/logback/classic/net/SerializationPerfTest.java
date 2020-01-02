@@ -19,9 +19,10 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import org.junit.TestCase;
-
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import ch.qos.logback.classic.net.testObjectBuilders.Builder;
 import ch.qos.logback.classic.net.testObjectBuilders.MinimalSer;
@@ -29,8 +30,10 @@ import ch.qos.logback.classic.net.testObjectBuilders.MinimalSerBuilder;
 import ch.qos.logback.classic.net.testObjectBuilders.TrivialLoggingEventVOBuilder;
 import ch.qos.logback.classic.spi.LoggingEventVO;
 
-@Ignore()
-public class SerializationPerfTest extends TestCase {
+import static org.junit.Assert.fail;
+
+@Ignore("Only run manually")
+public class SerializationPerfTest {
 
   ObjectOutputStream oos;
 
@@ -109,8 +112,8 @@ public class SerializationPerfTest extends TestCase {
          *
          */
 
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
     if (runWithExternalMockServer) {
       oos = new ObjectOutputStream(new Socket("localhost",
           ExternalMockSocketServer.PORT).getOutputStream());
@@ -119,12 +122,13 @@ public class SerializationPerfTest extends TestCase {
     }
   }
 
+  @After
   public void tearDown() throws Exception {
-    super.tearDown();
     oos.close();
     oos = null;
   }
 
+  @Test
   public void runPerfTest(Builder<?> builder, String label) throws Exception {
     // long time1 = System.nanoTime();
 
@@ -191,16 +195,19 @@ public class SerializationPerfTest extends TestCase {
   // runPerfTest(builder, "Minimal object externalization");
   // }
 
+  @Test
   public void testWithMinimalSerialization() throws Exception {
     Builder<MinimalSer> builder = new MinimalSerBuilder();
     runPerfTest(builder, "Minimal object serialization");
   }
 
+  // @Test
   // public void testWithExternalization() throws Exception {
   // Builder builder = new LoggingEventExtBuilder();
   // runPerfTest(builder, "LoggingEvent object externalization");
   // }
 
+  @Test
   public void testWithSerialization() throws Exception {
     Builder<LoggingEventVO> builder = new TrivialLoggingEventVOBuilder();
     runPerfTest(builder, "LoggingEventVO object serialization");

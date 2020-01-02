@@ -15,21 +15,20 @@
  */
 package ch.qos.logback.classic;
 
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import org.junit.Ignore;
-
-@Ignore()
-public class LoggerTestHelper extends TestCase {
-
+public class LoggerTestHelper {
 
   static void assertNameEquals(Logger logger, String name)  {
     assertNotNull(logger);
     assertEquals(name, logger.getName());
   }
+
   static void assertLevels(Level level, Logger logger, Level effectiveLevel)  {
     if(level == null) {
-    assertNull(logger.getLevel());
+      assertNull(logger.getLevel());
     } else {
       assertEquals(level, logger.getLevel());
     }
