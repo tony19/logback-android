@@ -151,6 +151,7 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
   public Map<String, String> getMDCPropertyMap() {
     return mdcPropertyMap;
   }
+  @Deprecated
   public Map<String, String> getMdc() {
     return mdcPropertyMap;
   }
