@@ -51,7 +51,11 @@ data class Configuration (
     private fun resolveProperties() {
         // local properties
         propertyMeta?.forEach {
-            properties[it.key] = it.value
+            when (it.scope?.toLowerCase(Locale.US) ?: "local") {
+                "local" -> properties[it.key] = it.value
+                "system" -> System.setProperty(it.key, it.value)
+                else -> throw UnsupportedOperationException("not yet implemented")
+            }
         }
 
         // no need for meta anymore

@@ -62,7 +62,7 @@ class XmlConfigurationTest: FreeSpec({
             XmlParser.parse("""<configuration>
             |<property key="logback.test.foo" value="bar" scope="system" />
             |</configuration>""".trimMargin())
-            //System.getProperty("logback.test.foo") shouldBe "bar"
+            System.getProperty("logback.test.foo") shouldBe "bar"
         }
 
         "sets context property" {
