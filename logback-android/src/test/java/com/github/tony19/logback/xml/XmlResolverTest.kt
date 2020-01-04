@@ -50,7 +50,7 @@ class XmlResolverTest: FreeSpec({
         "Charset" { resolve { charsetVal shouldBe StandardCharsets.UTF_16BE } }
     }
 
-    "sets subclassed property" - {
+    "sets subclassed property" {
         open class Animal(var says: String = "")
         class Dog(var color: String): Animal("woof") {
             constructor(): this("brown") // explicit default constructor required by resolver
@@ -72,7 +72,7 @@ class XmlResolverTest: FreeSpec({
         }
     }
 
-    "set array items" {
+    "adds array items" {
         data class Dummy(var stringVal: Array<String> = arrayOf("a", "b")) {
             fun addStringVal(value: String) { // explicit adder method required by resolver
                 stringVal += value

@@ -12,53 +12,53 @@ import io.kotlintest.specs.FreeSpec
 class XmlConfigurationTest: FreeSpec({
 
     "debug attr" - {
-        "can be set to true" - {
+        "can be set to true" {
             val config = XmlParser.parse("""<configuration debug="true"> </configuration>""")
             config.debug shouldBe true
         }
 
-        "can be set to false" - {
+        "can be set to false" {
             val config = XmlParser.parse("""<configuration debug="false"> </configuration>""")
             config.debug shouldBe false
         }
 
-        "is falsy by default" - {
+        "is falsy by default" {
             val config = XmlParser.parse("""<configuration> </configuration>""")
             config.debug shouldNotBe true
         }
     }
 
     "scan attr" - {
-        "can be set to true" - {
+        "can be set to true" {
             val config = XmlParser.parse("""<configuration scan="true" />""")
             config.scan shouldBe true
         }
 
-        "can be set to false" - {
+        "can be set to false" {
             val config = XmlParser.parse("""<configuration scan="false" />""")
             config.scan shouldBe false
         }
 
-        "is falsy by default" - {
+        "is falsy by default" {
             val config = XmlParser.parse("""<configuration />""")
             config.scan shouldNotBe true
         }
     }
 
     "scanPeriod attr" - {
-        "can be set" - {
+        "can be set" {
             val config = XmlParser.parse("""<configuration scan="true" scanPeriod="1 day" />""")
             config.scanPeriod shouldBe "1 day"
         }
 
-        "is null by default" - {
+        "is null by default" {
             val config = XmlParser.parse("""<configuration />""")
             config.scanPeriod should beNull()
         }
     }
 
     "property" - {
-        "sets value" - {
+        "sets value" {
             val config = XmlParser.parse("""<configuration>
                 |<property key="foo" value="lorem ipsum" />
                 |<property key="bar" value="dolor" />
@@ -71,7 +71,7 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "timestamp" - {
-        "sets value" - {
+        "sets value" {
             val config = XmlParser.parse("""<configuration>
                 |<timestamp key="foo" datePattern="yyyyMMdd'T'HHmmss" />
                 |<timestamp key="bar" datePattern="yyyyMMdd" />
@@ -84,7 +84,7 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "include" - {
-        "sets value" - {
+        "sets value" {
             val config = XmlParser.parse("""<configuration>
                 |<include file="/path/to/foo.xml" />
                 |</configuration>""".trimMargin())
@@ -93,7 +93,7 @@ class XmlConfigurationTest: FreeSpec({
             config.includes!!.find { it.file == "/path/to/foo.xml" } shouldNot beNull()
         }
 
-        "sets values" - {
+        "sets values" {
             val config = XmlParser.parse("""<configuration>
                 |<include file="/path/to/foo.xml" />
                 |<include file="/path/to/bar.xml" />
@@ -106,7 +106,7 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "includes" - {
-        "sets value" - {
+        "sets value" {
             val config = XmlParser.parse("""<configuration>
                 |<includes>
                 |  <include file="/path/to/foo.xml" />
@@ -117,7 +117,7 @@ class XmlConfigurationTest: FreeSpec({
             config.optionalIncludes!![0].includes!!.find { it.file == "/path/to/foo.xml" } shouldNot beNull()
         }
 
-        "sets values" - {
+        "sets values" {
             val config = XmlParser.parse("""<configuration>
                 |<includes>
                 |  <include file="/path/to/foo.xml" />
