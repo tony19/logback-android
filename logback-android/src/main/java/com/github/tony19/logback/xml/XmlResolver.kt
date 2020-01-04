@@ -6,16 +6,15 @@ import java.lang.reflect.Method
 import java.nio.charset.Charset
 import java.util.*
 
-class XmlResolver {
-    fun <T> resolve(k: Konsumer, className: String): T {
-        val inst = Class.forName(className).getDeclaredConstructor().newInstance()
+class XmlResolver: IResolver {
+    override fun <T> resolve(k: Konsumer, className: String): T {
         @Suppress("UNCHECKED_CAST")
-        return resolve(k, inst) as T
+        return resolve(k, create(Class.forName(className))) as T
     }
 
-    fun resolve(k: Konsumer, inst: Any): Any {
+    override fun resolve(k: Konsumer, inst: Any): Any {
         return inst.apply {
-            val instMethods = inst.javaClass.methods
+            val instMethods by lazy { inst.javaClass.methods }
             k.children(anyName) {
                 if (name?.localPart?.isNotEmpty()!!) {
                     val setterMethod = findSetterMethod(instMethods, name?.localPart)
@@ -59,20 +58,19 @@ class XmlResolver {
             else -> {
                 val className = k.attributes.getValueOpt("class")
                 val param = if (className != null && className.isNotEmpty()) Class.forName(className) else paramType
-
-                val paramInst = try {
-                    param.getDeclaredConstructor().newInstance()
-                } catch(e: NoSuchMethodException) {
-                    println("warning: missing default constructor for \"${param.name}\"")
-                    throw e
-                }
-
-                resolve(k, paramInst).apply {
+                resolve(k, create(param)).apply {
                     // FIXME: We need to have LoggerContext set before calling start()
                     //javaClass.methods.find { it.name == "start" }?.invoke(this)
                 }
             }
         }
+    }
+
+    private fun create(clazz: Class<*>): Any = try {
+        clazz.getDeclaredConstructor().newInstance()
+    } catch(e: NoSuchMethodException) {
+        println("warning: missing default constructor for \"${clazz.name}\"")
+        throw e
     }
 
     private val stringConverters by lazy {

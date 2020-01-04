@@ -2,6 +2,7 @@ package com.github.tony19.logback.xml
 
 import io.kotlintest.matchers.collections.shouldHaveSize
 import io.kotlintest.matchers.types.beNull
+import io.kotlintest.matchers.types.shouldBeInstanceOf
 import io.kotlintest.should
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNot
@@ -137,7 +138,23 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "appender" - {
-        "adds LogcatAppender" - {
+        "adds LogcatAppender meta" {
+            val config = XmlParser.parse("""<configuration>
+                |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+                |  <tagEncoder>
+                |    <pattern>%logger{12}</pattern>
+                |  </tagEncoder>
+                |  <encoder>
+                |    <pattern>[%-20thread] %msg</pattern>
+                |  </encoder>
+                |</appender>
+                |</configuration>""".trimMargin())
+
+            config.appenderMeta!! shouldHaveSize 1
+            config.appenderMeta!!.find { it.name == "logcat" && it.className == "ch.qos.logback.classic.android.LogcatAppender" } shouldNot beNull()
+        }
+
+        "creates LogcatAppender instance" - {
             val config = XmlParser.parse("""<configuration>
                 |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
                 |  <tagEncoder>
@@ -152,10 +169,18 @@ class XmlConfigurationTest: FreeSpec({
                 |</root>
                 |</configuration>""".trimMargin())
 
-            config.appenderMeta!! shouldHaveSize 1
-            config.appenderMeta!!.find { it.name == "logcat" && it.className == "ch.qos.logback.classic.android.LogcatAppender" } shouldNot beNull()
+            val appender = config.appenders.find { it.name == "logcat" }
 
+            appender shouldNot beNull()
+            appender.shouldBeInstanceOf<ch.qos.logback.classic.android.LogcatAppender>()
 
+            "and configures it" {
+                val logcat = appender as ch.qos.logback.classic.android.LogcatAppender
+                logcat.tagEncoder shouldNot beNull()
+                logcat.encoder shouldNot beNull()
+                logcat.tagEncoder!!.pattern shouldBe "%logger{12}"
+                logcat.encoder!!.pattern shouldBe "[%-20thread] %msg"
+            }
         }
     }
 })

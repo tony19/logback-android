@@ -1,6 +1,7 @@
 package com.github.tony19.logback.xml
 
 import com.gitlab.mvysny.konsumexml.Konsumer
+import com.gitlab.mvysny.konsumexml.konsumeXml
 
 data class Configuration (
     var debug: Boolean? = false,
@@ -13,43 +14,63 @@ data class Configuration (
     var optionalIncludes: List<Includes>?,
     var loggers: List<Logger>?,
     var root: Root?,
-    var resolvedAppenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf()
+    var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf()
 ) {
     companion object {
-        fun xml(k: Konsumer): Configuration {
-            k.checkCurrent("configuration")
-
-            return Configuration(
-                debug = k.attributes.getValueOpt("debug")?.toBoolean(),
-                scan = k.attributes.getValueOpt("scan")?.toBoolean(),
-                scanPeriod = k.attributes.getValueOpt("scanPeriod"),
-                appenderMeta = k.children("appender") { Appender.xml(this) },
-                properties = k.children("property") { Property.xml(this) },
-                timestamps = k.children("timestamp") { Timestamp.xml(this) },
-                includes = k.children("include") { Include.xml(this) },
-                optionalIncludes = k.children("includes") { Includes.xml(this) },
-                loggers = k.children("logger") { Logger.xml(this) },
-                root = k.childOpt("root") { Root.xml(this) }
-            ).apply {
-                val (matchedAppenders, unknownAppenders) = getAppenderRefs().map { appenderName ->
-                    appenderMeta?.find { it.name == appenderName }
-                }.partition { it !== null }
-
-                unknownAppenders.forEach {
-                    System.err.println("unknown appender ref: ${it!!.name}")
+        fun xml(xmlDoc: String): Configuration {
+            return xmlDoc.konsumeXml().use { k ->
+                k.child("configuration") {
+                    Configuration(
+                            debug = attributes.getValueOpt("debug")?.toBoolean(),
+                            scan = attributes.getValueOpt("scan")?.toBoolean(),
+                            scanPeriod = attributes.getValueOpt("scanPeriod"),
+                            appenderMeta = children("appender") { Appender.xml(this) },
+                            properties = children("property") { Property.xml(this) },
+                            timestamps = children("timestamp") { Timestamp.xml(this) },
+                            includes = children("include") { Include.xml(this) },
+                            optionalIncludes = children("includes") { Includes.xml(this) },
+                            loggers = children("logger") { Logger.xml(this) },
+                            root = childOpt("root") { Root.xml(this) }
+                    )
                 }
-
-                val resolver = XmlResolver()
-                val matchedAppenderNames = matchedAppenders.map { it!!.name!! }
-
-                // FIXME: XML stream is already read at this point, so we can't re-read it.
-                // A solution would be to re-instantiate Konsumer instance from string.
-                // Is that more expensive that just parsing everything in one pass?
-                k.children("appender") {
-                    val meta = Appender.xml(this)
-                    if (meta.name in matchedAppenderNames) {
-                        resolvedAppenders.add(resolver.resolve(this, meta.className))
+            }.apply {
+                xmlDoc.konsumeXml().use { k ->
+                    k.child("configuration") {
+                        resolveAppenders(this, XmlResolver())
+                        skipContents()
                     }
+                }
+            }
+        }
+    }
+
+    private fun resolveAppenders(k: Konsumer, resolver: IResolver) {
+        if (appenderMeta?.isEmpty()!!) {
+            System.err.println("no appenders defined")
+            return
+        }
+
+        val (matchedAppenders, unknownAppenders) = getAppenderRefs().map { appenderName ->
+            appenderMeta?.find { it.name == appenderName }
+        }.partition { it !== null }
+
+        unknownAppenders.forEach {
+            System.err.println("unknown appender ref: ${it!!.name}")
+        }
+
+        if (matchedAppenders.isEmpty()) {
+            System.err.println("no referenced appenders")
+
+        } else {
+            val matchedAppenderNames = matchedAppenders.map { it!!.name!! }
+
+            k.children("appender") {
+                val name = attributes.getValue("name")
+                val className = attributes.getValue("class")
+                if (name in matchedAppenderNames) {
+                    val newAppender = resolver.resolve<ch.qos.logback.core.Appender<*>>(this, className)
+                    newAppender.name = name
+                    appenders.add(newAppender)
                 }
             }
         }
