@@ -198,11 +198,12 @@ class XmlConfigurationTest: FreeSpec({
             appender.shouldBeInstanceOf<ch.qos.logback.classic.android.LogcatAppender>()
 
             "and configures it" {
-                val logcat = appender as ch.qos.logback.classic.android.LogcatAppender
-                logcat.tagEncoder shouldNot beNull()
-                logcat.encoder shouldNot beNull()
-                logcat.tagEncoder!!.pattern shouldBe "%logger{12}"
-                logcat.encoder!!.pattern shouldBe "[%-20thread] %msg"
+                (appender as ch.qos.logback.classic.android.LogcatAppender).apply {
+                    tagEncoder shouldNot beNull()
+                    encoder shouldNot beNull()
+                    tagEncoder!!.pattern shouldBe "%logger{12}"
+                    encoder!!.pattern shouldBe "[%-20thread] %msg"
+                }
             }
         }
 
