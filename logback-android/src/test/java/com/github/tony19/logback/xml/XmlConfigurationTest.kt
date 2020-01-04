@@ -161,22 +161,6 @@ class XmlConfigurationTest: FreeSpec({
             config.appenders shouldHaveSize 0
         }
 
-        "adds LogcatAppender meta" {
-            val config = XmlParser.parse("""<configuration>
-                |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
-                |  <tagEncoder>
-                |    <pattern>%logger{12}</pattern>
-                |  </tagEncoder>
-                |  <encoder>
-                |    <pattern>[%-20thread] %msg</pattern>
-                |  </encoder>
-                |</appender>
-                |</configuration>""".trimMargin())
-
-            config.appenderMeta!! shouldHaveSize 1
-            config.appenderMeta!!.find { it.name == "logcat" && it.className == "ch.qos.logback.classic.android.LogcatAppender" } shouldNot beNull()
-        }
-
         "creates LogcatAppender instance" - {
             val config = XmlParser.parse("""<configuration>
                 |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
@@ -205,21 +189,6 @@ class XmlConfigurationTest: FreeSpec({
                     encoder!!.pattern shouldBe "[%-20thread] %msg"
                 }
             }
-        }
-
-        "adds FileAppender meta" {
-            val config = XmlParser.parse("""<configuration>
-                <appender name="file" class="ch.qos.logback.core.FileAppender">
-                  <lazy>true</lazy>
-                  <file>/data/data/com.example/files/log.txt</file>
-                  <encoder>
-                    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
-                  </encoder>
-                </appender>
-                </configuration>""")
-
-            config.appenderMeta!! shouldHaveSize 1
-            config.appenderMeta!!.find { it.name == "file" && it.className == "ch.qos.logback.core.FileAppender" } shouldNot beNull()
         }
 
         "creates FileAppender instance" - {

@@ -54,6 +54,9 @@ data class Configuration (
             appenderMeta?.find { it.name == appenderName }
         }.partition { it !== null }
 
+        // no need for meta anymore
+        appenderMeta = null
+
         unknownAppenders.forEach {
             System.err.println("unknown appender ref: ${it!!.name}")
         }
