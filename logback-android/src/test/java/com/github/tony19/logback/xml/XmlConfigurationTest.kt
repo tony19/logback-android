@@ -205,5 +205,49 @@ class XmlConfigurationTest: FreeSpec({
                 logcat.encoder!!.pattern shouldBe "[%-20thread] %msg"
             }
         }
+
+        "adds FileAppender meta" {
+            val config = XmlParser.parse("""<configuration>
+                <appender name="file" class="ch.qos.logback.core.FileAppender">
+                  <lazy>true</lazy>
+                  <file>/data/data/com.example/files/log.txt</file>
+                  <encoder>
+                    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+                  </encoder>
+                </appender>
+                </configuration>""")
+
+            config.appenderMeta!! shouldHaveSize 1
+            config.appenderMeta!!.find { it.name == "file" && it.className == "ch.qos.logback.core.FileAppender" } shouldNot beNull()
+        }
+
+        "creates FileAppender instance" - {
+            val config = XmlParser.parse("""<configuration>
+                <appender name="file" class="ch.qos.logback.core.FileAppender">
+                  <lazy>true</lazy>
+                  <file>/data/data/com.example/files/log.txt</file>
+                  <encoder>
+                    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+                  </encoder>
+                </appender>
+                <root>
+                  <appender-ref ref="file"/>
+                </root>
+                </configuration>""")
+
+            val appender = config.appenders.find { it.name == "file" }
+
+            appender shouldNot beNull()
+            appender.shouldBeInstanceOf<ch.qos.logback.core.FileAppender<*>>()
+
+            "and configures it" {
+                (appender as ch.qos.logback.core.FileAppender<*>).apply {
+                    encoder shouldNot beNull()
+                    (encoder!! as ch.qos.logback.classic.encoder.PatternLayoutEncoder).pattern shouldBe "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n"
+                    file shouldBe "/data/data/com.example/files/log.txt"
+                    lazy shouldBe true
+                }
+            }
+        }
     }
 })
