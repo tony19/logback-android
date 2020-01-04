@@ -2,19 +2,21 @@ package com.github.tony19.logback.xml
 
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
+import java.util.*
 
 data class Configuration (
     var debug: Boolean? = false,
     var scan: Boolean? = false,
     var scanPeriod: String? = null,
     var appenderMeta: List<Appender>? = emptyList(),
-    var properties: List<Property>? = emptyList(),
+    var propertyMeta: List<Property>? = emptyList(),
     var timestamps: List<Timestamp>? = emptyList(),
     var includes: List<Include>? = emptyList(),
     var optionalIncludes: List<Includes>?,
     var loggers: List<Logger>?,
     var root: Root?,
-    var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf()
+    var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf(),
+    var properties: Properties = Properties()
 ) {
     companion object {
         fun xml(xmlDoc: String): Configuration {
@@ -25,7 +27,7 @@ data class Configuration (
                             scan = attributes.getValueOpt("scan")?.toBoolean(),
                             scanPeriod = attributes.getValueOpt("scanPeriod"),
                             appenderMeta = children("appender") { Appender.xml(this) },
-                            properties = children("property") { Property.xml(this) },
+                            propertyMeta = children("property") { Property.xml(this) },
                             timestamps = children("timestamp") { Timestamp.xml(this) },
                             includes = children("include") { Include.xml(this) },
                             optionalIncludes = children("includes") { Includes.xml(this) },
@@ -34,6 +36,8 @@ data class Configuration (
                     )
                 }
             }.apply {
+                resolveProperties()
+
                 xmlDoc.konsumeXml().use { k ->
                     k.child("configuration") {
                         resolveAppenders(this, XmlResolver())
@@ -42,6 +46,16 @@ data class Configuration (
                 }
             }
         }
+    }
+
+    private fun resolveProperties() {
+        // local properties
+        propertyMeta?.forEach {
+            properties[it.key] = it.value
+        }
+
+        // no need for meta anymore
+        propertyMeta = null
     }
 
     private fun resolveAppenders(k: Konsumer, resolver: IResolver) {

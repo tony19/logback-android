@@ -58,15 +58,24 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "property" - {
-        "sets value" {
-            val config = XmlParser.parse("""<configuration>
-                |<property key="foo" value="lorem ipsum" />
-                |<property key="bar" value="dolor" />
-                |</configuration>""".trimMargin())
+        "sets system property" {
+            XmlParser.parse("""<configuration>
+            |<property key="logback.test.foo" value="bar" scope="system" />
+            |</configuration>""".trimMargin())
+            //System.getProperty("logback.test.foo") shouldBe "bar"
+        }
 
-            config.properties!! shouldHaveSize 2
-            config.properties!!.find { x -> x.key == "foo" && x.value == "lorem ipsum"} shouldNot beNull()
-            config.properties!!.find { x -> x.key == "bar" && x.value == "dolor"} shouldNot beNull()
+        "sets context property" {
+
+        }
+
+        "sets local property" {
+            val config = XmlParser.parse("""<configuration>
+            |<property key="local1" value="value1" scope="local" />
+            |<property key="local2" value="value2" />
+            |</configuration>""".trimMargin())
+            config.properties["local1"] shouldBe "value1"
+            config.properties["local2"] shouldBe "value2"
         }
     }
 
