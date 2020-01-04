@@ -21,7 +21,13 @@ class XmlResolver {
                     val setterMethod = findSetterMethod(instMethods, name?.localPart)
                     if (setterMethod == null) {
                         skipContents()
-                        println("warning: setter not found: \"set${name!!.localPart.capitalize()}\" or \"add${name!!.localPart.capitalize()}\"")
+                        println("warning: setter method not found: \"set${name!!.localPart.capitalize()}\" or \"add${name!!.localPart.capitalize()}\"")
+
+                    // Arrays require an adder method to insert values!
+                    // (we don't support setting array items)
+                    } else if (setterMethod.parameterTypes[0].isArray && setterMethod.name.startsWith("set")) {
+                        skipContents()
+                        println("warning: adder method not found: \"add${name!!.localPart.capitalize()}\"")
 
                     } else {
                         val value = resolveValue(this, setterMethod.parameterTypes[0])

@@ -92,6 +92,22 @@ class XmlResolverTest: FreeSpec({
         }
     }
 
+    "ignores value when missing adder for array items" {
+        data class Dummy(var stringVal: Array<String> = arrayOf("a", "b"))
+
+        val xmlDoc = """<doc>
+            |  <stringVal>x</stringVal>
+            |  <stringVal>y</stringVal>
+            |  <stringVal>z</stringVal>
+            |</doc>
+        """.trimMargin()
+
+        xmlDoc.konsumeXml().child("doc") {
+            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            dummy.stringVal shouldContainExactlyInAnyOrder arrayOf("a", "b")
+        }
+    }
+
     "does not set readonly property" {
         data class Dummy(val stringVal: String = "initial")
 
