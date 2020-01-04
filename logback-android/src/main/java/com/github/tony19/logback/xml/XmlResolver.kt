@@ -54,8 +54,8 @@ class XmlResolver: IResolver {
 
     private fun resolveValue(k: Konsumer, paramType: Class<*>): Any {
         return when {
-            paramType.name == "java.lang.String" -> k.text()
-            paramType.name == "java.nio.charset.Charset" -> k.text { Charset.forName(it) }
+            paramType == java.lang.String::class.java -> k.text()
+            paramType == java.nio.charset.Charset::class.java -> k.text { Charset.forName(it) }
             paramType.isPrimitive -> k.text { parsePrimitive(paramType, it)!! }
             else -> {
                 val className = k.attributes.getValueOpt("class")
