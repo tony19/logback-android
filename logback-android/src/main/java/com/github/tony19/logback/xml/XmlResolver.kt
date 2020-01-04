@@ -25,7 +25,7 @@ class XmlResolver: IResolver {
                         println("warning: setter method not found: \"set${name!!.localPart.capitalize()}\" or \"add${name!!.localPart.capitalize()}\"")
 
                     // Arrays require an adder method to insert values!
-                    // (we don't support setting array items)
+                    // (we don't support array initialization)
                     } else if (setterMethod.parameterTypes[0].isArray && setterMethod.name.startsWith("set")) {
                         skipContents()
                         println("warning: adder method not found: \"add${name!!.localPart.capitalize()}\"")
