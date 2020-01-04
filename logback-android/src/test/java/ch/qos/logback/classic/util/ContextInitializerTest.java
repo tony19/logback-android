@@ -35,7 +35,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.StatusListener;
@@ -68,7 +67,7 @@ public class ContextInitializerTest {
       new ContextInitializer(loggerContext).autoConfig();
       Appender<ILoggingEvent> appender = root.getAppender("STDOUT");
       assertNotNull(appender);
-      assertTrue(appender instanceof ConsoleAppender);
+      assertTrue(appender instanceof ch.qos.logback.core.ConsoleAppender);
     }
     {
       loggerContext.stop();

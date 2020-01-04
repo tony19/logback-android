@@ -18,7 +18,6 @@ package ch.qos.logback.core;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import ch.qos.logback.core.joran.spi.ConsoleTarget;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.WarnStatus;
 
@@ -39,7 +38,7 @@ import ch.qos.logback.core.status.WarnStatus;
 public class ConsoleAppender<E> extends OutputStreamAppender<E> {
 
   @SuppressWarnings("deprecation")
-  protected ConsoleTarget target = ConsoleTarget.SystemOut;
+  protected ch.qos.logback.core.joran.spi.ConsoleTarget target = ch.qos.logback.core.joran.spi.ConsoleTarget.SystemOut;
 
   /**
    * Sets the value of the <b>Target</b> option. Recognized values are
@@ -48,7 +47,7 @@ public class ConsoleAppender<E> extends OutputStreamAppender<E> {
    */
   public void setTarget(String value) {
     @SuppressWarnings("deprecation")
-    ConsoleTarget t = ConsoleTarget.findByName(value.trim());
+    ch.qos.logback.core.joran.spi.ConsoleTarget t = ch.qos.logback.core.joran.spi.ConsoleTarget.findByName(value.trim());
     if (t == null) {
       targetWarn(value);
     } else {
@@ -67,9 +66,10 @@ public class ConsoleAppender<E> extends OutputStreamAppender<E> {
     return target.getName();
   }
 
+  @SuppressWarnings("deprecation")
   private void targetWarn(String val) {
     Status status = new WarnStatus("[" + val + "] should be one of "
-            + Arrays.toString(ConsoleTarget.values()), this);
+            + Arrays.toString(ch.qos.logback.core.joran.spi.ConsoleTarget.values()), this);
     status.add(new WarnStatus(
             "Using previously set target, System.out by default.", this));
     addStatus(status);

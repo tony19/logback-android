@@ -18,13 +18,12 @@ package ch.qos.logback.classic;
 import ch.qos.logback.classic.layout.TTLLLayout;
 import ch.qos.logback.classic.spi.Configurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
 /**
  * BasicConfigurator configures logback-classic by attaching a
- * {@link ConsoleAppender} to the root logger. The console appender's layout
+ * {@link ch.qos.logback.core.ConsoleAppender} to the root logger. The console appender's layout
  * is set to a {@link ch.qos.logback.classic.layout.TTLLLayout TTLLLayout}.
  *
  * @author Ceki Gulcu
@@ -38,7 +37,7 @@ public class BasicConfigurator extends ContextAwareBase implements Configurator 
 
   public void configure(LoggerContext lc) {
     addInfo("Setting up default configuration.");
-    ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<ILoggingEvent>();
+    ch.qos.logback.core.ConsoleAppender<ILoggingEvent> ca = new ch.qos.logback.core.ConsoleAppender<ILoggingEvent>();
     ca.setContext(lc);
     ca.setName("console");
     LayoutWrappingEncoder<ILoggingEvent> encoder = new LayoutWrappingEncoder<ILoggingEvent>();

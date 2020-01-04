@@ -27,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.encoder.DummyEncoder;
 import ch.qos.logback.core.encoder.EchoEncoder;
@@ -67,11 +66,11 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   @Override
   public Appender<Object> getAppender() {
-    return  new ConsoleAppender<Object>();
+    return  new ch.qos.logback.core.ConsoleAppender<Object>();
   }
 
   protected Appender<Object> getConfiguredAppender() {
-    ConsoleAppender<Object> ca = new ConsoleAppender<Object>();
+    ch.qos.logback.core.ConsoleAppender<Object> ca = new ch.qos.logback.core.ConsoleAppender<Object>();
     ca.setEncoder(new NopEncoder<Object>());
     ca.start();
     return ca;
@@ -79,7 +78,7 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   @Test
   public void smoke() {
-    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    ch.qos.logback.core.ConsoleAppender<Object> ca = (ch.qos.logback.core.ConsoleAppender<Object>) getAppender();
     ca.setEncoder(new DummyEncoder<Object>());
     ca.start();
     ca.doAppend(new Object());
@@ -88,7 +87,7 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   @Test
   public void open() {
-    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    ch.qos.logback.core.ConsoleAppender<Object> ca = (ch.qos.logback.core.ConsoleAppender<Object>) getAppender();
     DummyEncoder<Object> dummyEncoder = new DummyEncoder<Object>();
     dummyEncoder.setFileHeader("open");
     ca.setEncoder(dummyEncoder);
@@ -101,7 +100,7 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   @Test
   public void testClose() {
-    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    ch.qos.logback.core.ConsoleAppender<Object> ca = (ch.qos.logback.core.ConsoleAppender<Object>) getAppender();
     DummyEncoder<Object> dummyEncoder = new DummyEncoder<Object>();
     dummyEncoder.setFileFooter("CLOSED");
     ca.setEncoder(dummyEncoder);
@@ -117,7 +116,7 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
   // See http://jira.qos.ch/browse/LBCORE-143
   @Test
   public void changeInConsole() {
-    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    ch.qos.logback.core.ConsoleAppender<Object> ca = (ch.qos.logback.core.ConsoleAppender<Object>) getAppender();
     EchoEncoder<Object> encoder = new EchoEncoder<Object>();
     ca.setEncoder(encoder);
     ca.start();
@@ -132,7 +131,7 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   @Test
   public void testUTF16BE() throws UnsupportedEncodingException {
-    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    ch.qos.logback.core.ConsoleAppender<Object> ca = (ch.qos.logback.core.ConsoleAppender<Object>) getAppender();
     DummyEncoder<Object> dummyEncoder = new DummyEncoder<Object>();
     Charset utf16BE = Charset.forName("UTF-16BE");
     dummyEncoder.setCharset(utf16BE);
@@ -144,7 +143,7 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   @Test
   public void wrongTarget() {
-    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    ch.qos.logback.core.ConsoleAppender<Object> ca = (ch.qos.logback.core.ConsoleAppender<Object>) getAppender();
     EchoEncoder<Object> encoder = new EchoEncoder<Object>();
     encoder.setContext(context);
     ca.setContext(context);
