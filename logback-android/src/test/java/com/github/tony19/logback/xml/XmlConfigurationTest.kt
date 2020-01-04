@@ -138,6 +138,29 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "appender" - {
+        "ignores unreferenced appenders" {
+            val config = XmlParser.parse("""<configuration>
+                |<appender name="unusedA" class="ch.qos.logback.classic.android.LogcatAppender">
+                |  <tagEncoder>
+                |    <pattern>%logger{12}</pattern>
+                |  </tagEncoder>
+                |  <encoder>
+                |    <pattern>[%-20thread] %msg</pattern>
+                |  </encoder>
+                |</appender>
+                |<appender name="unusedB" class="ch.qos.logback.classic.android.LogcatAppender">
+                |  <tagEncoder>
+                |    <pattern>%logger{12}</pattern>
+                |  </tagEncoder>
+                |  <encoder>
+                |    <pattern>[%-20thread] %msg</pattern>
+                |  </encoder>
+                |</appender>
+                |</configuration>""".trimMargin())
+
+            config.appenders shouldHaveSize 0
+        }
+
         "adds LogcatAppender meta" {
             val config = XmlParser.parse("""<configuration>
                 |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
