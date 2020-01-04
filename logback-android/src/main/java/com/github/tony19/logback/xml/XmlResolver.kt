@@ -1,5 +1,7 @@
 package com.github.tony19.logback.xml
 
+import ch.qos.logback.classic.PatternLayout
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.anyName
 import java.lang.reflect.Method
@@ -57,7 +59,8 @@ class XmlResolver: IResolver {
             paramType.isPrimitive -> k.text { parsePrimitive(paramType, it)!! }
             else -> {
                 val className = k.attributes.getValueOpt("class")
-                val param = if (className != null && className.isNotEmpty()) Class.forName(className) else paramType
+                val param = getParamClass(className, paramType)
+
                 resolve(k, create(param)).apply {
                     // FIXME: We need to have LoggerContext set before calling start()
                     //javaClass.methods.find { it.name == "start" }?.invoke(this)
@@ -90,5 +93,19 @@ class XmlResolver: IResolver {
 
     private fun parsePrimitive(paramType: Class<*>, rawValue: String): Any? {
         return stringConverters[paramType.name.toLowerCase(Locale.US)]?.invoke(rawValue)
+    }
+
+    private fun getParamClass(className: String?, paramType: Class<*>): Class<*> {
+        if (paramType.isInterface && className.isNullOrEmpty()) {
+            return when (paramType) {
+                ch.qos.logback.core.encoder.Encoder::class.java -> PatternLayoutEncoder::class.java
+                ch.qos.logback.core.Layout::class.java -> PatternLayout::class.java
+                else -> throw Error("warning: cannot instantiate interface: ${paramType.name}")
+            }
+        }
+        return when {
+            !className.isNullOrEmpty() -> Class.forName(className)
+            else -> paramType
+        }
     }
 }
