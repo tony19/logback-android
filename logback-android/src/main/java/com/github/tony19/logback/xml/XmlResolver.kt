@@ -18,11 +18,15 @@ class XmlResolver {
             k.children(anyName) {
                 if (name?.localPart?.isNotEmpty()!!) {
                     val elemName = name?.localPart?.toLowerCase(Locale.US)
+                    // Prioritize adder in case a setter exists for an array. The
+                    // adder adds a single param, which works with the flow below.
                     val setterMethod = instMethods
                             .find {
-                                // Prioritize adder in case a setter exists for an array. The
-                                // adder adds a single param, which works with the flow below.
-                                it.name.toLowerCase(Locale.US) in arrayOf("add${elemName}", "set${elemName}")
+                                it.name.toLowerCase(Locale.US) == "add${elemName}"
+                                && it.parameterTypes.size == 1 }
+                        ?: instMethods
+                            .find {
+                                it.name.toLowerCase(Locale.US) == "set${elemName}"
                                 && it.parameterTypes.size == 1 }
 
                     if (setterMethod == null) {
