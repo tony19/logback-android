@@ -104,6 +104,12 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
 }
 
+// Exclude `javax.xml.bind:jaxb-api`, as it's unused in our project, but causing
+// several lint errors in processing module-info.class
+configurations.all {
+    exclude group: 'javax.xml.bind', module:'jaxb-api'
+}
+
 allprojects {
     tasks.withType(JavaCompile) {
         // Warn about deprecations
