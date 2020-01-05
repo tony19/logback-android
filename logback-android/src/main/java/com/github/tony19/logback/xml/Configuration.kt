@@ -1,5 +1,6 @@
 package com.github.tony19.logback.xml
 
+import ch.qos.logback.classic.LoggerContext
 import com.github.tony19.logback.utils.VariableExpander
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
@@ -17,10 +18,11 @@ data class Configuration (
     var loggers: List<Logger>?,
     var root: Root?,
     var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf(),
-    var properties: Properties = Properties()
+    var properties: Properties = Properties(),
+    val context: LoggerContext
 ) {
     companion object {
-        fun xml(xmlDoc: String): Configuration {
+        fun xml(xmlDoc: String, context: LoggerContext = LoggerContext()): Configuration {
             return xmlDoc.konsumeXml().use { k ->
                 k.child("configuration") {
                     Configuration(
@@ -33,15 +35,17 @@ data class Configuration (
                             includes = children("include") { Include.xml(this) },
                             optionalIncludes = children("includes") { Includes.xml(this) },
                             loggers = children("logger") { Logger.xml(this) },
-                            root = childOpt("root") { Root.xml(this) }
+                            root = childOpt("root") { Root.xml(this) },
+                            context = context
                     )
                 }
             }.apply {
                 resolveProperties()
 
+                val resolver = XmlResolver(::expandVar)
                 xmlDoc.konsumeXml().use { k ->
                     k.child("configuration") {
-                        resolveAppenders(this, XmlResolver())
+                        resolveAppenders(this, resolver)
                         skipContents()
                     }
                 }
@@ -54,22 +58,25 @@ data class Configuration (
             when (it.scope?.toLowerCase(Locale.US) ?: "local") {
                 "local" -> properties[it.key] = it.value
                 "system" -> System.setProperty(it.key, it.value)
-                else -> throw UnsupportedOperationException("not yet implemented")
+                "context" -> context.putProperty(it.key, it.value)
             }
         }
 
         // second pass to expand any variables
-        val expander = VariableExpander()
         propertyMeta?.forEach {
             when (it.scope?.toLowerCase(Locale.US) ?: "local") {
-                "local" -> properties[it.key] = expander.expand(it.value, properties)
-                "system" -> System.setProperty(it.key, expander.expand(it.value, properties))
-                else -> throw UnsupportedOperationException("not yet implemented")
+                "local" -> properties[it.key] = expandVar(it.value)
+                "system" -> System.setProperty(it.key, expandVar(it.value))
+                "context" -> context.putProperty(it.key, expandVar(it.value))
             }
         }
 
         // no need for meta anymore
         propertyMeta = null
+    }
+
+    private fun expandVar(input: String) = VariableExpander().expand(input) {
+        properties.getProperty(it) ?: context.getProperty(it) ?: System.getProperty(it) ?: System.getenv(it)
     }
 
     private fun resolveAppenders(k: Konsumer, resolver: IResolver) {
