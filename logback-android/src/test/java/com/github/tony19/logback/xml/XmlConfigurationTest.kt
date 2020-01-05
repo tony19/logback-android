@@ -77,6 +77,15 @@ class XmlConfigurationTest: FreeSpec({
             config.properties["local1"] shouldBe "value1"
             config.properties["local2"] shouldBe "value2"
         }
+
+        "sets local property with variables" {
+            val config = XmlParser.parse("""<configuration>
+            |<property key="logdir" value="/path/to/logs" scope="local" />
+            |<property key="logfile" value="${'$'}{logdir}/log.txt" />
+            |</configuration>""".trimMargin())
+
+            config.properties["logfile"] shouldBe "/path/to/logs/log.txt"
+        }
     }
 
     "timestamp" - {

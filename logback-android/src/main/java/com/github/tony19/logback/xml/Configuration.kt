@@ -1,5 +1,6 @@
 package com.github.tony19.logback.xml
 
+import com.github.tony19.logback.utils.VariableExpander
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
 import java.util.*
@@ -49,11 +50,20 @@ data class Configuration (
     }
 
     private fun resolveProperties() {
-        // local properties
         propertyMeta?.forEach {
             when (it.scope?.toLowerCase(Locale.US) ?: "local") {
                 "local" -> properties[it.key] = it.value
                 "system" -> System.setProperty(it.key, it.value)
+                else -> throw UnsupportedOperationException("not yet implemented")
+            }
+        }
+
+        // second pass to expand any variables
+        val expander = VariableExpander()
+        propertyMeta?.forEach {
+            when (it.scope?.toLowerCase(Locale.US) ?: "local") {
+                "local" -> properties[it.key] = expander.expand(it.value, properties)
+                "system" -> System.setProperty(it.key, expander.expand(it.value, properties))
                 else -> throw UnsupportedOperationException("not yet implemented")
             }
         }
