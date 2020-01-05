@@ -1,6 +1,10 @@
 package com.github.tony19.logback.xml
 
 import com.gitlab.mvysny.konsumexml.konsumeXml
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import io.kotlintest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
@@ -119,6 +123,23 @@ class XmlResolverTest: FreeSpec({
         xmlDoc.konsumeXml().child("doc") {
             val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
             dummy.stringVal shouldBe "initial"
+        }
+    }
+
+    "calls value handler" {
+        data class Dummy(var stringVal: String = "initial")
+
+        val xmlDoc = """<doc>
+            |  <stringVal>bob</stringVal>
+            |</doc>
+        """.trimMargin()
+
+        xmlDoc.konsumeXml().child("doc") {
+            val onValue: (String) -> String = mock {
+                onGeneric { invoke(any()) } doReturn ""
+            }
+            XmlResolver(onValue).resolve(this, Dummy()) as Dummy
+            verify(onValue).invoke("bob")
         }
     }
 })

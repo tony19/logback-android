@@ -102,6 +102,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     testImplementation "org.jetbrains.kotlin:kotlin-test"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 }
 
 // Exclude `javax.xml.bind:jaxb-api`, as it's unused in our project, but causing
