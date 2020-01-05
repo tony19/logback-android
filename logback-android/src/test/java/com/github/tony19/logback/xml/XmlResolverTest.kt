@@ -135,7 +135,7 @@ class XmlResolverTest: FreeSpec({
         """.trimMargin()
 
         xmlDoc.konsumeXml().child("doc") {
-            val onValue: (String) -> String = mock {
+            val onValue: (Any) -> Any = mock {
                 onGeneric { invoke(any()) } doReturn ""
             }
             XmlResolver(onValue).resolve(this, Dummy()) as Dummy

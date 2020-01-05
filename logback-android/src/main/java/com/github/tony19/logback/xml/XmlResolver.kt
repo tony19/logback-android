@@ -8,7 +8,7 @@ import java.lang.reflect.Method
 import java.nio.charset.Charset
 import java.util.*
 
-class XmlResolver(val onValue: (String) -> String = { it }): IResolver {
+class XmlResolver(val onValue: (Any) -> Any = { it }): IResolver {
     override fun <T> resolve(k: Konsumer, className: String): T {
         @Suppress("UNCHECKED_CAST")
         return resolve(k, create(Class.forName(className))) as T
@@ -55,16 +55,13 @@ class XmlResolver(val onValue: (String) -> String = { it }): IResolver {
     private fun resolveValue(k: Konsumer, paramType: Class<*>): Any {
         return when {
             paramType == java.lang.String::class.java -> onValue(k.text())
-            paramType == java.nio.charset.Charset::class.java -> k.text { Charset.forName(onValue(it)) }
-            paramType.isPrimitive -> k.text { parsePrimitive(paramType, onValue(it))!! }
+            paramType == java.nio.charset.Charset::class.java -> k.text { Charset.forName(onValue(it) as String) }
+            paramType.isPrimitive -> k.text { parsePrimitive(paramType, onValue(it) as String)!! }
             else -> {
                 val className = k.attributes.getValueOpt("class")
                 val param = getParamClass(className, paramType)
 
-                resolve(k, create(param)).apply {
-                    // FIXME: We need to have LoggerContext set before calling start()
-                    //javaClass.methods.find { it.name == "start" }?.invoke(this)
-                }
+                onValue(resolve(k, create(param)))
             }
         }
     }

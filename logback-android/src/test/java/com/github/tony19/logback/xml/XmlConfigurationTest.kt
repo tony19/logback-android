@@ -211,8 +211,9 @@ class XmlConfigurationTest: FreeSpec({
                 (appender as ch.qos.logback.classic.android.LogcatAppender).apply {
                     tagEncoder shouldNot beNull()
                     encoder shouldNot beNull()
-                    tagEncoder!!.pattern shouldBe "%logger{12}"
+                    tagEncoder!!.pattern shouldBe "%logger{12}%nopex" // %nopex automatically appended
                     encoder!!.pattern shouldBe "[%-20thread] %msg"
+                    isStarted shouldBe true
                 }
             }
         }
@@ -242,6 +243,7 @@ class XmlConfigurationTest: FreeSpec({
                     (encoder!! as ch.qos.logback.classic.encoder.PatternLayoutEncoder).pattern shouldBe "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n"
                     file shouldBe "/data/data/com.example/files/log.txt"
                     lazy shouldBe true
+                    isStarted shouldBe true
                 }
             }
         }

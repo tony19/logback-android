@@ -42,7 +42,19 @@ data class Configuration (
             }.apply {
                 resolveProperties()
 
-                val resolver = XmlResolver(::expandVar)
+                val resolver = XmlResolver { value ->
+                    if (value is String) {
+                        expandVar(value)
+
+                    } else {
+                        value.javaClass.methods.apply {
+                            find { it.name == "setContext" }?.invoke(value, context)
+                            find { it.name == "start" }?.invoke(value)
+                        }
+                        value
+                    }
+                }
+
                 xmlDoc.konsumeXml().use { k ->
                     k.child("configuration") {
                         resolveAppenders(this, resolver)
@@ -108,6 +120,8 @@ data class Configuration (
                 if (name in matchedAppenderNames) {
                     val newAppender = resolver.resolve<ch.qos.logback.core.Appender<*>>(this, className)
                     newAppender.name = name
+                    newAppender.context = context
+                    newAppender.start()
                     appenders.add(newAppender)
                 }
             }
