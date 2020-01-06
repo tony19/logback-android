@@ -2,6 +2,7 @@ package com.github.tony19.logback.xml
 
 import ch.qos.logback.classic.PatternLayout
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
+import com.github.tony19.logback.utils.capitalized
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.anyName
 import java.lang.reflect.Method
@@ -22,13 +23,13 @@ class XmlResolver(val onValue: (Any) -> Any = { it }): IResolver {
                     val setterMethod = findSetterMethod(instMethods, name?.localPart)
                     if (setterMethod == null) {
                         skipContents()
-                        println("warning: setter method not found: \"set${name!!.localPart.capitalize()}\" or \"add${name!!.localPart.capitalize()}\"")
+                        println("warning: setter method not found: \"set${name!!.localPart.capitalized()}\" or \"add${name!!.localPart.capitalized()}\"")
 
                     // Arrays require an adder method to insert values!
                     // (we don't support array initialization)
                     } else if (setterMethod.parameterTypes[0].isArray && setterMethod.name.startsWith("set")) {
                         skipContents()
-                        println("warning: adder method not found: \"add${name!!.localPart.capitalize()}\"")
+                        println("warning: adder method not found: \"add${name!!.localPart.capitalized()}\"")
 
                     } else {
                         val value = resolveValue(this, setterMethod.parameterTypes[0])
