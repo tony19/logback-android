@@ -4,9 +4,17 @@ plugins {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
-apply from: "${rootProject.projectDir}/gradle/docs.gradle"
-apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
+
+// In order to reduce build times, apply gradle files only when needed by specific tasks
+if (rootProject.gradle.startParameter.taskNames.any { it.matches("check|tasks") }) {
+    apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
+}
+if (rootProject.gradle.startParameter.taskNames.any { it.matches("docs|deploy|uploadArchives|tasks") }) {
+    apply from: "${rootProject.projectDir}/gradle/docs.gradle"
+}
+if (rootProject.gradle.startParameter.taskNames.any { it.matches("deploy|uploadArchives|tasks") }) {
+    apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
+}
 
 android {
     compileSdkVersion 28
