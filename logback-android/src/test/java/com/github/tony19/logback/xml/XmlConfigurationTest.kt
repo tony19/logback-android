@@ -8,6 +8,8 @@ import io.kotlintest.shouldBe
 import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.FreeSpec
+import io.kotlintest.extensions.system.withEnvironment
+import io.kotlintest.extensions.system.withSystemProperty
 
 class XmlConfigurationTest: FreeSpec({
 
@@ -93,6 +95,38 @@ class XmlConfigurationTest: FreeSpec({
             |</configuration>""".trimMargin())
 
             config.properties["logfile"] shouldBe "/path/to/logs/log.txt"
+        }
+
+        "reads system property as fallback" {
+            withSystemProperty("FOO", "sysFooValue") {
+                val config = XmlParser.parse("""<configuration>
+                |<property key="myKey" value="${'$'}{FOO}" />
+                |</configuration>""".trimMargin())
+
+                config.properties["myKey"] shouldBe "sysFooValue"
+            }
+        }
+
+        "reads environment variable as fallback" {
+            withEnvironment("FOO", "envFooValue") {
+                val config = XmlParser.parse("""<configuration>
+                |<property key="myKey" value="${'$'}{FOO}" />
+                |</configuration>""".trimMargin())
+
+                config.properties["myKey"] shouldBe "envFooValue"
+            }
+        }
+
+        "prefers system property as fallback" {
+            withSystemProperty("FOO", "sysFooValue") {
+                withEnvironment("FOO", "envFooValue") {
+                    val config = XmlParser.parse("""<configuration>
+                |<property key="myKey" value="${'$'}{FOO}" />
+                |</configuration>""".trimMargin())
+
+                    config.properties["myKey"] shouldBe "sysFooValue"
+                }
+            }
         }
     }
 

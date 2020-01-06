@@ -111,6 +111,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    testImplementation "io.kotlintest:kotlintest-extensions-system:3.2.1"
 }
 
 // Exclude `javax.xml.bind:jaxb-api`, as it's unused in our project, but causing
