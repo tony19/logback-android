@@ -71,7 +71,7 @@ dependencies {
     testImplementation('io.kotlintest:kotlintest-runner-junit4:3.5.0') {
         exclude(module: 'junit:junit')
     }
-    testImplementation('junit:junit:4.12') {
+    testImplementation('junit:junit:4.13') {
         exclude(module: 'hamcrest-core')
     }
     testImplementation 'org.hamcrest:hamcrest:2.2'
