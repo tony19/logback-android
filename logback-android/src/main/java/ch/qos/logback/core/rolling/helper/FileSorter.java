@@ -21,7 +21,7 @@ import java.util.List;
 
 class FileSorter {
 
-  private final List<FilenameParser> parsers;
+  /* package private */ final List<FilenameParser> parsers;
 
   FileSorter(FilenameParser ...parsers) {
     this.parsers = Arrays.asList(parsers);

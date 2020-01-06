@@ -50,7 +50,7 @@ public class SQLiteAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private String insertExceptionSQL;
   private String insertSQL;
   private String filename;
-  private DBNameResolver dbNameResolver;
+  /* package private */ DBNameResolver dbNameResolver;
   private Duration maxHistory;
   private long lastCleanupTime = 0;
   private SQLiteLogCleaner logCleaner;
