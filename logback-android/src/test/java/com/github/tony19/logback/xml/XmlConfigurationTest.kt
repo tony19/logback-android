@@ -9,7 +9,11 @@ import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.FreeSpec
 import io.kotlintest.extensions.system.withEnvironment
+import io.kotlintest.extensions.system.withSystemProperties
 import io.kotlintest.extensions.system.withSystemProperty
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.Date
 
 class XmlConfigurationTest: FreeSpec({
 
@@ -131,15 +135,56 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "timestamp" - {
-        "sets value" {
-            val config = XmlParser.parse("""<configuration>
-                |<timestamp key="foo" datePattern="yyyyMMdd'T'HHmmss" />
-                |<timestamp key="bar" datePattern="yyyyMMdd" />
-                |</configuration>""".trimMargin())
+        val testClockInstant = Instant.parse("2020-01-23T12:34:56Z")
+        val testClock = object: IClock {
+            override fun currentTimeMillis() = testClockInstant.toEpochMilli()
+        }
 
-            config.timestamps!! shouldHaveSize 2
-            config.timestamps!!.find { it.key == "foo" && it.datePattern == "yyyyMMdd'T'HHmmss" } shouldNot beNull()
-            config.timestamps!!.find { it.key == "bar" && it.datePattern == "yyyyMMdd" } shouldNot beNull()
+        fun test(scope: String, fn: (String?, String?, Any?) -> Unit) {
+            withSystemProperties(mapOf()) {
+                val scopeText = if (scope.isNullOrEmpty()) "" else "scope=\"${scope}\""
+                val config = Configuration.xml("""<configuration>
+                    |<timestamp key="logback.testKey" datePattern="yyyyMMdd'T'HHmmss" ${scopeText}/>
+                    |</configuration>""".trimMargin(), clock=testClock)
+
+                fn(
+                    System.getProperty("logback.testKey"),
+                    config.context.getProperty("logback.testKey"),
+                    config.properties["logback.testKey"]
+                )
+            }
+        }
+
+        "sets context property" {
+            test("context") { sysProp, contextProp, localProp ->
+                sysProp shouldBe null
+                contextProp shouldBe SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date.from(testClockInstant))
+                localProp shouldBe null
+            }
+        }
+
+        "set system property" {
+            test("system") { sysProp, contextProp, localProp ->
+                sysProp shouldBe SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date.from(testClockInstant))
+                contextProp shouldBe null
+                localProp shouldBe null
+            }
+        }
+
+        "set local property" {
+            test("local") { sysProp, contextProp, localProp ->
+                sysProp shouldBe null
+                contextProp shouldBe null
+                localProp shouldBe SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date.from(testClockInstant))
+            }
+        }
+
+        "set local property with no scope specified" {
+            test("") { sysProp, contextProp, localProp ->
+                sysProp shouldBe null
+                contextProp shouldBe null
+                localProp shouldBe SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date.from(testClockInstant))
+            }
         }
     }
 

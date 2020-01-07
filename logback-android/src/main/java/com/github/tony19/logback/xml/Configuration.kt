@@ -4,6 +4,7 @@ import ch.qos.logback.classic.LoggerContext
 import com.github.tony19.logback.utils.VariableExpander
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
+import java.text.SimpleDateFormat
 import java.util.*
 
 data class Configuration (
@@ -19,10 +20,11 @@ data class Configuration (
     var root: Root?,
     var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf(),
     var properties: Properties = Properties(),
-    val context: LoggerContext
+    val context: LoggerContext,
+    val clock: IClock
 ) {
     companion object {
-        fun xml(xmlDoc: String, context: LoggerContext = LoggerContext()): Configuration {
+        fun xml(xmlDoc: String, context: LoggerContext = LoggerContext(), clock: IClock = SystemClock()): Configuration {
             return xmlDoc.konsumeXml().use { k ->
                 k.child("configuration") {
                     Configuration(
@@ -36,11 +38,13 @@ data class Configuration (
                             optionalIncludes = children("includes") { Includes.xml(this) },
                             loggers = children("logger") { Logger.xml(this) },
                             root = childOpt("root") { Root.xml(this) },
-                            context = context
+                            context = context,
+                            clock = clock
                     )
                 }
             }.apply {
                 resolveProperties()
+                resolveTimestamps()
 
                 val resolver = XmlResolver { value ->
                     if (value is String) {
@@ -65,26 +69,37 @@ data class Configuration (
         }
     }
 
-    private fun resolveProperties() {
-        propertyMeta?.forEach {
-            when (it.scope?.toLowerCase(Locale.US) ?: "local") {
-                "local" -> properties[it.key] = it.value
-                "system" -> System.setProperty(it.key, it.value)
-                "context" -> context.putProperty(it.key, it.value)
-            }
+    private fun resolveTimestamps() {
+        timestamps?.forEach {
+            val time = if (it.timeRef == "contextBirth") context.birthTime else clock.currentTimeMillis()
+            val date = SimpleDateFormat(it.datePattern, Locale.US).format(time)
+            setProp(it.key, date, it.scope, ::expandVar)
         }
 
-        // second pass to expand any variables
+        // no need for timestamps anymore
+        timestamps = null
+    }
+
+    private fun resolveProperties() {
         propertyMeta?.forEach {
-            when (it.scope?.toLowerCase(Locale.US) ?: "local") {
-                "local" -> properties[it.key] = expandVar(it.value)
-                "system" -> System.setProperty(it.key, expandVar(it.value))
-                "context" -> context.putProperty(it.key, expandVar(it.value))
-            }
+            setProp(it.key, it.value, it.scope)
+        }
+
+        // second pass to expand any variables based on props
+        propertyMeta?.forEach {
+            setProp(it.key, it.value, it.scope, ::expandVar)
         }
 
         // no need for meta anymore
         propertyMeta = null
+    }
+
+    private fun setProp(key: String, value: String, scope: String?, valFn: (String) -> String = { it }) {
+        when (scope?.toLowerCase(Locale.US) ?: "local") {
+            "local" -> properties[key] = valFn(value)
+            "system" -> System.setProperty(key, valFn(value))
+            "context" -> context.putProperty(key, valFn(value))
+        }
     }
 
     private fun expandVar(input: String) = VariableExpander().expand(input) {
