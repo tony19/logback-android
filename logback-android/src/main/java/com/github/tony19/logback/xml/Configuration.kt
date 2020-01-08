@@ -108,7 +108,11 @@ data class Configuration (
                     resolveInPasses(context, clock) { File(include.file).konsumeXml() }
 
                 !include.url.isNullOrEmpty() ->
-                    resolveInPasses(context, clock) { URL(include.url).openStream().konsumeXml() }
+                    resolveInPasses(context, clock) {
+                        val connection = URL(include.url).openConnection()
+                        connection.useCaches = false
+                        connection.getInputStream().use { it.konsumeXml() }
+                    }
 
                 !include.resource.isNullOrEmpty() && javaClass.classLoader !== null ->
                     resolveInPasses(context, clock) {
