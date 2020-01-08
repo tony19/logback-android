@@ -71,6 +71,15 @@ data class Configuration (
         }
     }
 
+    private fun resolveScan() {
+        scan?.let {
+            println("warning: `scan` not supported at this time")
+        }
+        scanPeriod?.let {
+            println("warning: `scan` not supported at this time")
+        }
+    }
+
     private fun createValueResolver() = XmlResolver { value ->
         if (value is String) {
             expandVar(value)
