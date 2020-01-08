@@ -6,6 +6,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import com.github.tony19.logback.utils.VariableExpander
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
+import java.io.File
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,7 +29,11 @@ data class Configuration (
 ) {
     companion object {
         fun xml(xmlDoc: String, context: LoggerContext = LoggerContext(), clock: IClock = SystemClock()): Configuration {
-            return xmlDoc.konsumeXml().use { k ->
+            return resolveInPasses(context, clock) { xmlDoc.konsumeXml() }
+        }
+
+        private fun resolveInPasses(context: LoggerContext, clock: IClock, createStream: () -> Konsumer): Configuration {
+            return createStream().use { k ->
                 k.child("configuration") {
                     Configuration(
                             debug = attributes.getValueOpt("debug")?.toBoolean(),
@@ -45,6 +51,7 @@ data class Configuration (
                     )
                 }
             }.apply {
+                resolveIncludes()
                 resolveProperties()
                 resolveTimestamps()
 
@@ -61,7 +68,7 @@ data class Configuration (
                     }
                 }
 
-                xmlDoc.konsumeXml().use { k ->
+                createStream().use { k ->
                     k.child("configuration") {
                         resolveAppenders(this, resolver)
                         skipContents()
@@ -69,6 +76,23 @@ data class Configuration (
                 }
 
                 resolveLoggers()
+            }
+        }
+    }
+
+    private fun resolveIncludes() {
+        includes?.forEach { include ->
+            when {
+                !include.file.isNullOrEmpty() ->
+                    resolveInPasses(context, clock) { File(include.file).konsumeXml() }
+
+                !include.url.isNullOrEmpty() ->
+                    resolveInPasses(context, clock) { URL(include.url).openStream().konsumeXml() }
+
+                !include.resource.isNullOrEmpty() && javaClass.classLoader !== null ->
+                    resolveInPasses(context, clock) {
+                        javaClass.classLoader!!.getResource(include.resource).openStream().konsumeXml()
+                    }
             }
         }
     }

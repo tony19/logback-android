@@ -189,24 +189,32 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "include" - {
+        fun tmpConfigFile() = createTempFile().apply {
+            writeText("<configuration />")
+            deleteOnExit()
+        }
+
         "sets value" {
+            val tmpFile = tmpConfigFile()
             val config = XmlParser.parse("""<configuration>
-                |<include file="/path/to/foo.xml" />
+                |<include file="${tmpFile.absolutePath}" />
                 |</configuration>""".trimMargin())
 
             config.includes!! shouldHaveSize 1
-            config.includes!!.find { it.file == "/path/to/foo.xml" } shouldNot beNull()
+            config.includes!!.find { it.file == tmpFile.absolutePath } shouldNot beNull()
         }
 
         "sets values" {
+            val tmpFile = tmpConfigFile()
+            val tmpFile2 = tmpConfigFile()
             val config = XmlParser.parse("""<configuration>
-                |<include file="/path/to/foo.xml" />
-                |<include file="/path/to/bar.xml" />
+                |<include file="${tmpFile.absolutePath}" />
+                |<include file="${tmpFile2.absolutePath}" />
                 |</configuration>""".trimMargin())
 
             config.includes!! shouldHaveSize 2
-            config.includes!!.find { it.file == "/path/to/foo.xml" } shouldNot beNull()
-            config.includes!!.find { it.file == "/path/to/bar.xml" } shouldNot beNull()
+            config.includes!!.find { it.file == tmpFile.absolutePath } shouldNot beNull()
+            config.includes!!.find { it.file == tmpFile2.absolutePath } shouldNot beNull()
         }
     }
 
