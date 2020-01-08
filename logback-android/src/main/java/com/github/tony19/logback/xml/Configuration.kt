@@ -1,6 +1,8 @@
 package com.github.tony19.logback.xml
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
+import ch.qos.logback.classic.spi.ILoggingEvent
 import com.github.tony19.logback.utils.VariableExpander
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
@@ -64,6 +66,33 @@ data class Configuration (
                         resolveAppenders(this, resolver)
                         skipContents()
                     }
+                }
+
+                resolveLoggers()
+            }
+        }
+    }
+
+    private fun resolveLoggers() {
+        loggers?.forEach {
+            val logger = context.getLogger(it.name)
+            logger.level = Level.toLevel(it.level)
+            logger.isAdditive = it.additivity?.toBoolean() ?: false
+            it.appenderRefs.forEach { apdrRef ->
+                appenders.find { apdr -> apdr.name == apdrRef.ref!! }?.let { appender ->
+                    @Suppress("UNCHECKED_CAST")
+                    logger.addAppender(appender as ch.qos.logback.core.Appender<ILoggingEvent>)
+                }
+            }
+        }
+
+        root?.let {
+            val logger = context.getLogger(it.name ?: ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME)
+            logger.level = Level.toLevel(it.level)
+            it.appenderRefs.forEach { apdrRef ->
+                appenders.find { apdr -> apdr.name === apdrRef.ref!! }?.let { appender ->
+                    @Suppress("UNCHECKED_CAST")
+                    logger.addAppender(appender as ch.qos.logback.core.Appender<ILoggingEvent>)
                 }
             }
         }

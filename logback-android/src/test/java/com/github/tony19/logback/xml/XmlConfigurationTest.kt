@@ -327,4 +327,29 @@ class XmlConfigurationTest: FreeSpec({
             }
         }
     }
+
+    "logger" - {
+        "creates logger" {
+            val config = XmlParser.parse("""<configuration>
+                |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+                |  <encoder>
+                |    <pattern>[%-20thread] %msg</pattern>
+                |  </encoder>
+                |</appender>
+                |<logger name="com.example.foo">
+                |  <appender-ref ref="logcat" />
+                |</logger>
+                |</configuration>""".trimMargin())
+            config.context.loggerList shouldHaveSize 4 // root, "com", "example", "foo"
+            config.context.loggerList[3].apply {
+                name shouldBe "com.example.foo"
+                val appenderList = iteratorForAppenders().asSequence().toList()
+                appenderList shouldHaveSize 1
+                appenderList[0].shouldBeInstanceOf<ch.qos.logback.classic.android.LogcatAppender>()
+                val logcat = appenderList[0] as ch.qos.logback.classic.android.LogcatAppender
+                logcat.encoder?.pattern shouldNot beNull()
+                logcat.name shouldBe "logcat"
+            }
+        }
+    }
 })
