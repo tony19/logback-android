@@ -58,19 +58,7 @@ data class Configuration (
                 resolveProperties()
                 resolveTimestamps()
 
-                val resolver = XmlResolver { value ->
-                    if (value is String) {
-                        expandVar(value)
-
-                    } else {
-                        value.javaClass.methods.apply {
-                            find { it.name == "setContext" }?.invoke(value, context)
-                            find { it.name == "start" }?.invoke(value)
-                        }
-                        value
-                    }
-                }
-
+                val resolver = createValueResolver()
                 createStream().use { k ->
                     k.child("configuration") {
                         resolveAppenders(this, resolver)
@@ -80,6 +68,19 @@ data class Configuration (
 
                 resolveLoggers()
             }
+        }
+    }
+
+    private fun createValueResolver() = XmlResolver { value ->
+        if (value is String) {
+            expandVar(value)
+
+        } else {
+            value.javaClass.methods.apply {
+                find { it.name == "setContext" }?.invoke(value, context)
+                find { it.name == "start" }?.invoke(value)
+            }
+            value
         }
     }
 
