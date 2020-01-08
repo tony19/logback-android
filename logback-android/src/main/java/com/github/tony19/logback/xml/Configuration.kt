@@ -3,6 +3,8 @@ package com.github.tony19.logback.xml
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.status.OnConsoleStatusListener
+import ch.qos.logback.core.util.StatusListenerConfigHelper
 import com.github.tony19.logback.utils.VariableExpander
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
@@ -51,6 +53,7 @@ data class Configuration (
                     )
                 }
             }.apply {
+                resolveDebug()
                 resolveIncludes()
                 resolveProperties()
                 resolveTimestamps()
@@ -76,6 +79,14 @@ data class Configuration (
                 }
 
                 resolveLoggers()
+            }
+        }
+    }
+
+    private fun resolveDebug() {
+        debug?.let {
+            if (it) {
+                StatusListenerConfigHelper.addOnConsoleListenerInstance(context, OnConsoleStatusListener())
             }
         }
     }

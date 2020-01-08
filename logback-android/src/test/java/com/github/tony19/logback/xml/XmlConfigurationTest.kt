@@ -1,5 +1,7 @@
 package com.github.tony19.logback.xml
 
+import ch.qos.logback.core.Context
+import ch.qos.logback.core.status.OnConsoleStatusListener
 import io.kotlintest.matchers.collections.shouldHaveSize
 import io.kotlintest.matchers.types.beNull
 import io.kotlintest.matchers.types.shouldBeInstanceOf
@@ -31,6 +33,13 @@ class XmlConfigurationTest: FreeSpec({
         "is falsy by default" {
             val config = XmlParser.parse("""<configuration> </configuration>""")
             config.debug shouldNotBe true
+        }
+
+        "adds a console status listener" {
+            val config = XmlParser.parse("""<configuration debug="true"> </configuration>""")
+            val listeners = config.context.statusManager.copyOfStatusListenerList
+            listeners shouldHaveSize 1
+            listeners[0].shouldBeInstanceOf<OnConsoleStatusListener>()
         }
     }
 
