@@ -1,14 +1,10 @@
 package com.github.tony19.logback.xml
 
-import ch.qos.logback.core.Context
 import ch.qos.logback.core.status.OnConsoleStatusListener
+import io.kotlintest.*
 import io.kotlintest.matchers.collections.shouldHaveSize
 import io.kotlintest.matchers.types.beNull
 import io.kotlintest.matchers.types.shouldBeInstanceOf
-import io.kotlintest.should
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldNot
-import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.FreeSpec
 import io.kotlintest.extensions.system.withEnvironment
 import io.kotlintest.extensions.system.withSystemProperties
@@ -198,11 +194,6 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "include" - {
-        fun tmpConfigFile() = createTempFile().apply {
-            writeText("<configuration />")
-            deleteOnExit()
-        }
-
         "sets value" {
             val tmpFile = tmpConfigFile()
             val config = XmlParser.parse("""<configuration>
@@ -224,6 +215,14 @@ class XmlConfigurationTest: FreeSpec({
             config.includes!! shouldHaveSize 2
             config.includes!!.find { it.file == tmpFile.absolutePath } shouldNot beNull()
             config.includes!!.find { it.file == tmpFile2.absolutePath } shouldNot beNull()
+        }
+
+        "optional include does not throw error" {
+            shouldNotThrowAny {
+                XmlParser.parse("""<configuration>
+                |<include file="/path/to/nonexistent.xml" optional="true" />
+                |</configuration>""".trimMargin())
+            }
         }
     }
 
@@ -256,6 +255,39 @@ class XmlConfigurationTest: FreeSpec({
             config.optionalIncludes!![0].includes!!.find { it.file == "/path/to/bar.xml" } shouldNot beNull()
             config.optionalIncludes!![1].includes!!.find { it.file == "/path/to/baz.xml" } shouldNot beNull()
             config.optionalIncludes!![1].includes!!.find { it.file == "/path/to/qux.xml" } shouldNot beNull()
+        }
+
+        "does not throw errors if not found" {
+            shouldNotThrowAny {
+                XmlParser.parse("""<configuration>
+                |<includes>
+                |  <include file="/path/to/nonexistent.xml" />
+                |  <include url="http://nonexistent__foo.html" />
+                |  <include resource="bar.html" />
+                |</includes>
+                |</configuration>""".trimMargin())
+            }
+        }
+
+        "takes first include found" {
+            val tmpFile = tmpConfigFile("""<configuration>
+                |<property key="foo" value="bar" />
+                |</configuration>
+            """.trimMargin())
+            val tmpFile2 = tmpConfigFile("""<configuration>
+                |<property key="foo" value="baz" />
+                |</configuration>
+            """.trimMargin())
+            val config = XmlParser.parse("""<configuration>
+                |<includes>
+                |  <include file="/path/to/nonexistent1.xml" />
+                |  <include file="/path/to/nonexistent2.xml" />
+                |  <include file="${tmpFile.absolutePath}" />
+                |  <include file="${tmpFile2.absolutePath}" />
+                |</includes>
+                |</configuration>""".trimMargin())
+
+            config.properties["foo"] shouldBe "bar"
         }
     }
 
@@ -370,3 +402,8 @@ class XmlConfigurationTest: FreeSpec({
         }
     }
 })
+
+fun tmpConfigFile(config: String = "<configuration />") = createTempFile().apply {
+    writeText(config)
+    deleteOnExit()
+}

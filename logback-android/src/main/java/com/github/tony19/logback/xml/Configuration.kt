@@ -25,16 +25,16 @@ data class Configuration (
     var loggers: List<Logger>?,
     var root: Root?,
     var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf(),
-    var properties: Properties = Properties(),
+    var properties: Properties,
     val context: LoggerContext,
     val clock: IClock
 ) {
     companion object {
         fun xml(xmlDoc: String, context: LoggerContext = LoggerContext(), clock: IClock = SystemClock()): Configuration {
-            return resolveInPasses(context, clock) { xmlDoc.konsumeXml() }
+            return resolveInPasses(context, Properties(), clock) { xmlDoc.konsumeXml() }
         }
 
-        private fun resolveInPasses(context: LoggerContext, clock: IClock, createStream: () -> Konsumer): Configuration {
+        private fun resolveInPasses(context: LoggerContext, properties: Properties, clock: IClock, createStream: () -> Konsumer): Configuration {
             return createStream().use { k ->
                 k.child("configuration") {
                     Configuration(
@@ -48,6 +48,7 @@ data class Configuration (
                             optionalIncludes = children("includes") { Includes.xml(this) },
                             loggers = children("logger") { Logger.xml(this) },
                             root = childOpt("root") { Root.xml(this) },
+                            properties = properties,
                             context = context,
                             clock = clock
                     )
@@ -55,6 +56,7 @@ data class Configuration (
             }.apply {
                 resolveDebug()
                 resolveIncludes()
+                resolveOptionalIncludes()
                 resolveProperties()
                 resolveTimestamps()
 
@@ -94,30 +96,60 @@ data class Configuration (
     }
 
     private fun resolveDebug() {
-        debug?.let {
-            if (it) {
-                StatusListenerConfigHelper.addOnConsoleListenerInstance(context, OnConsoleStatusListener())
-            }
+        if (debug == true) {
+            StatusListenerConfigHelper.addOnConsoleListenerInstance(context, OnConsoleStatusListener())
         }
     }
 
     private fun resolveIncludes() {
-        includes?.forEach { include ->
-            when {
-                !include.file.isNullOrEmpty() ->
-                    resolveInPasses(context, clock) { File(include.file).konsumeXml() }
+        includes?.forEach {
+            try {
+                include(it)
 
-                !include.url.isNullOrEmpty() ->
-                    resolveInPasses(context, clock) {
-                        val connection = URL(include.url).openConnection()
-                        connection.useCaches = false
-                        connection.getInputStream().use { it.konsumeXml() }
-                    }
+            } catch (e: Exception) {
+                val optional = it.optional ?: false
+                if (!optional) {
+                    throw e
+                }
+            }
+        }
+    }
 
-                !include.resource.isNullOrEmpty() && javaClass.classLoader !== null ->
-                    resolveInPasses(context, clock) {
-                        javaClass.classLoader!!.getResource(include.resource).openStream().konsumeXml()
+    private fun include(include: Include) =
+        when {
+            !include.file.isNullOrEmpty() ->
+                resolveInPasses(context, properties, clock) { File(include.file).konsumeXml() }
+
+            !include.url.isNullOrEmpty() ->
+                resolveInPasses(context, properties, clock) {
+                    val connection = URL(include.url).openConnection()
+                    // disable cache to prevent locking file unnecessarily
+                    // when URL points to local file
+                    connection.useCaches = false
+                    connection.getInputStream().use { it.konsumeXml() }
+                }
+
+            !include.resource.isNullOrEmpty() && javaClass.classLoader !== null ->
+                resolveInPasses(context, properties, clock) {
+                    javaClass.classLoader!!.getResource(include.resource).openStream().use { it.konsumeXml() }
+                }
+
+            else -> null
+        }
+
+    private fun resolveOptionalIncludes() {
+        optionalIncludes?.forEach { optionalInclude ->
+            run loop@ {
+                optionalInclude.includes?.forEach {
+                    val result: Configuration? = try {
+                        include(it)
+                    } catch (e: Exception) {
+                        null
                     }
+                    if (result !== null) {
+                        return@loop
+                    }
+                }
             }
         }
     }
