@@ -13,10 +13,10 @@ data class Include(
             k.checkCurrent("include")
 
             return Include(
-                file = k.attributes.getValueOpt("file"),
-                resource = k.attributes.getValueOpt("resource"),
-                url = k.attributes.getValueOpt("url"),
-                optional = k.attributes.getValueOpt("optional")?.toBoolean()
+                    file = k.attributes.getValueOpt("file"),
+                    resource = k.attributes.getValueOpt("resource"),
+                    url = k.attributes.getValueOpt("url"),
+                    optional = k.attributes.getValueOpt("optional")?.toBoolean()
             )
         }
     }

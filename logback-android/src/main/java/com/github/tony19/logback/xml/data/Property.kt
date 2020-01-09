@@ -12,9 +12,9 @@ data class Property(
             k.checkCurrent("property")
 
             return Property(
-                key = k.attributes.getValue("key"),
-                value = k.attributes.getValue("value"),
-                scope = k.attributes.getValueOpt("scope")
+                    key = k.attributes.getValue("key"),
+                    value = k.attributes.getValue("value"),
+                    scope = k.attributes.getValueOpt("scope")
             )
         }
     }

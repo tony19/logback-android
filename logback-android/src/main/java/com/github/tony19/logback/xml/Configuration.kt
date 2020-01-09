@@ -15,20 +15,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 data class Configuration (
-    var debug: Boolean? = false,
-    var scan: Boolean? = false,
-    var scanPeriod: String? = null,
-    var appenderMeta: List<Appender>? = emptyList(),
-    var propertyMeta: List<Property>? = emptyList(),
-    var timestamps: List<Timestamp>? = emptyList(),
-    var includes: List<Include>? = emptyList(),
-    var optionalIncludes: List<Includes>?,
-    var loggers: List<Logger>?,
-    var root: Root?,
-    var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf(),
-    var properties: Properties,
-    val context: LoggerContext,
-    val clock: IClock
+        var debug: Boolean? = false,
+        var scan: Boolean? = false,
+        var scanPeriod: String? = null,
+        var appenderMeta: List<Appender>? = emptyList(),
+        var propertyMeta: List<Property>? = emptyList(),
+        var timestamps: List<Timestamp>? = emptyList(),
+        var includes: List<Include>? = emptyList(),
+        var optionalIncludes: List<Includes>?,
+        var loggers: List<Logger>?,
+        var root: Root?,
+        var appenders: MutableList<ch.qos.logback.core.Appender<*>> = mutableListOf(),
+        var properties: Properties,
+        val context: LoggerContext,
+        val clock: IClock
 ) {
     companion object {
         fun xml(xmlDoc: String, context: LoggerContext = LoggerContext(), clock: IClock = SystemClock()): Configuration {

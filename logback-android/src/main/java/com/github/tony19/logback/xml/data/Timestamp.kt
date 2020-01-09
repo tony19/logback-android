@@ -8,10 +8,10 @@ data class Timestamp(var key: String, var datePattern: String, var timeRef: Stri
             k.checkCurrent("timestamp")
 
             return Timestamp(
-                key = k.attributes.getValue("key"),
-                datePattern = k.attributes.getValue("datePattern"),
-                timeRef = k.attributes.getValueOpt("timeReference"),
-                scope = k.attributes.getValueOpt("scope")
+                    key = k.attributes.getValue("key"),
+                    datePattern = k.attributes.getValue("datePattern"),
+                    timeRef = k.attributes.getValueOpt("timeReference"),
+                    scope = k.attributes.getValueOpt("scope")
             )
         }
     }
