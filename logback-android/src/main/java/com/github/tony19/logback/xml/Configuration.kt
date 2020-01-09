@@ -6,6 +6,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.status.OnConsoleStatusListener
 import ch.qos.logback.core.util.StatusListenerConfigHelper
 import com.github.tony19.logback.utils.VariableExpander
+import com.github.tony19.logback.xml.data.*
 import com.gitlab.mvysny.konsumexml.Konsumer
 import com.gitlab.mvysny.konsumexml.konsumeXml
 import java.io.File

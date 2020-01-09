@@ -1,4 +1,4 @@
-package com.github.tony19.logback.xml
+package com.github.tony19.logback.xml.data
 
 import com.gitlab.mvysny.konsumexml.Konsumer
 
