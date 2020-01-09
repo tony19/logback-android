@@ -47,6 +47,10 @@ android {
         abortOnError false
     }
     testOptions {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
         unitTests {
             includeAndroidResources = true
 
