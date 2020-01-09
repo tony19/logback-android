@@ -120,7 +120,7 @@ class Configurator(val context: ConfigurationContext = ConfigurationContext()) {
         config.loggers?.forEach {
             val logger = context.loggerContext.getLogger(it.name)
             logger.level = Level.toLevel(it.level)
-            logger.isAdditive = it.additivity?.toBoolean() ?: false
+            logger.isAdditive = it.additivity ?: false
             it.appenderRefs.forEach { apdrRef ->
                 context.appenders.find { apdr -> apdr.name == apdrRef.ref!! }?.let { appender ->
                     @Suppress("UNCHECKED_CAST")

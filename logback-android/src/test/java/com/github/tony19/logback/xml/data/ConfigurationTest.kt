@@ -187,10 +187,71 @@ class ConfigurationTest: FreeSpec({
     }
 
     "appender" - {
+        "sets value" {
+            val config = XmlParser.parseConfigurationData("""<configuration>
+                |<appender name="myApp" class="com.example.MyAppender">
+                |  <file>/path/to/foo.xml</file>
+                |  <lazy>true</lazy>
+                |</appender>
+                |</configuration>""".trimMargin())
 
+            config.appenderMeta!! shouldHaveSize 1
+            config.appenderMeta!![0].name shouldBe "myApp"
+            config.appenderMeta!![0].className shouldBe "com.example.MyAppender"
+        }
+
+        "sets values" {
+            val config = XmlParser.parseConfigurationData("""<configuration>
+                |<appender name="myApp" class="com.example.MyAppender">
+                |  <file>/path/to/foo.xml</file>
+                |  <lazy>true</lazy>
+                |</appender>
+                |<appender name="myApp2" class="com.example.MyAppender2">
+                |  <file>/path/to/foo.xml</file>
+                |  <lazy>true</lazy>
+                |</appender>
+                |</configuration>""".trimMargin())
+
+            config.appenderMeta!! shouldHaveSize 2
+            config.appenderMeta!![0].name shouldBe "myApp"
+            config.appenderMeta!![0].className shouldBe "com.example.MyAppender"
+            config.appenderMeta!![1].name shouldBe "myApp2"
+            config.appenderMeta!![1].className shouldBe "com.example.MyAppender2"
+        }
     }
 
     "logger" - {
+        "sets value" {
+            val config = XmlParser.parseConfigurationData("""<configuration>
+                |<logger name="com.example.MyAppender" level="DEBUG" />
+                |</configuration>""".trimMargin())
 
+            config.loggers!! shouldHaveSize 1
+            config.loggers!![0].name shouldBe "com.example.MyAppender"
+            config.loggers!![0].level shouldBe "DEBUG"
+        }
+
+        "sets values" {
+            val config = XmlParser.parseConfigurationData("""<configuration>
+                |<logger name="com.example.MyAppender" level="DEBUG" />
+                |<logger name="com.example.MyAppender2" level="ERROR" />
+                |</configuration>""".trimMargin())
+
+            config.loggers!! shouldHaveSize 2
+            config.loggers!![0].name shouldBe "com.example.MyAppender"
+            config.loggers!![0].level shouldBe "DEBUG"
+            config.loggers!![1].name shouldBe "com.example.MyAppender2"
+            config.loggers!![1].level shouldBe "ERROR"
+        }
+
+        "sets additivity" {
+            val config = XmlParser.parseConfigurationData("""<configuration>
+                |<logger name="com.example.MyAppender" level="DEBUG" />
+                |<logger name="com.example.MyAppender" level="DEBUG" additivity="false" />
+                |</configuration>""".trimMargin())
+
+            config.loggers!! shouldHaveSize 2
+            config.loggers!![1].additivity shouldBe false
+        }
     }
 })

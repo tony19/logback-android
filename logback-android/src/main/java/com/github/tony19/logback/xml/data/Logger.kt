@@ -6,7 +6,7 @@ data class Logger (
         var name: String,
         var level: String? = null,
         var appenderRefs: List<AppenderRef>,
-        var additivity: String?
+        var additivity: Boolean?
 ) {
     companion object {
         fun xml(k: Konsumer): Logger {
@@ -15,7 +15,7 @@ data class Logger (
             return Logger(
                     name = k.attributes.getValue("name"),
                     level = k.attributes.getValueOpt("level"),
-                    additivity = k.attributes.getValueOpt("additivity"),
+                    additivity = k.attributes.getValueOpt("additivity")?.toBoolean(),
                     appenderRefs = k.children("appender-ref") { AppenderRef.xml(this) }
             )
         }
