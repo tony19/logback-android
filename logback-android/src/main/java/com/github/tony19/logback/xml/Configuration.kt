@@ -69,6 +69,7 @@ data class Configuration (
                 }
 
                 resolveLoggers()
+                resolveScan()
             }
         }
     }
