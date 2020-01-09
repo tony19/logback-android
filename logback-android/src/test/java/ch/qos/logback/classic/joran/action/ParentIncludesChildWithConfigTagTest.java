@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import ch.qos.logback.classic.android.LogcatAppender;
 import ch.qos.logback.core.FileAppender;

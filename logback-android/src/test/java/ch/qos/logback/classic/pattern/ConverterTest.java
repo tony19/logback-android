@@ -37,6 +37,7 @@ import ch.qos.logback.core.pattern.FormatInfo;
 
 import static org.junit.Assume.assumeThat;
 import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.greaterThan;
 
@@ -77,7 +78,7 @@ public class ConverterTest {
     StringBuilder buf = new StringBuilder();
     converter.write(buf, le);
     // the number below should be the line number of the previous line
-    assertEquals("78", buf.toString());
+    assertEquals("79", buf.toString());
     // TODO: Refactor this test so that it does not depend on the actual line numbers of this file
   }
 

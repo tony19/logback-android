@@ -41,8 +41,11 @@ import ch.qos.logback.core.CoreConstants;
 import static ch.qos.logback.classic.util.TestHelper.addSuppressed;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.IsEmptyString.isEmptyString;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 public class ThrowableProxyConverterTest {

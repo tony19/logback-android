@@ -15,7 +15,7 @@
  */
 package ch.qos.logback.classic.layout;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
 
 import org.junit.Before;

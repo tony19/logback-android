@@ -63,6 +63,7 @@ import ch.qos.logback.core.util.StatusPrinter;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 public class SiftingAppenderTest {
