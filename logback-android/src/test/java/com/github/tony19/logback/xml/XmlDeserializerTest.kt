@@ -11,7 +11,7 @@ import io.kotlintest.specs.FreeSpec
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
-class XmlResolverTest: FreeSpec({
+class XmlDeserializerTest: FreeSpec({
     "sets primitive property by child tag" - {
         data class Dummy(var stringVal: String = "",
                          var byteVal: Byte = 0,
@@ -37,27 +37,27 @@ class XmlResolverTest: FreeSpec({
             |</doc>
         """.trimMargin()
 
-        fun resolve(fn: Dummy.() -> Unit) {
+        fun deserialize(fn: Dummy.() -> Unit) {
             xmlDoc.konsumeXml().child("doc") {
-                fn(XmlResolver().resolve(this, Dummy()) as Dummy)
+                fn(XmlDeserializer().deserialize(this, Dummy()) as Dummy)
             }
         }
 
-        "String" { resolve { stringVal shouldBe "bob" } }
-        "Byte" { resolve { byteVal.compareTo(9) shouldBe 0 } }
-        "Int" { resolve { intVal shouldBe 23 } }
-        "Boolean" { resolve { boolVal shouldBe true } }
-        "Short" { resolve { shortVal.compareTo(160) shouldBe 0 } }
-        "Long" { resolve { longVal shouldBe 1577785250150 } }
-        "Float" { resolve { floatVal shouldBe 99.00F } }
-        "Double" { resolve { doubleVal shouldBe 123.5e10 } }
-        "Charset" { resolve { charsetVal shouldBe StandardCharsets.UTF_16BE } }
+        "String" { deserialize { stringVal shouldBe "bob" } }
+        "Byte" { deserialize { byteVal.compareTo(9) shouldBe 0 } }
+        "Int" { deserialize { intVal shouldBe 23 } }
+        "Boolean" { deserialize { boolVal shouldBe true } }
+        "Short" { deserialize { shortVal.compareTo(160) shouldBe 0 } }
+        "Long" { deserialize { longVal shouldBe 1577785250150 } }
+        "Float" { deserialize { floatVal shouldBe 99.00F } }
+        "Double" { deserialize { doubleVal shouldBe 123.5e10 } }
+        "Charset" { deserialize { charsetVal shouldBe StandardCharsets.UTF_16BE } }
     }
 
     "sets subclassed property" {
         open class Animal(var says: String = "")
         class Dog(var color: String): Animal("woof") {
-            constructor(): this("brown") // explicit default constructor required by resolver
+            constructor(): this("brown") // explicit default constructor required by deserializer
         }
         class Dummy(var pet: Animal = Animal())
 
@@ -70,7 +70,7 @@ class XmlResolverTest: FreeSpec({
         """.trimMargin()
 
         xmlDoc.konsumeXml().child("doc") {
-            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            val dummy = XmlDeserializer().deserialize(this, Dummy()) as Dummy
             dummy.pet.says shouldBe "grrrr"
             (dummy.pet as Dog).color shouldBe "tan"
         }
@@ -78,7 +78,7 @@ class XmlResolverTest: FreeSpec({
 
     "adds array items" {
         data class Dummy(var stringVal: Array<String> = arrayOf("a", "b")) {
-            fun addStringVal(value: String) { // explicit adder method required by resolver
+            fun addStringVal(value: String) { // explicit adder method required by deserializer
                 stringVal += value
             }
         }
@@ -91,7 +91,7 @@ class XmlResolverTest: FreeSpec({
         """.trimMargin()
 
         xmlDoc.konsumeXml().child("doc") {
-            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            val dummy = XmlDeserializer().deserialize(this, Dummy()) as Dummy
             dummy.stringVal shouldContainExactlyInAnyOrder arrayOf("a", "b", "x", "y", "z")
         }
     }
@@ -107,7 +107,7 @@ class XmlResolverTest: FreeSpec({
         """.trimMargin()
 
         xmlDoc.konsumeXml().child("doc") {
-            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            val dummy = XmlDeserializer().deserialize(this, Dummy()) as Dummy
             dummy.stringVal shouldContainExactlyInAnyOrder arrayOf("a", "b")
         }
     }
@@ -121,7 +121,7 @@ class XmlResolverTest: FreeSpec({
         """.trimMargin()
 
         xmlDoc.konsumeXml().child("doc") {
-            val dummy = XmlResolver().resolve(this, Dummy()) as Dummy
+            val dummy = XmlDeserializer().deserialize(this, Dummy()) as Dummy
             dummy.stringVal shouldBe "initial"
         }
     }
@@ -138,7 +138,7 @@ class XmlResolverTest: FreeSpec({
             val onValue: (Any) -> Any = mock {
                 onGeneric { invoke(any()) } doReturn ""
             }
-            XmlResolver(onValue).resolve(this, Dummy()) as Dummy
+            XmlDeserializer(onValue).deserialize(this, Dummy()) as Dummy
             verify(onValue).invoke("bob")
         }
     }

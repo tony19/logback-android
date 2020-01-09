@@ -9,13 +9,13 @@ import java.lang.reflect.Method
 import java.nio.charset.Charset
 import java.util.*
 
-class XmlResolver(val onValue: (Any) -> Any = { it }): IResolver {
-    override fun <T> resolve(k: Konsumer, className: String): T {
+class XmlDeserializer(val onValue: (Any) -> Any = { it }): IDeserializer {
+    override fun <T> deserialize(k: Konsumer, className: String): T {
         @Suppress("UNCHECKED_CAST")
-        return resolve(k, create(Class.forName(className))) as T
+        return deserialize(k, create(Class.forName(className))) as T
     }
 
-    override fun resolve(k: Konsumer, inst: Any): Any {
+    override fun deserialize(k: Konsumer, inst: Any): Any {
         return inst.apply {
             val instMethods by lazy { inst.javaClass.methods }
             k.children(anyName) {
@@ -62,7 +62,7 @@ class XmlResolver(val onValue: (Any) -> Any = { it }): IResolver {
                 val className = k.attributes.getValueOpt("class")
                 val param = getParamClass(className, paramType)
 
-                onValue(resolve(k, create(param)))
+                onValue(deserialize(k, create(param)))
             }
         }
     }

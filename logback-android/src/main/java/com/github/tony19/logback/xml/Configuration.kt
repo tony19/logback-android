@@ -84,7 +84,7 @@ data class Configuration (
         }
     }
 
-    private fun createValueResolver() = XmlResolver { value ->
+    private fun createValueResolver() = XmlDeserializer { value ->
         if (value is String) {
             expandVar(value)
 
@@ -218,7 +218,7 @@ data class Configuration (
         properties.getProperty(it) ?: context.getProperty(it) ?: System.getProperty(it) ?: System.getenv(it)
     }
 
-    private fun resolveAppenders(k: Konsumer, resolver: IResolver) {
+    private fun resolveAppenders(k: Konsumer, deserializer: IDeserializer) {
         if (appenderMeta?.isEmpty()!!) {
             System.err.println("no appenders defined")
             return
@@ -245,7 +245,7 @@ data class Configuration (
                 val name = attributes.getValue("name")
                 val className = attributes.getValue("class")
                 if (name in matchedAppenderNames) {
-                    val newAppender = resolver.resolve<ch.qos.logback.core.Appender<*>>(this, className)
+                    val newAppender = deserializer.deserialize<ch.qos.logback.core.Appender<*>>(this, className)
                     newAppender.name = name
                     newAppender.context = context
                     newAppender.start()
