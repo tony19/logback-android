@@ -130,7 +130,7 @@ class Configurator(val context: ConfigurationContext = ConfigurationContext()) {
         }
 
         config.root?.let {
-            val logger = context.loggerContext.getLogger(it.name ?: ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME)
+            val logger = context.loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME)
             logger.level = Level.toLevel(it.level)
             it.appenderRefs.forEach { apdrRef ->
                 context.appenders.find { apdr -> apdr.name === apdrRef.ref!! }?.let { appender ->

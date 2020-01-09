@@ -1,5 +1,7 @@
 package com.github.tony19.logback.xml
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import ch.qos.logback.core.status.OnConsoleStatusListener
 import io.kotlintest.*
 import io.kotlintest.matchers.collections.shouldHaveSize
@@ -302,6 +304,24 @@ class ConfiguratorTest: FreeSpec({
                 logcat.encoder?.pattern shouldNot beNull()
                 logcat.name shouldBe "logcat"
             }
+        }
+    }
+
+    "root" - {
+        val context = XmlParser.parse("""<configuration>
+                |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+                |  <encoder>
+                |    <pattern>[%-20thread] %msg</pattern>
+                |  </encoder>
+                |</appender>
+                |<root name="myRootLogger" level="DEBUG">
+                |  <appender-ref ref="logcat" />
+                |</root>
+                |</configuration>""".trimMargin())
+
+        "name is ignored" {
+            context.loggerContext.loggerList[0].name shouldNotBe "myRootLogger"
+            context.loggerContext.loggerList[0].name shouldBe Logger.ROOT_LOGGER_NAME
         }
     }
 })
