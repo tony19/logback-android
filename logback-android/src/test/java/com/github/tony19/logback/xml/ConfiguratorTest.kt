@@ -13,127 +13,83 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
 
-class XmlConfigurationTest: FreeSpec({
+class ConfiguratorTest: FreeSpec({
 
     "debug attr" - {
-        "can be set to true" {
-            val config = XmlParser.parse("""<configuration debug="true"> </configuration>""")
-            config.debug shouldBe true
-        }
-
-        "can be set to false" {
-            val config = XmlParser.parse("""<configuration debug="false"> </configuration>""")
-            config.debug shouldBe false
-        }
-
-        "is falsy by default" {
-            val config = XmlParser.parse("""<configuration> </configuration>""")
-            config.debug shouldNotBe true
-        }
-
         "adds a console status listener" {
-            val config = XmlParser.parse("""<configuration debug="true"> </configuration>""")
-            val listeners = config.context.statusManager.copyOfStatusListenerList
+            val context = XmlParser.parse("""<configuration debug="true"> </configuration>""")
+            val listeners = context.loggerContext.statusManager.copyOfStatusListenerList
             listeners shouldHaveSize 1
             listeners[0].shouldBeInstanceOf<OnConsoleStatusListener>()
         }
     }
 
-    "scan attr" - {
-        "can be set to true" {
-            val config = XmlParser.parse("""<configuration scan="true" />""")
-            config.scan shouldBe true
-        }
-
-        "can be set to false" {
-            val config = XmlParser.parse("""<configuration scan="false" />""")
-            config.scan shouldBe false
-        }
-
-        "is falsy by default" {
-            val config = XmlParser.parse("""<configuration />""")
-            config.scan shouldNotBe true
-        }
-    }
-
-    "scanPeriod attr" - {
-        "can be set" {
-            val config = XmlParser.parse("""<configuration scan="true" scanPeriod="1 day" />""")
-            config.scanPeriod shouldBe "1 day"
-        }
-
-        "is null by default" {
-            val config = XmlParser.parse("""<configuration />""")
-            config.scanPeriod should beNull()
-        }
-    }
-
     "property" - {
         "sets system property" {
-            val config = XmlParser.parse("""<configuration>
+            val context = XmlParser.parse("""<configuration>
             |<property key="logback.test.foo" value="bar" scope="system" />
             |</configuration>""".trimMargin())
             System.getProperty("logback.test.foo") shouldBe "bar"
-            config.context.getProperty("logback.test.foo") shouldBe null
-            config.properties["logback.test.foo"] shouldBe null
+            context.loggerContext.getProperty("logback.test.foo") shouldBe null
+            context.properties["logback.test.foo"] shouldBe null
         }
 
         "sets context property" {
-            val config = XmlParser.parse("""<configuration>
+            val context = XmlParser.parse("""<configuration>
             |<property key="myKey" value="myValue" scope="context" />
             |</configuration>""".trimMargin())
-            config.context.getProperty("myKey") shouldBe "myValue"
-            config.properties["myKey"] shouldBe null
+            context.loggerContext.getProperty("myKey") shouldBe "myValue"
+            context.properties["myKey"] shouldBe null
         }
 
         "sets local property" {
-            val config = XmlParser.parse("""<configuration>
+            val context = XmlParser.parse("""<configuration>
             |<property key="local1" value="value1" scope="local" />
             |<property key="local2" value="value2" />
             |</configuration>""".trimMargin())
-            config.properties["local1"] shouldBe "value1"
-            config.properties["local2"] shouldBe "value2"
-            config.context.getProperty("local1") shouldBe null
-            config.context.getProperty("local2") shouldBe null
+            context.properties["local1"] shouldBe "value1"
+            context.properties["local2"] shouldBe "value2"
+            context.loggerContext.getProperty("local1") shouldBe null
+            context.loggerContext.getProperty("local2") shouldBe null
         }
 
         "sets local property with variables" {
-            val config = XmlParser.parse("""<configuration>
+            val context = XmlParser.parse("""<configuration>
             |<property key="logdir" value="/path/to/logs" scope="local" />
             |<property key="logfile" value="${'$'}{logdir}/log.txt" />
             |</configuration>""".trimMargin())
 
-            config.properties["logfile"] shouldBe "/path/to/logs/log.txt"
+            context.properties["logfile"] shouldBe "/path/to/logs/log.txt"
         }
 
         "reads system property as fallback" {
             withSystemProperty("FOO", "sysFooValue") {
-                val config = XmlParser.parse("""<configuration>
+                val context = XmlParser.parse("""<configuration>
                 |<property key="myKey" value="${'$'}{FOO}" />
                 |</configuration>""".trimMargin())
 
-                config.properties["myKey"] shouldBe "sysFooValue"
+                context.properties["myKey"] shouldBe "sysFooValue"
             }
         }
 
         "reads environment variable as fallback" {
             withEnvironment("FOO", "envFooValue") {
-                val config = XmlParser.parse("""<configuration>
+                val context = XmlParser.parse("""<configuration>
                 |<property key="myKey" value="${'$'}{FOO}" />
                 |</configuration>""".trimMargin())
 
-                config.properties["myKey"] shouldBe "envFooValue"
+                context.properties["myKey"] shouldBe "envFooValue"
             }
         }
 
         "prefers system property as fallback" {
             withSystemProperty("FOO", "sysFooValue") {
                 withEnvironment("FOO", "envFooValue") {
-                    val config = XmlParser.parse("""<configuration>
+                    val context = XmlParser.parse("""<configuration>
                 |<property key="myKey" value="${'$'}{FOO}" />
                 |</configuration>""".trimMargin())
 
-                    config.properties["myKey"] shouldBe "sysFooValue"
+                    context.properties["myKey"] shouldBe "sysFooValue"
                 }
             }
         }
@@ -148,14 +104,14 @@ class XmlConfigurationTest: FreeSpec({
         fun test(scope: String, fn: (String?, String?, Any?) -> Unit) {
             withSystemProperties(mapOf()) {
                 val scopeText = if (scope.isNullOrEmpty()) "" else "scope=\"${scope}\""
-                val config = Configuration.xml("""<configuration>
+                val context = XmlParser.parse("""<configuration>
                     |<timestamp key="logback.testKey" datePattern="yyyyMMdd'T'HHmmss" ${scopeText}/>
                     |</configuration>""".trimMargin(), clock=testClock)
 
                 fn(
                     System.getProperty("logback.testKey"),
-                    config.context.getProperty("logback.testKey"),
-                    config.properties["logback.testKey"]
+                    context.loggerContext.getProperty("logback.testKey"),
+                    context.properties["logback.testKey"]
                 )
             }
         }
@@ -194,29 +150,6 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "include" - {
-        "sets value" {
-            val tmpFile = tmpConfigFile()
-            val config = XmlParser.parse("""<configuration>
-                |<include file="${tmpFile.absolutePath}" />
-                |</configuration>""".trimMargin())
-
-            config.includes!! shouldHaveSize 1
-            config.includes!!.find { it.file == tmpFile.absolutePath } shouldNot beNull()
-        }
-
-        "sets values" {
-            val tmpFile = tmpConfigFile()
-            val tmpFile2 = tmpConfigFile()
-            val config = XmlParser.parse("""<configuration>
-                |<include file="${tmpFile.absolutePath}" />
-                |<include file="${tmpFile2.absolutePath}" />
-                |</configuration>""".trimMargin())
-
-            config.includes!! shouldHaveSize 2
-            config.includes!!.find { it.file == tmpFile.absolutePath } shouldNot beNull()
-            config.includes!!.find { it.file == tmpFile2.absolutePath } shouldNot beNull()
-        }
-
         "optional include does not throw error" {
             shouldNotThrowAny {
                 XmlParser.parse("""<configuration>
@@ -227,36 +160,6 @@ class XmlConfigurationTest: FreeSpec({
     }
 
     "includes" - {
-        "sets value" {
-            val config = XmlParser.parse("""<configuration>
-                |<includes>
-                |  <include file="/path/to/foo.xml" />
-                |</includes>
-                |</configuration>""".trimMargin())
-
-            config.optionalIncludes!! shouldHaveSize 1
-            config.optionalIncludes!![0].includes!!.find { it.file == "/path/to/foo.xml" } shouldNot beNull()
-        }
-
-        "sets values" {
-            val config = XmlParser.parse("""<configuration>
-                |<includes>
-                |  <include file="/path/to/foo.xml" />
-                |  <include file="/path/to/bar.xml" />
-                |</includes>
-                |<includes>
-                |  <include file="/path/to/baz.xml" />
-                |  <include file="/path/to/qux.xml" />
-                |</includes>
-                |</configuration>""".trimMargin())
-
-            config.optionalIncludes!! shouldHaveSize 2
-            config.optionalIncludes!![0].includes!!.find { it.file == "/path/to/foo.xml" } shouldNot beNull()
-            config.optionalIncludes!![0].includes!!.find { it.file == "/path/to/bar.xml" } shouldNot beNull()
-            config.optionalIncludes!![1].includes!!.find { it.file == "/path/to/baz.xml" } shouldNot beNull()
-            config.optionalIncludes!![1].includes!!.find { it.file == "/path/to/qux.xml" } shouldNot beNull()
-        }
-
         "does not throw errors if not found" {
             shouldNotThrowAny {
                 XmlParser.parse("""<configuration>
@@ -316,7 +219,7 @@ class XmlConfigurationTest: FreeSpec({
         }
 
         "creates LogcatAppender instance" - {
-            val config = XmlParser.parse("""<configuration>
+            val context = XmlParser.parse("""<configuration>
                 |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
                 |  <tagEncoder>
                 |    <pattern>%logger{12}</pattern>
@@ -330,7 +233,7 @@ class XmlConfigurationTest: FreeSpec({
                 |</root>
                 |</configuration>""".trimMargin())
 
-            val appender = config.appenders.find { it.name == "logcat" }
+            val appender = context.appenders.find { it.name == "logcat" }
 
             appender shouldNot beNull()
             appender.shouldBeInstanceOf<ch.qos.logback.classic.android.LogcatAppender>()
@@ -347,7 +250,7 @@ class XmlConfigurationTest: FreeSpec({
         }
 
         "creates FileAppender instance" - {
-            val config = XmlParser.parse("""<configuration>
+            val context = XmlParser.parse("""<configuration>
                 <appender name="file" class="ch.qos.logback.core.FileAppender">
                   <lazy>true</lazy>
                   <file>/data/data/com.example/files/log.txt</file>
@@ -360,7 +263,7 @@ class XmlConfigurationTest: FreeSpec({
                 </root>
                 </configuration>""")
 
-            val appender = config.appenders.find { it.name == "file" }
+            val appender = context.appenders.find { it.name == "file" }
 
             appender shouldNot beNull()
             appender.shouldBeInstanceOf<ch.qos.logback.core.FileAppender<*>>()
@@ -379,7 +282,7 @@ class XmlConfigurationTest: FreeSpec({
 
     "logger" - {
         "creates logger" {
-            val config = XmlParser.parse("""<configuration>
+            val context = XmlParser.parse("""<configuration>
                 |<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
                 |  <encoder>
                 |    <pattern>[%-20thread] %msg</pattern>
@@ -389,8 +292,8 @@ class XmlConfigurationTest: FreeSpec({
                 |  <appender-ref ref="logcat" />
                 |</logger>
                 |</configuration>""".trimMargin())
-            config.context.loggerList shouldHaveSize 4 // root, "com", "example", "foo"
-            config.context.loggerList[3].apply {
+            context.loggerContext.loggerList shouldHaveSize 4 // root, "com", "example", "foo"
+            context.loggerContext.loggerList[3].apply {
                 name shouldBe "com.example.foo"
                 val appenderList = iteratorForAppenders().asSequence().toList()
                 appenderList shouldHaveSize 1
