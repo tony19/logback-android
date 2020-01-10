@@ -323,6 +323,10 @@ class ConfiguratorTest: FreeSpec({
             context.loggerContext.loggerList[0].name shouldNotBe "myRootLogger"
             context.loggerContext.loggerList[0].name shouldBe Logger.ROOT_LOGGER_NAME
         }
+
+        "level is set" {
+            context.loggerContext.getLogger(Logger.ROOT_LOGGER_NAME).level shouldBe Level.DEBUG
+        }
     }
 })
 

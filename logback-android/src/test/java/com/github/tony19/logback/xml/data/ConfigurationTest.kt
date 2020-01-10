@@ -254,4 +254,15 @@ class ConfigurationTest: FreeSpec({
             config.loggers!![1].additivity shouldBe false
         }
     }
+
+    "root" - {
+        "sets level" {
+            val config = XmlParser.parseConfigurationData("""<configuration>
+                |<root level="DEBUG" />
+                |</configuration>""".trimMargin())
+
+            config.root shouldNot beNull()
+            config.root!!.level shouldBe "DEBUG"
+        }
+    }
 })
