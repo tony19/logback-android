@@ -43,6 +43,9 @@ jobs:
       - run:
           name: Lint
           command: ./gradlew lint --parallel
+      - store_artifacts:
+          path: logback-android/build/reports/lint-results*
+          destination: reports
 
   test:
     executor: android28
@@ -55,9 +58,6 @@ jobs:
       - store_artifacts:
           path: logback-android/build/reports
           destination: reports
-      - store_artifacts:
-          path: logback-android/build/outputs
-          destination: outputs
       - store_test_results:
           path: logback-android/build/test-results
 
