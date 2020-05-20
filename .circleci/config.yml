@@ -1,33 +1,80 @@
+# Configuration for CircleCI
+# https://circleci.com/gh/tony19/logback-android
 version: 2.1
 
-orbs:
-  android: circleci/android@0.2.1
+executors:
+  android28:
+    docker:
+      - image: circleci/android:api-28
+    working_directory: ~/code
+    environment:
+      JVM_OPTS: -Xmx3200m
 
 jobs:
   build:
-    executor:
-      name: android/android
-      sdk-version: '28'
-
+    executor: android28
     steps:
       - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
       - run:
           name: Assemble outputs
-          command: ./gradlew -x lint assembleDebug assembleRelease --parallel
+          command: ./gradlew assembleDebug assembleRelease --parallel
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+      - store_artifacts:
+          path: logback-android/build/outputs
+          destination: outputs
 
   test:
-    executor:
-      name: android/android
-      sdk-version: '28'
-
+    executor: android28
     steps:
+      - attach_workspace:
+          at: ~/code
       - run:
           name: Run Tests
           command: ./gradlew test --parallel
+      - store_artifacts:
+          path: logback-android/build/reports
+          destination: reports
+      - store_artifacts:
+          path: logback-android/build/outputs
+          destination: outputs
+      - store_test_results:
+          path: logback-android/build/test-results
+
+  test_app:
+    executor: android28
+    steps:
+      - attach_workspace:
+          at: ~/code
+      - run:
+          name: Checkout app code
+          command: git clone https://github.com/tony19-sandbox/logback-test-app.git
+      - run:
+          name: Copy logback-android to app libs
+          command: mkdir -p logback-test-app/app/libs && cp logback-android/build/outputs/aar/logback-android-release.aar logback-test-app/app/libs/.
+      - run:
+          name: Test app
+          command: cd logback-test-app && ./gradlew test
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
+      - test_app:
+          requires:
+            - build
