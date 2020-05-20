@@ -44,7 +44,7 @@ jobs:
           name: Lint
           command: ./gradlew lint --parallel
       - store_artifacts:
-          path: logback-android/build/reports/lint-results*
+          path: logback-android/build/reports/lint-results.html
           destination: reports
 
   test:
