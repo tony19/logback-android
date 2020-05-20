@@ -35,6 +35,15 @@ jobs:
           path: logback-android/build/outputs
           destination: outputs
 
+  lint:
+    executor: android28
+    steps:
+      - attach_workspace:
+          at: ~/code
+      - run:
+          name: Lint
+          command: ./gradlew lint --parallel
+
   test:
     executor: android28
     steps:
@@ -72,6 +81,9 @@ workflows:
   build_and_test:
     jobs:
       - build
+      - lint:
+          requires:
+            - build
       - test:
           requires:
             - build
