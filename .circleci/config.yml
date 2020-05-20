@@ -1,44 +1,33 @@
-# Configuration for CircleCI
-# https://circleci.com/gh/tony19/logback-android
-version: 2.0
+version: 2.1
+
+orbs:
+  android: circleci/android@0.2.1
 
 jobs:
   build:
-    branches:
-      ignore: gh-pages
-    working_directory: ~/code
-    docker:
-      - image: circleci/android:api-28-alpha
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor:
+      name: android/android
+      sdk-version: '28'
+
     steps:
       - checkout
-      - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
-#      - run:
-#         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
-#         command: sudo chmod +x ./gradlew
       - run:
-          name: Download Dependencies
-          command: ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
+          name: Assemble outputs
+          command: ./gradlew -x lint assembleDebug assembleRelease --parallel
+
+  test:
+    executor:
+      name: android/android
+      sdk-version: '28'
+
+    steps:
       - run:
           name: Run Tests
-          command: ./gradlew check assembleDebug assembleRelease --parallel
-      - store_artifacts:
-          path: logback-android/build/reports
-          destination: reports
-      - store_artifacts:
-          path: logback-android/build/outputs
-          destination: outputs
-      - store_test_results:
-          path: logback-android/build/test-results
-      - run:
-          name: Deploy snapshot
-          command: scripts/deploysnapshot.sh
-      - run:
-          name: Trigger Test App
-          command: scripts/triggertestapp.sh
+          command: ./gradlew test --parallel
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test
