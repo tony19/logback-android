@@ -12,8 +12,6 @@ android:
     # The SDK version used to compile the project
     - android-29
 
-sudo: false
-
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-3/modules-3.lock
 cache:
