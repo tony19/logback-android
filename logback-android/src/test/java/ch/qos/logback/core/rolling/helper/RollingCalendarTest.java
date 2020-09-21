@@ -90,7 +90,7 @@ public class RollingCalendarTest {
   }
 
   private Calendar getEndOfNextNthPeriod(String dateFormat, Date date, int n) {
-    RollingCalendar rc = new RollingCalendar(dateFormat);
+    RollingCalendar rc = new RollingCalendar(dateFormat, GMT_TIMEZONE, Locale.US);
     Date nextDate = rc.getEndOfNextNthPeriod(date, n);
     Calendar cal = Calendar.getInstance(GMT_TIMEZONE, Locale.US);
     cal.setTime(nextDate);
