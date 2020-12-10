@@ -20,7 +20,6 @@ import android.content.ContextWrapper;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Environment;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -92,13 +91,13 @@ public class AndroidContextUtil {
    * or {@code null} if not mounted.
    */
   public String getMountedExternalStorageDirectoryPath() {
-    String path = null;
-    String state = Environment.getExternalStorageState();
-    if (state.equals(Environment.MEDIA_MOUNTED) ||
-        state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-      path = getExternalStorageDirectoryPath();
-    }
-    return path;
+//    String path = null;
+//    String state = Environment.getExternalStorageState();
+//    if (state.equals(Environment.MEDIA_MOUNTED) ||
+//        state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+//      path = getExternalStorageDirectoryPath();
+//    }
+    return null;
   }
 
   /**
@@ -115,11 +114,12 @@ public class AndroidContextUtil {
   @TargetApi(8)
   @SuppressWarnings("deprecation")
   public String getExternalStorageDirectoryPath() {
-    if (Build.VERSION.SDK_INT >= 29) {
-      return getExternalFilesDirectoryPath();
-    } else {
-      return Environment.getExternalStorageDirectory().getAbsolutePath();
-    }
+    return "";
+//    if (Build.VERSION.SDK_INT >= 29) {
+//      return getExternalFilesDirectoryPath();
+//    } else {
+//      return Environment.getExternalStorageDirectory().getAbsolutePath();
+//    }
   }
 
   /**
@@ -132,9 +132,10 @@ public class AndroidContextUtil {
    */
   @TargetApi(8)
   public String getExternalFilesDirectoryPath() {
-    return this.context != null
-            ? absPath(this.context.getExternalFilesDir(null))
-            : "";
+    return "";
+//    return this.context != null
+//            ? absPath(this.context.getExternalFilesDir(null))
+//            : "";
   }
 
   public String getCacheDirectoryPath() {
