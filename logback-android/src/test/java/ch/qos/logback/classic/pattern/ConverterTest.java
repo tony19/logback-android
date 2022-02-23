@@ -35,6 +35,7 @@ import ch.qos.logback.core.net.SyslogConstants;
 import ch.qos.logback.core.pattern.DynamicConverter;
 import ch.qos.logback.core.pattern.FormatInfo;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -77,7 +78,7 @@ public class ConverterTest {
     StringBuilder buf = new StringBuilder();
     converter.write(buf, le);
     // the number below should be the line number of the previous line
-    assertEquals("78", buf.toString());
+    assertEquals("79", buf.toString());
     // TODO: Refactor this test so that it does not depend on the actual line numbers of this file
   }
 
@@ -321,9 +322,9 @@ public class ConverterTest {
       converter.write(buf, le);
       assertTrue("buf is too short", buf.length() >= 10);
 
-      String expected = "Caller+4\t at java.lang.reflect.Method.invoke(";
+      String expected = "Caller+4\t";
       String actual = buf.toString().substring(0, expected.length());
-      assertThat(actual, is(expected));
+      assertThat(actual, startsWith(expected));
     }
   }
 
