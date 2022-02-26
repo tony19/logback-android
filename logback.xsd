@@ -10,15 +10,15 @@ Usage:
 <configuration
     xmlns="https://tony19.github.io/logback-android/xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://https://cdn.jsdelivr.net/gh/tony19/logback-android/src/main/java/com/github/tony19/logback/xml/logback.xsd">
+    xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd">
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
       <encoder>
         <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
       </encoder>
     </appender>
     <root level="WARN">
-      <appender-ref ref="STDOUT" />
+      <appender-ref ref="logcat" />
     </root>
 </configuration>
 
