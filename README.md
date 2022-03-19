@@ -80,8 +80,8 @@ _Gradle_ **release**
 
 ```groovy
 dependencies {
-  compile 'org.slf4j:slf4j-api:1.7.25'
-  compile 'com.github.tony19:logback-android:2.0.0'
+  implementation 'org.slf4j:slf4j-api:1.7.36'
+  implementation 'com.github.tony19:logback-android:2.0.0'
 }
 ```
 
@@ -93,8 +93,8 @@ repositories {
 }
 
 dependencies {
-  compile 'org.slf4j:slf4j-api:1.7.25'
-  compile 'com.github.tony19:logback-android:2.0.1-SNAPSHOT'
+  implementation 'org.slf4j:slf4j-api:1.7.36'
+  implementation 'com.github.tony19:logback-android:2.0.1-SNAPSHOT'
 }
 ```
 
