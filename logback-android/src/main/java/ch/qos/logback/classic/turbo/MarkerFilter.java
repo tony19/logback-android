@@ -18,6 +18,8 @@ package ch.qos.logback.classic.turbo;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import java.util.List;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.spi.FilterReply;
@@ -40,7 +42,7 @@ public class MarkerFilter extends MatchingFilter {
   }
   
   @Override
-  public FilterReply decide(Marker marker, Logger logger, Level level, String format, Object[] params, Throwable t) {
+  public FilterReply decide(List<Marker> marker, Logger logger, Level level, String format, Object[] params, Throwable t) {
     if(!isStarted()) {
       return FilterReply.NEUTRAL;
     }
