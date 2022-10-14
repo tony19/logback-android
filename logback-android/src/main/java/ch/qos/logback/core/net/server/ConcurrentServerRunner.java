@@ -176,7 +176,7 @@ public abstract class ConcurrentServerRunner<T extends Client>
    * Adds a client to the collection of those being tracked by the server.
    * @param client the client to add
    */
-  private void addClient(T client) {
+  protected void addClient(T client) {
     clientsLock.lock();
     try {
       clients.add(client);
@@ -190,7 +190,7 @@ public abstract class ConcurrentServerRunner<T extends Client>
    * Removes a client from the collection of those being tracked by the server.
    * @param client the client to remote
    */
-  private void removeClient(T client) {
+  protected void removeClient(T client) {
     clientsLock.lock();
     try {
       clients.remove(client);

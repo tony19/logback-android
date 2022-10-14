@@ -152,7 +152,7 @@ public class SocketConnectorBase implements SocketConnector {
   /**
    * A default {@link ExceptionHandler} that writes to {@code System.out}
    */
-  private static class ConsoleExceptionHandler implements ExceptionHandler {
+  protected static class ConsoleExceptionHandler implements ExceptionHandler {
 
     public void connectionFailed(SocketConnector connector, Exception ex) {
       System.out.println(ex);

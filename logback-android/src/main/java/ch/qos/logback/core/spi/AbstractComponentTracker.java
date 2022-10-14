@@ -211,7 +211,7 @@ abstract public class AbstractComponentTracker<C> implements ComponentTracker<C>
     return false;
   }
 
-  private boolean isEntryStale(Entry<C> entry, long now) {
+  protected boolean isEntryStale(Entry<C> entry, long now) {
     // stopped or improperly started appenders are considered stale
     // see also http://jira.qos.ch/browse/LBCLASSIC-316
     C c = entry.component;
@@ -221,7 +221,7 @@ abstract public class AbstractComponentTracker<C> implements ComponentTracker<C>
     return ((entry.timestamp + timeout) < now);
   }
 
-  private boolean isEntryDoneLingering(Entry<C> entry, long now) {
+  protected boolean isEntryDoneLingering(Entry<C> entry, long now) {
     return ((entry.timestamp + LINGERING_TIMEOUT) < now);
   }
 
