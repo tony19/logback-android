@@ -216,6 +216,6 @@ public final class LogbackMDCAdapter implements MDCAdapter {
 
   @Override
   public void clearDequeByKey(String key) {
-
+    put(key, null);
   }
 }
