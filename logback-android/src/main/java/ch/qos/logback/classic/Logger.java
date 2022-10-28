@@ -509,7 +509,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   }
 
   public boolean isDebugEnabled() {
-    return isDebugEnabled();
+    return isDebugEnabled(Collections.<Marker>emptyList());
   }
 
   public boolean isDebugEnabled(List<Marker> markers) {
@@ -666,7 +666,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   }
 
   public boolean isInfoEnabled() {
-    return isInfoEnabled();
+    return isInfoEnabled(Collections.<Marker>emptyList());
   }
 
   public boolean isInfoEnabled(List<Marker> markers) {
@@ -753,7 +753,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   }
 
   public boolean isTraceEnabled() {
-    return isTraceEnabled();
+    return isTraceEnabled(Collections.<Marker>emptyList());
   }
 
   public boolean isTraceEnabled(List<Marker> markers) {
@@ -770,7 +770,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   }
 
   public boolean isErrorEnabled() {
-    return isErrorEnabled();
+    return isErrorEnabled(Collections.<Marker>emptyList());
   }
 
   public boolean isErrorEnabled(List<Marker> markers) {
@@ -787,7 +787,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   }
 
   public boolean isWarnEnabled() {
-    return isWarnEnabled();
+    return isWarnEnabled(Collections.<Marker>emptyList());
   }
 
   public boolean isWarnEnabled(List<Marker> markers) {
