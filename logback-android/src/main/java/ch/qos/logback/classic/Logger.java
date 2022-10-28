@@ -30,6 +30,7 @@ import org.slf4j.spi.LocationAwareLogger;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -460,32 +461,32 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   @Override
   public boolean isTraceEnabled(Marker marker) {
-    return false;
+    return isTraceEnabled(Collections.singletonList(marker));
   }
 
   @Override
   public void trace(Marker marker, String msg) {
-
+    trace(Collections.singletonList(marker), msg);
   }
 
   @Override
   public void trace(Marker marker, String format, Object arg) {
-
+    trace(Collections.singletonList(marker), format, arg);
   }
 
   @Override
   public void trace(Marker marker, String format, Object arg1, Object arg2) {
-
+    trace(Collections.singletonList(marker), format, arg1, arg2);
   }
 
   @Override
   public void trace(Marker marker, String format, Object... argArray) {
-
+    trace(Collections.singletonList(marker), format, argArray);
   }
 
   @Override
   public void trace(Marker marker, String msg, Throwable t) {
-
+    trace(Collections.singletonList(marker), msg, t);
   }
 
   public void trace(List<Marker> markers, String msg) {
@@ -547,32 +548,32 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   @Override
   public boolean isDebugEnabled(Marker marker) {
-    return false;
+    return isDebugEnabled(Collections.singletonList(marker));
   }
 
   @Override
   public void debug(Marker marker, String msg) {
-
+    debug(Collections.singletonList(marker), msg);
   }
 
   @Override
   public void debug(Marker marker, String format, Object arg) {
-
+    debug(Collections.singletonList(marker), format, arg);
   }
 
   @Override
   public void debug(Marker marker, String format, Object arg1, Object arg2) {
-
+    debug(Collections.singletonList(marker), format, arg1, arg2);
   }
 
   @Override
-  public void debug(Marker marker, String format, Object... arguments) {
-
+  public void debug(Marker marker, String format, Object... argArray) {
+    debug(Collections.singletonList(marker), format, argArray);
   }
 
   @Override
   public void debug(Marker marker, String msg, Throwable t) {
-
+    debug(Collections.singletonList(marker), msg, t);
   }
 
   public void debug(List<Marker> markers, String msg) {
@@ -617,32 +618,32 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   @Override
   public boolean isErrorEnabled(Marker marker) {
-    return false;
+    return isErrorEnabled(Collections.singletonList(marker));
   }
 
   @Override
   public void error(Marker marker, String msg) {
-
+    error(Collections.singletonList(marker), msg);
   }
 
   @Override
   public void error(Marker marker, String format, Object arg) {
-
+    error(Collections.singletonList(marker), format, arg);
   }
 
   @Override
   public void error(Marker marker, String format, Object arg1, Object arg2) {
-
+    error(Collections.singletonList(marker), format, arg1, arg2);
   }
 
   @Override
   public void error(Marker marker, String format, Object... arguments) {
-
+    error(Collections.singletonList(marker), format, arguments);
   }
 
   @Override
   public void error(Marker marker, String msg, Throwable t) {
-
+    error(Collections.singletonList(marker), msg, t);
   }
 
   public void error(List<Marker> markers, String msg) {
@@ -704,32 +705,32 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   @Override
   public boolean isInfoEnabled(Marker marker) {
-    return false;
+    return isInfoEnabled(Collections.singletonList(marker));
   }
 
   @Override
   public void info(Marker marker, String msg) {
-
+    info(Collections.singletonList(marker), msg);
   }
 
   @Override
   public void info(Marker marker, String format, Object arg) {
-
+    info(Collections.singletonList(marker), format, arg);
   }
 
   @Override
   public void info(Marker marker, String format, Object arg1, Object arg2) {
-
+    info(Collections.singletonList(marker), format, arg1, arg2);
   }
 
   @Override
   public void info(Marker marker, String format, Object... arguments) {
-
+    info(Collections.singletonList(marker), format, arguments);
   }
 
   @Override
   public void info(Marker marker, String msg, Throwable t) {
-
+    info(Collections.singletonList(marker), msg, t);
   }
 
   public void info(List<Marker> markers, String msg) {
@@ -831,32 +832,32 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
 
   @Override
   public boolean isWarnEnabled(Marker marker) {
-    return false;
+    return isWarnEnabled(Collections.singletonList(marker));
   }
 
   @Override
   public void warn(Marker marker, String msg) {
-
+    warn(Collections.singletonList(marker), msg);
   }
 
   @Override
   public void warn(Marker marker, String format, Object arg) {
-
+    warn(Collections.singletonList(marker), format, arg);
   }
 
   @Override
   public void warn(Marker marker, String format, Object arg1, Object arg2) {
-
+    warn(Collections.singletonList(marker), format, arg1, arg2);
   }
 
   @Override
   public void warn(Marker marker, String format, Object... arguments) {
-
+    warn(Collections.singletonList(marker), format, arguments);
   }
 
   @Override
   public void warn(Marker marker, String msg, Throwable t) {
-
+    warn(Collections.singletonList(marker), msg, t);
   }
 
   public void warn(String format, Object arg) {
