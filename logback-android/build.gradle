@@ -74,7 +74,7 @@ dependencies {
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
 
     // For SMTPAppender
-    compileOnly 'com.sun.mail:android-mail:1.6.3'
+    compileOnly 'com.sun.mail:android-mail:1.6.7'
     compileOnly 'com.sun.mail:android-activation:1.6.3'
 
     testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
