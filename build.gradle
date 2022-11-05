@@ -17,7 +17,7 @@ buildscript {
   }
 }
 plugins {
-  id 'io.codearte.nexus-staging' version '0.11.0' // must be in root project
+  id 'io.codearte.nexus-staging' version '0.30.0' // must be in root project
   id 'com.github.hierynomus.license' version '0.15.0'
 }
 
