@@ -1,5 +1,5 @@
 plugins {
-    id 'net.researchgate.release' version '2.6.0'
+    id 'net.researchgate.release' version '2.8.1'
 }
 apply plugin: 'com.android.library'
 apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
