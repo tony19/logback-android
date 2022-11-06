@@ -23,6 +23,7 @@ package ch.qos.logback.core.net.ssl;
  * to facilitate unit testing.
  *
  * @author Carl Harris
+ * @author Bruno Harbulot
  */
 public interface SSLConfigurable {
 
@@ -84,4 +85,5 @@ public interface SSLConfigurable {
    */
   void setWantClientAuth(boolean state);
 
+  void setHostnameVerification(boolean verifyHostname);
 }

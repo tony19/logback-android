@@ -15,12 +15,16 @@
  */
 package ch.qos.logback.core.net.ssl;
 
+import android.annotation.TargetApi;
+
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 
 /**
  * An {@link SSLConfigurable} wrapper for an {@link SSLSocket}.
  *
  * @author Carl Harris
+ * @author Bruno Harbulot
  */
 public class SSLConfigurableSocket implements SSLConfigurable {
 
@@ -62,4 +66,14 @@ public class SSLConfigurableSocket implements SSLConfigurable {
     delegate.setWantClientAuth(state);
   }
 
+  @TargetApi(24)
+  @Override
+  public void setHostnameVerification(boolean hostnameVerification) {
+    if (!hostnameVerification) {
+      return;
+    }
+    SSLParameters sslParameters = delegate.getSSLParameters();
+    sslParameters.setEndpointIdentificationAlgorithm("HTTPS");
+    delegate.setSSLParameters(sslParameters);
+  }
 }
