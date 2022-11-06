@@ -17,7 +17,6 @@ package ch.qos.logback.core.rolling;
 
 import ch.qos.logback.core.pattern.SpacePadder;
 import ch.qos.logback.core.util.FileSize;
-import ch.qos.logback.core.util.FixedRateInvocationGate;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,6 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   private TimeBasedRollingPolicy<Object> tbrp;
   private TimeBasedFileNamingAndTriggeringPolicy<Object> tbfnatp;
   private ConfigParameters cp;
-  private FixedRateInvocationGate fixedRateInvocationGate = new FixedRateInvocationGate();
 
   @Before
   @Override
@@ -191,7 +189,6 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   @Test
   public void dailySizeBasedRolloverWithoutCap() {
     SizeAndTimeBasedFNATP<Object> sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<Object>();
-    sizeAndTimeBasedFNATP.invocationGate = fixedRateInvocationGate;
     sizeAndTimeBasedFNATP.setMaxFileSize(new FileSize(10000));
     tbfnatp = sizeAndTimeBasedFNATP;
     final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + ", GMT}-clean.%i.zip";
@@ -217,7 +214,6 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   public void dailyChronologSizeBasedRollover() {
     SizeAndTimeBasedFNATP<Object> sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<Object>();
     sizeAndTimeBasedFNATP.setMaxFileSize(new FileSize(10000));
-    sizeAndTimeBasedFNATP.invocationGate = fixedRateInvocationGate;
     tbfnatp = sizeAndTimeBasedFNATP;
     final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + ", GMT}/clean.%i.zip";
     cp.maxHistory(5).fileNamePattern(fileNamePattern).simulatedNumberOfPeriods(5 * 3);
@@ -246,7 +242,6 @@ public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRolli
   public void dailyChronologSizeBasedRolloverWithSecondPhase() {
     SizeAndTimeBasedFNATP<Object> sizeAndTimeBasedFNATP = new SizeAndTimeBasedFNATP<Object>();
     sizeAndTimeBasedFNATP.setMaxFileSize(new FileSize(10000));
-    sizeAndTimeBasedFNATP.invocationGate = fixedRateInvocationGate;
     tbfnatp = sizeAndTimeBasedFNATP;
 
     final String fileNamePattern = randomOutputDir + "/%d{" + DAILY_DATE_PATTERN + ", GMT}/clean.%i";

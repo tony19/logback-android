@@ -53,10 +53,6 @@ import ch.qos.logback.core.joran.spi.RuleStore;
  */
 abstract public class JoranConfiguratorBase<E> extends GenericConfigurator {
 
-  public List getErrorList() {
-    return null;
-  }
-
   @Override
   protected void addInstanceRules(RuleStore rs) {
 
