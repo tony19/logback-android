@@ -7,6 +7,7 @@ apply plugin: 'com.android.library'
 //apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
+    namespace 'com.github.tony19.logback.android'
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
