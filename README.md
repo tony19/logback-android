@@ -32,7 +32,7 @@ Quick Start
     }
     ```
 
-   **NOTE:** SLF5J 2.x is not yet supported.
+   **NOTE:** SLF4J 2.x is not [yet](https://github.com/tony19/logback-android/pull/247) supported.
 
 3. Create `app/src/main/assets/logback.xml` containing:
 
