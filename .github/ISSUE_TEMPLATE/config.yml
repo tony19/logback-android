@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/tony19/logback-android/discussions
+    about: Feel free to post discussions here
+  - name: Stack Overflow
+    url: https://stackoverflow.com/questions/tagged/logback+android
+    about: For technical support (e.g., configuration questions)
