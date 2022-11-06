@@ -8,6 +8,7 @@ apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
     compileSdkVersion 31
+    buildToolsVersion "30.0.3"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_6
