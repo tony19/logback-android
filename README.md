@@ -28,7 +28,7 @@ Quick Start
     }
     ```
 
-    If using `logback-android` in unit tests, **either** [use Robolectric](https://github.com/tony19/logback-android/issues/151#issuecomment-466276739), **or** use this config instead:
+   If using `logback-android` in unit tests, **either** [use Robolectric](https://github.com/tony19/logback-android/issues/151#issuecomment-466276739), **or** use this config instead:
 
     ```groovy
     dependencies {
