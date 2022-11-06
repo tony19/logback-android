@@ -7,7 +7,7 @@
 
 Overview
 --------
-[`logback-android`][2] brings the power of [`logback`][1] to Android. This library provides a highly configurable logging framework for Android apps, supporting multiple log destinations simultaneously:
+`logback-android` is a lite version of [`logback`](http://logback.qos.ch) that runs on Android. This library provides a highly configurable logging framework for Android apps, supporting multiple log destinations simultaneously:
 
  * files
  * SQLite databases
@@ -16,21 +16,23 @@ Overview
  * syslog
  * email
 
-Runs on Android 2.3 (SDK 9) or higher. See [Wiki][4] for documentation.
+Runs on Android 2.3 (SDK 9) or higher. See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 
-*For `v1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
+*For `logback-android@1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
 
 Quick Start
 -----------
-1. Create a new "Basic Activity" app in [Android Studio][3].
+1. Create a new "Basic Activity" app in [Android Studio](http://developer.android.com/sdk/index.html).
 2. In `app/build.gradle`, add the following dependencies:
 
     ```groovy
     dependencies {
-      compile 'org.slf4j:slf4j-api:1.7.25'
-      compile 'com.github.tony19:logback-android:2.0.0'
+      implementation 'org.slf4j:slf4j-api:1.7.36'
+      implementation 'com.github.tony19:logback-android:2.0.0'
     }
     ```
+
+   **NOTE:** SLF5J 2.x is not yet supported.
 
 3. Create `app/src/main/assets/logback.xml` containing:
 
@@ -108,7 +110,3 @@ Use these commands to create the AAR:
 
 The file is output to: `./build/logback-android-2.0.0-debug.aar`
 
- [1]: http://logback.qos.ch
- [2]: http://tony19.github.com/logback-android
- [3]: http://developer.android.com/sdk/index.html
- [4]: https://github.com/tony19/logback-android/wiki
