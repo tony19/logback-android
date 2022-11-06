@@ -28,6 +28,20 @@ Quick Start
     }
     ```
 
+    If using `logback-android` in unit tests, **either** [use Robolectric](https://github.com/tony19/logback-android/issues/151#issuecomment-466276739), **or** use this config instead:
+
+    ```groovy
+    dependencies {
+      implementation 'org.slf4j:slf4j-api:1.7.36'
+      implementation 'com.github.tony19:logback-android:2.0.0'
+      testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+    }
+
+    configurations.testImplementation {
+      exclude module: 'logback-android'
+    }
+    ```
+
    **NOTE:** SLF4J 2.x is not [yet](https://github.com/tony19/logback-android/pull/247) supported.
 
 3. Create `app/src/main/assets/logback.xml` containing:
