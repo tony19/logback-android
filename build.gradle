@@ -4,7 +4,7 @@ buildscript {
 
   repositories {
     google()
-    jcenter()
+    mavenCentral()
   }
   dependencies {
     classpath 'com.android.tools.build:gradle:3.2.1'
@@ -27,7 +27,7 @@ apply from: 'gradle/readme.gradle'
 allprojects {
   repositories {
     google()
-    jcenter()
+    mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   }
   apply from: "${rootProject.projectDir}/gradle/license.gradle"
