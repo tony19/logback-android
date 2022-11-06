@@ -1,6 +1,6 @@
 name: Bug Report
 description: File a bug report
-labels: ["bug", "triage"]
+labels: ["bug", "pending triage"]
 assignees:
   - tony19
 body:
