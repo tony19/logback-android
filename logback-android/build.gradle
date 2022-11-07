@@ -2,12 +2,14 @@ plugins {
     id 'net.researchgate.release' version '2.8.1'
 }
 apply plugin: 'com.android.library'
-apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
-apply from: "${rootProject.projectDir}/gradle/docs.gradle"
-apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
+//apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
+//apply from: "${rootProject.projectDir}/gradle/docs.gradle"
+//apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
+    namespace 'com.github.tony19.logback.android'
     compileSdkVersion 31
+    buildToolsVersion "30.0.3"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_6
@@ -77,9 +79,6 @@ dependencies {
     // For SMTPAppender
     compileOnly 'com.sun.mail:android-mail:1.6.7'
     compileOnly 'com.sun.mail:android-activation:1.6.7'
-
-    testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
-    testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
 }
 
 allprojects {
