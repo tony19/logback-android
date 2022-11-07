@@ -22,7 +22,7 @@ Quick Start
 
     ```groovy
     dependencies {
-      implementation 'org.slf4j:slf4j-api:1.7.36'
+      implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
       implementation 'com.github.tony19:logback-android:2.0.0'
     }
     ```
@@ -31,7 +31,7 @@ Quick Start
 
     ```groovy
     dependencies {
-      implementation 'org.slf4j:slf4j-api:1.7.36'
+      implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
       implementation 'com.github.tony19:logback-android:2.0.0'
       testImplementation 'ch.qos.logback:logback-classic:1.2.11'
     }
@@ -91,7 +91,7 @@ _Gradle_ **release**
 
 ```groovy
 dependencies {
-  implementation 'org.slf4j:slf4j-api:1.7.36'
+  implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
   implementation 'com.github.tony19:logback-android:2.0.0'
 }
 ```
@@ -104,7 +104,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'org.slf4j:slf4j-api:1.7.36'
+  implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
   implementation 'com.github.tony19:logback-android:2.0.1-SNAPSHOT'
 }
 ```
