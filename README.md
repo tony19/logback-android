@@ -46,7 +46,11 @@ Quick Start
 3. Create `app/src/main/assets/logback.xml` containing:
 
     ```xml
-    <configuration>
+    <configuration
+      xmlns="https://tony19.github.io/logback-android/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd"
+    >
       <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
         <tagEncoder>
           <pattern>%logger{12}</pattern>
