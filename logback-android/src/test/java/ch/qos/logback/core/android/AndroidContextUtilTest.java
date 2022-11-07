@@ -18,6 +18,7 @@ package ch.qos.logback.core.android;
 import android.os.Environment;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -136,7 +137,7 @@ public class AndroidContextUtilTest {
 
   @Test
   public void getExternalCacheDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getExternalCacheDirectoryPath(), endsWith("/external-cache"));
+    assertThat(contextUtil.getExternalCacheDirectoryPath(), containsString("/external-cache"));
   }
 
   @Test
@@ -146,7 +147,7 @@ public class AndroidContextUtilTest {
 
   @Test
   public void getPackageName() {
-    assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android"));
+    assertThat(contextUtil.getPackageName(), is("com.github.tony19.logback.android.test"));
   }
 
   @Test
