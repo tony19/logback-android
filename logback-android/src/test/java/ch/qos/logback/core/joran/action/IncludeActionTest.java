@@ -201,7 +201,7 @@ public class IncludeActionTest {
   @Test
   public void unknownURL() throws JoranException {
     new NetworkTestUtil().assumeNoUnresolvedUrlFallback();
-    System.setProperty(INCLUDE_KEY, "http://logback2345.qos.ch");
+    System.setProperty(INCLUDE_KEY, "https://example.com/nonexistent.html");
     tc.doConfigure(TOP_BY_URL);
     assertEquals(Status.WARN, statusChecker.getHighestLevel(0));
   }
