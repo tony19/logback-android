@@ -8,8 +8,6 @@ buildscript {
   }
   dependencies {
     classpath 'com.android.tools.build:gradle:7.3.1'
-    classpath 'org.ajoberstar:grgit:2.1.1'
-    classpath 'com.novoda:gradle-static-analysis-plugin:0.5.1'
 
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files
@@ -20,16 +18,12 @@ plugins {
   id 'com.github.hierynomus.license' version '0.15.0'
 }
 
-apply plugin: 'org.ajoberstar.grgit'
-apply from: 'gradle/readme.gradle'
-
 allprojects {
   repositories {
     google()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   }
-  apply from: "${rootProject.projectDir}/gradle/license.gradle"
 }
 
 task clean(type: Delete) {
