@@ -1,6 +1,3 @@
-plugins {
-    id 'maven-publish'
-}
 apply plugin: 'com.android.library'
 
 android {
@@ -42,49 +39,8 @@ android {
             }
         }
     }
-    publishing {
-        singleVariant('release') {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
 }
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId GROUP
-                artifactId 'logback-android'
-                version = VERSION_NAME
 
-                pom {
-                    name = 'logback-android'
-                    description = 'Logging library for Android apps'
-                    url = 'https://github.com/tony19/logback-android'
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'tony19'
-                            name = 'Tony Trinh'
-                            email = 'tony19@gmail.com'
-                        }
-                    }
-                    scm {
-                        connection = 'scm:git@github.com:tony19/logback-android.git'
-                        developerConnection = 'scm:git@github.com:tony19/logback-android.git'
-                        url = 'https://github.com/tony19/logback-android'
-                    }
-                }
-            }
-        }
-    }
-}
 dependencies {
 
     testImplementation('junit:junit:4.13.2') {
@@ -137,3 +93,11 @@ allprojects {
         reproducibleFileOrder = true
     }
 }
+
+ext {
+    PUBLISH_GROUP_ID = GROUP
+    PUBLISH_VERSION = VERSION_NAME
+    PUBLISH_ARTIFACT_ID = POM_ARTIFACT_ID
+}
+
+apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"

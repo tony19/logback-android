@@ -1,7 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-
   repositories {
     google()
     mavenCentral()
@@ -14,9 +13,11 @@ buildscript {
   }
 }
 plugins {
-  id 'io.codearte.nexus-staging' version '0.30.0' // must be in root project
+  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+  id 'maven-publish'
   id 'com.github.hierynomus.license' version '0.15.0'
 }
+apply from: "${rootDir}/gradle/publish-root.gradle"
 
 allprojects {
   repositories {
