@@ -1,4 +1,4 @@
-# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) [![CircleCI](https://circleci.com/gh/tony19/logback-android/tree/main.svg?style=svg)](https://circleci.com/gh/tony19/logback-android/tree/main) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
+# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) <a href="https://android-arsenal.com/api?level=9"><img alt="API" src="https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat"/></a> [![CircleCI](https://circleci.com/gh/tony19/logback-android/tree/main.svg?style=svg)](https://circleci.com/gh/tony19/logback-android/tree/main) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
 
 Overview
 --------
@@ -11,7 +11,7 @@ Overview
  * syslog
  * email
 
-Runs on Android 2.3 (SDK 9) or higher. See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
+See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 
 *For `logback-android@1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
 
