@@ -1,3 +1,6 @@
+plugins {
+    id 'net.researchgate.release' version '3.0.2'
+}
 apply plugin: 'com.android.library'
 
 android {
@@ -94,6 +97,20 @@ allprojects {
     tasks.withType(AbstractArchiveTask) {
         preserveFileTimestamps = false
         reproducibleFileOrder = true
+    }
+}
+
+release {
+    tagTemplate = 'v_${version}'
+    preTagCommitMessage = ':cloud: Release'
+    tagCommitMessage = ':cloud: Release'
+    newVersionCommitMessage = ':cloud: Bump'
+
+    versionPropertyFile = '../gradle.properties'
+    versionProperties = ['VERSION_NAME']
+
+    git {
+        requireBranch.set('main')
     }
 }
 
