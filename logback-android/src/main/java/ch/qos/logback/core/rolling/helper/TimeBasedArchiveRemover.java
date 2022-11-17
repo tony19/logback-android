@@ -33,12 +33,12 @@ import ch.qos.logback.core.util.FileSize;
 public class TimeBasedArchiveRemover extends ContextAwareBase implements ArchiveRemover {
 
   protected final FileNamePattern fileNamePattern;
-  protected final RollingCalendar rc;
-  protected int maxHistory = CoreConstants.UNBOUND_HISTORY;
+  private final RollingCalendar rc;
+  private int maxHistory = CoreConstants.UNBOUND_HISTORY;
   private long totalSizeCap = CoreConstants.UNBOUNDED_TOTAL_SIZE_CAP;
   private final FileProvider fileProvider;
   private final FileSorter fileSorter;
-  protected final DateParser dateParser;
+  private final DateParser dateParser;
 
   public TimeBasedArchiveRemover(FileNamePattern fileNamePattern, RollingCalendar rc, FileProvider fileProvider) {
     this.fileNamePattern = fileNamePattern;

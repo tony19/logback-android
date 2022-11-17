@@ -116,7 +116,7 @@ public class DefaultSocketConnector implements SocketConnector {
   /**
    * A default {@link ExceptionHandler} that writes to {@code System.out}
    */
-  protected static class ConsoleExceptionHandler implements ExceptionHandler {
+  private static class ConsoleExceptionHandler implements ExceptionHandler {
 
     public void connectionFailed(SocketConnector connector, Exception ex) {
       System.out.println(ex);

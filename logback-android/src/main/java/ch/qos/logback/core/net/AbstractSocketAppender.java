@@ -186,7 +186,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     }
   }
 
-  protected void connectSocketAndDispatchEvents() {
+  private void connectSocketAndDispatchEvents() {
     try {
       while (socketConnectionCouldBeEstablished()) {
         try {
