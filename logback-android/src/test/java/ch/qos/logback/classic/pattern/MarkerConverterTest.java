@@ -17,13 +17,14 @@ package ch.qos.logback.classic.pattern;
 
 import static junit.framework.Assert.assertEquals;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.Marker;
 import org.slf4j.helpers.BasicMarkerFactory;
+
+import java.util.Collections;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;

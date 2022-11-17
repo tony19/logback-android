@@ -18,10 +18,11 @@ package ch.qos.logback.classic.boolex;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MarkerFactory;
+
+import java.util.Collections;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
