@@ -1,13 +1,8 @@
-# logback-android [![CircleCI](https://circleci.com/gh/tony19/logback-android/tree/main.svg?style=svg)](https://circleci.com/gh/tony19/logback-android/tree/main) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
-<sup>v2.0.0</sup>
-
-<a href="https://opencollective.com/logback-android/donate" target="_blank">
-  <img src="https://opencollective.com/logback-android/donate/button@2x.png?color=blue" width=250 />
-</a>
+# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) [![CircleCI](https://circleci.com/gh/tony19/logback-android/tree/main.svg?style=svg)](https://circleci.com/gh/tony19/logback-android/tree/main) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
 
 Overview
 --------
-[`logback-android`][2] brings the power of [`logback`][1] to Android. This library provides a highly configurable logging framework for Android apps, supporting multiple log destinations simultaneously:
+`logback-android` is a lite version of [`logback`](http://logback.qos.ch) that runs on Android. This library provides a highly configurable logging framework for Android apps, supporting multiple log destinations simultaneously:
 
  * files
  * SQLite databases
@@ -16,26 +11,46 @@ Overview
  * syslog
  * email
 
-Runs on Android 2.3 (SDK 9) or higher. See [Wiki][4] for documentation.
+Runs on Android 2.3 (SDK 9) or higher. See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 
-*For `v1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
+*For `logback-android@1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
 
 Quick Start
 -----------
-1. Create a new "Basic Activity" app in [Android Studio][3].
+1. Create a new "Basic Activity" app in [Android Studio](http://developer.android.com/sdk/index.html).
 2. In `app/build.gradle`, add the following dependencies:
 
     ```groovy
     dependencies {
-      compile 'org.slf4j:slf4j-api:1.7.25'
-      compile 'com.github.tony19:logback-android:2.0.0'
+      implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
+      implementation 'com.github.tony19:logback-android:2.0.0'
     }
     ```
+
+   If using `logback-android` in unit tests, **either** [use Robolectric](https://github.com/tony19/logback-android/issues/151#issuecomment-466276739), **or** use this config instead:
+
+    ```groovy
+    dependencies {
+      implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
+      implementation 'com.github.tony19:logback-android:2.0.0'
+      testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+    }
+
+    configurations.testImplementation {
+      exclude module: 'logback-android'
+    }
+    ```
+
+   **NOTE:** SLF4J 2.x is not [yet](https://github.com/tony19/logback-android/pull/247) supported.
 
 3. Create `app/src/main/assets/logback.xml` containing:
 
     ```xml
-    <configuration>
+    <configuration
+      xmlns="https://tony19.github.io/logback-android/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd"
+    >
       <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
         <tagEncoder>
           <pattern>%logger{12}</pattern>
@@ -80,7 +95,7 @@ _Gradle_ **release**
 
 ```groovy
 dependencies {
-  implementation 'org.slf4j:slf4j-api:1.7.36'
+  implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
   implementation 'com.github.tony19:logback-android:2.0.0'
 }
 ```
@@ -93,7 +108,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'org.slf4j:slf4j-api:1.7.36'
+  implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
   implementation 'com.github.tony19:logback-android:2.0.1-SNAPSHOT'
 }
 ```
@@ -108,7 +123,3 @@ Use these commands to create the AAR:
 
 The file is output to: `./build/logback-android-2.0.0-debug.aar`
 
- [1]: http://logback.qos.ch
- [2]: http://tony19.github.com/logback-android
- [3]: http://developer.android.com/sdk/index.html
- [4]: https://github.com/tony19/logback-android/wiki

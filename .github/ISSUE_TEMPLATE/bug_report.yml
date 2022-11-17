@@ -1,0 +1,82 @@
+name: Bug Report
+description: File a bug report
+labels: ["bug", "pending triage"]
+assignees:
+  - tony19
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is. If you intend to submit a PR for this issue, tell us in the description. Thanks!
+      placeholder: Bug description
+    validations:
+      required: true
+
+  - type: input
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: A [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) is **required**, otherwise the issue might be closed without further notice. [**Why & How?**](https://antfu.me/posts/why-reproductions-are-required)
+      placeholder: Reproduction
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Optional if provided reproduction. Please copy-paste the log text (don't insert screenshots of your logs).
+
+        Provide the error log here in the format below:
+
+        ````
+        <details>
+        <summary>Click to expand!</summary>
+
+        ```shell
+        // paste the log text here
+        ```
+        </details>
+        ````
+
+  - type: input
+    id: version-logback-android
+    attributes:
+      label: logback-android version
+      description: What version of logback-android are you running?
+    validations:
+      required: true
+
+  - type: input
+    id: version-os
+    attributes:
+      label: OS Version
+      description: What version of Android are you running?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logback-config
+    attributes:
+      label: What logback configuration are you using? (logback.xml or Java/Kotlin code)
+      render: xml
+
+  - type: checkboxes
+    id: validations
+    attributes:
+      label: Validations
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Check that there isn't already an issue that reports the same bug to avoid creating a duplicate.
+          required: true
+        - label: Check that this is a concrete bug. For Q&A, please open a GitHub Discussion instead.
+          required: true
+        - label: The provided reproduction is a [minimal reproducible](https://stackoverflow.com/help/minimal-reproducible-example) of the bug.
+          required: true
