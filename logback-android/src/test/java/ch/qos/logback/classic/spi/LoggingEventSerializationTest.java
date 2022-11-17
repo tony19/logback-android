@@ -27,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -158,14 +159,14 @@ public class LoggingEventSerializationTest {
     LoggingEvent event = createLoggingEvent();
 
 
-    event.setMarker(marker);
-    assertNotNull(event.getMarker());
+    event.setMarkers(Collections.singletonList(marker));
+    assertNotNull(event.getMarkers());
 
     ILoggingEvent remoteEvent = writeAndRead(event);
     checkForEquality(event, remoteEvent);
 
-    assertNotNull(remoteEvent.getMarker());
-    assertEquals(marker, remoteEvent.getMarker());
+    assertNotNull(remoteEvent.getMarkers());
+    assertEquals(marker, remoteEvent.getMarkers());
   }
 
   @Test
@@ -175,14 +176,14 @@ public class LoggingEventSerializationTest {
     marker.add(marker2);
     LoggingEvent event = createLoggingEvent();
 
-    event.setMarker(marker);
-    assertNotNull(event.getMarker());
+    event.setMarkers(Collections.singletonList(marker));
+    assertNotNull(event.getMarkers());
 
     ILoggingEvent remoteEvent = writeAndRead(event);
     checkForEquality(event, remoteEvent);
 
-    assertNotNull(remoteEvent.getMarker());
-    assertEquals(marker, remoteEvent.getMarker());
+    assertNotNull(remoteEvent.getMarkers());
+    assertEquals(marker, remoteEvent.getMarkers());
   }
 
   @Test

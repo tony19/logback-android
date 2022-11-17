@@ -18,6 +18,7 @@ package ch.qos.logback.classic.boolex;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MarkerFactory;
@@ -45,7 +46,7 @@ public class OnMarkerEvaluatorTest {
     evaluator.addMarker("M");
     evaluator.start();
    
-    event.setMarker(MarkerFactory.getMarker("M"));
+    event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("M")));
     assertTrue(evaluator.evaluate(event));
   }
   

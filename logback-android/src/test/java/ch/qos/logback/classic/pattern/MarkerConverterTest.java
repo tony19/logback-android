@@ -17,6 +17,7 @@ package ch.qos.logback.classic.pattern;
 
 import static junit.framework.Assert.assertEquals;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,7 +91,7 @@ public class MarkerConverterTest {
   private ILoggingEvent createLoggingEvent(Marker marker) {
     LoggingEvent le = new LoggingEvent(this.getClass().getName(), lc.getLogger(Logger.ROOT_LOGGER_NAME),
         Level.DEBUG, "test message", null, null);
-    le.setMarker(marker);
+    le.setMarkers(Collections.singletonList(marker));
     return le;
   }
 }

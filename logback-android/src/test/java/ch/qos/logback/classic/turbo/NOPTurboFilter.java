@@ -21,11 +21,13 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.spi.FilterReply;
 
+import java.util.List;
+
 public class NOPTurboFilter extends TurboFilter {
 
   @Override
-  public FilterReply decide(final Marker marker, final Logger logger, final Level level, final String format,
-      final Object[] params, final Throwable t) {
+  public FilterReply decide(final List<Marker> markers, final Logger logger, final Level level, final String format,
+                            final Object[] params, final Throwable t) {
    
     return FilterReply.NEUTRAL;
   }
