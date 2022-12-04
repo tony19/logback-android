@@ -24,6 +24,8 @@ import org.slf4j.IMarkerFactory;
 import org.slf4j.Marker;
 import org.slf4j.helpers.BasicMarkerFactory;
 
+import java.util.Collections;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -90,7 +92,7 @@ public class MarkerConverterTest {
   private ILoggingEvent createLoggingEvent(Marker marker) {
     LoggingEvent le = new LoggingEvent(this.getClass().getName(), lc.getLogger(Logger.ROOT_LOGGER_NAME),
         Level.DEBUG, "test message", null, null);
-    le.setMarker(marker);
+    le.setMarkers(Collections.singletonList(marker));
     return le;
   }
 }
