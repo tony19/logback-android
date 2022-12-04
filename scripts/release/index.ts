@@ -71,6 +71,7 @@ async function main(): Promise<void> {
   await updateVersionInReadme(readmeFilePath, [
     [/logback-android:\d+\.\d+\.\d+(?!-SNAPSHOT)/g, `logback-android:${targetVersion}`],
     [/logback-android:\d+\.\d+\.\d+-SNAPSHOT/g, `logback-android:${nextVersion}`],
+    [/logback-android-\d+\.\d+\.\d+/g, `logback-android-${targetVersion}`],
     [/slf4j-api:\d+\.\d+\.\d+(-SNAPSHOT)?/g, `slf4j-api:${slf4jVersion}`],
   ])
 
