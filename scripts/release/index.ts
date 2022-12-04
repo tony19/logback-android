@@ -28,6 +28,7 @@ import {
   say,
   success,
 } from './utils/log'
+import { checkForJava } from './utils/java'
 
 async function main(): Promise<void> {
   const cwd = path.resolve(__dirname, '../../')
@@ -36,6 +37,7 @@ async function main(): Promise<void> {
   const changelogFilePath = `${cwd}/CHANGELOG.md`
   const tagPrefix = 'v_'
 
+  await checkForJava()
   await checkLocalPropertiesForRequiredKeys(`${cwd}/local.properties`)
   await logRecentCommits(tagPrefix)
 
