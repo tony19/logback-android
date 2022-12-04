@@ -121,4 +121,6 @@ Use these commands to create the AAR:
 
 The file is output to:
 
-    ./build/logback-android-3.0.0-debug.aar
+```sh
+./build/logback-android-3.0.0-debug.aar
+```
