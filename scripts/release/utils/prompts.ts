@@ -1,10 +1,18 @@
-import prompts from 'prompts'
+import prompts, { type PromptObject } from 'prompts'
 import colors from 'picocolors'
 import { getVersionChoices, isValidVersion, nextSnapshotVer } from './version'
 
+async function promptButExitIfCancelled<T>(args: PromptObject): Promise<T> {
+  const res = await prompts(args)
+  if (!res || !Object.keys(res).length) {
+    throw new Error('aborted')
+  }
+  return res as T
+}
+
 export async function promptForNextVersion(currentVersion: string) {
   const versionChoices = getVersionChoices(currentVersion)
-  const { releaseIndex }: { releaseIndex: number } = await prompts({
+  const { releaseIndex } = await promptButExitIfCancelled<{ releaseIndex: number }>({
     type: 'select',
     name: 'releaseIndex',
     message: 'Select release type',
@@ -36,7 +44,7 @@ export async function promptForNextVersion(currentVersion: string) {
 }
 
 export async function promptForCustomVersion(defaultValue: string) {
-  const { version }: { version: string } = await prompts({
+  const { version } = await promptButExitIfCancelled<{ version: string }>({
     type: 'text',
     name: 'version',
     message: 'Input custom version',
@@ -46,7 +54,7 @@ export async function promptForCustomVersion(defaultValue: string) {
 }
 
 export async function promptToConfirmRelease(tag: string) {
-  const { yes }: { yes: boolean } = await prompts({
+  const { yes } = await promptButExitIfCancelled<{ yes: boolean }>({
     type: 'toggle',
     name: 'yes',
     message: `Release ${colors.yellow(tag)} ?`,
@@ -57,7 +65,7 @@ export async function promptToConfirmRelease(tag: string) {
 }
 
 export async function promptToPushHead() {
-  const { yes }: { yes: boolean } = await prompts({
+  const { yes } = await promptButExitIfCancelled<{ yes: boolean }>({
     type: 'toggle',
     name: 'yes',
     message: `Push changes ?`,
@@ -68,7 +76,7 @@ export async function promptToPushHead() {
 }
 
 export async function promptToBuildAndReleaseToSonatype() {
-  const { yes }: { yes: boolean } = await prompts({
+  const { yes } = await promptButExitIfCancelled<{ yes: boolean }>({
     type: 'toggle',
     name: 'yes',
     message: `Build and release to Sonatype ?`,
