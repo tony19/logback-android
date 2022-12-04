@@ -121,4 +121,6 @@ Use these commands to create the AAR:
     cd logback-android
     scripts/makejar.sh
 
-The file is output to: `./build/logback-android-2.0.1-debug.aar`
+The file is output to:
+
+    ./build/logback-android-2.0.1-debug.aar
