@@ -1,27 +1,23 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-
   repositories {
     google()
     mavenCentral()
   }
   dependencies {
     classpath 'com.android.tools.build:gradle:7.3.1'
-    classpath 'org.ajoberstar:grgit:2.1.1'
-    classpath 'com.novoda:gradle-static-analysis-plugin:0.5.1'
 
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files
   }
 }
 plugins {
-  id 'io.codearte.nexus-staging' version '0.30.0' // must be in root project
+  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+  id 'maven-publish'
   id 'com.github.hierynomus.license' version '0.16.1'
 }
-
-apply plugin: 'org.ajoberstar.grgit'
-apply from: 'gradle/readme.gradle'
+apply from: "${rootDir}/gradle/publish-root.gradle"
 
 allprojects {
   repositories {
@@ -29,7 +25,6 @@ allprojects {
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   }
-  apply from: "${rootProject.projectDir}/gradle/license.gradle"
 }
 
 task clean(type: Delete) {

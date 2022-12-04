@@ -1,15 +1,9 @@
-plugins {
-    id 'net.researchgate.release' version '2.8.1'
-}
 apply plugin: 'com.android.library'
-//apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
-//apply from: "${rootProject.projectDir}/gradle/docs.gradle"
-//apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
     namespace 'com.github.tony19.logback.android'
     compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    buildToolsVersion '30.0.3'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_6
@@ -26,6 +20,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
         }
     }
     lintOptions {
@@ -56,7 +53,7 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
     testImplementation 'org.robolectric:robolectric:4.9'
     testImplementation 'org.mockito:mockito-core:2.28.2'
-    testImplementation 'joda-time:joda-time:2.12.1'
+    testImplementation 'joda-time:joda-time:2.12.2'
 
     // This dep is required when using Robolectric and targeting pre-21 SDKs.
     // Otherwise, tests fail with java.lang.NoClassDefFoundError.
@@ -87,7 +84,7 @@ allprojects {
         //options.compilerArgs << '-Xlint:deprecation'
         // Warn about unchecked usages
         options.compilerArgs << '-Xlint:unchecked'
-        // Don't warn about using source/target 1.5 option
+        // Don't warn about using source/target 1.6 option
         options.compilerArgs << '-Xlint:-options'
 
         options.debug(['debugLevel': 'source,lines,vars'])
@@ -100,20 +97,10 @@ allprojects {
     }
 }
 
-release {
-    tagTemplate = 'v_${version}'
-    preTagCommitMessage = ':cloud: Release'
-    tagCommitMessage = ':cloud: Release'
-    newVersionCommitMessage = ':cloud: Bump'
-
-    versionPropertyFile = '../gradle.properties'
-    versionProperties = ['VERSION_NAME']
-
-    git {
-        requireBranch = ''
-    }
+ext {
+    PUBLISH_GROUP_ID = GROUP
+    PUBLISH_VERSION = VERSION_NAME
+    PUBLISH_ARTIFACT_ID = POM_ARTIFACT_ID
 }
 
-nexusStaging {
-    packageGroup = 'com.github.tony19'
-}
+apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"

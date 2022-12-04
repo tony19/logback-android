@@ -1,0 +1,87 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+//apply plugin: 'org.jetbrains.dokka'
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    if (project.plugins.findPlugin("com.android.library")) {
+        from android.sourceSets.main.java.srcDirs
+        from android.sourceSets.main.kotlin.srcDirs
+    } else {
+        from sourceSets.main.java.srcDirs
+        from sourceSets.main.kotlin.srcDirs
+    }
+}
+
+//tasks.withType(dokkaHtmlPartial.getClass()).configureEach {
+//    pluginsMapConfiguration.set(
+//            ["org.jetbrains.dokka.base.DokkaBase": """{ "separateInheritedMembers": true}"""]
+//    )
+//}
+
+//task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+//    archiveClassifier.set('javadoc')
+//    from dokkaJavadoc.outputDirectory
+//}
+task javadocJar(type: Jar) {
+    archiveClassifier.set('javadoc')
+}
+
+
+artifacts {
+    archives androidSourcesJar
+    archives javadocJar
+}
+
+group = PUBLISH_GROUP_ID
+version = PUBLISH_VERSION
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version PUBLISH_VERSION
+
+                artifact bundleReleaseAar
+                artifact androidSourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = PUBLISH_ARTIFACT_ID
+                    name = 'logback-android'
+                    description = 'Logging library for Android apps'
+                    url = 'https://github.com/tony19/logback-android'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'tony19'
+                            name = 'Tony Trinh'
+                            email = 'tony19@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git@github.com:tony19/logback-android.git'
+                        developerConnection = 'scm:git@github.com:tony19/logback-android.git'
+                        url = 'https://github.com/tony19/logback-android'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+            rootProject.ext["signing.keyId"],
+            rootProject.ext["signing.key"],
+            rootProject.ext["signing.password"],
+    )
+    sign publishing.publications
+}

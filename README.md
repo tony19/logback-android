@@ -1,4 +1,4 @@
-# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) [![CircleCI](https://circleci.com/gh/tony19/logback-android/tree/main.svg?style=svg)](https://circleci.com/gh/tony19/logback-android/tree/main) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
+# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) <a href="https://android-arsenal.com/api?level=9"><img alt="API" src="https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat"/></a> [![CircleCI](https://circleci.com/gh/tony19/logback-android/tree/main.svg?style=svg)](https://circleci.com/gh/tony19/logback-android/tree/main) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
 
 Overview
 --------
@@ -11,7 +11,7 @@ Overview
  * syslog
  * email
 
-Runs on Android 2.3 (SDK 9) or higher. See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
+See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 
 *For `logback-android@1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
 
@@ -23,7 +23,7 @@ Quick Start
     ```groovy
     dependencies {
       implementation 'org.slf4j:slf4j-api:2.0.3'
-      implementation 'com.github.tony19:logback-android:2.0.0'
+      implementation 'com.github.tony19:logback-android:2.0.1'
     }
     ```
 
@@ -31,8 +31,8 @@ Quick Start
 
     ```groovy
     dependencies {
-      implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
-      implementation 'com.github.tony19:logback-android:2.0.0'
+      implementation 'org.slf4j:slf4j-api:2.0.3'
+      implementation 'com.github.tony19:logback-android:2.0.1'
       testImplementation 'ch.qos.logback:logback-classic:1.2.11'
     }
 
@@ -40,8 +40,6 @@ Quick Start
       exclude module: 'logback-android'
     }
     ```
-
-   **NOTE:** SLF4J 2.x is not [yet](https://github.com/tony19/logback-android/pull/247) supported.
 
 3. Create `app/src/main/assets/logback.xml` containing:
 
@@ -95,8 +93,8 @@ _Gradle_ **release**
 
 ```groovy
 dependencies {
-  implementation 'org.slf4j:slf4j-api:1.7.36' // slf4j 2.x not yet supported
-  implementation 'com.github.tony19:logback-android:2.0.0'
+  implementation 'org.slf4j:slf4j-api:2.0.3'
+  implementation 'com.github.tony19:logback-android:2.0.1'
 }
 ```
 
@@ -109,7 +107,7 @@ repositories {
 
 dependencies {
   implementation 'org.slf4j:slf4j-api:2.0.3'
-  implementation 'com.github.tony19:logback-android:2.0.1-SNAPSHOT'
+  implementation 'com.github.tony19:logback-android:2.0.2-SNAPSHOT'
 }
 ```
 
@@ -121,5 +119,5 @@ Use these commands to create the AAR:
     cd logback-android
     scripts/makejar.sh
 
-The file is output to: `./build/logback-android-2.0.0-debug.aar`
+The file is output to: `./build/logback-android-2.0.1-debug.aar`
 
