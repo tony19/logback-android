@@ -47,11 +47,17 @@ async function main(): Promise<void> {
   if (!currentVersion) {
     throw new Error('no version found in gradle.properties')
   }
+  if (!slf4jVersion) {
+    throw new Error('no slf4jVersion found in gradle.properties')
+  }
 
   const { version: targetVersion, nextVersion } = await promptForNextVersion(currentVersion)
   if (!targetVersion) {
     // exited out of prompts with CTRL+C
     return
+  }
+  if (!nextVersion) {
+    throw new Error('no nextVersion found')
   }
 
   const tag = `${tagPrefix}${targetVersion}`
