@@ -17,8 +17,6 @@ package ch.qos.logback.classic.turbo;
 
 import org.slf4j.Marker;
 
-import java.util.List;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.spi.ContextAwareBase;
@@ -46,7 +44,7 @@ public abstract class TurboFilter extends ContextAwareBase implements LifeCycle 
    * The returned value should be one of <code>{@link FilterReply#DENY}</code>,
    * <code>{@link FilterReply#NEUTRAL}</code>, or <code>{@link FilterReply#ACCEPT}</code>.
 
-   * @param markers
+   * @param marker
    * @param logger
    * @param level
    * @param format
@@ -54,8 +52,8 @@ public abstract class TurboFilter extends ContextAwareBase implements LifeCycle 
    * @param t
    * @return decision
    */
-  public abstract FilterReply decide(List<Marker> markers, Logger logger,
-                                     Level level, String format, Object[] params, Throwable t);
+  public abstract FilterReply decide(Marker marker, Logger logger,
+      Level level, String format, Object[] params, Throwable t);
 
   public void start() {
     this.start = true;

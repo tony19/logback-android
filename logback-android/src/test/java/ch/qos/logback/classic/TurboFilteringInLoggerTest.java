@@ -29,8 +29,6 @@ import ch.qos.logback.classic.turbo.MarkerFilter;
 import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.spi.FilterReply;
 
-import java.util.List;
-
 
 public class TurboFilteringInLoggerTest  {
 
@@ -172,14 +170,16 @@ public class TurboFilteringInLoggerTest  {
 
 class YesFilter extends TurboFilter {
   @Override
-  public FilterReply decide(List<Marker> markers, Logger logger, Level level, String format, Object[] params, Throwable t) {
+  public FilterReply decide(Marker marker, Logger logger, Level level,
+      String format, Object[] params, Throwable t) {
     return FilterReply.ACCEPT;
   }
 }
 
 class NoFilter extends TurboFilter {
   @Override
-  public FilterReply decide(List<Marker> markers, Logger logger, Level level, String format, Object[] params, Throwable t) {
+  public FilterReply decide(Marker marker, Logger logger, Level level,
+      String format, Object[] params, Throwable t) {
     return FilterReply.DENY;
   }
 }

@@ -15,7 +15,6 @@
  */
 package ch.qos.logback.classic.spi;
 
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Marker;
@@ -39,7 +38,7 @@ final public class TurboFilterList extends CopyOnWriteArrayList<TurboFilter> {
    * ACCEPT or DENY, then that value is returned. If all of the filters return
    * NEUTRAL, then NEUTRAL is returned.
    */
-  public FilterReply getTurboFilterChainDecision(final List<Marker> markers,
+  public FilterReply getTurboFilterChainDecision(final Marker marker,
       final Logger logger, final Level level, final String format,
       final Object[] params, final Throwable t) {
     
@@ -51,7 +50,7 @@ final public class TurboFilterList extends CopyOnWriteArrayList<TurboFilter> {
     if (size == 1) {
       try {
         TurboFilter tf = get(0);
-        return tf.decide(markers, logger, level, format, params, t);
+        return tf.decide(marker, logger, level, format, params, t);
       } catch (IndexOutOfBoundsException iobe) {
         return FilterReply.NEUTRAL;
       }
@@ -62,7 +61,7 @@ final public class TurboFilterList extends CopyOnWriteArrayList<TurboFilter> {
     for (int i = 0; i < len; i++) {
     //for (TurboFilter tf : this) {
       final TurboFilter tf = (TurboFilter) tfa[i];
-      final FilterReply r = tf.decide(markers, logger, level, format, params, t);
+      final FilterReply r = tf.decide(marker, logger, level, format, params, t);
       if (r == FilterReply.DENY || r == FilterReply.ACCEPT) {
         return r;
       }

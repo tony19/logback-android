@@ -45,16 +45,14 @@ public class OnMarkerEvaluator extends EventEvaluatorBase<ILoggingEvent> {
   public boolean evaluate(ILoggingEvent event) throws NullPointerException,
       EvaluationException {
 
-    List<Marker> eventsMarker = event.getMarkers();
-    if (eventsMarker.isEmpty()) {
+    Marker eventsMarker = event.getMarker();
+    if (eventsMarker == null) {
       return false;
     }
 
     for (String markerStr : markerList) {
-      for (Marker marker : eventsMarker) {
-        if (marker.contains(markerStr)) {
-          return true;
-        }
+      if (eventsMarker.contains(markerStr)) {
+        return true;
       }
     }
     return false;
