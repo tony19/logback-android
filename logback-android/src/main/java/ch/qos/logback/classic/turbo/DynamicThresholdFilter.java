@@ -21,7 +21,6 @@ import ch.qos.logback.core.spi.FilterReply;
 import org.slf4j.Marker;
 import org.slf4j.MDC;
 
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -224,7 +223,7 @@ public class DynamicThresholdFilter extends TurboFilter {
    * 'levelAssociatedWithMDCValue'. If it null, then it is set to the
    * {@link #defaultThreshold} value.
    *
-   * @param markers
+   * @param marker
    * @param logger
    * @param level
    * @param s
@@ -234,8 +233,8 @@ public class DynamicThresholdFilter extends TurboFilter {
    * @return FilterReply - this filter's decision
    */
   @Override
-  public FilterReply decide(List<Marker> markers, Logger logger, Level level,
-                            String s, Object[] objects, Throwable throwable) {
+  public FilterReply decide(Marker marker, Logger logger, Level level,
+      String s, Object[] objects, Throwable throwable) {
 
     String mdcValue = MDC.get(this.key);
     if (!isStarted()) {

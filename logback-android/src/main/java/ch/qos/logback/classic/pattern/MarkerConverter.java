@@ -17,8 +17,6 @@ package ch.qos.logback.classic.pattern;
 
 import org.slf4j.Marker;
 
-import java.util.List;
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 /**
@@ -31,11 +29,11 @@ public class MarkerConverter extends ClassicConverter {
   private static String EMPTY = "";
 
   public String convert(ILoggingEvent le) {
-    List<Marker> markers = le.getMarkers();
-    if (markers == null || markers.isEmpty()) {
+    Marker marker = le.getMarker();
+    if (marker == null) {
       return EMPTY;
     } else {
-      return markers.toString();
+      return marker.toString();
     }
   }
 

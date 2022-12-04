@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Marker;
@@ -58,7 +57,7 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
 
   private ThrowableProxyVO throwableProxy;
   private StackTraceElement[] callerDataArray;
-  private List<Marker> markers;
+  private Marker marker;
   private Map<String, String> mdcPropertyMap;
   private long timeStamp;
 
@@ -70,7 +69,7 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
     ledo.level = (le.getLevel());
     ledo.message = (le.getMessage());
     ledo.argumentArray = (le.getArgumentArray());
-    ledo.markers = le.getMarkers();
+    ledo.marker = le.getMarker();
     ledo.mdcPropertyMap = le.getMDCPropertyMap();
     ledo.timeStamp = le.getTimeStamp();
     ledo.throwableProxy = ThrowableProxyVO.build(le.getThrowableProxy());
@@ -133,8 +132,8 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
     return callerDataArray != null;
   }
 
-  public List<Marker> getMarkers() {
-    return markers;
+  public Marker getMarker() {
+    return marker;
   }
 
   public long getTimeStamp() {
@@ -236,10 +235,10 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
     if (timeStamp != other.timeStamp)
       return false;
 
-    if (markers == null) {
-      if (other.markers != null)
+    if (marker == null) {
+      if (other.marker != null)
         return false;
-    } else if (!markers.equals(other.markers))
+    } else if (!marker.equals(other.marker))
       return false;
 
     if (mdcPropertyMap == null) {

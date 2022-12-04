@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Marker;
@@ -52,7 +51,7 @@ public class PubLoggingEventVO implements ILoggingEvent, Serializable {
 
   public IThrowableProxy throwableProxy;
   public StackTraceElement[] callerDataArray;
-  public List<Marker> markers;
+  public Marker marker;
   public Map<String, String> mdcPropertyMap;
   public long timeStamp;
 
@@ -107,9 +106,8 @@ public class PubLoggingEventVO implements ILoggingEvent, Serializable {
     return callerDataArray != null;
   }
 
-  @Override
-  public List<Marker> getMarkers() {
-    return markers;
+  public Marker getMarker() {
+    return marker;
   }
 
   public long getTimeStamp() {
@@ -212,10 +210,10 @@ public class PubLoggingEventVO implements ILoggingEvent, Serializable {
     if (timeStamp != other.timeStamp)
       return false;
 
-    if (markers == null) {
-      if (other.markers != null)
+    if (marker == null) {
+      if (other.marker != null)
         return false;
-    } else if (!markers.equals(other.markers))
+    } else if (!marker.equals(other.marker))
       return false;
 
     if (mdcPropertyMap == null) {

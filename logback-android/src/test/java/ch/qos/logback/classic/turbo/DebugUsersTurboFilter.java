@@ -41,7 +41,7 @@ public class DebugUsersTurboFilter extends TurboFilter {
   List<String> userList = new ArrayList<String>();
 
   @Override
-  public FilterReply decide(List<Marker> markers, Logger logger, Level level, String format, Object[] params, Throwable t) {
+  public FilterReply decide(Marker marker, Logger logger, Level level, String format, Object[] params, Throwable t) {
     if (!level.equals(Level.DEBUG)) {
       return FilterReply.NEUTRAL;
     }

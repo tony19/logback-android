@@ -18,8 +18,6 @@ package ch.qos.logback.classic.turbo;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
-import java.util.List;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.spi.FilterReply;
@@ -51,7 +49,7 @@ public class MDCFilter extends MatchingFilter {
 
   String MDCKey;
   String value;
-
+  
   @Override
   public void start() {
     int errorCount = 0;
@@ -69,7 +67,7 @@ public class MDCFilter extends MatchingFilter {
   }
 
   @Override
-  public FilterReply decide(List<Marker> markers, Logger logger, Level level, String format, Object[] params, Throwable t) {
+  public FilterReply decide(Marker marker, Logger logger, Level level, String format, Object[] params, Throwable t) {
 
     if (!isStarted()) {
       return FilterReply.NEUTRAL;

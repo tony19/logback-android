@@ -22,8 +22,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MarkerFactory;
 
-import java.util.Collections;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.LoggingEvent;
@@ -47,7 +45,7 @@ public class OnMarkerEvaluatorTest {
     evaluator.addMarker("M");
     evaluator.start();
    
-    event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("M")));
+    event.setMarker(MarkerFactory.getMarker("M"));
     assertTrue(evaluator.evaluate(event));
   }
   
