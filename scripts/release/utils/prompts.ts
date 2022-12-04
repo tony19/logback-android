@@ -4,7 +4,7 @@ import { getVersionChoices, isValidVersion, nextSnapshotVer } from './version'
 
 async function promptButExitIfCancelled<T>(args: PromptObject): Promise<T> {
   const res = await prompts(args)
-  if (!res || Object.keys(res)) {
+  if (!res || !Object.keys(res).length) {
     throw new Error('aborted')
   }
   return res as T
