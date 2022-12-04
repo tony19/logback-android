@@ -70,8 +70,8 @@ async function main(): Promise<void> {
     say('\nBuilding and releasing to Sonatype ...')
     await buildAndReleaseToSonatype({ cwd })
   }
-  say('\nGenerating changelog ...')
-  await generateChangelog(changelogFilePath)
+  // say('\nGenerating changelog ...')
+  // await generateChangelog(changelogFilePath)
 
   await commitChangedFiles({ cwd, message: `chore: release ${tag}` }, readmeFilePath, gradleFilePath, changelogFilePath)
   await tagHead(tag, `logback-android-${targetVersion}`)
