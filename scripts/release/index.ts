@@ -66,6 +66,10 @@ async function main(): Promise<void> {
     [/slf4j-api:\d+\.\d+\.\d+(-SNAPSHOT)?/g, `slf4j-api:${slf4jVersion}`],
   ])
 
+  if (await promptToBuildAndReleaseToSonatype()) {
+    say('\nBuilding and releasing to Sonatype ...')
+    await buildAndReleaseToSonatype({ cwd })
+  }
   say('\nGenerating changelog ...')
   await generateChangelog(changelogFilePath)
 
@@ -87,11 +91,6 @@ async function main(): Promise<void> {
   if (await promptToPushHead()) {
     say('\nPushing changes ...')
     await pushHead(tag)
-  }
-
-  if (await promptToBuildAndReleaseToSonatype()) {
-    say('\nBuilding and releasing to Sonatype ...')
-    await buildAndReleaseToSonatype({ cwd })
   }
 
   success('\n✅ Done!')
