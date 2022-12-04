@@ -18,6 +18,7 @@ package ch.qos.logback.classic.spi;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.MDC;
@@ -88,7 +89,7 @@ public class LoggingEvent implements ILoggingEvent {
 
   private StackTraceElement[] callerDataArray;
 
-  private Marker marker;
+  private List<Marker> markers;
 
   private Map<String, String> mdcPropertyMap;
 
@@ -271,16 +272,16 @@ public class LoggingEvent implements ILoggingEvent {
     this.callerDataArray = callerDataArray;
   }
 
-  public Marker getMarker() {
-    return marker;
+  public List<Marker> getMarkers() {
+    return markers;
   }
 
-  public void setMarker(Marker marker) {
-    if (this.marker != null) {
+  public void setMarkers(List<Marker> markers) {
+    if (this.markers != null) {
       throw new IllegalStateException(
               "The marker has been already set for this event.");
     }
-    this.marker = marker;
+    this.markers = markers;
   }
 
   public long getContextBirthTime() {

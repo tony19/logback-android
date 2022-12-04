@@ -266,33 +266,33 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
     turboFilterList.clear();
   }
 
-  final FilterReply getTurboFilterChainDecision_0_3OrMore(final Marker marker,
+  final FilterReply getTurboFilterChainDecision_0_3OrMore(final List<Marker> markers,
                                                           final Logger logger, final Level level, final String format,
                                                           final Object[] params, final Throwable t) {
     if (turboFilterList.size() == 0) {
       return FilterReply.NEUTRAL;
     }
-    return turboFilterList.getTurboFilterChainDecision(marker, logger, level,
+    return turboFilterList.getTurboFilterChainDecision(markers, logger, level,
             format, params, t);
   }
 
-  final FilterReply getTurboFilterChainDecision_1(final Marker marker,
+  final FilterReply getTurboFilterChainDecision_1(final List<Marker> markers,
                                                   final Logger logger, final Level level, final String format,
                                                   final Object param, final Throwable t) {
     if (turboFilterList.size() == 0) {
       return FilterReply.NEUTRAL;
     }
-    return turboFilterList.getTurboFilterChainDecision(marker, logger, level,
+    return turboFilterList.getTurboFilterChainDecision(markers, logger, level,
             format, new Object[]{param}, t);
   }
 
-  final FilterReply getTurboFilterChainDecision_2(final Marker marker,
+  final FilterReply getTurboFilterChainDecision_2(final List<Marker> markers,
                                                   final Logger logger, final Level level, final String format,
                                                   final Object param1, final Object param2, final Throwable t) {
     if (turboFilterList.size() == 0) {
       return FilterReply.NEUTRAL;
     }
-    return turboFilterList.getTurboFilterChainDecision(marker, logger, level,
+    return turboFilterList.getTurboFilterChainDecision(markers, logger, level,
             format, new Object[]{param1, param2}, t);
   }
 

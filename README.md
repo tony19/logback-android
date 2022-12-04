@@ -22,8 +22,8 @@ Quick Start
 
     ```groovy
     dependencies {
-      implementation 'org.slf4j:slf4j-api:' // slf4j 2.x not yet supported
-      implementation 'com.github.tony19:logback-android:2.0.2-SNAPSHOT'
+      implementation 'org.slf4j:slf4j-api:2.0.3'
+      implementation 'com.github.tony19:logback-android:2.0.1'
     }
     ```
 
@@ -31,8 +31,8 @@ Quick Start
 
     ```groovy
     dependencies {
-      implementation 'org.slf4j:slf4j-api:' // slf4j 2.x not yet supported
-      implementation 'com.github.tony19:logback-android:2.0.2-SNAPSHOT'
+      implementation 'org.slf4j:slf4j-api:2.0.3'
+      implementation 'com.github.tony19:logback-android:2.0.1'
       testImplementation 'ch.qos.logback:logback-classic:1.2.11'
     }
 
@@ -40,8 +40,6 @@ Quick Start
       exclude module: 'logback-android'
     }
     ```
-
-   **NOTE:** SLF4J 2.x is not [yet](https://github.com/tony19/logback-android/pull/247) supported.
 
 3. Create `app/src/main/assets/logback.xml` containing:
 
@@ -95,8 +93,8 @@ _Gradle_ **release**
 
 ```groovy
 dependencies {
-  implementation 'org.slf4j:slf4j-api:' // slf4j 2.x not yet supported
-  implementation 'com.github.tony19:logback-android:2.0.2-SNAPSHOT'
+  implementation 'org.slf4j:slf4j-api:2.0.3'
+  implementation 'com.github.tony19:logback-android:2.0.1'
 }
 ```
 
@@ -108,7 +106,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'org.slf4j:slf4j-api:' // slf4j 2.x not yet supported
+  implementation 'org.slf4j:slf4j-api:2.0.3'
   implementation 'com.github.tony19:logback-android:2.0.2-SNAPSHOT'
 }
 ```
@@ -121,5 +119,5 @@ Use these commands to create the AAR:
     cd logback-android
     scripts/makejar.sh
 
-The file is output to: `./build/logback-android-2.0.0-debug.aar`
+The file is output to: `./build/logback-android-2.0.1-debug.aar`
 

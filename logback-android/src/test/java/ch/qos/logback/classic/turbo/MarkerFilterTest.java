@@ -25,6 +25,8 @@ import org.slf4j.MarkerFactory;
 
 import ch.qos.logback.core.spi.FilterReply;
 
+import java.util.Collections;
+
 public class MarkerFilterTest {
 
   static String TOTO = "TOTO";
@@ -38,7 +40,7 @@ public class MarkerFilterTest {
     MarkerFilter mkt = new MarkerFilter();
     mkt.start();
     assertFalse(mkt.isStarted());
-    assertEquals(FilterReply.NEUTRAL, mkt.decide(totoMarker, null, null, null, null, null));
+    assertEquals(FilterReply.NEUTRAL, mkt.decide(Collections.singletonList(totoMarker), null, null, null, null, null));
     assertEquals(FilterReply.NEUTRAL, mkt.decide(null, null, null, null, null, null));
 
   }
@@ -54,7 +56,7 @@ public class MarkerFilterTest {
     mkt.start();
     assertTrue(mkt.isStarted());
     assertEquals(FilterReply.DENY, mkt.decide(null, null, null, null, null, null));
-    assertEquals(FilterReply.ACCEPT, mkt.decide(totoMarker, null, null, null, null, null));
+    assertEquals(FilterReply.ACCEPT, mkt.decide(Collections.singletonList(totoMarker), null, null, null, null, null));
   }
 
   @Test
@@ -72,8 +74,8 @@ public class MarkerFilterTest {
 
     assertTrue(mkt.isStarted());
     assertEquals(FilterReply.DENY, mkt.decide(null, null, null, null, null, null));
-    assertEquals(FilterReply.ACCEPT, mkt.decide(totoMarker, null, null, null, null, null));
-    assertEquals(FilterReply.ACCEPT, mkt.decide(compositeMarker, null, null, null, null, null));
+    assertEquals(FilterReply.ACCEPT, mkt.decide(Collections.singletonList(totoMarker), null, null, null, null, null));
+    assertEquals(FilterReply.ACCEPT, mkt.decide(Collections.singletonList(compositeMarker), null, null, null, null, null));
   }
 
 }

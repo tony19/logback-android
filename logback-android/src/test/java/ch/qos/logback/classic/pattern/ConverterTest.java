@@ -16,6 +16,7 @@
 package ch.qos.logback.classic.pattern;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -252,7 +253,7 @@ public class ConverterTest {
 
       StringBuilder buf = new StringBuilder();
       LoggingEvent event = makeLoggingEvent(null);
-      event.setMarker(MarkerFactory.getMarker("XXX"));
+      event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("XXX")));
       converter.write(buf, event);
       if (buf.length() < 10) {
         fail("buf is too short");
@@ -270,7 +271,7 @@ public class ConverterTest {
 
       StringBuilder buf = new StringBuilder();
       LoggingEvent event = makeLoggingEvent(null);
-      event.setMarker(MarkerFactory.getMarker("YYY"));
+      event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("YYY")));
       converter.write(buf, event);
       if (buf.length() < 10) {
         fail("buf is too short");
@@ -287,7 +288,7 @@ public class ConverterTest {
 
       StringBuilder buf = new StringBuilder();
       LoggingEvent event = makeLoggingEvent(null);
-      event.setMarker(MarkerFactory.getMarker("YYY"));
+      event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("YYY")));
       converter.write(buf, event);
       if (buf.length() < 10) {
         fail("buf is too short");
