@@ -27,6 +27,7 @@ class FileFinder {
 
   private static final String REGEX_MARKER_START = "(?:\uFFFE)?";
   private static final String REGEX_MARKER_END = "(?:\uFFFF)?";
+  private static final String PATTERN_SEPARATOR = "/";  // separator with slashified path and pattern
   private FileProvider fileProvider;
 
   FileFinder(FileProvider fileProvider) {
@@ -93,10 +94,10 @@ class FileFinder {
     }
   }
 
-  List<PathPart> splitPath(String pattern) {
+  List<PathPart> splitPath(String pathPattern) {
     List<PathPart> parts = new ArrayList<PathPart>();
     List<String> literals = new ArrayList<String>();
-    for (String p : pattern.split(File.separator)) {
+    for (String p : pathPattern.split(PATTERN_SEPARATOR)) {
       final boolean isRegex = p.contains(REGEX_MARKER_START) && p.contains(REGEX_MARKER_END);
       p = p.replace(REGEX_MARKER_START, "").replace(REGEX_MARKER_END, "");
       if (isRegex) {
@@ -115,17 +116,17 @@ class FileFinder {
     return parts;
   }
 
-  static String regexEscapePath(String path) {
-    if (path.contains(File.separator)) {
-      String[] parts = path.split(File.separator);
+  static String regexEscapePath(String pattern) {
+    if (pattern.contains(PATTERN_SEPARATOR)) {
+      String[] parts = pattern.split(PATTERN_SEPARATOR);
       for (int i = 0; i < parts.length; i++) {
         if (parts[i].length() > 0) {
           parts[i] = REGEX_MARKER_START + parts[i] + REGEX_MARKER_END;
         }
       }
-      return TextUtils.join(File.separator, parts);
+      return TextUtils.join(PATTERN_SEPARATOR, parts);
     } else {
-      return REGEX_MARKER_START + path + REGEX_MARKER_END;
+      return REGEX_MARKER_START + pattern + REGEX_MARKER_END;
     }
   }
 
