@@ -59,7 +59,7 @@ dependencies {
     // Otherwise, tests fail with java.lang.NoClassDefFoundError.
     // https://github.com/robolectric/robolectric/issues/2562#issuecomment-263086503
     testImplementation 'org.robolectric:android-all:13-robolectric-9030017'
-    testImplementation 'com.icegreen:greenmail:1.6.13'
+    testImplementation 'com.icegreen:greenmail:1.6.14'
     testImplementation 'dom4j:dom4j:1.6.1'
     testImplementation 'org.easytesting:fest-assert:1.4'
     testImplementation "org.slf4j:integration:${slf4jVersion}"
