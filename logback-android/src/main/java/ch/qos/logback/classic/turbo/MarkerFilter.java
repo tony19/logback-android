@@ -42,20 +42,20 @@ public class MarkerFilter extends MatchingFilter {
   }
   
   @Override
-  public FilterReply decide(List<Marker> marker, Logger logger, Level level, String format, Object[] params, Throwable t) {
+  public FilterReply decide(List<Marker> markers, Logger logger, Level level, String format, Object[] params, Throwable t) {
     if(!isStarted()) {
       return FilterReply.NEUTRAL;
     }
     
-    if(marker == null) {
+    if(markers == null) {
       return onMismatch;
     } 
-    
-    if(marker.contains(markerToMatch)) {
-      return onMatch;
-    } else {
-      return onMismatch;
+    for (Marker marker : markers) {
+      if (marker.contains(markerToMatch)) {
+        return onMatch;
+      }
     }
+    return onMismatch;
   }
 
   /**

@@ -56,7 +56,7 @@ public class MarkerConverterTest {
   @Test
   public void testWithNullMarker() {
     String result = converter.convert(createLoggingEvent(null));
-    assertEquals("", result);
+    assertEquals("[null]", result);
   }
   
   @Test
@@ -64,7 +64,7 @@ public class MarkerConverterTest {
     String name = "test";
     Marker marker = markerFactory.getMarker(name);
     String result = converter.convert(createLoggingEvent(marker));
-    assertEquals(name, result);
+    assertEquals("[" + name + "]", result);
   }
   
   @Test
@@ -74,7 +74,7 @@ public class MarkerConverterTest {
     
     String result = converter.convert(createLoggingEvent(marker));
     
-    assertEquals("test [ child ]", result);
+    assertEquals("[test [ child ]]", result);
   }
   
   @Test
@@ -86,7 +86,7 @@ public class MarkerConverterTest {
     
     String result = converter.convert(createLoggingEvent(marker));
     
-    assertEquals("testParent [ child1, child2, child3 ]", result);
+    assertEquals("[testParent [ child1, child2, child3 ]]", result);
   }
   
   private ILoggingEvent createLoggingEvent(Marker marker) {
