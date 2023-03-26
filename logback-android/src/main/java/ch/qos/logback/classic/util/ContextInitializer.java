@@ -21,7 +21,6 @@ import java.net.URL;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.android.AndroidContextUtil;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.InfoStatus;
 import ch.qos.logback.core.status.StatusManager;
@@ -121,8 +120,6 @@ public class ContextInitializer {
    */
   public void autoConfig() throws JoranException {
     StatusListenerConfigHelper.installIfAsked(loggerContext);
-
-    new AndroidContextUtil().setupProperties(loggerContext);
 
     boolean verbose = true;
     boolean configured = false;

@@ -16,6 +16,7 @@
 package ch.qos.logback.classic.pattern;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -78,7 +79,7 @@ public class ConverterTest {
     StringBuilder buf = new StringBuilder();
     converter.write(buf, le);
     // the number below should be the line number of the previous line
-    assertEquals("79", buf.toString());
+    assertEquals("80", buf.toString());
     // TODO: Refactor this test so that it does not depend on the actual line numbers of this file
   }
 
@@ -252,7 +253,7 @@ public class ConverterTest {
 
       StringBuilder buf = new StringBuilder();
       LoggingEvent event = makeLoggingEvent(null);
-      event.setMarker(MarkerFactory.getMarker("XXX"));
+      event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("XXX")));
       converter.write(buf, event);
       if (buf.length() < 10) {
         fail("buf is too short");
@@ -270,7 +271,7 @@ public class ConverterTest {
 
       StringBuilder buf = new StringBuilder();
       LoggingEvent event = makeLoggingEvent(null);
-      event.setMarker(MarkerFactory.getMarker("YYY"));
+      event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("YYY")));
       converter.write(buf, event);
       if (buf.length() < 10) {
         fail("buf is too short");
@@ -287,7 +288,7 @@ public class ConverterTest {
 
       StringBuilder buf = new StringBuilder();
       LoggingEvent event = makeLoggingEvent(null);
-      event.setMarker(MarkerFactory.getMarker("YYY"));
+      event.setMarkers(Collections.singletonList(MarkerFactory.getMarker("YYY")));
       converter.write(buf, event);
       if (buf.length() < 10) {
         fail("buf is too short");

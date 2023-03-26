@@ -25,9 +25,8 @@ import android.os.Environment;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Properties;
 
-import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.Context;
 import ch.qos.logback.core.CoreConstants;
 
 /**
@@ -48,23 +47,28 @@ public class AndroidContextUtil {
     this.context = contextWrapper;
   }
 
+  public static boolean containsProperties(String value) {
+    return value.contains(CoreConstants.DATA_DIR_KEY)
+            || value.contains(CoreConstants.EXT_DIR_KEY)
+            || value.contains(CoreConstants.PACKAGE_NAME_KEY)
+            || value.contains(CoreConstants.VERSION_CODE_KEY)
+            || value.contains(CoreConstants.VERSION_NAME_KEY);
+  }
+
   /**
    * Sets properties for use in configs
    * @param context logger context whose property map is updated
    */
-  public void setupProperties(LoggerContext context) {
+  public void setupProperties(Context context) {
     // legacy properties
-    Properties props = new Properties();
-    props.setProperty(CoreConstants.DATA_DIR_KEY, getFilesDirectoryPath());
+    context.putProperty(CoreConstants.DATA_DIR_KEY, getFilesDirectoryPath());
     final String extDir = getMountedExternalStorageDirectoryPath();
     if (extDir != null) {
-      props.setProperty(CoreConstants.EXT_DIR_KEY, extDir);
+      context.putProperty(CoreConstants.EXT_DIR_KEY, extDir);
     }
-    props.setProperty(CoreConstants.PACKAGE_NAME_KEY, getPackageName());
-    props.setProperty(CoreConstants.VERSION_CODE_KEY, getVersionCode());
-    props.setProperty(CoreConstants.VERSION_NAME_KEY, getVersionName());
-
-    context.putProperties(props);
+    context.putProperty(CoreConstants.PACKAGE_NAME_KEY, getPackageName());
+    context.putProperty(CoreConstants.VERSION_CODE_KEY, getVersionCode());
+    context.putProperty(CoreConstants.VERSION_NAME_KEY, getVersionName());
   }
 
   protected static ContextWrapper getContext() {

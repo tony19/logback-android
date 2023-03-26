@@ -24,6 +24,8 @@ import org.slf4j.IMarkerFactory;
 import org.slf4j.Marker;
 import org.slf4j.helpers.BasicMarkerFactory;
 
+import java.util.Collections;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -54,7 +56,7 @@ public class MarkerConverterTest {
   @Test
   public void testWithNullMarker() {
     String result = converter.convert(createLoggingEvent(null));
-    assertEquals("", result);
+    assertEquals("[null]", result);
   }
   
   @Test
@@ -62,7 +64,7 @@ public class MarkerConverterTest {
     String name = "test";
     Marker marker = markerFactory.getMarker(name);
     String result = converter.convert(createLoggingEvent(marker));
-    assertEquals(name, result);
+    assertEquals("[" + name + "]", result);
   }
   
   @Test
@@ -72,7 +74,7 @@ public class MarkerConverterTest {
     
     String result = converter.convert(createLoggingEvent(marker));
     
-    assertEquals("test [ child ]", result);
+    assertEquals("[test [ child ]]", result);
   }
   
   @Test
@@ -84,13 +86,13 @@ public class MarkerConverterTest {
     
     String result = converter.convert(createLoggingEvent(marker));
     
-    assertEquals("testParent [ child1, child2, child3 ]", result);
+    assertEquals("[testParent [ child1, child2, child3 ]]", result);
   }
   
   private ILoggingEvent createLoggingEvent(Marker marker) {
     LoggingEvent le = new LoggingEvent(this.getClass().getName(), lc.getLogger(Logger.ROOT_LOGGER_NAME),
         Level.DEBUG, "test message", null, null);
-    le.setMarker(marker);
+    le.setMarkers(Collections.singletonList(marker));
     return le;
   }
 }

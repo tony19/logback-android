@@ -25,6 +25,8 @@ import ch.qos.logback.core.helpers.CyclicBuffer;
 import ch.qos.logback.core.net.SMTPAppenderBase;
 import org.slf4j.Marker;
 
+import java.util.List;
+
 /**
  * Send an e-mail when a specific logging event occurs, typically on errors or
  * fatal errors.
@@ -93,11 +95,16 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
   }
 
   protected boolean eventMarksEndOfLife(ILoggingEvent eventObject) {
-    Marker marker = eventObject.getMarker();
-    if(marker == null)
+    List<Marker> markers = eventObject.getMarkers();
+    if(markers == null || markers.isEmpty())
       return false;
 
-    return marker.contains(ClassicConstants.FINALIZE_SESSION_MARKER);
+    for(Marker marker : markers) {
+      if(marker.contains(ClassicConstants.FINALIZE_SESSION_MARKER)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 
