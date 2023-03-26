@@ -25,6 +25,7 @@ import java.util.Stack;
 import org.xml.sax.Locator;
 
 import ch.qos.logback.core.Context;
+import ch.qos.logback.core.android.AndroidContextUtil;
 import ch.qos.logback.core.joran.action.Action;
 import ch.qos.logback.core.joran.event.InPlayListener;
 import ch.qos.logback.core.joran.event.SaxEvent;
@@ -45,6 +46,7 @@ public class InterpretationContext extends ContextAwareBase implements
   Stack<Object> objectStack;
   Map<String, Object> objectMap;
   Map<String, String> propertiesMap;
+  static boolean androidContextInitDone = false;
 
   Interpreter joranInterpreter;
   final List<InPlayListener> listenerList = new ArrayList<InPlayListener>();
@@ -161,11 +163,19 @@ public class InterpretationContext extends ContextAwareBase implements
     if (value == null) {
       return null;
     }
+    initAndroidContextIfValueHasSpecialVars(value);
     return OptionHelper.substVars(value, this, context);
   }
 
-
-
+  private void initAndroidContextIfValueHasSpecialVars(String value) {
+    if (androidContextInitDone) {
+      return;
+    }
+    if (AndroidContextUtil.containsProperties(value)) {
+      new AndroidContextUtil().setupProperties(context);
+      androidContextInitDone = true;
+    }
+  }
 
   public boolean isListenerListEmpty() {
     return listenerList.isEmpty();
