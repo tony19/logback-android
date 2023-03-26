@@ -79,7 +79,7 @@ public class ConverterTest {
     StringBuilder buf = new StringBuilder();
     converter.write(buf, le);
     // the number below should be the line number of the previous line
-    assertEquals("79", buf.toString());
+    assertEquals("80", buf.toString());
     // TODO: Refactor this test so that it does not depend on the actual line numbers of this file
   }
 
