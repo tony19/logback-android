@@ -46,7 +46,7 @@ public class OnMarkerEvaluator extends EventEvaluatorBase<ILoggingEvent> {
       EvaluationException {
 
     List<Marker> eventsMarker = event.getMarkers();
-    if (eventsMarker.isEmpty()) {
+    if (eventsMarker == null || eventsMarker.isEmpty()) {
       return false;
     }
 
