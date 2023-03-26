@@ -3,13 +3,13 @@ package org.slf4j.impl;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.helpers.BasicMarkerFactory;
-import org.slf4j.helpers.NOPMDCAdapter;
 import org.slf4j.helpers.Util;
 import org.slf4j.spi.MDCAdapter;
 import org.slf4j.spi.SLF4JServiceProvider;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.util.ContextInitializer;
+import ch.qos.logback.classic.util.LogbackMDCAdapter;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.status.StatusUtil;
@@ -58,7 +58,7 @@ public class LoggerServiceProvider implements SLF4JServiceProvider {
         initializeLoggerContext();
         defaultLoggerContext.start();
         markerFactory = new BasicMarkerFactory();
-        mdcAdapter = new NOPMDCAdapter();
+        mdcAdapter = new LogbackMDCAdapter();
     }
 
     private void initializeLoggerContext() {
