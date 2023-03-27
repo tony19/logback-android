@@ -17,74 +17,74 @@ See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 
 ## Quick Start
 
- 1. Create a new "Basic Activity" app in [Android Studio](http://developer.android.com/sdk/index.html).
- 2. In `app/build.gradle`, add the following dependencies:
+1. Create a new "Basic Activity" app in [Android Studio](http://developer.android.com/sdk/index.html).
+2. In `app/build.gradle`, add the following dependencies:
 
-     ```groovy
-     dependencies {
-       implementation 'org.slf4j:slf4j-api:2.0.7'
-       implementation 'com.github.tony19:logback-android:3.0.0'
-     }
-     ```
+    ```groovy
+    dependencies {
+      implementation 'org.slf4j:slf4j-api:2.0.7'
+      implementation 'com.github.tony19:logback-android:3.0.0'
+    }
+    ```
 
-    If using `logback-android` in unit tests, **either** [use Robolectric](https://github.com/tony19/logback-android/issues/151#issuecomment-466276739), **or** use this config instead:
+   If using `logback-android` in unit tests, **either** [use Robolectric](https://github.com/tony19/logback-android/issues/151#issuecomment-466276739), **or** use this config instead:
 
-     ```groovy
-     dependencies {
-       implementation 'org.slf4j:slf4j-api:2.0.7'
-       implementation 'com.github.tony19:logback-android:3.0.0'
-       testImplementation 'ch.qos.logback:logback-classic:1.2.11'
-     }
+    ```groovy
+    dependencies {
+      implementation 'org.slf4j:slf4j-api:2.0.7'
+      implementation 'com.github.tony19:logback-android:3.0.0'
+      testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+    }
 
-     configurations.testImplementation {
-       exclude module: 'logback-android'
-     }
-     ```
+    configurations.testImplementation {
+      exclude module: 'logback-android'
+    }
+    ```
 
- 3. Create `app/src/main/assets/logback.xml` containing:
+3. Create `app/src/main/assets/logback.xml` containing:
 
-     ```xml
-     <configuration
-       xmlns="https://tony19.github.io/logback-android/xml"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd"
-     >
-       <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
-         <tagEncoder>
-           <pattern>%logger{12}</pattern>
-         </tagEncoder>
-         <encoder>
-           <pattern>[%-20thread] %msg</pattern>
-         </encoder>
-       </appender>
+    ```xml
+    <configuration
+      xmlns="https://tony19.github.io/logback-android/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd"
+    >
+      <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <tagEncoder>
+          <pattern>%logger{12}</pattern>
+        </tagEncoder>
+        <encoder>
+          <pattern>[%-20thread] %msg</pattern>
+        </encoder>
+      </appender>
 
-       <root level="DEBUG">
-         <appender-ref ref="logcat" />
-       </root>
-     </configuration>
-     ```
+      <root level="DEBUG">
+        <appender-ref ref="logcat" />
+      </root>
+    </configuration>
+    ```
 
- 4. In `MainActivity.java`, add the following imports:
+4. In `MainActivity.java`, add the following imports:
 
-     ```java
-     import org.slf4j.Logger;
-     import org.slf4j.LoggerFactory;
-     ```
+    ```java
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+    ```
 
- 5. ...and modify `onOptionsItemSelected()` to log "hello world":
+5. ...and modify `onOptionsItemSelected()` to log "hello world":
 
-     ```java
-     @Override
-     public boolean onOptionsItemSelected(MenuItem item) {
-         Logger log = LoggerFactory.getLogger(MainActivity.class);
-         log.info("hello world");
-         // ...
-     }
-     ```
+    ```java
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Logger log = LoggerFactory.getLogger(MainActivity.class);
+        log.info("hello world");
+        // ...
+    }
+    ```
 
- 6. Build and start the app.
- 7. Open logcat for your device (via the _Android Monitor_ tab in Android Studio).
- 8. Click the app menu, and select the menu-option. You should see "hello world" in logcat.
+6. Build and start the app.
+7. Open logcat for your device (via the _Android Monitor_ tab in Android Studio).
+8. Click the app menu, and select the menu-option. You should see "hello world" in logcat.
 
 
 ## Download
@@ -127,27 +127,27 @@ The file is output to:
 
 ## Release
 
- 1. CD into `./scripts/release`.
- 2. Install deps: `npm install`
- 3. Make sure `local.properties` contains the following keys, required to sign artifacts and upload to Maven Central:
+1. CD into `./scripts/release`.
+2. Install deps: `npm install`
+3. Make sure `local.properties` contains the following keys, required to sign artifacts and upload to Maven Central:
 
-    ```properties
-    # output from `gpg --export-secret-keys <PUBKEY_LAST8> | base64`
-    signing.key=
-    # PUBKEY_LAST8 from `gpg --list-keys` (last 8 digits of pub key)
-    signing.keyId=
-    # password for key (can be empty if key has no password)
-    signing.password=
-    # path to secring.gpg file from `gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg`
-    signing.secretKeyRingFile=/Users/tony/.gnupg/secring.gpg
-    # OSS sonatype username at https://issues.sonatype.org
-    ossrhUsername=
-    # OSS sonatype password at https://issues.sonatype.org
-    ossrhPassword=
-    # profile ID from https://oss.sonatype.org/#stagingProfiles (select profile, and copy profile ID from hash in address bar)
-    sonatypeStagingProfileId=b2413418ab44f
-    ```
+   ```properties
+   # output from `gpg --export-secret-keys <PUBKEY_LAST8> | base64`
+   signing.key=
+   # PUBKEY_LAST8 from `gpg --list-keys` (last 8 digits of pub key)
+   signing.keyId=
+   # password for key (can be empty if key has no password)
+   signing.password=
+   # path to secring.gpg file from `gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg`
+   signing.secretKeyRingFile=/Users/tony/.gnupg/secring.gpg
+   # OSS sonatype username at https://issues.sonatype.org
+   ossrhUsername=
+   # OSS sonatype password at https://issues.sonatype.org
+   ossrhPassword=
+   # profile ID from https://oss.sonatype.org/#stagingProfiles (select profile, and copy profile ID from hash in address bar)
+   sonatypeStagingProfileId=b2413418ab44f
+   ```
 
- 4. Do a dry-run: `npm run start --dry`
- 5. If everything looks good, rerun without `--dry`.
- 6. Confirm the artifacts were uploaded in https://repo1.maven.org/maven2/com/github/tony19/logback-android/3.0.0/.
+4. Do a dry-run: `npm run start --dry`
+5. If everything looks good, rerun without `--dry`.
+6. Confirm the artifacts were uploaded in https://repo1.maven.org/maven2/com/github/tony19/logback-android/3.0.0/.
