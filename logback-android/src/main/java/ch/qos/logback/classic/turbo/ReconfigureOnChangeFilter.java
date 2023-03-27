@@ -95,9 +95,8 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
   private volatile long mask = 0xF;
   private volatile long lastMaskCheck = System.currentTimeMillis();
 
-
   @Override
-  public FilterReply decide(Marker marker, Logger logger, Level level,
+  public FilterReply decide(List<Marker> markers, Logger logger, Level level,
                             String format, Object[] params, Throwable t) {
     if (!isStarted()) {
       return FilterReply.NEUTRAL;

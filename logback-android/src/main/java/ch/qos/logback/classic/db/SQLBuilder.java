@@ -99,7 +99,7 @@ public class SQLBuilder {
         .append(dbNameResolver.getColumnName(ColumnName.EVENT_ID)).append(") ")
         .append("REFERENCES ")
         .append(dbNameResolver.getTableName(TableName.LOGGING_EVENT)).append(" (")
-        .append(dbNameResolver.getColumnName(ColumnName.EVENT_ID)).append(") ")
+        .append(dbNameResolver.getColumnName(ColumnName.EVENT_ID)).append(")  ON DELETE CASCADE ")
         .append(")");
     return sqlBuilder.toString();
   }
@@ -117,7 +117,7 @@ public class SQLBuilder {
         .append(dbNameResolver.getColumnName(ColumnName.EVENT_ID)).append(") ")
         .append("REFERENCES ")
         .append(dbNameResolver.getTableName(TableName.LOGGING_EVENT)).append(" (")
-        .append(dbNameResolver.getColumnName(ColumnName.EVENT_ID)).append(") ")
+        .append(dbNameResolver.getColumnName(ColumnName.EVENT_ID)).append(")  ON DELETE CASCADE ")
         .append(")");
     return sqlBuilder.toString();
   }

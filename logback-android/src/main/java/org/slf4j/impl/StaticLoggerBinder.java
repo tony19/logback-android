@@ -15,11 +15,19 @@
  */
 package org.slf4j.impl;
 
+import static org.slf4j.impl.LoggerServiceProvider.REQUESTED_API_VERSION;
+
 import ch.qos.logback.core.status.StatusUtil;
 import org.slf4j.ILoggerFactory;
+import org.slf4j.IMarkerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.Util;
 import org.slf4j.spi.LoggerFactoryBinder;
+import org.slf4j.spi.MDCAdapter;
+import org.slf4j.spi.SLF4JServiceProvider;
+
+import java.util.concurrent.ConcurrentMap;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.util.ContextInitializer;
@@ -35,14 +43,7 @@ import ch.qos.logback.core.util.StatusPrinter;
  *
  * @author Ceki G&uuml;lc&uuml;
  */
-public class StaticLoggerBinder implements LoggerFactoryBinder {
-
-  /**
-   * Declare the version of the SLF4J API this implementation is compiled
-   * against. The value of this field is usually modified with each release.
-   */
-  // to avoid constant folding by the compiler, this field must *not* be final
-  public static String REQUESTED_API_VERSION = "1.6"; // !final
+public class StaticLoggerBinder implements SLF4JServiceProvider {
 
   final static String NULL_CS_URL = CoreConstants.CODES_URL + "#null_CS";
 
@@ -54,7 +55,7 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
   private static Object KEY = new Object();
 
   static {
-    SINGLETON.init();
+    SINGLETON.initialize();
   }
 
   private boolean initialized = false;
@@ -75,13 +76,11 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
    */
   static void reset() {
     SINGLETON = new StaticLoggerBinder();
-    SINGLETON.init();
+    SINGLETON.initialize();
   }
 
-  /**
-   * Package access for testing purposes.
-   */
-  void init() {
+  @Override
+  public void initialize() {
     try {
       try {
         new ContextInitializer(defaultLoggerContext).autoConfig();
@@ -112,8 +111,22 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
     return contextSelectorBinder.getContextSelector().getLoggerContext();
   }
 
+  @Override
+  public IMarkerFactory getMarkerFactory() {
+    return StaticMarkerBinder.SINGLETON.getMarkerFactory();
+  }
+
+  @Override
+  public MDCAdapter getMDCAdapter() {
+    return StaticMDCBinder.SINGLETON.getMDCA();
+  }
+
+  @Override
+  public String getRequestedApiVersion() {
+    return REQUESTED_API_VERSION;
+  }
+
   public String getLoggerFactoryClassStr() {
     return contextSelectorBinder.getClass().getName();
   }
-
 }

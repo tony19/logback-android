@@ -15,7 +15,10 @@
  */
 package ch.qos.logback.classic.util;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -194,5 +197,25 @@ public final class LogbackMDCAdapter implements MDCAdapter {
 
     // the newMap replaces the old one for serialisation's sake
     copyOnThreadLocal.set(newMap);
+  }
+
+  @Override
+  public void pushByKey(String key, String value) {
+    put(key, value);
+  }
+
+  @Override
+  public String popByKey(String key) {
+    return get(key);
+  }
+
+  @Override
+  public Deque<String> getCopyOfDequeByKey(String key) {
+    return get(key) == null ? null : new ArrayDeque<String>(Collections.singletonList(get(key)));
+  }
+
+  @Override
+  public void clearDequeByKey(String key) {
+    put(key, null);
   }
 }

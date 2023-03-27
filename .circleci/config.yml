@@ -3,16 +3,16 @@
 version: 2.1
 
 executors:
-  android28:
+  android:
     docker:
-      - image: circleci/android:api-28
+      - image: cimg/android:2023.02.1
     working_directory: ~/code
     environment:
       JVM_OPTS: -Xmx3200m
 
 jobs:
   build:
-    executor: android28
+    executor: android
     steps:
       - checkout
       - restore_cache:
@@ -36,7 +36,7 @@ jobs:
           destination: outputs
 
   lint:
-    executor: android28
+    executor: android
     steps:
       - attach_workspace:
           at: ~/code
@@ -48,7 +48,7 @@ jobs:
           destination: reports
 
   test:
-    executor: android28
+    executor: android
     steps:
       - attach_workspace:
           at: ~/code
@@ -62,7 +62,7 @@ jobs:
           path: logback-android/build/test-results
 
   test_app:
-    executor: android28
+    executor: android
     steps:
       - attach_workspace:
           at: ~/code

@@ -287,7 +287,7 @@ public class ConditionalIncludeActionTest {
     final String xml =
         "<x>" +
             "<findInclude>" +
-                "<include url='http://nonexistent.html'/>" +
+                "<include url='https://example.com/nonexistent.html'/>" +
                 "<include url='"+ URL_TO_INCLUDE +"'/>" +
             "</findInclude>" +
             "<stack name='C'/>" +

@@ -1,22 +1,18 @@
-plugins {
-    id 'net.researchgate.release' version '2.6.0'
-}
 apply plugin: 'com.android.library'
-apply from: "${rootProject.projectDir}/gradle/analysis.gradle"
-apply from: "${rootProject.projectDir}/gradle/docs.gradle"
-apply from: "${rootProject.projectDir}/gradle/deploy.gradle"
 
 android {
-    compileSdkVersion 29
+    namespace 'com.github.tony19.logback.android'
+    compileSdkVersion 31
+    buildToolsVersion '30.0.3'
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_5
-        targetCompatibility JavaVersion.VERSION_1_5
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
     }
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 29
+        targetSdkVersion 31
         versionCode VERSION_CODE.toInteger()
         versionName VERSION_NAME
     }
@@ -24,6 +20,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
         }
     }
     lintOptions {
@@ -47,38 +46,36 @@ android {
 
 dependencies {
 
-    testImplementation('junit:junit:4.12') {
+    testImplementation('junit:junit:4.13.2') {
         exclude(module: 'hamcrest-core')
     }
 
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
-    testImplementation 'org.mockito:mockito-core:2.23.4'
-    testImplementation 'joda-time:joda-time:2.10.1'
+    testImplementation 'org.robolectric:robolectric:4.9.2'
+    testImplementation 'org.mockito:mockito-core:2.28.2'
+    testImplementation 'joda-time:joda-time:2.12.4'
 
     // This dep is required when using Robolectric and targeting pre-21 SDKs.
     // Otherwise, tests fail with java.lang.NoClassDefFoundError.
     // https://github.com/robolectric/robolectric/issues/2562#issuecomment-263086503
-    testImplementation 'org.robolectric:android-all:8.1.0-robolectric-r4458339'
-    testImplementation 'com.icegreen:greenmail:1.5.9'
+    testImplementation 'org.robolectric:android-all:13-robolectric-9030017'
+    testImplementation 'com.icegreen:greenmail:1.6.14'
     testImplementation 'dom4j:dom4j:1.6.1'
     testImplementation 'org.easytesting:fest-assert:1.4'
-    testImplementation "org.slf4j:integration:${slf4jVersion}"
+    testImplementation "org.slf4j:integration:2.0.0-alpha1" // don't seem to have any stable 2.x releases yet: https://mvnrepository.com/artifact/org.slf4j/integration
     testImplementation "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
     testImplementation "org.slf4j:slf4j-api:${slf4jVersion}:tests"
     testImplementation "org.slf4j:slf4j-ext:${slf4jVersion}"
     testImplementation(group: 'org.subethamail', name: 'subethasmtp', version: '3.1.7') {
         exclude(module: 'slf4j-api')
     }
+    testImplementation project(path: ':logback-android')
 
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
 
     // For SMTPAppender
-    compileOnly 'com.sun.mail:android-mail:1.6.3'
-    compileOnly 'com.sun.mail:android-activation:1.6.3'
-
-    testImplementation 'ch.qos.cal10n:cal10n-api:0.8.1'
-    testAnnotationProcessor 'ch.qos.cal10n:cal10n-api:0.8.1'
+    compileOnly 'com.sun.mail:android-mail:1.6.7'
+    compileOnly 'com.sun.mail:android-activation:1.6.7'
 }
 
 allprojects {
@@ -87,7 +84,7 @@ allprojects {
         //options.compilerArgs << '-Xlint:deprecation'
         // Warn about unchecked usages
         options.compilerArgs << '-Xlint:unchecked'
-        // Don't warn about using source/target 1.5 option
+        // Don't warn about using source/target 1.6 option
         options.compilerArgs << '-Xlint:-options'
 
         options.debug(['debugLevel': 'source,lines,vars'])
@@ -100,20 +97,10 @@ allprojects {
     }
 }
 
-release {
-    tagTemplate = 'v_${version}'
-    preTagCommitMessage = ':cloud: Release'
-    tagCommitMessage = ':cloud: Release'
-    newVersionCommitMessage = ':cloud: Bump'
-
-    versionPropertyFile = '../gradle.properties'
-    versionProperties = ['VERSION_NAME']
-
-    git {
-        requireBranch = ''
-    }
+ext {
+    PUBLISH_GROUP_ID = GROUP
+    PUBLISH_VERSION = VERSION_NAME
+    PUBLISH_ARTIFACT_ID = POM_ARTIFACT_ID
 }
 
-nexusStaging {
-    packageGroup = 'com.github.tony19'
-}
+apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"

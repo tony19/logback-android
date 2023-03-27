@@ -355,11 +355,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     // In Android, relative paths created with File() are relative
     // to root, so fix it by prefixing the path to the app's "files"
     // directory.
-    // This transformation is rather expensive, since it involves loading the
-    // Android manifest from the APK (which is a ZIP file), and parsing it to
-    // retrieve the application package name. This should be avoided if
-    // possible as it may perceptibly delay the app launch time.
-    if (EnvUtil.isAndroidOS() && !new File(filename).isAbsolute()) {
+    if (!new File(filename).isAbsolute()) {
       String dataDir = context.getProperty(CoreConstants.DATA_DIR_KEY);
       filename = FileUtil.prefixRelativePath(dataDir, filename);
     }

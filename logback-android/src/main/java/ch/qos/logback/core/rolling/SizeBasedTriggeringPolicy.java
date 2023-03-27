@@ -16,11 +16,8 @@
 package ch.qos.logback.core.rolling;
 
 import java.io.File;
-import java.util.Locale;
 
-import ch.qos.logback.core.util.DefaultInvocationGate;
 import ch.qos.logback.core.util.FileSize;
-import ch.qos.logback.core.util.InvocationGate;
 
 /**
  * SizeBasedTriggeringPolicy looks at size of the file being currently written
@@ -46,14 +43,7 @@ public class SizeBasedTriggeringPolicy<E> extends TriggeringPolicyBase<E> {
   public SizeBasedTriggeringPolicy() {
   }
 
-  private InvocationGate invocationGate = new DefaultInvocationGate();
-
   public boolean isTriggeringEvent(final File activeFile, final E event) {
-    long now = System.currentTimeMillis();
-    if (invocationGate.isTooSoon(now)) {
-      return false;
-    }
-
     return (activeFile.length() >= maxFileSize.getSize());
   }
 

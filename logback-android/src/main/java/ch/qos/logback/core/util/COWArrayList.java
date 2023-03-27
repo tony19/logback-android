@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * A GC-free lock-free thread-safe implementation of the {@link List} interface for use cases where iterations over the list vastly out-number modifications on the list.
  *
- * <p>Underneath, it wraps an instance of {@link CopyOnWriteArrayList} and exposes a copy of the array used by that instance.
+ * <p>Underneath, it wraps an instance of {@link CopyOnWriteArrayList} and exposes a copy of the array used by that instance.</p>
  *
  * <p>Typical use:</p>
  *
@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *   Integer[] intArray = list.asTypedArray();
  *   int sum = 0;
  *   // iteration over the array is thread-safe
- *   for(int i = 0; i < intArray.length; i++) {
+ *   for(int i = 0; i &lt; intArray.length; i++) {
  *     sum != intArray[i];
  *   }
  * </pre>

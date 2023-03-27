@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+logback.xml schema, based on:
+ * https://github.com/enricopulatzo/logback-XSD
+ * https://github.com/nkatsar/logback-XSD
+
+Usage: Specify the xmlns, xmlns:xsi, and xsi:schemaLocation attributes on
+`<configuration>` as seen here:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration
+    xmlns="https://tony19.github.io/logback-android/xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd">
+
+    <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+      <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      </encoder>
+    </appender>
+    <root level="WARN">
+      <appender-ref ref="logcat" />
+    </root>
+</configuration>
+```
+
+If in Android Studio, hover the remote URI in xsi:schemaLocation (i.e., the URI will appear red).
+Right-click the red light-bulb hint, and select "Fetch remote resource".
+
+If in Visual Studio Code, use an XML extension (such as RedHat's XML), which automatically
+fetches the remote schema definition.
+-->
+<xsd:schema targetNamespace="https://tony19.github.io/logback-android/xml"
+    xmlns="https://tony19.github.io/logback-android/xml"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    version="1.0">
+
+    <xsd:element name="configuration" type="Configuration">
+        <xsd:annotation>
+            <xsd:documentation>Logback configuration context</xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="included" type="Configuration">
+        <xsd:annotation>
+            <xsd:documentation>Logback configuration context in external file</xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="Configuration">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="shutdownHook" type="ShutdownHook">
+                <xsd:annotation>
+                    <xsd:documentation>Creates hook to be invoked as part of current VM's shutdown sequence</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="statusListener" type="StatusListener">
+                <xsd:annotation>
+                    <xsd:documentation>Creates listener that receives internal status messages (for troubleshooting)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="contextListener" type="ContextListener">
+                <xsd:annotation>
+                    <xsd:documentation>Creates listener that receives internal state changes (for troubleshooting)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="conversionRule" type="ConversionRule">
+                <xsd:annotation>
+                    <xsd:documentation>Creates <a href="http://logback.qos.ch/manual/layouts.html#customConversionSpecifier">conversion specifier</a> used in pattern layouts, which creates string based on given log event</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+<!--            <xsd:element name="newRule" type="NewRule">-->
+<!--                <xsd:annotation>-->
+<!--                    <xsd:documentation>Creates an XML element parser rule (NOT SUPPORTED)</xsd:documentation>-->
+<!--                </xsd:annotation>-->
+<!--            </xsd:element>-->
+            <xsd:element name="include" type="Include">
+                <xsd:annotation>
+                    <xsd:documentation>Loads configuration from external source</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="includes" type="Includes">
+                <xsd:annotation>
+                    <xsd:documentation>Loads first configuration found from list of external sources</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="contextName" maxOccurs="1" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Name of configuration context</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="define" type="Define">
+                <xsd:annotation>
+                    <xsd:documentation>Defines property of specified class</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="timestamp" type="Timestamp">
+                <xsd:annotation>
+                    <xsd:documentation>Defines string property that contains timestamp (ms)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="property" type="Property">
+                <xsd:annotation>
+                    <xsd:documentation>Defines string property</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="appender" type="Appender">
+                <xsd:annotation>
+                    <xsd:documentation>Creates <a href=""><code>Appender</code></a> instance</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="logger" type="Logger">
+                <xsd:annotation>
+                    <xsd:documentation>Creates <a href=""><code>Logger</code></a> instance</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="root" type="Root">
+                <xsd:annotation>
+                    <xsd:documentation>Creates root <a href=""><code>Logger</code></a> instance</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="debug" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>Enables internal status logger (for troubleshooting)</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scan" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Enables file watcher on this configuration file, which reloads configuration on change</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scanPeriod" type="Duration">
+            <xsd:annotation>
+                <xsd:documentation>Duration between file-change checks; <code>scan</code> must be <code>true</code></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="packagingData" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>Enables package details in stacktraces <b>(expensive process)</b></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ShutdownHook">
+        <xsd:attribute name="class" type="xsd:string"
+            default="ch.qos.logback.core.hook.DelayingShutdownHook">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <a href=""><code>ShutdownHook</code></a> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ConversionRule">
+        <xsd:attribute name="conversionWord" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Word pattern that triggers conversion</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="converterClass" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <a href=""><code>ClassicConverter</code></a> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="NewRule">
+        <xsd:attribute name="pattern" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Element path (e.g., configuration/appender/myElement)</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="actionClass" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <a href="https://tony19.github.io/logback-android/doc/2.0.0/ch/qos/logback/core/joran/action/Action.html"><code>Action</code></a> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="StatusListener">
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <a href=""><code>StatusListener</code></a> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ContextListener">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="resetJUL" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Enables reset of <code>java.util.logging</code></xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <a href=""><code>ContextListener</code></a> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Includes">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="include" minOccurs="1" type="Include">
+                <xsd:annotation>
+                    <xsd:documentation>Loads optional configuration from external source</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="Include">
+        <xsd:attribute name="file" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Path to configuration file</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="resource" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Resource path to configuration file</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="url" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>URL to configuration file</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="optional" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>Don't raise error if source not found</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="Define">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Timestamp">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="key" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Name of property</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="datePattern" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Pattern used to format timestamp</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="timeReference" type="TimeReference">
+            <xsd:annotation>
+                <xsd:documentation>Starting reference to use</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:simpleType name="TimeReference">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="contextBirth">
+                <!-- <xsd:annotation>
+                    <xsd:documentation>Creation time of logger context</xsd:documentation>
+                </xsd:annotation> -->
+            </xsd:enumeration>
+            <xsd:enumeration value="now">
+                <!-- <xsd:annotation>
+                    <xsd:documentation>Current time</xsd:documentation>
+                </xsd:annotation> -->
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="RollingPolicy">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="fileNamePattern" minOccurs="1" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Pattern used to generate filenames</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="maxHistory" minOccurs="0" type="xsd:unsignedInt">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum number of retained log periods (based on <code>fileNamePattern</code>)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="minIndex" minOccurs="0" type="xsd:unsignedInt">
+                <xsd:annotation>
+                    <xsd:documentation>Lower bound for window's index (<a href="http://logback.qos.ch/manual/appenders.html#FixedWindowRollingPolicy"><code>FixedWindowRollingPolicy</code></a>)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="maxIndex" minOccurs="0" type="xsd:unsignedInt">
+                <xsd:annotation>
+                    <xsd:documentation>Upper bound for window's index (<a href="http://logback.qos.ch/manual/appenders.html#FixedWindowRollingPolicy"><code>FixedWindowRollingPolicy</code></a>)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="timeBasedFileNamingAndTriggeringPolicy" minOccurs="0" type="TriggeringPolicy">
+                <xsd:annotation>
+                    <xsd:documentation>Component that controls whether log rotation occurs (<code>TimeBasedRollingPolicy</code>)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="cleanHistoryOnStart" minOccurs="0" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Enables archive removal at startup</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="maxFileSize" minOccurs="0" type="FileSize">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum file size of each archive</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="totalSizeCap" minOccurs="0" type="FileSize">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum cummulative size of all archive files</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>RollingPolicy</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:simpleType name="FileSize">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[1-9][0-9]*(KB|MB|GB)?"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Duration">
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:pattern value="[1-9][0-9]*\s*(|milli(second)?|second(e)?|minute|hour|day)s?"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="TriggeringPolicy">
+        <xsd:sequence>
+            <xsd:element name="maxFileSize" minOccurs="0" type="FileSize">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum file size of each archive</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="class" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>TriggeringPolicy</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="Property">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Name with which specified value will be associated</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="value" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Value to be associated with specified name</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="file" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Path to <code>.properties</code> file to load</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="resource" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Path to <code>.properties</code> resource file to load</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Appender">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="target" minOccurs="0" type="Target">
+                <xsd:annotation>
+                    <xsd:documentation>Destination standard stream (<code>ConsoleAppender</code>)</xsd:documentation>
+                    <xsd:appinfo>...<markdown>ConsoleAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="lazy" maxOccurs="1" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Don't create resource until first log event</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="file" minOccurs="0" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Path to destination file (<code>FileAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>FileAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="encoder" minOccurs="0" type="Encoder">
+                <xsd:annotation>
+                    <xsd:documentation>Log event encoder</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="tagEncoder" minOccurs="0" type="Encoder">
+                <xsd:annotation>
+                    <xsd:documentation>Log tag encoder (<code>LogcatAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>LogcatAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="filter" minOccurs="0" type="Filter">
+                <xsd:annotation>
+                    <xsd:documentation>Log event filter</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="append" minOccurs="0" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Append log events to file instead of overwrite (<code>FileAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>FileAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="prudent" minOccurs="0" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Allow multiple writers/JVMs (<code>FileAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>FileAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="layout" minOccurs="0" type="Layout">
+                <xsd:annotation>
+                    <xsd:documentation>Log event serialization layout</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="rollingPolicy" minOccurs="0" type="RollingPolicy">
+                <xsd:annotation>
+                    <xsd:documentation>Component that controls how log rotation occurs (<code>RollingFileAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>RollingFileAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="triggeringPolicy" minOccurs="0" type="TriggeringPolicy">
+                <xsd:annotation>
+                    <xsd:documentation>Component that controls whether log rotation occurs (<code>RollingFileAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>RollingFileAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="evaluator" maxOccurs="1" type="Evaluator">
+                <xsd:annotation>
+                    <xsd:documentation>Filter that passes log event based on its evaluation</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="remoteHost" maxOccurs="1" type="xsd:normalizedString">
+                <xsd:annotation>
+                    <xsd:documentation>Remote host address (<code>SocketAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SocketAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="port" maxOccurs="1" type="xsd:unsignedInt">
+                <xsd:annotation>
+                    <xsd:documentation>Remote host port (<code>SocketAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SocketAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="reconnectionDelay" maxOccurs="1" type="xsd:unsignedLong">
+                <xsd:annotation>
+                    <xsd:documentation>Time (ms) between reconnection attempts (<code>SocketAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SocketAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="includeCallerData" maxOccurs="1" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Show caller information in stacktrace (<code>SocketAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SocketAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="maxHistory" maxOccurs="1" type="Duration">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum duration of retained log periods (<code>SQLiteAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SocketAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="filename" maxOccurs="1" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Path to destination file (<code>SQLiteAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SQLiteAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="dbNameResolver" maxOccurs="1" type="DBNameResolver">
+                <xsd:annotation>
+                    <xsd:documentation>Name resolver for database table and columns (<code>SQLiteAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SQLiteAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="logCleaner" maxOccurs="1" type="LogCleaner">
+                <xsd:annotation>
+                    <xsd:documentation>Archive removal mechanism (<code>SQLiteAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SQLiteAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="cyclicBufferTracker" maxOccurs="1" type="CyclicBufferTracker">
+                <xsd:annotation>
+                    <xsd:documentation>Log event buffer (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="smtpHost" maxOccurs="1" type="xsd:normalizedString">
+                <xsd:annotation>
+                    <xsd:documentation>SMTP server address (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="smtpPort" maxOccurs="1" type="xsd:unsignedInt">
+                <xsd:annotation>
+                    <xsd:documentation>SMTP server port (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="SSL" maxOccurs="1" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Enable SSL (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="username" maxOccurs="1" type="xsd:normalizedString">
+                <xsd:annotation>
+                    <xsd:documentation>Username for SMTP server (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="password" maxOccurs="1" type="xsd:normalizedString">
+                <xsd:annotation>
+                    <xsd:documentation>Password for SMTP server (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="to" maxOccurs="1" type="xsd:normalizedString">
+                <xsd:annotation>
+                    <xsd:documentation>Comma-separated email addresses to which email is sent (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="from" maxOccurs="1" type="xsd:normalizedString">
+                <xsd:annotation>
+                    <xsd:documentation>Email address from which email is sent (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="subject" maxOccurs="1" type="xsd:normalizedString">
+                <xsd:annotation>
+                    <xsd:documentation>Subject line pattern layout (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="asynchronousSending" maxOccurs="1" type="xsd:boolean" default="true">
+                <xsd:annotation>
+                    <xsd:documentation>Send email asynchronously (<code>SMTPAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>SMTPAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="appender-ref" minOccurs="0" type="AppenderRef">
+                <xsd:annotation>
+                    <xsd:documentation>Refers to predefined <code>&lt;appender&gt;</code> by name (<code>AsyncAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>AsyncAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="class" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>Appender</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:simpleType name="Target">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="System.out"/>
+            <xsd:enumeration value="System.err"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="Filter">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="level" minOccurs="0" maxOccurs="unbounded" type="LoggerLevel">
+                <xsd:annotation>
+                    <xsd:documentation>Level to filter logs against</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="onMatch" minOccurs="0" maxOccurs="unbounded" type="MatchValue">
+                <xsd:annotation>
+                    <xsd:documentation>Action to take when filter matches</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="onMismatch" minOccurs="0" maxOccurs="unbounded" type="MatchValue">
+                <xsd:annotation>
+                    <xsd:documentation>Action to take when filter does not match</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>Filter</code>implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:simpleType name="MatchValue">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ACCEPT">
+                <xsd:annotation>
+                    <xsd:documentation>Accept log event</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="DENY">
+                <xsd:annotation>
+                    <xsd:documentation>Deny log event</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="NEUTRAL">
+                <xsd:annotation>
+                    <xsd:documentation>Pass log event to next filter</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="Layout">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="pattern" minOccurs="0" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>String that controls formatting, and consists of a mix of literal content and conversion specifiers</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>Layout</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Logger">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="appender-ref" minOccurs="0" maxOccurs="unbounded" type="AppenderRef">
+                <xsd:annotation>
+                    <xsd:documentation>Refers to predefined <code>&lt;appender&gt;</code> by name</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Name of logger; typically name of package or class</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="level" type="LoggerLevel">
+            <xsd:annotation>
+                <xsd:documentation>Logger's verbosity level</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="additivity" type="xsd:boolean"  default="true">
+            <xsd:annotation>
+                <xsd:documentation>Propagate log events to other loggers</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Encoder">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="charset" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Character set to encode log event strings</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="immediateFlush" type="xsd:boolean" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Disable buffering; and flush to stream immediately</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="layout" minOccurs="0" type="Layout">
+                <xsd:annotation>
+                    <xsd:documentation>Log event serialization layout</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="outputPatternAsHeader" type="xsd:boolean" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Insert <code>pattern</code> at top of file as column key header</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="pattern" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>String that controls formatting, and consists of a mix of literal content and conversion specifiers</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>Encoder</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="Root">
+        <xsd:sequence>
+            <xsd:element name="appender-ref" minOccurs="0" maxOccurs="unbounded" type="AppenderRef">
+                <xsd:annotation>
+                    <xsd:documentation>Refers to predefined <code>&lt;appender&gt;</code> by name</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="level" use="required" type="LoggerLevel">
+            <xsd:annotation>
+                <xsd:documentation>Logger's verbosity level</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="AppenderRef">
+        <xsd:attribute name="ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Name of <code>&lt;appender&gt;</code> to reference</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:simpleType name="LoggerLevel">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="OFF"/>
+                    <xsd:enumeration value="off"/>
+                    <xsd:enumeration value="ALL"/>
+                    <xsd:enumeration value="all"/>
+                    <xsd:enumeration value="INHERITED"/>
+                    <xsd:enumeration value="inherited"/>
+                    <xsd:enumeration value="NULL"/>
+                    <xsd:enumeration value="null"/>
+                    <xsd:enumeration value="ERROR"/>
+                    <xsd:enumeration value="error"/>
+                    <xsd:enumeration value="WARN"/>
+                    <xsd:enumeration value="warn"/>
+                    <xsd:enumeration value="INFO"/>
+                    <xsd:enumeration value="info"/>
+                    <xsd:enumeration value="DEBUG"/>
+                    <xsd:enumeration value="debug"/>
+                    <xsd:enumeration value="TRACE"/>
+                    <xsd:enumeration value="trace"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="($\{.+:-)?[Oo][Ff]{2}\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Aa][Ll]{2}\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Ii][Nn][Hh][Ee][Rr][Ii][Tt][Ee][Dd]\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Nn][Uu][Ll]{2}\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Ee][Rr]{2}[Oo][Rr]\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Ww][Aa][Rr][Nn]\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Ii][Nn][Ff][Oo]\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Dd][Ee][Bb][Uu][Gg]\}?"/>
+                    <xsd:pattern value="($\{.+:-)?[Tt][Rr][Aa][Cc][Ee]\}?"/>
+                    <xsd:pattern value="\$\{.+\}"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+   <xsd:complexType name="DBNameResolver">
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>DBNameResolver</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="LogCleaner">
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>LogCleaner</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="CyclicBufferTracker">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="bufferSize" type="xsd:string" maxOccurs="1" default="256">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum log events per component</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="maxComponents" maxOccurs="1" type="xsd:unsignedInt">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum number of components to track</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="timeout" maxOccurs="1" type="xsd:unsignedLong" default="180000">
+                <xsd:annotation>
+                    <xsd:documentation>Maximum time (ms) component is tracked</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>CyclicBufferTracker</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Evaluator">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="marker" type="xsd:string" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>Marker (<code>OnMarkerEvaluator</code>)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:any namespace="https://tony19.github.io/logback-android/xml/custom" processContents="lax" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="class" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Classname of <code>Evaluator</code> implementation to invoke</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute/>
+    </xsd:complexType>
+</xsd:schema>

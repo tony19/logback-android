@@ -1,0 +1,36 @@
+{
+  "name": "gradle-release",
+  "version": "1.0.0",
+  "description": "Utility for release management of Gradle projects",
+  "main": "./index.ts",
+  "scripts": {
+    "start": "tsx ./index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tony19/logback-android.git"
+  },
+  "keywords": [
+    "gradle",
+    "release"
+  ],
+  "author": "Tony Trinh <tony19@gmail.com>",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/tony19/logback-android/issues"
+  },
+  "homepage": "https://github.com/tony19/logback-android#readme",
+  "devDependencies": {
+    "@types/minimist": "^1.2.2",
+    "@types/node": "^18.11.9",
+    "@types/prompts": "^2.4.1",
+    "@types/semver": "^7.3.13",
+    "conventional-changelog": "^3.1.25",
+    "execa": "^7.0.0",
+    "minimist": "^1.2.7",
+    "picocolors": "^1.0.0",
+    "prompts": "^2.4.2",
+    "semver": "^7.3.8",
+    "tsx": "^3.12.1"
+  }
+}

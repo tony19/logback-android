@@ -72,7 +72,9 @@ public class RollingCalendar extends GregorianCalendar {
   }
 
   public RollingCalendar(String datePattern) {
-    this(datePattern, GMT_TIMEZONE, Locale.US);
+    super();
+    this.datePattern = datePattern;
+    this.periodicityType = computePeriodicityType();
   }
 
   public RollingCalendar(String datePattern, TimeZone tz, Locale locale) {

@@ -22,6 +22,8 @@ import ch.qos.logback.core.sift.Discriminator;
 import ch.qos.logback.core.sift.SiftingAppenderBase;
 import org.slf4j.Marker;
 
+import java.util.List;
+
 /**
  * This appender can contains other appenders which it can build dynamically
  * depending on MDC values. The built appender is specified as part of a
@@ -47,10 +49,14 @@ public class SiftingAppender extends SiftingAppenderBase<ILoggingEvent> {
   }
 
   protected boolean eventMarksEndOfLife(ILoggingEvent event) {
-    Marker marker = event.getMarker();
-    if(marker == null)
+    List<Marker> markers = event.getMarkers();
+    if(markers == null)
       return false;
 
-    return marker.contains(ClassicConstants.FINALIZE_SESSION_MARKER);
+    for (Marker marker : markers) {
+      if(marker.contains(ClassicConstants.FINALIZE_SESSION_MARKER))
+        return true;
+    }
+    return false;
   }
 }
