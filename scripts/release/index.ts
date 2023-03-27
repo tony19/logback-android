@@ -87,10 +87,10 @@ async function main(): Promise<void> {
 
   say(`\nUpdating snapshot version to ${nextVersion} ...`)
   await updateVersionInGradleProperties(gradleFilePath, nextVersion)
-  await updateVersionInReadme(readmeFilePath, [
-    [/logback-android:\d+\.\d+\.\d+(?!-SNAPSHOT)/g, `logback-android:${nextVersion}`],
-    [/logback-android:\d+\.\d+\.\d+-SNAPSHOT/g, `logback-android:${nextSnapshotVer(nextVersion)}`],
-  ])
+//   await updateVersionInReadme(readmeFilePath, [
+//     [/logback-android:\d+\.\d+\.\d+(?!-SNAPSHOT)/g, `logback-android:${nextVersion}`],
+//     [/logback-android:\d+\.\d+\.\d+-SNAPSHOT/g, `logback-android:${nextSnapshotVer(nextVersion)}`],
+//   ])
 
   await commitChangedFiles({ cwd, message: `chore: update SNAPSHOT version` }, readmeFilePath, gradleFilePath)
 
