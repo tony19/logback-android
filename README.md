@@ -124,3 +124,31 @@ The file is output to:
 ```sh
 ./build/logback-android-3.0.0-debug.aar
 ```
+
+Release
+-------
+
+1. CD into `./scripts/release`.
+2. Install deps: `npm install`
+3. Make sure `local.properties` contains the following keys, required to sign artifacts and upload to Maven Central:
+
+   ```properties
+   # output from `gpg --export-secret-keys <PUBKEY_LAST8> | base64`
+   signing.key=
+   # PUBKEY_LAST8 from `gpg --list-keys` (last 8 digits of pub key)
+   signing.keyId=
+   # password for key (can be empty if key has no password)
+   signing.password=
+   # path to secring.gpg file from `gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg`
+   signing.secretKeyRingFile=/Users/tony/.gnupg/secring.gpg
+   # OSS sonatype username at https://issues.sonatype.org
+   ossrhUsername=
+   # OSS sonatype password at https://issues.sonatype.org
+   ossrhPassword=
+   # profile ID from https://oss.sonatype.org/#stagingProfiles (select profile, and copy profile ID from hash in address bar)
+   sonatypeStagingProfileId=b2413418ab44f
+   ```
+
+4. Do a dry-run: `npm run start --dry`
+5. If everything looks good, rerun without `--dry`.
+6. Confirm the artifacts were uploaded in https://repo1.maven.org/maven2/com/github/tony19/logback-android/3.0.0/.
