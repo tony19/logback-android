@@ -6,8 +6,8 @@ android {
     buildToolsVersion '30.0.3'
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     defaultConfig {
@@ -25,6 +25,7 @@ android {
             debuggable true
         }
     }
+
     lintOptions {
         checkAllWarnings true
         lintConfig rootProject.file('gradle/lint.xml')
