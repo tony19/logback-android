@@ -11,7 +11,7 @@ staticAnalysis {
     maxWarnings = 0
   }
   checkstyle {
-    toolVersion "10.9.3"
+    toolVersion "10.12.0"
     configFile rootProject.file('config/checkstyle.xml')
   }
   pmd {
