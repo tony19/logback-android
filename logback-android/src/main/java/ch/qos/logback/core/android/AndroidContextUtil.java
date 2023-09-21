@@ -16,7 +16,6 @@
 package ch.qos.logback.core.android;
 
 import android.annotation.TargetApi;
-import android.content.ContextWrapper;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -25,6 +24,7 @@ import android.os.Environment;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.CoreConstants;
@@ -37,14 +37,16 @@ import ch.qos.logback.core.CoreConstants;
  * @since 1.0.8-1
  */
 public class AndroidContextUtil {
-  private ContextWrapper context;
+  private static final AtomicReference<android.content.Context> CONTEXT_HOLDER = new AtomicReference<>();
+
+  private final android.content.Context context;
 
   public AndroidContextUtil() {
     this(getContext());
   }
 
-  public AndroidContextUtil(ContextWrapper contextWrapper) {
-    this.context = contextWrapper;
+  public AndroidContextUtil(android.content.Context context) {
+    this.context = (context == null) ? null : context.getApplicationContext();
   }
 
   public static boolean containsProperties(String value) {
@@ -71,11 +73,21 @@ public class AndroidContextUtil {
     context.putProperty(CoreConstants.VERSION_NAME_KEY, getVersionName());
   }
 
-  protected static ContextWrapper getContext() {
+  public static void setApplicationContext(android.content.Context context) {
+    CONTEXT_HOLDER.set((context == null) ? null : context.getApplicationContext());
+  }
+
+  protected static android.content.Context getContext() {
+    android.content.Context context = CONTEXT_HOLDER.get();
+    if (context != null) {
+        return context.getApplicationContext();
+    }
+
     try {
       Class<?> c = Class.forName("android.app.AppGlobals");
       Method method = c.getDeclaredMethod("getInitialApplication");
-      return (ContextWrapper)method.invoke(c);
+      context = (android.content.Context) method.invoke(c);
+      return (context == null) ? null : context.getApplicationContext();
     } catch (ClassNotFoundException e) {
       //e.printStackTrace();
     } catch (NoSuchMethodException e) {
@@ -116,10 +128,10 @@ public class AndroidContextUtil {
    *
    * @return the absolute path to the external storage directory
    */
-  @TargetApi(8)
+  @TargetApi(Build.VERSION_CODES.FROYO)
   @SuppressWarnings("deprecation")
   public String getExternalStorageDirectoryPath() {
-    if (Build.VERSION.SDK_INT >= 29) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       return getExternalFilesDirectoryPath();
     } else {
       return absPath(Environment.getExternalStorageDirectory());
@@ -134,7 +146,7 @@ public class AndroidContextUtil {
    *
    * @return the absolute path to the external storage directory
    */
-  @TargetApi(8)
+  @TargetApi(Build.VERSION_CODES.FROYO)
   public String getExternalFilesDirectoryPath() {
     return this.context != null
             ? absPath(this.context.getExternalFilesDir(null))
@@ -185,9 +197,9 @@ public class AndroidContextUtil {
    * @return the absolute path to the files directory
    * (example: "/data/data/com.example/nobackup/files")
    */
-  @TargetApi(21)
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public String getNoBackupFilesDirectoryPath() {
-    return Build.VERSION.SDK_INT >= 21 &&
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
             this.context != null
             ? absPath(this.context.getNoBackupFilesDir())
             : "";
@@ -201,10 +213,8 @@ public class AndroidContextUtil {
    * (example: "/data/data/com.example/databases")
    */
   public String getDatabaseDirectoryPath() {
-    return this.context != null
-            && this.context.getDatabasePath("x") != null
-            ? this.context.getDatabasePath("x").getParent()
-            : "";
+    File dbPath = (this.context == null) ? null : this.context.getDatabasePath("x");
+    return (dbPath != null) ? dbPath.getParent() : "";
   }
 
   public String getDatabasePath(String databaseName) {
@@ -217,8 +227,12 @@ public class AndroidContextUtil {
     String versionCode = "";
     if (this.context != null) {
       try {
-        PackageInfo pkgInfo = this.context.getPackageManager().getPackageInfo(getPackageName(), 0);
-        versionCode = "" + pkgInfo.versionCode;
+        PackageManager pm = this.context.getPackageManager();
+        PackageInfo pkgInfo = pm.getPackageInfo(getPackageName(), 0);
+        versionCode = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                ? Long.toString(pkgInfo.getLongVersionCode())
+                : Integer.toString(pkgInfo.versionCode)
+                ;
       } catch (PackageManager.NameNotFoundException e) {
       }
     }
@@ -229,7 +243,8 @@ public class AndroidContextUtil {
     String versionName = "";
     if (this.context != null) {
       try {
-        PackageInfo pkgInfo = this.context.getPackageManager().getPackageInfo(getPackageName(), 0);
+        PackageManager pm = this.context.getPackageManager();
+        PackageInfo pkgInfo = pm.getPackageInfo(getPackageName(), 0);
         versionName = pkgInfo.versionName;
       } catch (PackageManager.NameNotFoundException e) {
       }
@@ -237,7 +252,7 @@ public class AndroidContextUtil {
     return versionName != null ? versionName : "";
   }
 
-  private String absPath(File file) {
+  private static String absPath(File file) {
     return file != null ? file.getAbsolutePath() : "";
   }
 }
