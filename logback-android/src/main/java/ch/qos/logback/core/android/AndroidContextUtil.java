@@ -229,7 +229,10 @@ public class AndroidContextUtil {
       try {
         PackageManager pm = this.context.getPackageManager();
         PackageInfo pkgInfo = pm.getPackageInfo(getPackageName(), 0);
-        versionCode = "" + pkgInfo.versionCode;
+        versionCode = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                ? Long.toString(pkgInfo.getLongVersionCode())
+                : Integer.toString(pkgInfo.versionCode)
+                ;
       } catch (PackageManager.NameNotFoundException e) {
       }
     }
@@ -249,7 +252,7 @@ public class AndroidContextUtil {
     return versionName != null ? versionName : "";
   }
 
-  private String absPath(File file) {
+  private static String absPath(File file) {
     return file != null ? file.getAbsolutePath() : "";
   }
 }
