@@ -86,6 +86,43 @@ See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 7. Open logcat for your device (via the _Android Monitor_ tab in Android Studio).
 8. Click the app menu, and select the menu-option. You should see "hello world" in logcat.
 
+## Providing Android context externally
+
+In order to support various [special properties](https://github.com/tony19/logback-android/wiki#special-properties-for-xml-config) the code requires
+access to an Android [Context](https://developer.android.com/reference/android/content/Context) instance. By default, the framework uses a workaround based
+on reflection that seems to work for the time being. However, in view of Google's [restrictions on non-SDK interfaces](https://developer.android.com/guide/app-compatibility/restrictions-non-sdk-interfaces)
+this code might not work anymore. Therefore, the framework provides a special API that enables the application to provide an Android context instance that
+will be used instead of the workaround. **Note:** the context instance must be provided *before* it is needed by the framework, so the best place for it
+would be in the application's *onCreate* callback:
+
+```java
+public class MyApplication extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Assuming no logging occurs before this 
+        AndroidContextUtils.setApplicationContext(this);
+    }
+}
+```
+
+If an earlier initialization is required, then one might consider overriding `attachBaseContext`, although at this stage the context instance might not be
+fully initialized. This might be good enough though if by the time the context is used by the framework it becomes fully initialized.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        AndroidContextUtils.setApplicationContext(base);
+    }
+}
+```
+
+*Note:* despite the fact that the method is called `setApplicationContext` - the user may use *any* `ContextWrapper` component (*Application, Activity, Service*) - the
+framework will actually use the ["pure" application context](https://developer.android.com/reference/android/content/Context#getApplicationContext()).
 
 ## Download
 
