@@ -5,7 +5,7 @@ version: 2.1
 executors:
   android:
     docker:
-      - image: cimg/android:2023.02.1
+      - image: cimg/android:2023.12.1
     working_directory: ~/code
     environment:
       JVM_OPTS: -Xmx3200m
