@@ -1,8 +1,8 @@
 # Modern Android Logging Frameworks — Research & Feature Roadmap for logback-android
 
 **Status:** Research (July 2026)
-**Companion doc:** [`kotlin-dsl-implementation-plan.md`](kotlin-dsl-implementation-plan.md) — detailed
-implementation plan for the highest-priority item (Kotlin configuration DSL).
+**Companion doc:** [`kotlin-dsl-implementation-plan.md`](kotlin-dsl-implementation-plan.md)
+— detailed implementation plan for the highest-priority item (Kotlin configuration DSL).
 
 This document surveys the modern Android/Kotlin logging ecosystem, identifies the best
 feature of each framework, and maps each one to a concrete way logback-android could
@@ -150,7 +150,7 @@ going into 2026. No action needed beyond the same KMP bridge story as Kermit.
 Legend: ✅ already have (advertise it) · 🟡 partial · ❌ gap.
 
 | # | Feature (seen in) | Status | How logback-android mimics or improves it |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | Lazy message lambdas (kotlin-logging, logcat, Kermit) | ❌ | Inline `Logger.debug { }` extensions in a new `logback-android-ktx` artifact — zero cost when disabled, improves on Timber (no varargs boxing). **Planned: DSL plan §5.** |
 | 2 | Tag/logger auto-inference (Timber, logcat, kotlin-logging) | 🟡 | `logger()` receiver-based factory in `-ktx` (Square's inline approach, no stack-walk — improves on Timber). **Planned: DSL plan §5.** |
 | 3 | Code-based typed configuration (Kermit, XLog builders) | 🟡 | **Kotlin DSL** — typed, IDE-completable, lifecycle-safe; improves on XLog's builders via real object refs and on XML via compile-time checking and no parse cost at startup. **Planned: see companion doc.** |
@@ -187,17 +187,17 @@ Ordered by leverage-per-effort; each phase is independently shippable.
 
 ## 5. Sources
 
-Timber: https://github.com/jakewharton/timber ·
-Kermit: https://github.com/touchlab/Kermit, https://kermit.touchlab.co/docs/crashreporting/ ·
-Napier: https://github.com/AAkira/Napier ·
-kotlin-logging: https://github.com/oshai/kotlin-logging ·
-square/logcat: https://github.com/square/logcat ·
-XLog: https://github.com/elvishew/xLog ·
-orhanobut/logger: https://github.com/orhanobut/logger ·
-OpenTelemetry Android: https://opentelemetry.io/blog/2025/android-road-to-stable/ ·
-Datadog: https://docs.datadoghq.com/logs/log_collection/android/ ·
-Sentry: https://docs.sentry.io/platforms/android/logs/ ·
-Bugfender: https://bugfender.com/platforms/android/ ·
-Chucker: https://github.com/ChuckerTeam/chucker ·
-Hyperion: https://github.com/willowtreeapps/Hyperion-Android ·
-androidx tracing: https://developer.android.com/reference/androidx/tracing/Trace
+Timber: <https://github.com/jakewharton/timber> ·
+Kermit: <https://github.com/touchlab/Kermit>, <https://kermit.touchlab.co/docs/crashreporting/> ·
+Napier: <https://github.com/AAkira/Napier> ·
+kotlin-logging: <https://github.com/oshai/kotlin-logging> ·
+square/logcat: <https://github.com/square/logcat> ·
+XLog: <https://github.com/elvishew/xLog> ·
+orhanobut/logger: <https://github.com/orhanobut/logger> ·
+OpenTelemetry Android: <https://opentelemetry.io/blog/2025/android-road-to-stable/> ·
+Datadog: <https://docs.datadoghq.com/logs/log_collection/android/> ·
+Sentry: <https://docs.sentry.io/platforms/android/logs/> ·
+Bugfender: <https://bugfender.com/platforms/android/> ·
+Chucker: <https://github.com/ChuckerTeam/chucker> ·
+Hyperion: <https://github.com/willowtreeapps/Hyperion-Android> ·
+androidx tracing: <https://developer.android.com/reference/androidx/tracing/Trace>

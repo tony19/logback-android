@@ -64,7 +64,7 @@ Design principles (these resolve most ambiguity during implementation):
 ## 2. Constraints and existing facts (verified against the repo)
 
 | Fact | Where |
-|---|---|
+| --- | --- |
 | Single Gradle module `:logback-android`, all Java | `settings.gradle` |
 | Gradle wrapper 8.1.1, AGP 7.4.2 | `gradle/wrapper/gradle-wrapper.properties`, root `build.gradle:9` |
 | Core module: `minSdkVersion 9`, Java 6 source/target | `logback-android/build.gradle:9-15` |
@@ -174,6 +174,7 @@ apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"
 ```
 
 Notes:
+
 - `minSdkVersion 14` (not 9): the Kotlin stdlib and current tooling do not meaningfully
   support pre-14, and AGP only requires a *consumer's* minSdk to be ≥ the library's, so
   the Java core keeps its minSdk 9 story intact.
@@ -189,7 +190,7 @@ Notes:
 
 Create the source directories:
 
-```
+```text
 logback-android-ktx/src/main/kotlin/com/github/tony19/logback/android/dsl/
 logback-android-ktx/src/test/kotlin/com/github/tony19/logback/android/dsl/
 ```
@@ -200,7 +201,7 @@ inside the `android {}` block.)
 
 ### 0.4 Verify
 
-```
+```bash
 ./gradlew :logback-android-ktx:assembleDebug
 ```
 
@@ -621,7 +622,7 @@ users. Document this in KDoc (done above).
 
 ### 1.9 Verify Phase 1
 
-```
+```bash
 ./gradlew :logback-android-ktx:assembleDebug
 ```
 
@@ -738,7 +739,7 @@ Use `org.junit.rules.TemporaryFolder` (`@get:Rule`) for file paths.
 
 ### Verify
 
-```
+```bash
 ./gradlew :logback-android-ktx:test :logback-android:test
 ```
 
