@@ -21,12 +21,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowEnvironment;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -44,7 +47,38 @@ public class AndroidContextUtilTest {
   @Before
   public void before() {
     ShadowEnvironment.reset();
+    // Ensure no context leaked in from a prior test's setApplicationContext() call
+    AndroidContextUtil.setApplicationContext(null);
     contextUtil = new AndroidContextUtil();
+  }
+
+  @After
+  public void after() {
+    // Reset the static holder so it doesn't leak into other tests
+    AndroidContextUtil.setApplicationContext(null);
+  }
+
+  @Test
+  public void setApplicationContextIsUsedInsteadOfReflectionWorkaround() {
+    android.content.Context appContext = RuntimeEnvironment.getApplication();
+    AndroidContextUtil.setApplicationContext(appContext);
+    assertThat(AndroidContextUtil.getContext(), is(appContext.getApplicationContext()));
+  }
+
+  @Test
+  public void noArgConstructorPicksUpProvidedContext() {
+    android.content.Context appContext = RuntimeEnvironment.getApplication();
+    AndroidContextUtil.setApplicationContext(appContext);
+    // The no-arg constructor resolves its context through getContext(), so it
+    // should observe the externally provided context.
+    assertThat(new AndroidContextUtil().getPackageName(), is(appContext.getPackageName()));
+  }
+
+  @Test
+  public void setApplicationContextNullFallsBackToReflectionWorkaround() {
+    AndroidContextUtil.setApplicationContext(RuntimeEnvironment.getApplication());
+    AndroidContextUtil.setApplicationContext(null);
+    assertThat(AndroidContextUtil.getContext(), is(notNullValue()));
   }
 
   @Test
