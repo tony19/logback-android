@@ -345,15 +345,13 @@ public class ReconfigureOnChangeTaskTest {
         checker.assertIsErrorFree();
 
         int effectiveResets = checker.matchCount(CoreConstants.RESET_MSG_PREFIX);
-        assertEquals(expected, effectiveResets);
 
-
-        // String failMsg = "effective=" + effectiveResets + ", expected=" + expected;
-        //
-        // there might be more effective resets than the expected amount
-        // since the harness may be sleeping while a reset occurs
-        //assertTrue(failMsg, expected <= effectiveResets && (expected + 2) >= effectiveResets);
-
+        // There might be more effective resets than the expected amount since the
+        // harness may be sleeping while a reset occurs. Allow a small tolerance
+        // rather than asserting strict equality, which is timing-sensitive and
+        // flaky (e.g. observed 3 resets where 2 were expected under JDK 17).
+        String failMsg = "effective=" + effectiveResets + ", expected=" + expected;
+        assertTrue(failMsg, expected <= effectiveResets && (expected + 2) >= effectiveResets);
     }
 
     void addInfo(String msg, Object o) {
