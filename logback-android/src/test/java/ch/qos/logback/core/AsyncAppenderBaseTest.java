@@ -290,10 +290,7 @@ public class AsyncAppenderBaseTest {
     asyncAppenderBase.start();
     asyncAppenderBase.stop();
     assertFalse(asyncAppenderBase.worker.isAlive());
-    // NOTE: since JDK 20, the interrupt status of a terminated thread
-    // remains readable, so the worker may report itself interrupted here
-    // even though the interruption never propagated. The swallowing is
-    // verified by the clean stop above (no exception, worker exited).
+    assertFalse(asyncAppenderBase.worker.isInterrupted());
   }
 
   private void verify(ListAppender<Integer> la, int atLeast) {

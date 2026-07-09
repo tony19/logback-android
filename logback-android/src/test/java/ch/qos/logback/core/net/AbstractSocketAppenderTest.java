@@ -32,7 +32,6 @@ import ch.qos.logback.core.util.Duration;
 import ch.qos.logback.core.util.ExecutorServiceUtil;
 
 import org.junit.After;
-import org.junit.Rule;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -63,15 +62,14 @@ import static org.mockito.Mockito.when;
  */
 public class AbstractSocketAppenderTest {
 
-  // socket dispatch is asynchronous and intermittently exceeds verify
-  // windows on slow CI runners; retry instead of losing coverage
-  @Rule
-  public ch.qos.logback.core.testUtil.RetryRule retry = new ch.qos.logback.core.testUtil.RetryRule(3);
-
   /**
    * Timeout used for all blocking operations in multi-threading contexts.
+   * Kept generous so the background connect/dispatch thread has ample time to
+   * run under CI, where Mockito's inline mock maker (default since Mockito 5)
+   * adds per-invocation instrumentation overhead. This is an upper bound for
+   * verify(...) polling, not a fixed sleep, so passing tests stay fast.
    */
-  private static final int TIMEOUT = 5000;  // generous window for async verifies on loaded CI runners
+  private static final int TIMEOUT = 5000;
 
   private ScheduledExecutorService executorService;
   private MockContext mockContext;
@@ -86,7 +84,12 @@ public class AbstractSocketAppenderTest {
 
   @Before
   public void setupValidAppenderWithMockDependencies() throws Exception {
-    executorService = spy(ExecutorServiceUtil.newScheduledExecutorService());
+    // Use the real executor directly rather than a Mockito spy. The spy is
+    // never verified, and wrapping a live thread pool in Mockito's inline mock
+    // maker (default since Mockito 5) can interfere with its worker threads so
+    // that submitted connect tasks intermittently never run, causing flaky
+    // "zero interactions" failures (e.g. closesSocketOnException).
+    executorService = ExecutorServiceUtil.newScheduledExecutorService();
     mockContext = new MockContext(executorService);
     preSerializationTransformer = spy(new StringPreSerializationTransformer());
     socket = mock(Socket.class);
@@ -249,7 +252,14 @@ public class AbstractSocketAppenderTest {
     appender.append("some event");
 
     // then
-    verify(socket, timeout(TIMEOUT).atLeastOnce()).close();
+    // Synchronize on the "connection closed" status message, which the connect
+    // thread logs on the appender immediately after closing the socket, before
+    // verifying the socket mock. Verifying the socket directly with a bare
+    // timeout() races with the background thread and flakily reports zero
+    // interactions under JDK 17 + Mockito's inline mock maker; awaiting the
+    // appender signal first establishes the necessary happens-before ordering.
+    verify(appender, timeout(TIMEOUT).atLeastOnce()).addInfo(contains("connection closed"));
+    verify(socket).close();
   }
 
   @Test
