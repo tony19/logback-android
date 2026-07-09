@@ -48,7 +48,10 @@ public class RetryRule implements TestRule {
                 + ": attempt " + attempt + " of " + maxAttempts + " failed");
           }
         }
-        throw lastFailure;
+        // make the retries visible in the reported failure so CI output
+        // shows whether the rule engaged
+        throw new AssertionError(description.getDisplayName()
+            + " failed on all " + maxAttempts + " attempts; last failure attached", lastFailure);
       }
     };
   }
