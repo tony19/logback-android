@@ -14,17 +14,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # build across both modern LTS JDKs; the published artifacts are
+        # made JDK-specific by their compile targets:
+        #   logback-android      -> Java 11 bytecode, minSdk 26
+        #   logback-android-jdk8 -> Java 8 bytecode, minSdk 21
+        java: [17, 21]
+    name: build (JDK ${{ matrix.java }})
     steps:
       - uses: actions/checkout@v4
 
-      # The build itself runs on a single pinned modern JDK; the published
-      # artifacts are made JDK-specific by their compile targets:
-      #   logback-android      -> Java 11 bytecode, minSdk 26
-      #   logback-android-jdk8 -> Java 8 bytecode, minSdk 21
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: ${{ matrix.java }}
 
       - uses: gradle/actions/setup-gradle@v4
 
@@ -58,5 +63,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: test-reports-jdk${{ matrix.java }}
           path: logback-android/build/reports/
