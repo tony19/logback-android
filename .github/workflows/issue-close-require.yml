@@ -4,14 +4,36 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+permissions:
+  issues: write
+
 jobs:
   close-issues:
     runs-on: ubuntu-latest
     steps:
       - name: need reproduction
-        uses: actions-cool/issues-helper@v3
+        uses: actions/github-script@v8
         with:
-          actions: "close-issues"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          labels: "need reproduction"
-          inactive-day: 3
+          script: |
+            const inactiveDays = 3;
+            const cutoff = new Date(Date.now() - inactiveDays * 24 * 60 * 60 * 1000);
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'need reproduction',
+              per_page: 100,
+            });
+            for (const issue of issues) {
+              if (issue.pull_request) continue;
+              if (new Date(issue.updated_at) < cutoff) {
+                console.log(`Closing #${issue.number} (last updated ${issue.updated_at})`);
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                  state_reason: 'not_planned',
+                });
+              }
+            }
