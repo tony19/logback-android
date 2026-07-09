@@ -1,0 +1,39 @@
+name: Request Copilot Review
+
+# Automatically request a GitHub Copilot code review when a pull request is
+# opened or reopened. Copilot follows the guidance in
+# .github/copilot-instructions.md.
+#
+# Requires "Copilot code review" to be enabled for the repository
+# (Settings > Copilot). If Copilot is unavailable the request step is a no-op
+# and the workflow still succeeds.
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+
+permissions:
+  pull-requests: write
+
+jobs:
+  request-review:
+    runs-on: ubuntu-latest
+    # Skip drafts and PRs from forks (the token cannot request reviewers there).
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Request Copilot review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${REPO}/pulls/${PR}/requested_reviewers" \
+            -f "reviewers[]=copilot-pull-request-reviewer[bot]" \
+            || echo "Copilot review could not be requested (Copilot may be disabled for this repo); continuing."
