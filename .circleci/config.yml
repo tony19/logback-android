@@ -52,9 +52,16 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/code
+      # run the two flavors' suites in separate invocations: with the
+      # configuration cache Gradle parallelizes independent tasks within a
+      # project, and two concurrent test JVMs make the socket/SMTP tests
+      # (random-port mock servers) flaky on small executors
       - run:
-          name: Run Tests
-          command: ./gradlew testJdk11DebugUnitTest testJdk8DebugUnitTest --parallel
+          name: Run Tests (jdk11)
+          command: ./gradlew testJdk11DebugUnitTest
+      - run:
+          name: Run Tests (jdk8)
+          command: ./gradlew testJdk8DebugUnitTest
       - store_artifacts:
           path: logback-android/build/reports
           destination: reports
