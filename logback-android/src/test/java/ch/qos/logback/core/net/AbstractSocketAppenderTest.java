@@ -51,7 +51,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -325,7 +325,7 @@ public class AbstractSocketAppenderTest {
     appender.append("some event");
 
     // then
-    verifyZeroInteractions(deque);
+    verifyNoInteractions(deque);
   }
 
   @Test

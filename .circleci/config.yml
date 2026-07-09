@@ -5,7 +5,7 @@ version: 2.1
 executors:
   android:
     docker:
-      - image: cimg/android:2023.02.1
+      - image: cimg/android:2024.01.1
     working_directory: ~/code
     environment:
       JVM_OPTS: -Xmx3200m
@@ -18,15 +18,15 @@ jobs:
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
       - run:
-          name: Download Dependencies
-          command: ./gradlew androidDependencies
+          name: Install Android SDK platform
+          command: sdkmanager "platforms;android-35"
+      - run:
+          name: Assemble outputs
+          command: ./gradlew assembleDebug assembleRelease --parallel
       - save_cache:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "logback-android/build.gradle" }}
-      - run:
-          name: Assemble outputs
-          command: ./gradlew assembleDebug assembleRelease --parallel
       - persist_to_workspace:
           root: .
           paths:
@@ -44,7 +44,7 @@ jobs:
           name: Lint
           command: ./gradlew lint --parallel
       - store_artifacts:
-          path: logback-android/build/reports/lint-results.html
+          path: logback-android/build/reports
           destination: reports
 
   test:
@@ -54,7 +54,7 @@ jobs:
           at: ~/code
       - run:
           name: Run Tests
-          command: ./gradlew test --parallel
+          command: ./gradlew testJdk11DebugUnitTest testJdk8DebugUnitTest --parallel
       - store_artifacts:
           path: logback-android/build/reports
           destination: reports
@@ -71,7 +71,7 @@ jobs:
           command: git clone https://github.com/tony19-sandbox/logback-test-app.git
       - run:
           name: Copy logback-android to app libs
-          command: mkdir -p logback-test-app/app/libs && cp logback-android/build/outputs/aar/logback-android-release.aar logback-test-app/app/libs/.
+          command: mkdir -p logback-test-app/app/libs && cp logback-android/build/outputs/aar/logback-android-jdk11-release.aar logback-test-app/app/libs/logback-android-release.aar
       - run:
           name: Test app
           command: cd logback-test-app && ./gradlew test
