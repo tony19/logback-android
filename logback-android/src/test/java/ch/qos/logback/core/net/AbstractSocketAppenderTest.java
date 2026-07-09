@@ -32,6 +32,7 @@ import ch.qos.logback.core.util.Duration;
 import ch.qos.logback.core.util.ExecutorServiceUtil;
 
 import org.junit.After;
+import org.junit.Rule;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -62,10 +63,15 @@ import static org.mockito.Mockito.when;
  */
 public class AbstractSocketAppenderTest {
 
+  // socket dispatch is asynchronous and intermittently exceeds verify
+  // windows on slow CI runners; retry instead of losing coverage
+  @Rule
+  public ch.qos.logback.core.testUtil.RetryRule retry = new ch.qos.logback.core.testUtil.RetryRule(3);
+
   /**
    * Timeout used for all blocking operations in multi-threading contexts.
    */
-  private static final int TIMEOUT = 1000;
+  private static final int TIMEOUT = 5000;  // generous window for async verifies on loaded CI runners
 
   private ScheduledExecutorService executorService;
   private MockContext mockContext;

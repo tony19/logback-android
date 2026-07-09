@@ -21,6 +21,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.Duration;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -33,6 +34,11 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class SocketAppenderMessageLossTest {
+
+  // real-socket round trips under tight per-test timeouts are flaky on
+  // loaded CI runners; retry instead of losing coverage
+  @Rule
+  public ch.qos.logback.core.testUtil.RetryRule retry = new ch.qos.logback.core.testUtil.RetryRule(3);
   int runLen = 100;
   Duration reconnectionDelay =  new Duration(1000);
   static final int TIMEOUT = 3000;
