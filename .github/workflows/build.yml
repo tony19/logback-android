@@ -47,8 +47,14 @@ jobs:
       - name: Lint
         run: ./gradlew lint --parallel
 
+      # Run the unit tests serially (single worker) rather than in parallel.
+      # Several socket/async appender tests spin up background daemon threads
+      # and assert on their behavior within a timeout. Running the debug and
+      # release Robolectric suites concurrently oversubscribes the CI runner's
+      # few cores and can starve those background threads past their timeout,
+      # producing flaky failures under JDK 17 + Mockito's inline mock maker.
       - name: Run tests
-        run: ./gradlew test --parallel
+        run: ./gradlew test --max-workers=1
 
       - name: Upload build outputs
         if: always()
