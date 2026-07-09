@@ -120,11 +120,14 @@ jobs:
           echo "slf4j=$(grep '^slf4jVersion=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
 
       # Deploy the build-under-test to the local Maven repo (~/.m2), where
-      # logback-test-app resolves com.github.tony19:logback-android from. Signing
-      # is skipped automatically since CI configures no PGP keys (see
-      # gradle/publish-module.gradle); mavenLocal consumers don't need signatures.
-      - name: Publish logback-android to Maven local
-        run: ./gradlew publishToMavenLocal --no-configuration-cache
+      # logback-test-app resolves com.github.tony19:logback-android from. The
+      # app declares minSdk 23, so it must consume the jdk8 variant (minSdk 21);
+      # publish just that variant under the base coordinate the app references
+      # (see gradle/publish-module.gradle). Signing is skipped automatically
+      # since CI configures no PGP keys; mavenLocal consumers don't need
+      # signatures.
+      - name: Publish logback-android (jdk8 variant) to Maven local
+        run: ./gradlew publishReleaseJdk8PublicationToMavenLocal -PpublishJdk8UnderBaseArtifactId --no-configuration-cache
 
       # Use the tagged release of the test app so the CI flow is reproducible.
       - name: Checkout app code

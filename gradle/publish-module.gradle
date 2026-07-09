@@ -43,10 +43,17 @@ afterEvaluate {
                 pom { configurePom(it) }
             }
 
-            // Legacy JDK build: Java 8 bytecode, minSdk 21
+            // Legacy JDK build: Java 8 bytecode, minSdk 21.
+            // -PpublishJdk8UnderBaseArtifactId publishes this variant under the
+            // base coordinate instead of the '-jdk8' suffix. CI uses it (with
+            // publishReleaseJdk8PublicationToMavenLocal, which skips the jdk11
+            // publication that normally owns the base coordinate) so the
+            // downstream test app (minSdk 23) can consume the build-under-test
+            // without changing its dependency coordinates.
             releaseJdk8(MavenPublication) {
                 groupId PUBLISH_GROUP_ID
-                artifactId "${PUBLISH_ARTIFACT_ID}-jdk8"
+                artifactId project.hasProperty('publishJdk8UnderBaseArtifactId') \
+                        ? PUBLISH_ARTIFACT_ID : "${PUBLISH_ARTIFACT_ID}-jdk8"
                 version PUBLISH_VERSION
 
                 from components.jdk8Release
