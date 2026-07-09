@@ -156,7 +156,10 @@ public class AndroidContextUtilTest {
 
   @Test
   public void getExternalFilesDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getExternalFilesDirectoryPath(), endsWith("/external-files"));
+    // Robolectric emulates the real external-files layout
+    // (<external-storage>/Android/data/<package>), so only check that the
+    // path is rooted in external storage
+    assertThat(contextUtil.getExternalFilesDirectoryPath(), containsString("/external-files"));
   }
 
   @Test

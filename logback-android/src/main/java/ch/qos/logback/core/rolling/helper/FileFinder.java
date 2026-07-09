@@ -15,8 +15,6 @@
  */
 package ch.qos.logback.core.rolling.helper;
 
-import android.text.TextUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +100,7 @@ class FileFinder {
       p = p.replace(REGEX_MARKER_START, "").replace(REGEX_MARKER_END, "");
       if (isRegex) {
         if (!literals.isEmpty()) {
-          parts.add(new LiteralPathPart(TextUtils.join(File.separator, literals)));
+          parts.add(new LiteralPathPart(join(File.separator, literals)));
           literals.clear();
         }
         parts.add(new RegexPathPart(p));
@@ -111,7 +109,7 @@ class FileFinder {
       }
     }
     if (!literals.isEmpty()) {
-      parts.add(new LiteralPathPart(TextUtils.join(File.separator, literals)));
+      parts.add(new LiteralPathPart(join(File.separator, literals)));
     }
     return parts;
   }
@@ -124,10 +122,24 @@ class FileFinder {
           parts[i] = REGEX_MARKER_START + parts[i] + REGEX_MARKER_END;
         }
       }
-      return TextUtils.join(PATTERN_SEPARATOR, parts);
+      return join(PATTERN_SEPARATOR, Arrays.asList(parts));
     } else {
       return REGEX_MARKER_START + pattern + REGEX_MARKER_END;
     }
+  }
+
+  // avoids android.text.TextUtils (keeps this class free of Android
+  // framework calls so it stays testable on a plain JVM) and
+  // String.join (API 26+, above the jdk8 variant's minSdk)
+  private static String join(String delimiter, Iterable<String> parts) {
+    StringBuilder sb = new StringBuilder();
+    for (String p : parts) {
+      if (sb.length() > 0) {
+        sb.append(delimiter);
+      }
+      sb.append(p);
+    }
+    return sb.toString();
   }
 
   static String unescapePath(String path) {

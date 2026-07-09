@@ -30,12 +30,6 @@ jobs:
       - name: Assemble all JDK variants
         run: ./gradlew assembleRelease
 
-      - name: Unit tests (jdk11 variant)
-        run: ./gradlew testJdk11DebugUnitTest
-
-      - name: Unit tests (jdk8 variant)
-        run: ./gradlew testJdk8DebugUnitTest
-
       - name: Verify bytecode targets
         run: |
           set -eux
@@ -48,8 +42,15 @@ jobs:
             test "$major" = "$want"
           }
           # class file major version: Java 11 = 55, Java 8 = 52
+          ls -la logback-android/build/outputs/aar/
           check logback-android/build/outputs/aar/logback-android-jdk11-release.aar 55
           check logback-android/build/outputs/aar/logback-android-jdk8-release.aar 52
+
+      - name: Unit tests (jdk11 variant)
+        run: ./gradlew testJdk11DebugUnitTest
+
+      - name: Unit tests (jdk8 variant)
+        run: ./gradlew testJdk8DebugUnitTest
 
       - name: Upload test reports
         if: failure()
