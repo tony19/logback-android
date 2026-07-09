@@ -1,0 +1,103 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Pin the exact Android SDK components used by the build so CI does not
+      # depend on whatever happens to be preinstalled on the runner image.
+      # These match compileSdkVersion 31 and buildToolsVersion '30.0.3' in
+      # logback-android/build.gradle.
+      - name: Install Android SDK packages
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-31 build-tools;30.0.3'
+
+      - name: Assemble outputs
+        run: ./gradlew assembleDebug assembleRelease --parallel
+
+      - name: Lint
+        run: ./gradlew lint --parallel
+
+      - name: Run tests
+        run: ./gradlew test --parallel
+
+      - name: Upload build outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outputs
+          path: logback-android/build/outputs
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: logback-android/build/reports
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: logback-android/build/test-results
+
+      - name: Upload release AAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: logback-android-release-aar
+          path: logback-android/build/outputs/aar/logback-android-release.aar
+
+  test_app:
+    name: Test App
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Checkout app code
+        run: git clone https://github.com/tony19-sandbox/logback-test-app.git
+
+      - name: Download release AAR
+        uses: actions/download-artifact@v4
+        with:
+          name: logback-android-release-aar
+          path: aar
+
+      - name: Copy logback-android to app libs
+        run: |
+          mkdir -p logback-test-app/app/libs
+          cp aar/logback-android-release.aar logback-test-app/app/libs/.
+
+      - name: Test app
+        run: cd logback-test-app && ./gradlew test
