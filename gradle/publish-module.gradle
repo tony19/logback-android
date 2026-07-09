@@ -78,10 +78,19 @@ afterEvaluate {
 }
 
 signing {
-    useInMemoryPgpKeys(
-            rootProject.ext["signing.keyId"],
-            rootProject.ext["signing.key"],
-            rootProject.ext["signing.password"],
-    )
-    sign publishing.publications
+    def signingKey = rootProject.ext["signing.key"]
+    // Only sign when a signing key is configured (release CI sets SIGNING_KEY).
+    // Without this guard, `sign publishing.publications` attaches unmet `.asc`
+    // artifacts to the publication, so `publishToMavenLocal` fails when no keys
+    // are present. Skipping signing lets the logback-android CI (and local
+    // developers) deploy the build-under-test to mavenLocal for logback-test-app.
+    required { signingKey }
+    if (signingKey) {
+        useInMemoryPgpKeys(
+                rootProject.ext["signing.keyId"],
+                signingKey,
+                rootProject.ext["signing.password"],
+        )
+        sign publishing.publications
+    }
 }
