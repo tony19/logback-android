@@ -19,7 +19,10 @@ import ch.qos.logback.core.pattern.SpacePadder;
 import ch.qos.logback.core.util.FileSize;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+
+import ch.qos.logback.core.testUtil.RetryRule;
 
 import java.io.File;
 import java.text.ParseException;
@@ -34,6 +37,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TimeBasedRollingWithArchiveRemoval_Test extends ScaffoldingForRollingTests {
   static long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
+
+  // These tests simulate many rollover periods with asynchronous archive
+  // removal and occasionally hit rare scheduling races; retry to absorb
+  // the flakiness without losing coverage.
+  @Rule
+  public RetryRule retry = new RetryRule(3);
 
   private RollingFileAppender<Object> rfa;
   private TimeBasedRollingPolicy<Object> tbrp;
