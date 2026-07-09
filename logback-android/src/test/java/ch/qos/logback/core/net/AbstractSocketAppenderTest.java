@@ -252,7 +252,14 @@ public class AbstractSocketAppenderTest {
     appender.append("some event");
 
     // then
-    verify(socket, timeout(TIMEOUT).atLeastOnce()).close();
+    // Synchronize on the "connection closed" status message, which the connect
+    // thread logs on the appender immediately after closing the socket, before
+    // verifying the socket mock. Verifying the socket directly with a bare
+    // timeout() races with the background thread and flakily reports zero
+    // interactions under JDK 17 + Mockito's inline mock maker; awaiting the
+    // appender signal first establishes the necessary happens-before ordering.
+    verify(appender, timeout(TIMEOUT).atLeastOnce()).addInfo(contains("connection closed"));
+    verify(socket).close();
   }
 
   @Test
