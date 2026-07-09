@@ -69,9 +69,11 @@ jobs:
       - run:
           name: Checkout app code
           command: git clone https://github.com/tony19-sandbox/logback-test-app.git
+      # Use the jdk8 variant here: its minSdk 21 floor is closest to the old
+      # single artifact's, so the existing test app can consume it unchanged
       - run:
           name: Copy logback-android to app libs
-          command: mkdir -p logback-test-app/app/libs && cp logback-android/build/outputs/aar/logback-android-jdk11-release.aar logback-test-app/app/libs/logback-android-release.aar
+          command: mkdir -p logback-test-app/app/libs && cp logback-android/build/outputs/aar/logback-android-jdk8-release.aar logback-test-app/app/libs/logback-android-release.aar
       - run:
           name: Test app
           command: cd logback-test-app && ./gradlew test

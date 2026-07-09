@@ -38,7 +38,8 @@ jobs:
             dir=$(mktemp -d)
             unzip -q "$aar" classes.jar -d "$dir"
             unzip -q "$dir/classes.jar" 'ch/qos/logback/classic/Logger.class' -d "$dir"
-            major=$(od -An -j6 -N2 -d "$dir/ch/qos/logback/classic/Logger.class" | tr -d ' ')
+            # class-file major version: low byte of the big-endian u16 at offset 6
+            major=$(od -An -j7 -N1 -tu1 "$dir/ch/qos/logback/classic/Logger.class" | tr -d ' ')
             test "$major" = "$want"
           }
           # class file major version: Java 11 = 55, Java 8 = 52
