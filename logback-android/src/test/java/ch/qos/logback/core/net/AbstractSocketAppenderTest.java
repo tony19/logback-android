@@ -64,8 +64,12 @@ public class AbstractSocketAppenderTest {
 
   /**
    * Timeout used for all blocking operations in multi-threading contexts.
+   * Kept generous so the background connect/dispatch thread has ample time to
+   * run under CI, where Mockito's inline mock maker (default since Mockito 5)
+   * adds per-invocation instrumentation overhead. This is an upper bound for
+   * verify(...) polling, not a fixed sleep, so passing tests stay fast.
    */
-  private static final int TIMEOUT = 1000;
+  private static final int TIMEOUT = 5000;
 
   private ScheduledExecutorService executorService;
   private MockContext mockContext;

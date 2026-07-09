@@ -302,6 +302,14 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> implemen
       }
 
       aai.detachAndStopAllAppenders();
+
+      // Swallow the interruption that stop() may have raised so the worker
+      // terminates in a non-interrupted state. Without this, if stop() interrupts
+      // the worker before it blocks in take() (so no InterruptedException clears
+      // the flag), the thread dies with its interrupt flag still set. Since JDK 14
+      // (JDK-8229516), Thread.isInterrupted() reads a field that persists after
+      // termination, so that residual flag would otherwise remain observable.
+      Thread.interrupted();
     }
   }
 }
