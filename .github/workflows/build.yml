@@ -82,27 +82,52 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # The downstream logback-test-app uses a newer Android Gradle plugin that
-      # requires JDK 17, matching the library build.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # JDK 17: required to build logback-android (see the build job) and by the
+      # newer Android Gradle plugin the downstream logback-test-app uses.
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Checkout app code
-        run: git clone https://github.com/tony19-sandbox/logback-test-app.git
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Download release AAR
-        uses: actions/download-artifact@v4
+      # android-31 / build-tools 30.0.3 build logback-android (matching the build
+      # job); android-36 / build-tools 36.0.0 are what logback-test-app compiles
+      # against (compileSdk 36, buildToolsVersion '36.0.0').
+      - name: Install Android SDK packages
+        uses: android-actions/setup-android@v3
         with:
-          name: logback-android-release-aar
-          path: aar
+          packages: 'platform-tools platforms;android-31 platforms;android-36 build-tools;30.0.3 build-tools;36.0.0'
 
-      - name: Copy logback-android to app libs
+      # Read the versions being tested so logback-test-app can be pointed at the
+      # build-under-test instead of its released default.
+      - name: Read versions under test
+        id: versions
         run: |
-          mkdir -p logback-test-app/app/libs
-          cp aar/logback-android-release.aar logback-test-app/app/libs/.
+          echo "logback=$(grep '^VERSION_NAME=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+          echo "slf4j=$(grep '^slf4jVersion=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
 
+      # Deploy the build-under-test to the local Maven repo (~/.m2), where
+      # logback-test-app resolves com.github.tony19:logback-android from. Signing
+      # is skipped automatically since CI configures no PGP keys (see
+      # gradle/publish-module.gradle); mavenLocal consumers don't need signatures.
+      - name: Publish logback-android to Maven local
+        run: ./gradlew publishToMavenLocal --no-configuration-cache
+
+      # Use the tagged release of the test app so the CI flow is reproducible.
+      - name: Checkout app code
+        run: git clone --branch v0.0.2 --depth 1 https://github.com/tony19-sandbox/logback-test-app.git
+
+      # logback-test-app resolves com.github.tony19:logback-android:${logbackAndroidVersion}
+      # from mavenLocal; override its released default with the build-under-test.
       - name: Test app
-        run: cd logback-test-app && ./gradlew test
+        run: |
+          cd logback-test-app
+          ./gradlew test \
+            -PlogbackAndroidVersion=${{ steps.versions.outputs.logback }} \
+            -Pslf4jVersion=${{ steps.versions.outputs.slf4j }}
