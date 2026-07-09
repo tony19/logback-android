@@ -20,11 +20,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      # JDK 11 is AGP 7.4.2's required baseline. It is also the JDK the unit
+      # tests rely on: the project's Mockito 2.28.2 (ByteBuddy 1.9) cannot mock
+      # JDK internal classes (e.g. ThreadPoolExecutor, ObjectOutputStream) on
+      # JDK 17+, which makes AbstractSocketAppenderTest and others fail with NPEs.
+      - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '11'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -79,11 +83,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up JDK 17
+      - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '11'
 
       - name: Checkout app code
         run: git clone https://github.com/tony19-sandbox/logback-test-app.git
