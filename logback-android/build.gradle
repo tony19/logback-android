@@ -55,7 +55,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.14.1'
     // Mockito 5 uses the inline mock maker by default, which is required to
     // mock final/JDK classes on JDK 17+ (older versions fail with NPEs).
-    testImplementation 'org.mockito:mockito-core:5.14.2'
+    testImplementation 'org.mockito:mockito-core:5.23.0'
     testImplementation 'joda-time:joda-time:2.12.5'
 
     // This dep is required when using Robolectric and targeting pre-21 SDKs.
