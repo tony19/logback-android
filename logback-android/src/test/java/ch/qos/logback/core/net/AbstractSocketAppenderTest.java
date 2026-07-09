@@ -37,13 +37,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -365,7 +364,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockOneSuccessfulSocketConnection();
-    doThrow(new IOException()).when(objectWriter).write(anyObject());
+    doThrow(new IOException()).when(objectWriter).write(any());
     appender.start();
     awaitStartOfEventDispatching();
 
@@ -430,7 +429,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockOneSuccessfulSocketConnection();
-    doThrow(new IOException()).when(objectWriter).write(anyObject());
+    doThrow(new IOException()).when(objectWriter).write(any());
     doReturn(false).when(deque).offerFirst("some event");
     appender.start();
     awaitStartOfEventDispatching();
@@ -448,7 +447,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockTwoSuccessfulSocketConnections();
-    doThrow(new IOException()).when(objectWriter).write(anyObject());
+    doThrow(new IOException()).when(objectWriter).write(any());
     appender.start();
     awaitStartOfEventDispatching();
 
