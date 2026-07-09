@@ -16,6 +16,11 @@ plugins {
   id 'io.github.gradle-nexus.publish-plugin' version '1.3.0'
   id 'maven-publish'
   id 'com.github.hierynomus.license' version '0.16.1'
+  // Automatically retries failed tests. A handful of logback-core's async
+  // appender/rolling tests are timing-sensitive and can flake on CI; retrying
+  // only the failed tests keeps the build stable without masking genuine
+  // failures (a truly broken test fails all attempts).
+  id 'org.gradle.test-retry' version '1.6.2' apply false
 }
 apply from: "${rootDir}/gradle/publish-root.gradle"
 
