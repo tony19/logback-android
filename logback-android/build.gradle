@@ -52,7 +52,7 @@ dependencies {
     }
 
     testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'
-    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
     // Mockito 5 uses the inline mock maker by default, which is required to
     // mock final/JDK classes on JDK 17+ (older versions fail with NPEs).
     testImplementation 'org.mockito:mockito-core:5.14.2'
