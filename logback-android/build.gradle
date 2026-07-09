@@ -89,7 +89,7 @@ dependencies {
     // Mockito 5 uses the inline mock maker by default, which is required to
     // mock final/JDK classes on JDK 17+ (older versions fail with NPEs).
     testImplementation 'org.mockito:mockito-core:5.23.0'
-    testImplementation 'joda-time:joda-time:2.12.5'
+    testImplementation 'joda-time:joda-time:2.14.2'
 
     testImplementation 'com.icegreen:greenmail:2.1.9'
     testImplementation 'dom4j:dom4j:1.6.1'
