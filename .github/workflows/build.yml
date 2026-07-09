@@ -20,6 +20,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Pin the exact Android SDK components used by the build so CI does not
+      # depend on whatever happens to be preinstalled on the runner image.
+      # These match compileSdkVersion 31 and buildToolsVersion '30.0.3' in
+      # logback-android/build.gradle. This runs before the JDK 11 setup below
+      # because the modern sdkmanager requires JDK 17+ to accept licenses; it
+      # therefore uses the runner's preinstalled JDK 17+, while Gradle itself
+      # runs on JDK 11 (set up in the next step).
+      - name: Install Android SDK packages
+        uses: android-actions/setup-android@v3
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+        with:
+          packages: 'platform-tools platforms;android-31 build-tools;30.0.3'
+
       # JDK 11 is AGP 7.4.2's required baseline. It is also the JDK the unit
       # tests rely on: the project's Mockito 2.28.2 (ByteBuddy 1.9) cannot mock
       # JDK internal classes (e.g. ThreadPoolExecutor, ObjectOutputStream) on
@@ -32,15 +46,6 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      # Pin the exact Android SDK components used by the build so CI does not
-      # depend on whatever happens to be preinstalled on the runner image.
-      # These match compileSdkVersion 31 and buildToolsVersion '30.0.3' in
-      # logback-android/build.gradle.
-      - name: Install Android SDK packages
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platform-tools platforms;android-31 build-tools;30.0.3'
 
       - name: Assemble outputs
         run: ./gradlew assembleDebug assembleRelease --parallel
