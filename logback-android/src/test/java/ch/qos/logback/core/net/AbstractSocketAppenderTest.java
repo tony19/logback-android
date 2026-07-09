@@ -84,7 +84,12 @@ public class AbstractSocketAppenderTest {
 
   @Before
   public void setupValidAppenderWithMockDependencies() throws Exception {
-    executorService = spy(ExecutorServiceUtil.newScheduledExecutorService());
+    // Use the real executor directly rather than a Mockito spy. The spy is
+    // never verified, and wrapping a live thread pool in Mockito's inline mock
+    // maker (default since Mockito 5) can interfere with its worker threads so
+    // that submitted connect tasks intermittently never run, causing flaky
+    // "zero interactions" failures (e.g. closesSocketOnException).
+    executorService = ExecutorServiceUtil.newScheduledExecutorService();
     mockContext = new MockContext(executorService);
     preSerializationTransformer = spy(new StringPreSerializationTransformer());
     socket = mock(Socket.class);
