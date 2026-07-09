@@ -107,10 +107,13 @@ jobs:
           path: aar
 
       # Use the jdk8 variant: its minSdk 21 floor is closest to the old
-      # single artifact's, so the existing test app consumes it unchanged
+      # single artifact's, so the existing test app consumes it unchanged.
+      # Remove any logback AARs shipped in the app repo first — a leftover
+      # debug AAR alongside ours trips AGP's unique-namespace validation.
       - name: Copy logback-android to app libs
         run: |
           mkdir -p logback-test-app/app/libs
+          rm -f logback-test-app/app/libs/logback-android-*.aar
           cp aar/logback-android-jdk8-release.aar logback-test-app/app/libs/logback-android-release.aar
 
       - name: Test app
