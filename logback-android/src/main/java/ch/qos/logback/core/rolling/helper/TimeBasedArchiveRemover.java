@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -59,10 +61,44 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
       this.capTotalSize(files);
     }
 
+    Set<String> retainedDirs = this.retainedPeriodDirs(now);
     List<String> emptyDirs = this.findEmptyDirs();
     for (String dir : emptyDirs) {
+      // Never delete a directory belonging to a non-expired period, even if it
+      // currently appears empty. This cleanup runs asynchronously, so a retained
+      // period's directory can be momentarily empty while its active file is being
+      // (re)created or compressed on another thread. Deleting it then races with,
+      // and can destroy, the current period's freshly created directory.
+      if (retainedDirs.contains(new File(dir).getAbsolutePath())) {
+        continue;
+      }
       this.delete(new File(dir));
     }
+  }
+
+  /**
+   * Computes the directories (and their ancestors) of every non-expired period,
+   * i.e. the current period back through {@code maxHistory} periods. These must be
+   * protected from empty-directory removal because their contents may be transiently
+   * absent from disk while files are being created or compressed asynchronously.
+   */
+  private Set<String> retainedPeriodDirs(Date now) {
+    Set<String> dirs = new HashSet<String>();
+    int periodsToKeep = (this.maxHistory == CoreConstants.UNBOUND_HISTORY) ? 0 : this.maxHistory;
+    for (int i = 0; i <= periodsToKeep; i++) {
+      Date periodStart = this.rc.getEndOfNextNthPeriod(now, -i);
+      // convertMultipleArguments (not convert) so patterns that also contain an
+      // integer token (%i, size-and-time based rollover) are handled: each token
+      // consumes only its applicable argument. Only the directory is used, which
+      // is determined by the date token, so the integer value is irrelevant.
+      String path = this.fileNamePattern.convertMultipleArguments(periodStart, Integer.valueOf(0));
+      File dir = new File(path).getParentFile();
+      while (dir != null) {
+        dirs.add(dir.getAbsolutePath());
+        dir = dir.getParentFile();
+      }
+    }
+    return dirs;
   }
 
   private boolean delete(File file) {
