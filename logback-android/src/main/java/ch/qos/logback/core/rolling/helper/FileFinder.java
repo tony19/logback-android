@@ -132,12 +132,17 @@ class FileFinder {
   // framework calls so it stays testable on a plain JVM) and
   // String.join (API 26+, above the jdk8 variant's minSdk)
   private static String join(String delimiter, Iterable<String> parts) {
+    // the delimiter goes between every pair of elements, even empty ones
+    // (a leading "" from splitting an absolute path must yield a leading
+    // delimiter), matching the semantics of android.text.TextUtils#join
     StringBuilder sb = new StringBuilder();
+    boolean first = true;
     for (String p : parts) {
-      if (sb.length() > 0) {
+      if (!first) {
         sb.append(delimiter);
       }
       sb.append(p);
+      first = false;
     }
     return sb.toString();
   }
