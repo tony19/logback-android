@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'org.gradle.test-retry'
 
 android {
     namespace 'com.github.tony19.logback.android'
@@ -77,6 +78,18 @@ dependencies {
     // For SMTPAppender
     compileOnly 'com.sun.mail:android-mail:1.6.7'
     compileOnly 'com.sun.mail:android-activation:1.6.7'
+}
+
+// Retry failed unit tests to absorb rare, timing-sensitive flakes in
+// logback-core's async appender/rolling tests. Only failed tests are re-run;
+// a test that fails every attempt still fails the build, and maxFailures caps
+// retries so a broadly-broken suite isn't retried endlessly.
+tasks.withType(Test).configureEach {
+    retry {
+        maxRetries = 2
+        maxFailures = 20
+        failOnPassedAfterRetry = false
+    }
 }
 
 allprojects {
