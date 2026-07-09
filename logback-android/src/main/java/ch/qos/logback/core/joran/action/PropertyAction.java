@@ -74,7 +74,7 @@ public class PropertyAction extends Action {
         FileInputStream istream = new FileInputStream(file);
         loadAndSetProperties(ec, istream, scope);
       } catch (FileNotFoundException e) {
-        addError("Could not find properties file [" + file + "].", e);
+        addError("Could not find properties file [" + file + "].");
       } catch (IOException e1) {
         addError("Could not read properties file [" + file + "].", e1);
       }

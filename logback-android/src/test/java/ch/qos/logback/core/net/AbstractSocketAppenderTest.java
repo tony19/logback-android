@@ -37,13 +37,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -52,7 +51,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,8 +64,12 @@ public class AbstractSocketAppenderTest {
 
   /**
    * Timeout used for all blocking operations in multi-threading contexts.
+   * Kept generous so the background connect/dispatch thread has ample time to
+   * run under CI, where Mockito's inline mock maker (default since Mockito 5)
+   * adds per-invocation instrumentation overhead. This is an upper bound for
+   * verify(...) polling, not a fixed sleep, so passing tests stay fast.
    */
-  private static final int TIMEOUT = 1000;
+  private static final int TIMEOUT = 5000;
 
   private ScheduledExecutorService executorService;
   private MockContext mockContext;
@@ -81,7 +84,12 @@ public class AbstractSocketAppenderTest {
 
   @Before
   public void setupValidAppenderWithMockDependencies() throws Exception {
-    executorService = spy(ExecutorServiceUtil.newScheduledExecutorService());
+    // Use the real executor directly rather than a Mockito spy. The spy is
+    // never verified, and wrapping a live thread pool in Mockito's inline mock
+    // maker (default since Mockito 5) can interfere with its worker threads so
+    // that submitted connect tasks intermittently never run, causing flaky
+    // "zero interactions" failures (e.g. closesSocketOnException).
+    executorService = ExecutorServiceUtil.newScheduledExecutorService();
     mockContext = new MockContext(executorService);
     preSerializationTransformer = spy(new StringPreSerializationTransformer());
     socket = mock(Socket.class);
@@ -244,7 +252,14 @@ public class AbstractSocketAppenderTest {
     appender.append("some event");
 
     // then
-    verify(socket, timeout(TIMEOUT).atLeastOnce()).close();
+    // Synchronize on the "connection closed" status message, which the connect
+    // thread logs on the appender immediately after closing the socket, before
+    // verifying the socket mock. Verifying the socket directly with a bare
+    // timeout() races with the background thread and flakily reports zero
+    // interactions under JDK 17 + Mockito's inline mock maker; awaiting the
+    // appender signal first establishes the necessary happens-before ordering.
+    verify(appender, timeout(TIMEOUT).atLeastOnce()).addInfo(contains("connection closed"));
+    verify(socket).close();
   }
 
   @Test
@@ -326,7 +341,7 @@ public class AbstractSocketAppenderTest {
     appender.append("some event");
 
     // then
-    verifyZeroInteractions(deque);
+    verifyNoInteractions(deque);
   }
 
   @Test
@@ -365,7 +380,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockOneSuccessfulSocketConnection();
-    doThrow(new IOException()).when(objectWriter).write(anyObject());
+    doThrow(new IOException()).when(objectWriter).write(any());
     appender.start();
     awaitStartOfEventDispatching();
 
@@ -430,7 +445,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockOneSuccessfulSocketConnection();
-    doThrow(new IOException()).when(objectWriter).write(anyObject());
+    doThrow(new IOException()).when(objectWriter).write(any());
     doReturn(false).when(deque).offerFirst("some event");
     appender.start();
     awaitStartOfEventDispatching();
@@ -448,7 +463,7 @@ public class AbstractSocketAppenderTest {
 
     // given
     mockTwoSuccessfulSocketConnections();
-    doThrow(new IOException()).when(objectWriter).write(anyObject());
+    doThrow(new IOException()).when(objectWriter).write(any());
     appender.start();
     awaitStartOfEventDispatching();
 

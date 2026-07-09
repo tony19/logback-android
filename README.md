@@ -1,4 +1,4 @@
-# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) <a href="https://android-arsenal.com/api?level=9"><img alt="API" src="https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat"/></a> [![CircleCI](https://circleci.com/gh/tony19/logback-android/tree/main.svg?style=svg)](https://circleci.com/gh/tony19/logback-android/tree/main) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
+# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) <a href="https://android-arsenal.com/api?level=9"><img alt="API" src="https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat"/></a> [![Build](https://github.com/tony19/logback-android/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/tony19/logback-android/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
 
 ## Overview
 
@@ -86,6 +86,44 @@ See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 7. Open logcat for your device (via the _Android Monitor_ tab in Android Studio).
 8. Click the app menu, and select the menu-option. You should see "hello world" in logcat.
 
+## Providing Android context externally
+
+In order to support various [special properties](https://github.com/tony19/logback-android/wiki#special-properties-for-xml-config) the code requires
+access to an Android [Context](https://developer.android.com/reference/android/content/Context) instance. By default, the framework uses a workaround based
+on reflection that seems to work for the time being. However, in view of Google's [restrictions on non-SDK interfaces](https://developer.android.com/guide/app-compatibility/restrictions-non-sdk-interfaces)
+this code might not work anymore. Therefore, the framework provides a special API that enables the application to provide an Android context instance that
+will be used instead of the workaround. **Note:** the context instance must be provided *before* it is needed by the framework, so the best place for it
+would be in the application's *onCreate* callback:
+
+```java
+public class MyApplication extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Assuming no logging occurs before this
+        AndroidContextUtil.setApplicationContext(this);
+    }
+}
+```
+
+If an earlier initialization is required, then one might consider overriding `attachBaseContext`, although at this stage the context instance might not be
+fully initialized. This might be good enough though if by the time the context is used by the framework it becomes fully initialized.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        AndroidContextUtil.setApplicationContext(base);
+    }
+}
+```
+
+*Note:* despite the fact that the method is called `setApplicationContext` - the user may use *any* `ContextWrapper` component (*Application, Activity, Service*) - the
+framework will actually use the ["pure" application context](https://developer.android.com/reference/android/content/Context#getApplicationContext()).
+
 
 ## Download
 
@@ -127,9 +165,7 @@ The file is output to:
 
 ## Release
 
-1. CD into `./scripts/release`.
-2. Install deps: `npm install`
-3. Make sure `local.properties` contains the following keys, required to sign artifacts and upload to Maven Central:
+1. Make sure `local.properties` contains the following keys, required to sign artifacts and upload to Maven Central:
 
    ```properties
    # output from `gpg --export-secret-keys <PUBKEY_LAST8> | base64`
@@ -148,6 +184,12 @@ The file is output to:
    sonatypeStagingProfileId=b2413418ab44f
    ```
 
-4. Do a dry-run: `npm run start --dry`
-5. If everything looks good, rerun without `--dry`.
-6. Confirm the artifacts were uploaded in https://repo1.maven.org/maven2/com/github/tony19/logback-android/3.0.0/.
+2. Set the release version in `gradle.properties` (drop the `-SNAPSHOT` suffix).
+3. Build, sign, and upload to a Sonatype staging repository:
+
+   ```sh
+   ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+   ```
+
+4. Tag the release and bump `gradle.properties` back to the next `-SNAPSHOT` version.
+5. Confirm the artifacts were uploaded in https://repo1.maven.org/maven2/com/github/tony19/logback-android/3.0.0/.
