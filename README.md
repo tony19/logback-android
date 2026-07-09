@@ -165,9 +165,7 @@ The file is output to:
 
 ## Release
 
-1. CD into `./scripts/release`.
-2. Install deps: `npm install`
-3. Make sure `local.properties` contains the following keys, required to sign artifacts and upload to Maven Central:
+1. Make sure `local.properties` contains the following keys, required to sign artifacts and upload to Maven Central:
 
    ```properties
    # output from `gpg --export-secret-keys <PUBKEY_LAST8> | base64`
@@ -186,6 +184,12 @@ The file is output to:
    sonatypeStagingProfileId=b2413418ab44f
    ```
 
-4. Do a dry-run: `npm run start --dry`
-5. If everything looks good, rerun without `--dry`.
-6. Confirm the artifacts were uploaded in https://repo1.maven.org/maven2/com/github/tony19/logback-android/3.0.0/.
+2. Set the release version in `gradle.properties` (drop the `-SNAPSHOT` suffix).
+3. Build, sign, and upload to a Sonatype staging repository:
+
+   ```sh
+   ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+   ```
+
+4. Tag the release and bump `gradle.properties` back to the next `-SNAPSHOT` version.
+5. Confirm the artifacts were uploaded in https://repo1.maven.org/maven2/com/github/tony19/logback-android/3.0.0/.

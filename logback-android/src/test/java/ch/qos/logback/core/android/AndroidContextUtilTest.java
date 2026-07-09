@@ -156,7 +156,10 @@ public class AndroidContextUtilTest {
 
   @Test
   public void getExternalFilesDirectoryPathIsNotEmpty() {
-    assertThat(contextUtil.getExternalFilesDirectoryPath(), endsWith("/external-files"));
+    // Robolectric 4.14+ returns the real-Android scoped path, which nests the
+    // package dir under the external-files root (.../external-files/Android/data/<pkg>),
+    // so assert the path contains the external-files segment rather than ends with it.
+    assertThat(contextUtil.getExternalFilesDirectoryPath(), containsString("/external-files"));
   }
 
   @Test
