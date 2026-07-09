@@ -121,21 +121,25 @@ public class SyslogAppenderTest {
 
   @Test
   public void tException() throws InterruptedException {
-    setMockServerAndConfigure(21);
-
     String logMsg = "hello";
     String exMsg = "just testing";
     Exception ex = new Exception(exMsg);
+
+    // one syslog message for the log message, one for the exception's
+    // first line, and one per stack frame (the frame count depends on
+    // the JDK and test runner, so compute it instead of hardcoding)
+    int expectedCount = 2 + ex.getStackTrace().length;
+    setMockServerAndConfigure(expectedCount);
+
     logger.debug(logMsg, ex);
     StatusPrinter.print(lc);
 
-    // wait max 2 seconds for mock server to finish. However, it should
+    // wait max 8 seconds for mock server to finish. However, it should
     // much sooner than that.
     mockServer.join(8000);
     assertTrue(mockServer.isFinished());
 
-    // message + 20 lines of stacktrace
-    assertEquals(21, mockServer.getMessageList().size());
+    assertEquals(expectedCount, mockServer.getMessageList().size());
     // int i = 0;
     // for (String line: mockServer.msgList) {
     // System.out.println(i++ + ": " + line);

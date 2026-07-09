@@ -23,6 +23,8 @@ import ch.qos.logback.core.testUtil.NPEAppender;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -177,17 +179,41 @@ public class AsyncAppenderBaseTest {
     statusChecker.assertContainsMatch("Invalid queue size");
   }
 
-  @SuppressWarnings("deprecation")
   @Test
-  public void workerThreadFlushesOnStop() {
+  public void workerThreadFlushesOnStop() throws InterruptedException {
     int loopLen = 5;
     int maxRuntime = (loopLen + 1) * Math.max(1000, delayingListAppender.delay);
-    ListAppender<Integer> la = delayingListAppender;
+
+    // Thread.suspend/resume were removed in modern JDKs, so instead of
+    // suspending the worker thread, block it inside the first append until
+    // the gate opens, letting subsequent events pile up in the queue.
+    final CountDownLatch gate = new CountDownLatch(1);
+    final DelayingListAppender<Integer> la = new DelayingListAppender<Integer>() {
+      @Override
+      public void append(Integer e) {
+        try {
+          gate.await();
+        } catch (InterruptedException ie) {
+          interrupted = true;
+        }
+        super.append(e);
+      }
+    };
+    la.setContext(context);
+    la.setName("list");
+    la.start();
+
     asyncAppenderBase.addAppender(la);
     asyncAppenderBase.setDiscardingThreshold(0);
     asyncAppenderBase.setMaxFlushTime(maxRuntime);
     asyncAppenderBase.start();
-    asyncAppenderBase.worker.suspend();
+
+    // sentinel event: the worker dequeues it and blocks on the gate
+    asyncAppenderBase.doAppend(-1);
+    long deadline = System.currentTimeMillis() + maxRuntime;
+    while (asyncAppenderBase.getNumberOfElementsInQueue() > 0 && System.currentTimeMillis() < deadline) {
+      Thread.sleep(1);
+    }
 
     for (int i = 0; i < loopLen; i++) {
       asyncAppenderBase.doAppend(i);
@@ -195,11 +221,11 @@ public class AsyncAppenderBaseTest {
     assertEquals(loopLen, asyncAppenderBase.getNumberOfElementsInQueue());
     assertEquals(0, la.list.size());
 
-    asyncAppenderBase.worker.resume();
+    gate.countDown();
     asyncAppenderBase.stop();
 
     assertEquals(0, asyncAppenderBase.getNumberOfElementsInQueue());
-    verify(la, loopLen);
+    verify(la, loopLen + 1);
   }
 
   // @SuppressWarnings("deprecation")

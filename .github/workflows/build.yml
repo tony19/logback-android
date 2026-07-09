@@ -10,77 +10,84 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    name: Build
+    name: Build (JDK ${{ matrix.java }})
     runs-on: ubuntu-latest
-    env:
-      JVM_OPTS: -Xmx3200m
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # build across both modern LTS JDKs; the published artifacts are
+        # made JDK-specific by their compile targets:
+        #   logback-android      -> Java 11 bytecode, minSdk 26
+        #   logback-android-jdk8 -> Java 8 bytecode, minSdk 21
+        java: [17, 21]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # JDK 17: required by the modern sdkmanager to accept SDK licenses, and
-      # supported by the test stack (Mockito 5's inline mock maker mocks JDK
-      # internal classes correctly on 17+). AGP 7.4.2 also runs on JDK 17.
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: ${{ matrix.java }}
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Pin the exact Android SDK components used by the build so CI does not
-      # depend on whatever happens to be preinstalled on the runner image.
-      # These match compileSdkVersion 31 and buildToolsVersion '30.0.3' in
-      # logback-android/build.gradle.
-      - name: Install Android SDK packages
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platform-tools platforms;android-31 build-tools;30.0.3'
+      - name: Assemble all JDK variants
+        run: ./gradlew assembleRelease
 
-      - name: Assemble outputs
-        run: ./gradlew assembleDebug assembleRelease --parallel
+      - name: Verify bytecode targets
+        run: |
+          set -eux
+          check() {
+            aar="$1"; want="$2"
+            dir=$(mktemp -d)
+            unzip -q "$aar" classes.jar -d "$dir"
+            unzip -q "$dir/classes.jar" 'ch/qos/logback/classic/Logger.class' -d "$dir"
+            # class-file major version: low byte of the big-endian u16 at offset 6
+            major=$(od -An -j7 -N1 -tu1 "$dir/ch/qos/logback/classic/Logger.class" | tr -d ' ')
+            test "$major" = "$want"
+          }
+          # class file major version: Java 11 = 55, Java 8 = 52
+          ls -la logback-android/build/outputs/aar/
+          check logback-android/build/outputs/aar/logback-android-jdk11-release.aar 55
+          check logback-android/build/outputs/aar/logback-android-jdk8-release.aar 52
 
       - name: Lint
-        run: ./gradlew lint --parallel
+        run: ./gradlew lint
 
-      - name: Run tests
-        run: ./gradlew test --parallel
+      - name: Unit tests (jdk11 variant)
+        run: ./gradlew testJdk11DebugUnitTest
 
-      - name: Upload build outputs
-        if: always()
+      - name: Unit tests (jdk8 variant)
+        run: ./gradlew testJdk8DebugUnitTest
+
+      - name: Upload test reports
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: outputs
-          path: logback-android/build/outputs
+          name: test-reports-jdk${{ matrix.java }}
+          path: logback-android/build/reports/
 
-      - name: Upload reports
-        if: always()
+      - name: Upload release AARs
+        if: matrix.java == 21
         uses: actions/upload-artifact@v4
         with:
-          name: reports
-          path: logback-android/build/reports
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: logback-android/build/test-results
-
-      - name: Upload release AAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: logback-android-release-aar
-          path: logback-android/build/outputs/aar/logback-android-release.aar
+          name: release-aars
+          path: logback-android/build/outputs/aar/
 
   test_app:
     name: Test App
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -96,13 +103,13 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # android-31 / build-tools 30.0.3 build logback-android (matching the build
-      # job); android-36 / build-tools 36.0.0 are what logback-test-app compiles
-      # against (compileSdk 36, buildToolsVersion '36.0.0').
+      # android-35 builds logback-android (matching the build job); android-36 /
+      # build-tools 36.0.0 are what logback-test-app compiles against
+      # (compileSdk 36, buildToolsVersion '36.0.0').
       - name: Install Android SDK packages
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools platforms;android-31 platforms;android-36 build-tools;30.0.3 build-tools;36.0.0'
+          packages: 'platform-tools platforms;android-35 platforms;android-36 build-tools;36.0.0'
 
       # Read the versions being tested so logback-test-app can be pointed at the
       # build-under-test instead of its released default.
@@ -113,11 +120,14 @@ jobs:
           echo "slf4j=$(grep '^slf4jVersion=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
 
       # Deploy the build-under-test to the local Maven repo (~/.m2), where
-      # logback-test-app resolves com.github.tony19:logback-android from. Signing
-      # is skipped automatically since CI configures no PGP keys (see
-      # gradle/publish-module.gradle); mavenLocal consumers don't need signatures.
-      - name: Publish logback-android to Maven local
-        run: ./gradlew publishToMavenLocal --no-configuration-cache
+      # logback-test-app resolves com.github.tony19:logback-android from. The
+      # app declares minSdk 23, so it must consume the jdk8 variant (minSdk 21);
+      # publish just that variant under the base coordinate the app references
+      # (see gradle/publish-module.gradle). Signing is skipped automatically
+      # since CI configures no PGP keys; mavenLocal consumers don't need
+      # signatures.
+      - name: Publish logback-android (jdk8 variant) to Maven local
+        run: ./gradlew publishReleaseJdk8PublicationToMavenLocal -PpublishJdk8UnderBaseArtifactId --no-configuration-cache
 
       # Use the tagged release of the test app so the CI flow is reproducible.
       - name: Checkout app code

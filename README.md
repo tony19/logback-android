@@ -1,4 +1,4 @@
-# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) <a href="https://android-arsenal.com/api?level=9"><img alt="API" src="https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat"/></a> [![Build](https://github.com/tony19/logback-android/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/tony19/logback-android/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
+# logback-android [![GitHub release](https://img.shields.io/github/release/tony19/logback-android.svg?maxAge=2592000)](https://github.com/tony19/logback-android/releases/) <a href="https://android-arsenal.com/api?level=21"><img alt="API" src="https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat"/></a> [![Build](https://github.com/tony19/logback-android/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/tony19/logback-android/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4fc7dae87f034dd181e4228acec33221)](https://www.codacy.com/gh/tony19/logback-android/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tony19/logback-android&amp;utm_campaign=Badge_Grade)
 
 ## Overview
 
@@ -14,6 +14,17 @@
 See [Wiki](https://github.com/tony19/logback-android/wiki) for documentation.
 
 *For `logback-android@1.x`, see the [`1.x` branch](https://github.com/tony19/logback-android/tree/1.x).*
+
+## JDK-specific builds
+
+`logback-android` is published as JDK-specific artifacts instead of a single lowest-common-denominator build:
+
+| Artifact | Bytecode | minSdk |
+|---|---|---|
+| `com.github.tony19:logback-android` | Java 11 | 26 (Android 8.0) |
+| `com.github.tony19:logback-android-jdk8` | Java 8 | 21 (Android 5.0) |
+
+Use `logback-android` unless your app must support devices older than Android 8.0, in which case use `logback-android-jdk8`.
 
 ## Quick Start
 

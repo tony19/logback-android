@@ -3,20 +3,30 @@ apply plugin: 'org.gradle.test-retry'
 
 android {
     namespace 'com.github.tony19.logback.android'
-    compileSdkVersion 31
-    buildToolsVersion '30.0.3'
+    compileSdk = 35
+
+    // JDK-specific builds: each flavor pins a Java bytecode target and the
+    // matching Android runtime floor, published as separate artifacts:
+    //
+    //   jdk11 -> logback-android      (Java 11 bytecode, minSdk 26)
+    //   jdk8  -> logback-android-jdk8 (Java 8 bytecode, minSdk 21)
+    flavorDimensions = ['jdk']
+    productFlavors {
+        jdk11 {
+            dimension = 'jdk'
+            minSdk = 26
+        }
+        jdk8 {
+            dimension = 'jdk'
+            minSdk = 21
+        }
+    }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
-    defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 31
-        versionCode VERSION_CODE.toInteger()
-        versionName VERSION_NAME
-    }
     buildTypes {
         release {
             minifyEnabled false
@@ -26,9 +36,9 @@ android {
             debuggable true
         }
     }
-    lintOptions {
-        checkAllWarnings true
-        lintConfig rootProject.file('gradle/lint.xml')
+    lint {
+        checkAllWarnings = true
+        lintConfig = rootProject.file('gradle/lint.xml')
     }
     testOptions {
         unitTests {
@@ -41,6 +51,29 @@ android {
                     exceptionFormat = 'full'
                 }
             }
+        }
+    }
+    publishing {
+        singleVariant('jdk11Release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
+        singleVariant('jdk8Release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+}
+
+// The published jdk8 classes compile to Java 8 bytecode; everything else
+// (jdk11 variants and all unit tests) compiles at Java 11. This must go
+// through the variant API so it configures *after* AGP applies
+// compileOptions to the compile tasks.
+android.libraryVariants.all { variant ->
+    if (variant.flavorName == 'jdk8') {
+        variant.javaCompileProvider.configure {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
 }
@@ -58,10 +91,6 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.23.0'
     testImplementation 'joda-time:joda-time:2.12.5'
 
-    // This dep is required when using Robolectric and targeting pre-21 SDKs.
-    // Otherwise, tests fail with java.lang.NoClassDefFoundError.
-    // https://github.com/robolectric/robolectric/issues/2562#issuecomment-263086503
-    testImplementation 'org.robolectric:android-all:13-robolectric-9030017'
     testImplementation 'com.icegreen:greenmail:2.1.9'
     testImplementation 'dom4j:dom4j:1.6.1'
     testImplementation "org.slf4j:integration:2.0.0-alpha1" // don't seem to have any stable 2.x releases yet: https://mvnrepository.com/artifact/org.slf4j/integration
@@ -98,7 +127,7 @@ allprojects {
         //options.compilerArgs << '-Xlint:deprecation'
         // Warn about unchecked usages
         options.compilerArgs << '-Xlint:unchecked'
-        // Don't warn about using source/target 1.6 option
+        // Don't warn about using older source/target options
         options.compilerArgs << '-Xlint:-options'
 
         options.debug(['debugLevel': 'source,lines,vars'])
