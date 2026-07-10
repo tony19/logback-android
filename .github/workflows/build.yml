@@ -107,7 +107,7 @@ jobs:
       # build-tools 36.0.0 are what logback-test-app compiles against
       # (compileSdk 36, buildToolsVersion '36.0.0').
       - name: Install Android SDK packages
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-35 platforms;android-36 build-tools;36.0.0'
 
