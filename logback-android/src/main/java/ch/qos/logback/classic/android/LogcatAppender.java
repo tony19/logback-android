@@ -22,6 +22,8 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
+import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
+import ch.qos.logback.core.joran.spi.DefaultClass;
 
 /**
  * An appender that wraps the native Android logging mechanism (<i>logcat</i>);
@@ -44,8 +46,8 @@ public class LogcatAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
    * http://developer.android.com/reference/android/util/Log.html#isLoggable(java.lang.String, int)
    */
   private static final int MAX_TAG_LENGTH = 23;
-  private PatternLayoutEncoder encoder = null;
-  private PatternLayoutEncoder tagEncoder = null;
+  private LayoutWrappingEncoder<ILoggingEvent> encoder = null;
+  private LayoutWrappingEncoder<ILoggingEvent> tagEncoder = null;
   private boolean checkLoggable = false;
 
   /**
@@ -77,15 +79,26 @@ public class LogcatAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
       // prevent stack traces from showing up in the tag
       // (which could lead to very confusing error messages)
       if (layout instanceof PatternLayout) {
-        String pattern = this.tagEncoder.getPattern();
-        if (!pattern.contains("%nopex")) {
-          this.tagEncoder.stop();
-          this.tagEncoder.setPattern(pattern + "%nopex");
-          this.tagEncoder.start();
+        if (this.tagEncoder instanceof PatternLayoutEncoder) {
+          PatternLayoutEncoder tagPatternEncoder = (PatternLayoutEncoder) this.tagEncoder;
+          String pattern = tagPatternEncoder.getPattern();
+          if (!pattern.contains("%nopex")) {
+            // restarting the encoder rebuilds its layout from the new pattern
+            tagPatternEncoder.stop();
+            tagPatternEncoder.setPattern(pattern + "%nopex");
+            tagPatternEncoder.start();
+          }
+          ((PatternLayout) this.tagEncoder.getLayout()).setPostCompileProcessor(null);
+        } else {
+          PatternLayout tagLayout = (PatternLayout) layout;
+          String pattern = tagLayout.getPattern();
+          if (pattern != null && !pattern.contains("%nopex")) {
+            tagLayout.stop();
+            tagLayout.setPostCompileProcessor(null);
+            tagLayout.setPattern(pattern + "%nopex");
+            tagLayout.start();
+          }
         }
-
-        PatternLayout tagLayout = (PatternLayout) layout;
-        tagLayout.setPostCompileProcessor(null);
       }
     }
 
@@ -145,29 +158,32 @@ public class LogcatAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   }
 
   /**
-   * Gets the pattern-layout encoder for this appender's <i>logcat</i> message
+   * Gets the layout-wrapping encoder for this appender's <i>logcat</i> message
    *
-   * @return the pattern-layout encoder
+   * @return the layout-wrapping encoder
    */
-  public PatternLayoutEncoder getEncoder() {
+  public LayoutWrappingEncoder<ILoggingEvent> getEncoder() {
     return this.encoder;
   }
 
   /**
-   * Sets the pattern-layout encoder for this appender's <i>logcat</i> message
+   * Sets the layout-wrapping encoder for this appender's <i>logcat</i> message.
+   * This is a {@link PatternLayoutEncoder} in most configurations, but any
+   * {@link LayoutWrappingEncoder} with a layout is accepted (issue #376).
    *
-   * @param encoder the pattern-layout encoder
+   * @param encoder the layout-wrapping encoder
    */
-  public void setEncoder(PatternLayoutEncoder encoder) {
+  @DefaultClass(PatternLayoutEncoder.class)
+  public void setEncoder(LayoutWrappingEncoder<ILoggingEvent> encoder) {
     this.encoder = encoder;
   }
 
   /**
-   * Gets the pattern-layout encoder for this appender's <i>logcat</i> tag
+   * Gets the layout-wrapping encoder for this appender's <i>logcat</i> tag
    *
-   * @return the pattern encoder
+   * @return the layout-wrapping encoder
    */
-  public PatternLayoutEncoder getTagEncoder() {
+  public LayoutWrappingEncoder<ILoggingEvent> getTagEncoder() {
     return this.tagEncoder;
   }
 
@@ -187,10 +203,12 @@ public class LogcatAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
    * (in this case: <code>f.f.foo.foo.bar.Test</code>).
    *
    * @param encoder
-   *            the pattern-layout encoder; specify {@code null} to
+   *            the layout-wrapping encoder (a {@link PatternLayoutEncoder}
+   *            in most configurations); specify {@code null} to
    *            automatically use the logger's name as the tag
    */
-  public void setTagEncoder(PatternLayoutEncoder encoder) {
+  @DefaultClass(PatternLayoutEncoder.class)
+  public void setTagEncoder(LayoutWrappingEncoder<ILoggingEvent> encoder) {
     this.tagEncoder = encoder;
   }
 
