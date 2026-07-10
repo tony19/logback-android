@@ -779,7 +779,7 @@ fetches the remote schema definition.
                     <xsd:pattern value="($\{.+:-)?[Ii][Nn][Ff][Oo]\}?"/>
                     <xsd:pattern value="($\{.+:-)?[Dd][Ee][Bb][Uu][Gg]\}?"/>
                     <xsd:pattern value="($\{.+:-)?[Tt][Rr][Aa][Cc][Ee]\}?"/>
-                    <xsd:pattern value="\$\{.+\}"/>
+                    <xsd:pattern value="$\{.+\}"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>
