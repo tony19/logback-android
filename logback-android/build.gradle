@@ -5,6 +5,13 @@ android {
     namespace 'com.github.tony19.logback.android'
     compileSdk = 35
 
+    defaultConfig {
+        // packaged into the AAR and applied to consuming apps automatically;
+        // logback-android is configured reflectively (from logback.xml), so
+        // consumers' R8 builds break without these rules (issues #378, #380)
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
     // JDK-specific builds: each flavor pins a Java bytecode target and the
     // matching Android runtime floor, published as separate artifacts:
     //
