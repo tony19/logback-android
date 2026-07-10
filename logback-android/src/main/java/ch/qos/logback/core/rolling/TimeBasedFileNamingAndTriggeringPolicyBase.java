@@ -82,7 +82,12 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
       }
     }
 
-    addInfo("Setting initial period to " + dateInCurrentPeriod);
+    // Date#toString looks up timezone display names through android.icu,
+    // which crashes on devices with corrupted ICU data (issue #373); a
+    // numeric-offset format avoids that lookup entirely
+    addInfo("Setting initial period to "
+            + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z", Locale.US)
+                    .format(dateInCurrentPeriod));
     computeNextCheck();
   }
 
