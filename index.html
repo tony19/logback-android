@@ -1,110 +1,238 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>logback-android</title>
-
-    <link rel="stylesheet" type="text/css" href="css/museo/stylesheet.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
-    <link rel="stylesheet" type="text/css" href="css/tomorrow-night.css">
-
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
-    <script type="text/javascript" src="js/jquery.google-analytics.js"></script>
-    <script type="text/javascript" src="js/custom.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>logback-android — The logging framework for Android</title>
+  <meta name="description" content="logback-android brings the power of logback to Android: a fast, reliable, and flexible logging framework with support for logcat, files, SQLite, sockets, syslog, and email.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/site.js"></script>
 </head>
-
 <body>
-<a href="https://github.com/tony19/logback-android">
-    <img style="position: absolute; top: 0; right: 0; border: 0;"
-         src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
-         alt="Fork me on GitHub"/>
-</a>
 
-<div id="container">
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" rx="5" fill="#2f7d4f"/>
+        <path d="M7 8h10M7 12h7M7 16h4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      logback-android
+    </a>
+    <button class="icon-btn nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="about.html">About</a>
+      <a href="benefits.html">Benefits</a>
+      <a href="docs.html">Docs</a>
+      <a href="editor.html">Config Editor</a>
+      <a class="nav-cta" href="https://github.com/tony19/logback-android">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme"></button>
+    </nav>
+  </div>
+</header>
 
-    <h1><span class="slidein"><a href="https://github.com/tony19/logback-android">logback-android</a></span></h1>
-
-    <div class="description">
-        The reliable, generic, fast and flexible logging framework for Java on Android.
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="badges">
+        <span class="badge">v3.0.0</span>
+        <span class="badge">API 21+</span>
+        <span class="badge">Apache-2.0</span>
+      </div>
+      <h1>Powerful logging for <span class="accent">Android</span></h1>
+      <p class="tagline">
+        logback-android brings the reliable, fast, and flexible
+        <a href="https://logback.qos.ch">logback</a> framework to Android —
+        log to logcat, files, SQLite, sockets, syslog, and email, all from one XML config.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="docs.html">Get Started</a>
+        <a class="btn btn-secondary" href="editor.html">Try the Config Editor</a>
+        <a class="btn btn-secondary" href="https://github.com/tony19/logback-android">View on GitHub</a>
+      </div>
+      <div class="hero-code">
+<pre data-copy><code>dependencies {
+  implementation 'org.slf4j:slf4j-api:2.0.7'
+  implementation 'com.github.tony19:logback-android:3.0.0'
+}</code></pre>
+      </div>
     </div>
+  </section>
 
-    <h2>Quick Start</h2>
-    <ol>
-        <li class="pad">
-            Add <a href="http://repo1.maven.org/maven2/com/github/tony19/logback-android/2.0.0/logback-android-2.0.0.aar">logback-android</a> and <a
-                href="http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar">slf4j-api</a> to your project classpath.
+  <section class="section alt">
+    <div class="container">
+      <h2>Why logback-android?</h2>
+      <p class="lead">A production-grade logging framework built on the proven logback engine, tuned for Android.</p>
+      <div class="grid cols-3">
+        <div class="card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h3>Multiple destinations</h3>
+          <p>Send logs simultaneously to logcat, files, SQLite databases, sockets, syslog, and email — each with its own filters and formats.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3>Declarative XML config</h3>
+          <p>Change logging behavior without touching code. Drop a <code>logback.xml</code> into your assets, or configure programmatically if you prefer.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h3>Fast and lightweight</h3>
+          <p>A lite port of logback that trims server-only baggage, keeping your APK small and your logging overhead low.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h3>Familiar SLF4J API</h3>
+          <p>Write log statements against SLF4J, the de-facto standard Java logging facade. Code that logs on the server logs the same way on Android.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h3>Android-aware</h3>
+          <p>Built-in variables like <code>${DATA_DIR}</code>, <code>${PACKAGE_NAME}</code>, and <code>${VERSION_NAME}</code> resolve at runtime, so configs work across devices and app versions.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Battle-tested</h3>
+          <p>Powered by the same engine trusted in countless JVM deployments for over a decade, maintained and adapted for Android since 2011.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <section class="section">
+    <div class="container">
+      <h2>Quick start</h2>
+      <p class="lead">Three steps to structured, configurable logging in your app.</p>
+      <ol class="steps">
+        <li>
+          <h3>Add the dependencies</h3>
+          <p>In your module's <code>build.gradle</code>:</p>
+<pre data-copy><code>dependencies {
+  implementation 'org.slf4j:slf4j-api:2.0.7'
+  implementation 'com.github.tony19:logback-android:3.0.0'
+}</code></pre>
+          <p>Supporting devices older than Android 8.0? Use the Java 8 artifact
+          <code>logback-android-jdk8</code> instead (minSdk 21).</p>
         </li>
+        <li>
+          <h3>Create <code>app/src/main/assets/logback.xml</code></h3>
+          <p>This minimal config sends everything at <code>DEBUG</code> and above to logcat:</p>
+<pre data-copy><code>&lt;configuration
+  xmlns="https://tony19.github.io/logback-android/xml"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd"
+&gt;
+  &lt;appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender"&gt;
+    &lt;tagEncoder&gt;
+      &lt;pattern&gt;%logger{12}&lt;/pattern&gt;
+    &lt;/tagEncoder&gt;
+    &lt;encoder&gt;
+      &lt;pattern&gt;[%-20thread] %msg&lt;/pattern&gt;
+    &lt;/encoder&gt;
+  &lt;/appender&gt;
 
-        <li class="pad">Configure logback-android using an <a href="https://github.com/tony19/logback-android/wiki#configuration-via-xml">XML file</a> or <a href="https://github.com/tony19/logback-android/wiki#configuration-in-code">in-code statements</a>. Otherwise, logging is silently disabled.</li>
-
-        <li class="pad">
-            <div>
-                <p>
-                  Use slf4j-api in your application to write logging statements as shown in the example below.
-<pre><code data-language="java">package com.example;
-
-import org.slf4j.Logger;
+  &lt;root level="DEBUG"&gt;
+    &lt;appender-ref ref="logcat" /&gt;
+  &lt;/root&gt;
+&lt;/configuration&gt;</code></pre>
+          <p>Or skip the hand-writing — build it visually with the <a href="editor.html">Config Editor</a>.</p>
+        </li>
+        <li>
+          <h3>Log away</h3>
+<pre data-copy><code>import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.os.Bundle;
-import android.app.Activity;
-
 public class MainActivity extends Activity {
+  private static final Logger log =
+      LoggerFactory.getLogger(MainActivity.class);
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-
-    // SLF4J
-    Logger LOG = LoggerFactory.getLogger(MainActivity.class);
-    LOG.info("hello world");
+    log.info("hello world");
   }
-}
-</code></pre>
-                </p>
-            </div>
+}</code></pre>
         </li>
-
-    </ol>
-
-    <h2>Documentation</h2>
-    <ul>
-        <li><a href="http://tony19.github.com/logback-android/doc/2.0.0/">logback-android Javadoc</a></li>
-        <li><a href="http://logback.qos.ch/manual/">logback manual</a></li>
-        <li><a href="http://logback.qos.ch/reasonsToSwitch.html">Why switch from log4j?</a></li>
-        <li><a href="https://github.com/tony19/logback-android/wiki/Changelog">Changelog</a></li>
-        <li><a href="https://github.com/tony19/logback-android/wiki/FAQ">FAQ</a></li>
-    </ul>
-
-    <h2>Download</h2>
-    <ul>
-        <li><code><a href="http://repo1.maven.org/maven2/com/github/tony19/logback-android/2.0.0/logback-android-2.0.0.aar">logback-android-2.0.0.aar</a></code>
-        </li>
-        <li><code><a href="http://search.maven.org/remotecontent?filepath=org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar">slf4j-api-1.7.25.jar</a></code>
-        </li>
-    </ul>
-
-    <p>OR add a Gradle dependency:
-
-<pre><code>dependencies {
-  compile 'org.slf4j:slf4j-api:1.7.25'
-  compile 'com.github.tony19:logback-android:2.0.0'
-}
-</code></pre>
-    </p>
-
-    <h2>License</h2>
-    <p>
-        <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache v2.0</a>
-    </p>
-
-    <div class="footer">
-        get the source code on GitHub : <a href="https://github.com/tony19/logback-android">tony19/logback-android</a>
+      </ol>
     </div>
+  </section>
 
-</div>
+  <section class="section alt">
+    <div class="container">
+      <h2>Build your config visually</h2>
+      <p class="lead">
+        The interactive Config Editor lets you add and remove loggers and appenders, tweak levels,
+        patterns, and rolling policies — and generates a ready-to-use <code>logback.xml</code> as you type.
+      </p>
+      <div class="hero-actions" style="justify-content: flex-start; margin-top: 1.5rem;">
+        <a class="btn btn-primary" href="editor.html">Open the Config Editor</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/tony19/logback-android">GitHub repository</a></li>
+          <li><a href="https://github.com/tony19/logback-android/releases">Releases</a></li>
+          <li><a href="https://github.com/tony19/logback-android/wiki/Changelog">Changelog</a></li>
+          <li><a href="https://github.com/tony19/logback-android/issues">Issue tracker</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Documentation</h4>
+        <ul>
+          <li><a href="docs.html">Getting started</a></li>
+          <li><a href="https://github.com/tony19/logback-android/wiki">Wiki</a></li>
+          <li><a href="doc/2.0.0/">Javadoc</a></li>
+          <li><a href="https://logback.qos.ch/manual/">logback manual</a></li>
+          <li><a href="https://github.com/tony19/logback-android/wiki/FAQ">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="editor.html">Config Editor</a></li>
+          <li><a href="https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd">XML schema (XSD)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Site</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="benefits.html">Benefits</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-note">
+      logback-android is released under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
+      Maintained by <a href="https://github.com/tony19">@tony19</a> and <a href="https://github.com/tony19/logback-android/graphs/contributors">contributors</a>.
+      &copy; <span data-year>2026</span>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>

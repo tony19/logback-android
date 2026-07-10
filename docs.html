@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Docs — logback-android</title>
+  <meta name="description" content="logback-android documentation: installation, configuration, appender reference, special properties, Javadoc, and links to the full wiki.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/site.js"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" rx="5" fill="#2f7d4f"/>
+        <path d="M7 8h10M7 12h7M7 16h4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      logback-android
+    </a>
+    <button class="icon-btn nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="benefits.html">Benefits</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="editor.html">Config Editor</a>
+      <a class="nav-cta" href="https://github.com/tony19/logback-android">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme"></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container page-header">
+    <h1>Documentation</h1>
+    <p>Everything you need to install, configure, and get the most out of logback-android.</p>
+  </div>
+
+  <div class="container prose section" style="padding-top: 1.5rem;">
+
+    <h2 id="install">1. Installation</h2>
+    <p>Add the SLF4J API and logback-android to your module's <code>build.gradle</code>:</p>
+<pre data-copy><code>dependencies {
+  implementation 'org.slf4j:slf4j-api:2.0.7'
+  implementation 'com.github.tony19:logback-android:3.0.0'
+}</code></pre>
+    <p>logback-android is published as JDK-specific artifacts — pick the one that matches your minimum SDK:</p>
+    <div class="table-wrap">
+      <table class="nice">
+        <thead><tr><th>Artifact</th><th>Bytecode</th><th>minSdk</th></tr></thead>
+        <tbody>
+          <tr><td><code>com.github.tony19:logback-android</code></td><td>Java 11</td><td>26 (Android 8.0)</td></tr>
+          <tr><td><code>com.github.tony19:logback-android-jdk8</code></td><td>Java 8</td><td>21 (Android 5.0)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout info">
+      <strong>Unit tests:</strong> if you use logback-android in local unit tests, either run them with
+      Robolectric, or exclude <code>logback-android</code> from the test configuration and substitute
+      <code>ch.qos.logback:logback-classic</code>. See the
+      <a href="https://github.com/tony19/logback-android#quick-start">README</a> for the exact snippet.
+    </div>
+
+    <h2 id="configure">2. Configuration</h2>
+    <p>
+      On startup, logback-android looks for <code>logback.xml</code> in your app's
+      <code>assets</code> directory (<code>app/src/main/assets/logback.xml</code>).
+      If no configuration is found, <strong>logging is silently disabled</strong> — so this file is
+      not optional. A minimal config that logs to logcat:
+    </p>
+<pre data-copy><code>&lt;configuration
+  xmlns="https://tony19.github.io/logback-android/xml"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://tony19.github.io/logback-android/xml https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd"
+&gt;
+  &lt;appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender"&gt;
+    &lt;tagEncoder&gt;
+      &lt;pattern&gt;%logger{12}&lt;/pattern&gt;
+    &lt;/tagEncoder&gt;
+    &lt;encoder&gt;
+      &lt;pattern&gt;[%-20thread] %msg&lt;/pattern&gt;
+    &lt;/encoder&gt;
+  &lt;/appender&gt;
+
+  &lt;root level="DEBUG"&gt;
+    &lt;appender-ref ref="logcat" /&gt;
+  &lt;/root&gt;
+&lt;/configuration&gt;</code></pre>
+    <p>
+      Prefer not to write XML by hand? The <a href="editor.html">Config Editor</a> builds this file
+      for you interactively. Configuration
+      <a href="https://github.com/tony19/logback-android/wiki#configuration-in-code">in code</a> is
+      also supported.
+    </p>
+
+    <h3 id="appenders">Appender reference</h3>
+    <div class="table-wrap">
+      <table class="nice">
+        <thead><tr><th>Appender</th><th>Class</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Logcat</td>
+            <td><code>ch.qos.logback.classic.android.LogcatAppender</code></td>
+            <td>Writes to Android logcat with a configurable tag and message pattern.</td>
+          </tr>
+          <tr>
+            <td>File</td>
+            <td><code>ch.qos.logback.core.FileAppender</code></td>
+            <td>Appends to a single file on the device.</td>
+          </tr>
+          <tr>
+            <td>Rolling file</td>
+            <td><code>ch.qos.logback.core.rolling.RollingFileAppender</code></td>
+            <td>Rotates log files by time and/or size, pruning old files automatically.</td>
+          </tr>
+          <tr>
+            <td>SQLite</td>
+            <td><code>ch.qos.logback.classic.android.SQLiteAppender</code></td>
+            <td>Stores events in a SQLite database with automatic expiry (<code>maxHistory</code>).</td>
+          </tr>
+          <tr>
+            <td>Socket</td>
+            <td><code>ch.qos.logback.classic.net.SocketAppender</code></td>
+            <td>Streams serialized events to a remote log server.</td>
+          </tr>
+          <tr>
+            <td>Syslog</td>
+            <td><code>ch.qos.logback.classic.net.SyslogAppender</code></td>
+            <td>Sends events to a syslog daemon over UDP.</td>
+          </tr>
+          <tr>
+            <td>SMTP (email)</td>
+            <td><code>ch.qos.logback.classic.net.SMTPAppender</code></td>
+            <td>Emails a batch of recent events when an error occurs.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="properties">Special properties</h3>
+    <p>These variables are resolved at runtime and can be used anywhere in your config:</p>
+    <div class="table-wrap">
+      <table class="nice">
+        <thead><tr><th>Property</th><th>Resolves to</th></tr></thead>
+        <tbody>
+          <tr><td><code>${DATA_DIR}</code></td><td>The app's data directory (<code>Context.getFilesDir()</code>)</td></tr>
+          <tr><td><code>${LOG_DIR}</code></td><td>The app's log directory</td></tr>
+          <tr><td><code>${EXT_DIR}</code></td><td>External storage directory (if available)</td></tr>
+          <tr><td><code>${PACKAGE_NAME}</code></td><td>The application package name</td></tr>
+          <tr><td><code>${VERSION_NAME}</code></td><td>The app's version name</td></tr>
+          <tr><td><code>${VERSION_CODE}</code></td><td>The app's version code</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">
+      See <a href="https://github.com/tony19/logback-android/wiki#special-properties-for-xml-config">special
+      properties</a> on the wiki for details.
+    </p>
+
+    <h3 id="context">Providing the Android context</h3>
+    <p>
+      Resolving the special properties requires an Android <code>Context</code>. By default the
+      framework uses a reflection-based workaround, but Google's restrictions on non-SDK interfaces
+      may break it in the future. The recommended approach is to provide the context explicitly,
+      before any logging occurs:
+    </p>
+<pre data-copy><code>public class MyApplication extends Application {
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    // Assuming no logging occurs before this
+    AndroidContextUtil.setApplicationContext(this);
+  }
+}</code></pre>
+
+    <h2 id="reference">3. Reference material</h2>
+    <div class="grid cols-2" style="margin-top: 1rem;">
+      <div class="card">
+        <h3><a href="https://github.com/tony19/logback-android/wiki">Project wiki</a></h3>
+        <p>The full logback-android documentation: XML and in-code configuration, appender options, filters, and recipes.</p>
+      </div>
+      <div class="card">
+        <h3><a href="doc/2.0.0/">Javadoc</a></h3>
+        <p>API documentation for logback-android classes. Older versions are archived under <code>doc/&lt;version&gt;</code>.</p>
+      </div>
+      <div class="card">
+        <h3><a href="https://logback.qos.ch/manual/">logback manual</a></h3>
+        <p>The upstream manual — architecture, pattern layout syntax, filters, and rolling policies all apply to logback-android.</p>
+      </div>
+      <div class="card">
+        <h3><a href="https://github.com/tony19/logback-android/wiki/FAQ">FAQ</a></h3>
+        <p>Answers to common questions: ProGuard/R8 rules, multidex, performance, and troubleshooting.</p>
+      </div>
+      <div class="card">
+        <h3><a href="https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd">XML schema</a></h3>
+        <p>The <code>logback.xsd</code> schema enables IDE validation and autocompletion for your <code>logback.xml</code>.</p>
+      </div>
+      <div class="card">
+        <h3><a href="https://github.com/tony19/logback-android/wiki/Changelog">Changelog</a></h3>
+        <p>What changed in each release, including migration notes for major versions.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/tony19/logback-android">GitHub repository</a></li>
+          <li><a href="https://github.com/tony19/logback-android/releases">Releases</a></li>
+          <li><a href="https://github.com/tony19/logback-android/wiki/Changelog">Changelog</a></li>
+          <li><a href="https://github.com/tony19/logback-android/issues">Issue tracker</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Documentation</h4>
+        <ul>
+          <li><a href="docs.html">Getting started</a></li>
+          <li><a href="https://github.com/tony19/logback-android/wiki">Wiki</a></li>
+          <li><a href="doc/2.0.0/">Javadoc</a></li>
+          <li><a href="https://logback.qos.ch/manual/">logback manual</a></li>
+          <li><a href="https://github.com/tony19/logback-android/wiki/FAQ">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="editor.html">Config Editor</a></li>
+          <li><a href="https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd">XML schema (XSD)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Site</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="benefits.html">Benefits</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-note">
+      logback-android is released under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
+      Maintained by <a href="https://github.com/tony19">@tony19</a> and <a href="https://github.com/tony19/logback-android/graphs/contributors">contributors</a>.
+      &copy; <span data-year>2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
