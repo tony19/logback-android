@@ -38,7 +38,7 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Assemble all JDK variants
         run: ./gradlew assembleRelease
@@ -101,7 +101,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # android-35 builds logback-android (matching the build job); android-36 /
       # build-tools 36.0.0 are what logback-test-app compiles against
