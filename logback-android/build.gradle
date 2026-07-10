@@ -27,10 +27,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    buildFeatures {
+        // Disable build features that are otherwise enabled by default
+        // (moved here from the android.defaults.buildfeatures.* properties,
+        // which were removed in AGP 9)
+        resValues = false
+        shaders = false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             debuggable true
@@ -66,14 +74,23 @@ android {
 }
 
 // The published jdk8 classes compile to Java 8 bytecode; everything else
-// (jdk11 variants and all unit tests) compiles at Java 11. This must go
-// through the variant API so it configures *after* AGP applies
-// compileOptions to the compile tasks.
-android.libraryVariants.all { variant ->
-    if (variant.flavorName == 'jdk8') {
-        variant.javaCompileProvider.configure {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
+// (jdk11 variants and all unit tests) compiles at Java 11. AGP 9 removed the
+// legacy variant API (android.libraryVariants), so match the jdk8 library
+// compile tasks by name instead; test compile tasks are excluded so tests
+// stay at Java 11. AGP applies compileOptions to the tasks from its own
+// afterEvaluate hook, so this override must be registered from a later
+// afterEvaluate to win. If AGP configured javac through options.release
+// (which takes precedence over source/targetCompatibility), override that
+// instead.
+afterEvaluate {
+    tasks.withType(JavaCompile).configureEach {
+        if (name.startsWith('compileJdk8') && !name.contains('Test')) {
+            if (options.release.present) {
+                options.release = 8
+            } else {
+                sourceCompatibility = JavaVersion.VERSION_1_8
+                targetCompatibility = JavaVersion.VERSION_1_8
+            }
         }
     }
 }
@@ -130,7 +147,8 @@ allprojects {
         // Don't warn about using older source/target options
         options.compilerArgs << '-Xlint:-options'
 
-        options.debug(['debugLevel': 'source,lines,vars'])
+        // CompileOptions.debug(Map) was removed in Gradle 9; use debugOptions
+        options.debugOptions.debugLevel = 'source,lines,vars'
         options.debug = VERSION_NAME.contains('SNAPSHOT')
     }
 
