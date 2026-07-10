@@ -76,12 +76,22 @@ android {
 // The published jdk8 classes compile to Java 8 bytecode; everything else
 // (jdk11 variants and all unit tests) compiles at Java 11. AGP 9 removed the
 // legacy variant API (android.libraryVariants), so match the jdk8 library
-// compile tasks by name; configureEach runs after AGP applies compileOptions
-// to the tasks. Test compile tasks are excluded so tests stay at Java 11.
-tasks.withType(JavaCompile).configureEach {
-    if (name.startsWith('compileJdk8') && !name.contains('Test')) {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+// compile tasks by name instead; test compile tasks are excluded so tests
+// stay at Java 11. AGP applies compileOptions to the tasks from its own
+// afterEvaluate hook, so this override must be registered from a later
+// afterEvaluate to win. If AGP configured javac through options.release
+// (which takes precedence over source/targetCompatibility), override that
+// instead.
+afterEvaluate {
+    tasks.withType(JavaCompile).configureEach {
+        if (name.startsWith('compileJdk8') && !name.contains('Test')) {
+            if (options.release.present) {
+                options.release = 8
+            } else {
+                sourceCompatibility = JavaVersion.VERSION_1_8
+                targetCompatibility = JavaVersion.VERSION_1_8
+            }
+        }
     }
 }
 
