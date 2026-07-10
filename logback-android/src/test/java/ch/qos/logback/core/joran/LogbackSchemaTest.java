@@ -15,6 +15,7 @@
  */
 package ch.qos.logback.core.joran;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -64,6 +65,8 @@ public class LogbackSchemaTest {
   public void schemaCompiles() throws Exception {
     Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
         .newSchema(new StreamSource(schemaFile));
+    assertNotNull("schema failed to compile", schema);
+
     // validate a representative config, including a property reference as a
     // level value, which is what the pattern facets on line ~782 exist for
     String config =
