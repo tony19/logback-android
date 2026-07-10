@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Docs — logback-android</title>
-  <meta name="description" content="logback-android documentation: installation, configuration, appender reference, special properties, Javadoc, and links to the full wiki.">
+  <meta name="description" content="logback-android documentation: installation, configuration, appender reference, special properties, and Javadoc.">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/site.css">
   <script src="assets/js/site.js"></script>
@@ -96,9 +96,7 @@
 &lt;/configuration&gt;</code></pre>
     <p>
       Prefer not to write XML by hand? The <a href="editor.html">Config Editor</a> builds this file
-      for you interactively. Configuration
-      <a href="https://github.com/tony19/logback-android/wiki#configuration-in-code">in code</a> is
-      also supported.
+      for you interactively. Programmatic (in-code) configuration is also supported.
     </p>
 
     <h3 id="appenders">Appender reference</h3>
@@ -160,11 +158,6 @@
         </tbody>
       </table>
     </div>
-    <p class="muted">
-      See <a href="https://github.com/tony19/logback-android/wiki#special-properties-for-xml-config">special
-      properties</a> on the wiki for details.
-    </p>
-
     <h3 id="context">Providing the Android context</h3>
     <p>
       Resolving the special properties requires an Android <code>Context</code>. By default the
@@ -184,8 +177,8 @@
     <h2 id="reference">3. Reference material</h2>
     <div class="grid cols-2" style="margin-top: 1rem;">
       <div class="card">
-        <h3><a href="https://github.com/tony19/logback-android/wiki">Project wiki</a></h3>
-        <p>The full logback-android documentation: XML and in-code configuration, appender options, filters, and recipes.</p>
+        <h3><a href="https://github.com/tony19/logback-android#readme">README</a></h3>
+        <p>The repository README: quick start, JDK-specific artifacts, unit-test setup, and providing the Android context.</p>
       </div>
       <div class="card">
         <h3><a href="doc/2.0.0/">Javadoc</a></h3>
@@ -196,16 +189,16 @@
         <p>The upstream manual — architecture, pattern layout syntax, filters, and rolling policies all apply to logback-android.</p>
       </div>
       <div class="card">
-        <h3><a href="https://github.com/tony19/logback-android/wiki/FAQ">FAQ</a></h3>
-        <p>Answers to common questions: ProGuard/R8 rules, multidex, performance, and troubleshooting.</p>
+        <h3><a href="https://github.com/tony19/logback-android/issues">Issue tracker</a></h3>
+        <p>Search existing questions and answers, report bugs, or request features.</p>
       </div>
       <div class="card">
         <h3><a href="https://cdn.jsdelivr.net/gh/tony19/logback-android/logback.xsd">XML schema</a></h3>
         <p>The <code>logback.xsd</code> schema enables IDE validation and autocompletion for your <code>logback.xml</code>.</p>
       </div>
       <div class="card">
-        <h3><a href="https://github.com/tony19/logback-android/wiki/Changelog">Changelog</a></h3>
-        <p>What changed in each release, including migration notes for major versions.</p>
+        <h3><a href="https://github.com/tony19/logback-android/releases">Releases</a></h3>
+        <p>Release notes for each version, including what changed and migration notes.</p>
       </div>
     </div>
   </div>
@@ -219,7 +212,6 @@
         <ul>
           <li><a href="https://github.com/tony19/logback-android">GitHub repository</a></li>
           <li><a href="https://github.com/tony19/logback-android/releases">Releases</a></li>
-          <li><a href="https://github.com/tony19/logback-android/wiki/Changelog">Changelog</a></li>
           <li><a href="https://github.com/tony19/logback-android/issues">Issue tracker</a></li>
         </ul>
       </div>
@@ -227,10 +219,9 @@
         <h4>Documentation</h4>
         <ul>
           <li><a href="docs.html">Getting started</a></li>
-          <li><a href="https://github.com/tony19/logback-android/wiki">Wiki</a></li>
+          <li><a href="https://github.com/tony19/logback-android#readme">README</a></li>
           <li><a href="doc/2.0.0/">Javadoc</a></li>
           <li><a href="https://logback.qos.ch/manual/">logback manual</a></li>
-          <li><a href="https://github.com/tony19/logback-android/wiki/FAQ">FAQ</a></li>
         </ul>
       </div>
       <div class="footer-col">
