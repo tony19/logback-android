@@ -126,7 +126,11 @@ dependencies {
     }
     testImplementation project(path: ':logback-android')
 
-    compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
+    // 'api' so slf4j-api appears as a compile-scope dependency in the
+    // published POM; consumers previously had to add it by hand and got
+    // NoClassDefFoundError (SLF4JServiceProvider) when a transitive
+    // slf4j-api 1.x won dependency resolution instead (issue #359)
+    api "org.slf4j:slf4j-api:${slf4jVersion}"
 
     // For SMTPAppender
     compileOnly 'com.sun.mail:android-mail:1.6.8'

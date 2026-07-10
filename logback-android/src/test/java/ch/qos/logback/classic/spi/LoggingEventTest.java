@@ -34,6 +34,18 @@ public class LoggingEventTest {
   }
 
 
+  // Issue #365: getMarkerList is logback-classic's name for getMarkers
+  @Test
+  public void markerListIsSynonymForMarkers() {
+    LoggingEvent event = new LoggingEvent("", logger, Level.INFO, "msg", null, null);
+    org.slf4j.Marker marker = org.slf4j.MarkerFactory.getMarker("EVENT_365");
+    event.setMarkers(java.util.Collections.singletonList(marker));
+
+    assertEquals(event.getMarkers(), event.getMarkerList());
+    assertEquals(1, event.getMarkerList().size());
+    assertEquals(marker, event.getMarkerList().get(0));
+  }
+
   @Test
   public void testFormattingOneArg() {
     String message = "x={}";

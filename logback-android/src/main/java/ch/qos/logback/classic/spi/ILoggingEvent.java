@@ -73,6 +73,19 @@ public interface ILoggingEvent extends DeferredProcessingAware {
   List<Marker> getMarkers();
 
   /**
+   * Synonym for {@link #getMarkers()}, matching the method name used by
+   * logback-classic 1.3+ so that code shared between logback-android and
+   * logback-classic (e.g. custom encoders exercised by JVM unit tests
+   * that substitute logback-classic) compiles and runs against both
+   * (issue #365).
+   *
+   * @return the markers associated with this event
+   */
+  default List<Marker> getMarkerList() {
+    return getMarkers();
+  }
+
+  /**
    * @return the MDC map. The returned value can be an empty map but not null.
    */
   Map<String, String> getMDCPropertyMap();

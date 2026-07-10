@@ -26,13 +26,17 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowLog;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
+import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
+import ch.qos.logback.core.joran.spi.JoranException;
 
 /**
  * Tests the {@link LogcatAppender} class
@@ -103,7 +107,7 @@ public class LogcatAppenderTest {
   private void setTagPattern(String tag, boolean checkLoggable) {
     logcatAppender.stop();
     logcatAppender.setCheckLoggable(checkLoggable);
-    logcatAppender.getTagEncoder().setPattern(tag);
+    ((PatternLayoutEncoder) logcatAppender.getTagEncoder()).setPattern(tag);
     logcatAppender.start();
   }
 
@@ -182,5 +186,64 @@ public class LogcatAppenderTest {
     ShadowLog.reset();
     context.getLogger(LOGGER_NAME).debug("msg", new NullPointerException());
     assertLogcatContains(Log.DEBUG, NullPointerException.class.getName());
+  }
+
+  /**
+   * Issue #376
+   */
+  @Test
+  public void supportsLayoutWrappingEncoder() throws JoranException {
+    String config =
+        "<configuration>" +
+        "  <appender name='logcat' class='ch.qos.logback.classic.android.LogcatAppender'>" +
+        "    <encoder class='ch.qos.logback.core.encoder.LayoutWrappingEncoder'>" +
+        "      <layout class='ch.qos.logback.classic.PatternLayout'>" +
+        "        <pattern>wrapped: %msg</pattern>" +
+        "      </layout>" +
+        "    </encoder>" +
+        "  </appender>" +
+        "  <root level='DEBUG'><appender-ref ref='logcat'/></root>" +
+        "</configuration>";
+    LogcatAppender appender = configureFromXml(config);
+
+    assertThat(appender.isStarted(), is(true));
+    assertThat(appender.getEncoder(), is(instanceOf(LayoutWrappingEncoder.class)));
+
+    LoggingEvent event = new LoggingEvent();
+    event.setMessage("hello");
+    assertThat(appender.getEncoder().getLayout().doLayout(event), is("wrapped: hello"));
+  }
+
+  /**
+   * Issue #376: an encoder element without a class attribute must still
+   * default to PatternLayoutEncoder
+   */
+  @Test
+  public void defaultEncoderTypeIsPatternLayoutEncoder() throws JoranException {
+    String config =
+        "<configuration>" +
+        "  <appender name='logcat' class='ch.qos.logback.classic.android.LogcatAppender'>" +
+        "    <encoder><pattern>%msg</pattern></encoder>" +
+        "    <tagEncoder><pattern>tag</pattern></tagEncoder>" +
+        "  </appender>" +
+        "  <root level='DEBUG'><appender-ref ref='logcat'/></root>" +
+        "</configuration>";
+    LogcatAppender appender = configureFromXml(config);
+
+    assertThat(appender.isStarted(), is(true));
+    assertThat(appender.getEncoder(), is(instanceOf(PatternLayoutEncoder.class)));
+    assertThat(appender.getTagEncoder(), is(instanceOf(PatternLayoutEncoder.class)));
+  }
+
+  private LogcatAppender configureFromXml(String config) throws JoranException {
+    LoggerContext ctx = new LoggerContext();
+    JoranConfigurator configurator = new JoranConfigurator();
+    configurator.setContext(ctx);
+    configurator.doConfigure(new ByteArrayInputStream(config.getBytes()));
+
+    LogcatAppender appender = (LogcatAppender) ctx
+        .getLogger(Logger.ROOT_LOGGER_NAME).getAppender("logcat");
+    assertThat(appender, is(notNullValue()));
+    return appender;
   }
 }
