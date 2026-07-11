@@ -59,6 +59,8 @@ import static org.hamcrest.Matchers.is;
 @RunWith(RobolectricTestRunner.class)
 public class Issue383StrictModeTest {
 
+  private FilesDirCountingContext trackingContext;
+
   /**
    * Wraps the real application context and counts every {@link #getFilesDir()}
    * call. On a real device with StrictMode's {@code detectDiskReads()}, each of
@@ -86,8 +88,6 @@ public class Issue383StrictModeTest {
       return super.getFilesDir();
     }
   }
-
-  private FilesDirCountingContext trackingContext;
 
   @Before
   public void setUp() {
