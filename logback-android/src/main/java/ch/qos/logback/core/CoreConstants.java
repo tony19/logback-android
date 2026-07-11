@@ -179,6 +179,25 @@ public class CoreConstants {
   public static final String EXT_DIR_KEY = "EXT_DIR";
 
   /**
+   * The key under which the application's external files directory
+   * (i.e. {@code Context#getExternalFilesDir(null)}) is registered in the
+   * logger context. Unlike {@link #EXT_DIR_KEY}, this value does not depend
+   * on the Android version. The value is typically something like:
+   * "/storage/emulated/0/Android/data/com.example/files" and is absent when
+   * external storage is unavailable.
+   */
+  public static final String EXT_FILES_DIR_KEY = "EXT_FILES_DIR";
+
+  /**
+   * The key under which the application's external cache directory
+   * (i.e. {@code Context#getExternalCacheDir()}) is registered in the
+   * logger context. The value is typically something like:
+   * "/storage/emulated/0/Android/data/com.example/cache" and is absent when
+   * external storage is unavailable.
+   */
+  public static final String EXT_CACHE_DIR_KEY = "EXT_CACHE_DIR";
+
+  /**
    * The key under which the application package name is registered
    * in the logger context.
    */

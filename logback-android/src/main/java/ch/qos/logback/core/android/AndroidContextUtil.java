@@ -52,6 +52,8 @@ public class AndroidContextUtil {
   public static boolean containsProperties(String value) {
     return value.contains(CoreConstants.DATA_DIR_KEY)
             || value.contains(CoreConstants.EXT_DIR_KEY)
+            || value.contains(CoreConstants.EXT_FILES_DIR_KEY)
+            || value.contains(CoreConstants.EXT_CACHE_DIR_KEY)
             || value.contains(CoreConstants.PACKAGE_NAME_KEY)
             || value.contains(CoreConstants.VERSION_CODE_KEY)
             || value.contains(CoreConstants.VERSION_NAME_KEY);
@@ -67,6 +69,16 @@ public class AndroidContextUtil {
     final String extDir = getMountedExternalStorageDirectoryPath();
     if (extDir != null) {
       context.putProperty(CoreConstants.EXT_DIR_KEY, extDir);
+    }
+    // Android-version-independent paths to the app-specific external
+    // directories, writable without permissions on API 19+ (issue #181)
+    final String extFilesDir = getExternalFilesDirectoryPath();
+    if (extFilesDir != null && !extFilesDir.isEmpty()) {
+      context.putProperty(CoreConstants.EXT_FILES_DIR_KEY, extFilesDir);
+    }
+    final String extCacheDir = getExternalCacheDirectoryPath();
+    if (extCacheDir != null && !extCacheDir.isEmpty()) {
+      context.putProperty(CoreConstants.EXT_CACHE_DIR_KEY, extCacheDir);
     }
     context.putProperty(CoreConstants.PACKAGE_NAME_KEY, getPackageName());
     context.putProperty(CoreConstants.VERSION_CODE_KEY, getVersionCode());
