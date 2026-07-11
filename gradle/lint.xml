@@ -2,8 +2,8 @@
 <lint>
     <issue id="OldTargetApi" severity="ignore" />
     <issue id="PrivateApi">
-        <ignore path="*/SystemPropertiesProxy.java" />
-        <ignore path="*/AndroidContextUtil.java" />
+        <ignore path="*/SystemPropertiesProxy.kt" />
+        <ignore path="*/AndroidContextUtil.kt" />
     </issue>
     <issue id="TrulyRandom">
         <ignore path="*/SecureRandomFactoryBean.java" />
