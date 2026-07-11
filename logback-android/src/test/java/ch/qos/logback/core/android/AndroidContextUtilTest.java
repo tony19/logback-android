@@ -220,6 +220,29 @@ public class AndroidContextUtilTest {
     assertThat(loggerContext.getProperty(CoreConstants.EXT_CACHE_DIR_KEY), is(contextUtil.getExternalCacheDirectoryPath()));
   }
 
+  // Issue #228
+  @Test
+  public void createAppExternalStorageDirsCreatesMissingDirs() {
+    android.content.Context appContext = RuntimeEnvironment.getApplication();
+    java.io.File extFilesDir = appContext.getExternalFilesDir(null);
+    java.io.File extCacheDir = appContext.getExternalCacheDir();
+
+    assertThat(extFilesDir.delete(), is(true));
+    assertThat(extCacheDir.delete(), is(true));
+
+    contextUtil.createAppExternalStorageDirs();
+
+    assertThat(extFilesDir.exists(), is(true));
+    assertThat(extCacheDir.exists(), is(true));
+  }
+
+  // Issue #228
+  @Test
+  public void createAppExternalStorageDirsIsNoopWithoutContext() {
+    // must not throw
+    new AndroidContextUtil(null).createAppExternalStorageDirs();
+  }
+
   // Issue #181
   @Test
   public void containsPropertiesDetectsExternalDirKeys() {
