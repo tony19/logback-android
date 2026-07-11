@@ -20,7 +20,7 @@ plugins {
   // appender/rolling tests are timing-sensitive and can flake on CI; retrying
   // only the failed tests keeps the build stable without masking genuine
   // failures (a truly broken test fails all attempts).
-  id 'org.gradle.test-retry' version '1.6.2' apply false
+  id 'org.gradle.test-retry' version '1.6.5' apply false
 }
 apply from: "${rootDir}/gradle/publish-root.gradle"
 
