@@ -131,7 +131,16 @@ public class AndroidContextUtil {
    */
   public String getMountedExternalStorageDirectoryPath() {
     String path = null;
-    String state = Environment.getExternalStorageState();
+    String state;
+    try {
+      state = Environment.getExternalStorageState();
+    } catch (RuntimeException e) {
+      // Environment.getExternalStorageState throws
+      // ArrayIndexOutOfBoundsException in processes without an external
+      // storage volume, e.g. shell-context tools started via app_process
+      // (issue #315); treat it the same as "not mounted"
+      return null;
+    }
     if (Environment.MEDIA_MOUNTED.equals(state) ||
         Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
       path = getExternalStorageDirectoryPath();
