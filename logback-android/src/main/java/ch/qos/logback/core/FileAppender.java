@@ -56,6 +56,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   private boolean prudent = false;
   private boolean initialized = false;
   private boolean lazyInit = false;
+  private boolean syncOnFlush = false;
 
   private FileSize bufferSize = new FileSize(DEFAULT_BUFFER_SIZE);
 
@@ -223,6 +224,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
       ResilientFileOutputStream resilientFos = new ResilientFileOutputStream(file, append, bufferSize.getSize());
       resilientFos.setContext(context);
+      resilientFos.setSyncOnFlush(syncOnFlush);
       setOutputStream(resilientFos);
       successful = true;
     } finally {
@@ -277,6 +279,30 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
   public void setBufferSize(FileSize bufferSize) {
     addInfo("Setting bufferSize to ["+bufferSize.toString()+"]");
     this.bufferSize = bufferSize;
+  }
+
+  /**
+   * @see #setSyncOnFlush(boolean)
+   *
+   * @return true if every flush also syncs the file descriptor
+   */
+  public boolean isSyncOnFlush() {
+    return syncOnFlush;
+  }
+
+  /**
+   * When true, every flush of the log stream also forces the bytes down to
+   * the storage device (fsync). Combined with the default
+   * {@code immediateFlush}, each event is durable against an abrupt
+   * power-off — not just against the process being killed, which an
+   * ordinary flush already survives — at the cost of a slower write per
+   * event (issue #371). Consider wrapping the appender in an
+   * {@code AsyncAppender} if the extra latency matters. Defaults to false.
+   *
+   * @param syncOnFlush true to fsync on every flush
+   */
+  public void setSyncOnFlush(boolean syncOnFlush) {
+    this.syncOnFlush = syncOnFlush;
   }
 
   private void safeWrite(E event) throws IOException {

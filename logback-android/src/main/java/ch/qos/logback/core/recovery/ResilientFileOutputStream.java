@@ -22,6 +22,7 @@ public class ResilientFileOutputStream extends ResilientOutputStreamBase {
 
   private File file;
   private FileOutputStream fos;
+  private boolean syncOnFlush;
 
 
   public ResilientFileOutputStream(File file, boolean append, long bufferSize) throws FileNotFoundException {
@@ -29,6 +30,36 @@ public class ResilientFileOutputStream extends ResilientOutputStreamBase {
     fos = new FileOutputStream(file, append);
     this.os = new BufferedOutputStream(fos, (int) bufferSize);
     this.presumedClean = true;
+  }
+
+  /**
+   * Sets whether each {@link #flush()} also forces the file descriptor to
+   * sync to the storage device (fsync), so already-flushed bytes survive an
+   * abrupt power-off and not just a process kill.
+   *
+   * @param syncOnFlush true to fsync on every flush
+   */
+  public void setSyncOnFlush(boolean syncOnFlush) {
+    this.syncOnFlush = syncOnFlush;
+  }
+
+  @Override
+  public void flush() {
+    super.flush();
+    if (syncOnFlush && fos != null) {
+      try {
+        fos.getFD().sync();
+      } catch (IOException e) {
+        postIOFailure(e);
+      }
+    }
+  }
+
+  @Override
+  public void close() throws IOException {
+    // flush (and fsync, if enabled) anything still buffered before closing
+    flush();
+    super.close();
   }
 
   public FileChannel getChannel() {

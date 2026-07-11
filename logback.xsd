@@ -436,6 +436,12 @@ fetches the remote schema definition.
                     <xsd:appinfo><markdown>FileAppender</markdown></xsd:appinfo>
                 </xsd:annotation>
             </xsd:element>
+            <xsd:element name="syncOnFlush" minOccurs="0" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>Sync the file descriptor to the storage device on every flush, making flushed log events durable against abrupt power-off at the cost of slower writes (<code>FileAppender</code>)</xsd:documentation>
+                    <xsd:appinfo><markdown>FileAppender</markdown></xsd:appinfo>
+                </xsd:annotation>
+            </xsd:element>
             <xsd:element name="layout" minOccurs="0" type="Layout">
                 <xsd:annotation>
                     <xsd:documentation>Log event serialization layout</xsd:documentation>

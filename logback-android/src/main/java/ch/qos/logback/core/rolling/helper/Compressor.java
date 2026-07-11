@@ -44,6 +44,17 @@ public class Compressor extends ContextAwareBase {
 
   static final int BUFFER_SIZE = 8192;
 
+  // Compression streams into "<target><TMP_SUFFIX>" and atomically renames to
+  // the final archive name only after a fully successful write, so an app
+  // killed mid-compression can never leave a malformed archive behind
+  // (issue #369)
+  static final String TMP_SUFFIX = ".tmp";
+
+  // a temp file untouched for this long cannot belong to an in-flight
+  // compression (which writes continuously), so it's a leftover from an
+  // interrupted rollover and safe to sweep
+  static final long STALE_TMP_AGE_MS = 30 * 60 * 1000;
+
   public Compressor(CompressionMode compressionMode) {
     this.compressionMode = compressionMode;
   }
@@ -97,12 +108,15 @@ public class Compressor extends ContextAwareBase {
 
     addInfo("ZIP compressing [" + file2zip + "] as ["+zippedFile+"]");
     createMissingTargetDirsIfNecessary(zippedFile);
+    deleteStaleTempFiles(zippedFile);
 
+    File tmpFile = new File(nameOfZippedFile + TMP_SUFFIX);
+    boolean streamed = false;
     BufferedInputStream bis = null;
     ZipOutputStream zos = null;
     try {
       bis = new BufferedInputStream(new FileInputStream(nameOfFile2zip));
-      zos = new ZipOutputStream(new FileOutputStream(nameOfZippedFile));
+      zos = new ZipOutputStream(new FileOutputStream(tmpFile));
 
       ZipEntry zipEntry = computeZipEntry(innerEntryName);
       zos.putNextEntry(zipEntry);
@@ -114,31 +128,22 @@ public class Compressor extends ContextAwareBase {
         zos.write(inbuf, 0, n);
       }
 
-      addInfo("Done ZIP compressing [" + file2zip + "] as [" + zippedFile + "]");
+      // close in-try so a failed close (i.e. an incomplete archive)
+      // counts as a failed compression
+      zos.close();
+      zos = null;
+      bis.close();
+      bis = null;
+      streamed = true;
     } catch (Exception e) {
       addStatus(new ErrorStatus("Error occurred while compressing ["
               + nameOfFile2zip + "] into [" + nameOfZippedFile + "].", this, e));
     } finally {
-      if (bis != null) {
-        try {
-          bis.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
-      if (zos != null) {
-        try {
-          zos.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
+      closeQuietly(bis);
+      closeQuietly(zos);
     }
 
-    if (!file2zip.delete()) {
-      addStatus(new WarnStatus("Could not delete [" + nameOfFile2zip + "].",
-              this));
-    }
+    finishCompression(file2zip, tmpFile, zippedFile, streamed);
   }
 
   // http://jira.qos.ch/browse/LBCORE-98
@@ -191,12 +196,15 @@ public class Compressor extends ContextAwareBase {
 
     addInfo("GZ compressing [" + file2gz + "] as ["+gzedFile+"]");
     createMissingTargetDirsIfNecessary(gzedFile);
+    deleteStaleTempFiles(gzedFile);
 
+    File tmpFile = new File(nameOfgzedFile + TMP_SUFFIX);
+    boolean streamed = false;
     BufferedInputStream bis = null;
     GZIPOutputStream gzos = null;
     try {
       bis = new BufferedInputStream(new FileInputStream(nameOfFile2gz));
-      gzos = new GZIPOutputStream(new FileOutputStream(nameOfgzedFile));
+      gzos = new GZIPOutputStream(new FileOutputStream(tmpFile));
       byte[] inbuf = new byte[BUFFER_SIZE];
       int n;
 
@@ -204,31 +212,84 @@ public class Compressor extends ContextAwareBase {
         gzos.write(inbuf, 0, n);
       }
 
-      addInfo("Done ZIP compressing [" + file2gz + "] as [" + gzedFile + "]");
-
+      // close in-try so a failed close (i.e. an incomplete archive)
+      // counts as a failed compression
+      gzos.close();
+      gzos = null;
+      bis.close();
+      bis = null;
+      streamed = true;
     } catch (Exception e) {
       addStatus(new ErrorStatus("Error occurred while compressing ["
               + nameOfFile2gz + "] into [" + nameOfgzedFile + "].", this, e));
     } finally {
-      if (bis != null) {
-        try {
-          bis.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
-      if (gzos != null) {
-        try {
-          gzos.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
+      closeQuietly(bis);
+      closeQuietly(gzos);
     }
 
-    if (!file2gz.delete()) {
-      addStatus(new WarnStatus("Could not delete [" + nameOfFile2gz + "].",
-              this));
+    finishCompression(file2gz, tmpFile, gzedFile, streamed);
+  }
+
+  /**
+   * Promotes a fully written temp file to the final archive name and only
+   * then deletes the source file. On any failure, the source file is kept
+   * (no log data is lost) and the partial temp file is removed.
+   */
+  private void finishCompression(File sourceFile, File tmpFile, File targetFile, boolean streamed) {
+    boolean success = streamed;
+    if (success && !tmpFile.renameTo(targetFile)) {
+      addStatus(new ErrorStatus("Failed to rename compressed file ["
+              + tmpFile + "] to [" + targetFile + "].", this));
+      success = false;
+    }
+
+    if (success) {
+      addInfo("Done compressing [" + sourceFile + "] as [" + targetFile + "]");
+      if (!sourceFile.delete()) {
+        addStatus(new WarnStatus("Could not delete [" + sourceFile + "].",
+                this));
+      }
+    } else if (tmpFile.exists() && !tmpFile.delete()) {
+      addStatus(new WarnStatus("Could not delete temporary file [" + tmpFile
+              + "].", this));
+    }
+  }
+
+  /**
+   * Sweeps leftover temp files from compressions interrupted by an abrupt
+   * app kill (issue #369). Only files with a compression suffix directly
+   * followed by {@value #TMP_SUFFIX} are candidates — by construction those
+   * are partial archives, never original log data — and only when untouched
+   * for {@link #STALE_TMP_AGE_MS}, so in-flight compressions in the same
+   * directory are never disturbed.
+   */
+  private void deleteStaleTempFiles(File targetFile) {
+    File dir = targetFile.getAbsoluteFile().getParentFile();
+    if (dir == null) {
+      return;
+    }
+    File[] candidates = dir.listFiles((d, name) ->
+            name.endsWith(".gz" + TMP_SUFFIX) || name.endsWith(".zip" + TMP_SUFFIX));
+    if (candidates == null) {
+      return;
+    }
+    long cutoff = System.currentTimeMillis() - STALE_TMP_AGE_MS;
+    for (File candidate : candidates) {
+      long lastModified = candidate.lastModified();
+      if (lastModified > 0 && lastModified < cutoff && candidate.delete()) {
+        addInfo("Deleted stale temporary file [" + candidate
+                + "] left over from an interrupted compression");
+      }
+    }
+  }
+
+  private void closeQuietly(java.io.Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (IOException e) {
+        // ignore
+      }
     }
   }
 
