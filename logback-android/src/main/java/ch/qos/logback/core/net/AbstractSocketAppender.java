@@ -85,10 +85,13 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   private int acceptConnectionTimeout = DEFAULT_ACCEPT_CONNECTION_DELAY;
   private Duration eventDelayLimit = new Duration(DEFAULT_EVENT_DELAY_TIMEOUT);
   
+  private boolean lazyInit = false;
+
   private BlockingDeque<E> deque;
   private String peerId;
   private SocketConnector connector;
   private Future<?> task;
+  private boolean taskSubmitted = false;
 
   private volatile Socket socket;
 
@@ -137,25 +140,25 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     }
 
     if (errorCount == 0) {
-      try {
-        address = InetAddress.getByName(remoteHost);
-      } catch (UnknownHostException ex) {
-        addError("unknown host: " + remoteHost);
-        errorCount++;
-      }
-    }
-
-    if (errorCount == 0) {
       deque = queueFactory.newLinkedBlockingDeque(queueSize);
       peerId = "remote peer " + remoteHost + ":" + port + ": ";
-      connector = createConnector(address, port, 0, reconnectionDelay.getMilliseconds());
-      task = getContext().getScheduledExecutorService().submit(new Runnable() {
-        public void run() {
-          connectSocketAndDispatchEvents();
-        }
-      });
+      // defer the dispatch task (and the host-name resolution it performs)
+      // until the first log event when lazy (issue #341)
+      if (!lazyInit) {
+        submitDispatchTask();
+      }
       super.start();
     }
+  }
+
+  private synchronized void submitDispatchTask() {
+    if (taskSubmitted) return;
+    taskSubmitted = true;
+    task = getContext().getScheduledExecutorService().submit(new Runnable() {
+      public void run() {
+        resolveHostAndDispatchEvents();
+      }
+    });
   }
 
   /**
@@ -165,7 +168,9 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   public void stop() {
     if (!isStarted()) return;
     CloseUtil.closeQuietly(socket);
-    task.cancel(true);
+    if (task != null) {
+      task.cancel(true);
+    }
     super.stop();
   }
 
@@ -175,6 +180,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   @Override
   protected void append(E event) {
     if (event == null || !isStarted()) return;
+    submitDispatchTask();
 
     try {
       final boolean inserted = deque.offer(event, eventDelayLimit.getMilliseconds(), TimeUnit.MILLISECONDS);
@@ -183,6 +189,39 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
       }
     } catch (InterruptedException e) {
       addError("Interrupted while appending event to SocketAppender", e);
+    }
+  }
+
+  private void resolveHostAndDispatchEvents() {
+    // Resolve the host name in the background task rather than in start()
+    // (issue #65): resolution does a network lookup, which must not run on
+    // the thread that initializes logging (often the main thread), and a
+    // device that is offline at startup would otherwise permanently disable
+    // this appender. Retry with the reconnection delay until resolved.
+    try {
+      while (!resolveRemoteHost()) {
+        long delayMs = (reconnectionDelay != null) ? reconnectionDelay.getMilliseconds() : 0;
+        if (delayMs <= 0) {
+          addError(peerId + "gave up resolving host (reconnectionDelay is zero)");
+          return;
+        }
+        Thread.sleep(delayMs);
+      }
+    } catch (InterruptedException ex) {
+      addInfo("shutting down before host resolution completed");
+      return;
+    }
+    connector = createConnector(address, port, 0, reconnectionDelay.getMilliseconds());
+    connectSocketAndDispatchEvents();
+  }
+
+  private boolean resolveRemoteHost() {
+    try {
+      address = InetAddress.getByName(remoteHost);
+      return true;
+    } catch (UnknownHostException ex) {
+      addWarn(peerId + "unknown host: " + remoteHost + " (will retry)");
+      return false;
     }
   }
 
@@ -303,6 +342,26 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
    * @return transformer object
    */
   protected abstract PreSerializationTransformer<E> getPST();
+
+  /**
+   * Gets the enable status of lazy initialization of the socket connection
+   *
+   * @return true if enabled; false otherwise
+   */
+  public boolean getLazy() {
+    return lazyInit;
+  }
+
+  /**
+   * Enables/disables lazy initialization of the socket connection. This
+   * defers the host-name resolution and connection until the first
+   * outgoing message (issue #341).
+   *
+   * @param enable true to enable lazy initialization; false otherwise
+   */
+  public void setLazy(boolean enable) {
+    lazyInit = enable;
+  }
 
   /**
    * The <b>RemoteHost</b> property takes the name of of the host where a corresponding server is running.

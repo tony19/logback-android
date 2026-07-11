@@ -47,6 +47,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
@@ -159,8 +160,11 @@ public class AbstractSocketAppenderTest {
     verify(appender).addError(contains("Queue size must be greater than zero"));
   }
 
+  // Issue #65: host-name resolution happens in the background task with
+  // retries, so an unresolvable host (e.g. device offline at startup) no
+  // longer prevents the appender from starting
   @Test
-  public void failsToStartWithUnresolvableRemoteHost() throws Exception {
+  public void startsWithUnresolvableRemoteHostAndRetriesResolution() throws Exception {
 
     new NetworkTestUtil().assumeNoUnresolvedUrlFallback();
 
@@ -171,8 +175,31 @@ public class AbstractSocketAppenderTest {
     appender.start();
 
     // then
-    assertFalse(appender.isStarted());
-    verify(appender).addError(contains("unknown host"));
+    assertTrue(appender.isStarted());
+    verify(appender, timeout(TIMEOUT)).addWarn(contains("unknown host"));
+  }
+
+  // Issue #341
+  @Test
+  public void lazyInitDefersConnectionUntilFirstEvent() throws Exception {
+
+    // given
+    mockOneSuccessfulSocketConnection();
+    appender.setLazy(true);
+
+    // when
+    appender.start();
+
+    // then: started, but no connection attempt yet (the dispatch task is
+    // only submitted on the first append, so nothing runs asynchronously)
+    assertTrue(appender.isStarted());
+    verify(appender, never()).newConnector(any(InetAddress.class), anyInt(), anyLong(), anyLong());
+
+    // when
+    appender.append("some event");
+
+    // then
+    verify(appender, timeout(TIMEOUT)).newConnector(any(InetAddress.class), anyInt(), anyLong(), anyLong());
   }
 
   @Test
