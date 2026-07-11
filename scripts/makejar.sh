@@ -1,7 +1,8 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
+set -e
 
 if [[ ! -z "$1" ]] && [[ "$1" != -r ]]; then
-  echo "Creates the uber jar in ./build"
+  echo "Creates the AAR in ./build"
   echo
   echo " Usage: $0 [-r]"
   echo
@@ -10,9 +11,15 @@ if [[ ! -z "$1" ]] && [[ "$1" != -r ]]; then
   exit 1
 fi
 
-. gradle.properties
+# Read VERSION_NAME from gradle.properties. Do NOT source the file: it is a
+# Java properties file, and lines like "org.gradle.jvmargs=-Xmx6g" are not
+# valid shell (issue #346).
+version=$(sed -n 's/^VERSION_NAME=//p' gradle.properties | tr -d '[:space:]')
+if [[ -z "$version" ]]; then
+  echo "error: VERSION_NAME not found in gradle.properties" >&2
+  exit 1
+fi
 
-version=${VERSION_NAME}
 _profile=Debug
 if [[ "$1" == "-r" ]]; then
   _profile=Release
@@ -20,5 +27,5 @@ if [[ "$1" == "-r" ]]; then
 fi
 
 ./gradlew clean assemble${_profile} -x test -PVERSION_NAME=${version}
-mkdir build
+mkdir -p build
 cp -vf ./logback-android/build/outputs/aar/logback-android*.aar ./build/
