@@ -205,4 +205,26 @@ public class AndroidContextUtilTest {
     assertThat(loggerContext.getProperty(CoreConstants.VERSION_NAME_KEY), is(contextUtil.getVersionName()));
     assertThat(loggerContext.getProperty(CoreConstants.PACKAGE_NAME_KEY), is(contextUtil.getPackageName()));
   }
+
+  // Issue #181
+  @Test
+  public void setupPropertiesIncludesExternalDirs() {
+    LoggerContext loggerContext = new LoggerContext();
+
+    assertThat(loggerContext.getProperty(CoreConstants.EXT_FILES_DIR_KEY), is(nullValue()));
+    assertThat(loggerContext.getProperty(CoreConstants.EXT_CACHE_DIR_KEY), is(nullValue()));
+
+    contextUtil.setupProperties(loggerContext);
+
+    assertThat(loggerContext.getProperty(CoreConstants.EXT_FILES_DIR_KEY), is(contextUtil.getExternalFilesDirectoryPath()));
+    assertThat(loggerContext.getProperty(CoreConstants.EXT_CACHE_DIR_KEY), is(contextUtil.getExternalCacheDirectoryPath()));
+  }
+
+  // Issue #181
+  @Test
+  public void containsPropertiesDetectsExternalDirKeys() {
+    assertThat(AndroidContextUtil.containsProperties("${EXT_FILES_DIR}/logs/app.log"), is(true));
+    assertThat(AndroidContextUtil.containsProperties("${EXT_CACHE_DIR}/logs/app.log"), is(true));
+    assertThat(AndroidContextUtil.containsProperties("/absolute/path/app.log"), is(false));
+  }
 }
