@@ -98,6 +98,21 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
     assertThat(val, containsString("java.lang.Exception: Bogus exception"));
   }
 
+  // Issue #332: color composite converters must be registered so patterns
+  // shared with regular logback compile without errors
+  @Test
+  public void colorConvertersAreRegistered() {
+    pl.setPattern("%highlight(%-5level) %cyan(%logger{36}) - %msg");
+    pl.start();
+    String val = pl.doLayout(makeLoggingEvent("Some message", null));
+
+    // no "conversion words" errors, and ANSI codes wrap the colored parts;
+    // INFO highlights as blue (34), %cyan is 36
+    assertThat(val, containsString("\033[34mINFO \033[0;39m"));
+    assertThat(val, containsString("\033[36mc.q.l.c.pattern.ConverterTest\033[0;39m"));
+    assertThat(val, containsString("Some message"));
+  }
+
   @Test
   public void testCompositePattern() {
     pl.setPattern("%-56(%d %lo{20}) - %m%n");
