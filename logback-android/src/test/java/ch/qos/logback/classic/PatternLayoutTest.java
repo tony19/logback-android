@@ -109,7 +109,7 @@ public class PatternLayoutTest extends AbstractPatternLayoutBaseTest<ILoggingEve
     // no "conversion words" errors, and ANSI codes wrap the colored parts;
     // INFO highlights as blue (34), %cyan is 36
     assertThat(val, containsString("\033[34mINFO \033[0;39m"));
-    assertThat(val, containsString("\033[36mc.q.l.c.pattern.ConverterTest\033[0;39m"));
+    assertThat(val, containsString("\033[36mc.q.l.classic.pattern.ConverterTest\033[0;39m"));
     assertThat(val, containsString("Some message"));
   }
 
