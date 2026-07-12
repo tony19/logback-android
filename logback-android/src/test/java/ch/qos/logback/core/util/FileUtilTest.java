@@ -27,6 +27,7 @@ import java.util.Random;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.android.AndroidContextUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,5 +106,54 @@ public class FileUtilTest {
   public void createParentDirAcceptsNoParentSpecified() {
     File file = new File("testing.txt");
     assertTrue(FileUtil.createMissingParentDirectories(file));
+  }
+
+  // Issue #228: on Android 11+, mkdirs() fails for paths beneath the
+  // app-specific external directories until the platform creates the base
+  // dirs upon the app's request. Verify that when the first mkdirs() fails,
+  // the base directories are requested from AndroidContextUtil and mkdirs()
+  // is retried.
+  @Test
+  public void createParentDirRetriesAfterCreatingAppExternalStorageDirs() throws IOException {
+    // a regular file blocking the parent chain makes the first mkdirs()
+    // fail, standing in for the OS rejecting creation of Android/data dirs
+    final File blocker = new File(CoreTestConstants.OUTPUT_DIR_PREFIX + "/fu" + diff + "/blocker");
+    File file = new File(blocker, "logs/testing.txt");
+    cleanupList.add(file);
+    cleanupList.add(file.getParentFile());
+    cleanupList.add(blocker);
+    cleanupList.add(blocker.getParentFile());
+
+    blocker.getParentFile().mkdirs();
+    assertTrue(blocker.createNewFile());
+
+    AndroidContextUtil platform = new AndroidContextUtil(null) {
+      @Override
+      public void createAppExternalStorageDirs() {
+        // simulate the platform creating the requested base directories
+        blocker.delete();
+        blocker.mkdirs();
+      }
+    };
+
+    assertTrue(FileUtil.createMissingParentDirectories(file, platform));
+    assertTrue(file.getParentFile().exists());
+  }
+
+  // Issue #228
+  @Test
+  public void createParentDirReturnsFalseWhenRetryAlsoFails() throws IOException {
+    File blocker = new File(CoreTestConstants.OUTPUT_DIR_PREFIX + "/fu" + diff + "/blocker2");
+    File file = new File(blocker, "logs/testing.txt");
+    cleanupList.add(blocker);
+    cleanupList.add(blocker.getParentFile());
+
+    blocker.getParentFile().mkdirs();
+    assertTrue(blocker.createNewFile());
+
+    // no-op platform (no Android context available)
+    AndroidContextUtil platform = new AndroidContextUtil(null);
+
+    assertFalse(FileUtil.createMissingParentDirectories(file, platform));
   }
 }

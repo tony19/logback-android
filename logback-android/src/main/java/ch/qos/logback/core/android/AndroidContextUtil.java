@@ -184,6 +184,33 @@ public class AndroidContextUtil {
             : "";
   }
 
+  /**
+   * Requests creation of the app-specific external storage directories
+   * ({@code Android/data/<package>/files} and {@code Android/data/<package>/cache}).
+   *
+   * Under scoped storage (Android 11+), these base directories can only be
+   * created by the platform: a plain {@link File#mkdirs()} fails until the
+   * app requests them via
+   * {@link android.content.Context#getExternalFilesDir(String)} or
+   * {@link android.content.Context#getExternalCacheDir()}, both of which
+   * create the directory if it doesn't already exist (issue #228).
+   *
+   * This is a no-op if no Android context is available, and it tolerates
+   * broken external-storage states (issue #431).
+   */
+  public void createAppExternalStorageDirs() {
+    if (this.context == null) {
+      return;
+    }
+    try {
+      this.context.getExternalFilesDir(null);
+      this.context.getExternalCacheDir();
+    } catch (RuntimeException e) {
+      // tolerate broken external-storage state (issue #431); the caller's
+      // subsequent directory-creation attempt fails and reports as usual
+    }
+  }
+
   public String getCacheDirectoryPath() {
     return this.context != null
             ? absPath(this.context.getCacheDir())

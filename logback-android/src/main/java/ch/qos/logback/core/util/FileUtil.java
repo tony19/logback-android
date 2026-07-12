@@ -17,6 +17,7 @@ package ch.qos.logback.core.util;
 
 import java.io.File;
 import ch.qos.logback.core.Context;
+import ch.qos.logback.core.android.AndroidContextUtil;
 import ch.qos.logback.core.rolling.RolloverFailure;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
@@ -38,6 +39,11 @@ public class FileUtil extends ContextAwareBase {
    * parent directories were created successfully; {@code false} otherwise
    */
   static public boolean createMissingParentDirectories(File file) {
+    return createMissingParentDirectories(file, null);
+  }
+
+  // package-private for testing
+  static boolean createMissingParentDirectories(File file, AndroidContextUtil androidContextUtil) {
     File parent = file.getParentFile();
     if (parent == null) {
       // Parent directory not specified, therefore it's a request to
@@ -47,6 +53,18 @@ public class FileUtil extends ContextAwareBase {
     // File.mkdirs() creates the parent directories only if they don't
     // already exist; and it's okay if they do.
     parent.mkdirs();
+    if (!parent.exists()) {
+      // Under scoped storage (Android 11+), the app-specific external
+      // directories (Android/data/<package>/{files,cache}) can only be
+      // created by the platform, so mkdirs() fails for paths beneath them
+      // until the app requests those base directories from the OS.
+      // Request them now, then retry (issue #228).
+      if (androidContextUtil == null) {
+        androidContextUtil = new AndroidContextUtil();
+      }
+      androidContextUtil.createAppExternalStorageDirs();
+      parent.mkdirs();
+    }
     return parent.exists();
   }
 
