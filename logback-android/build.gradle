@@ -1,5 +1,16 @@
 apply plugin: 'com.android.library'
+// Compiles src/main/kotlin. Applied as the standalone plugin (AGP's
+// built-in Kotlin support is opted out in gradle.properties) because this
+// project needs per-flavor Kotlin bytecode targets; see the afterEvaluate
+// block below.
+apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'org.gradle.test-retry'
+
+kotlin {
+    // Library mode: every public declaration in the Kotlin sources must
+    // state its visibility and types deliberately.
+    explicitApi()
+}
 
 android {
     namespace 'com.github.tony19.logback.android'
@@ -99,6 +110,16 @@ afterEvaluate {
                 targetCompatibility = JavaVersion.VERSION_1_8
             }
         }
+    }
+
+    // Keep the Kotlin bytecode targets in lockstep with javac above:
+    // Java 8 for the published jdk8 library classes, Java 11 for the
+    // jdk11 variants and all unit tests.
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        boolean isJdk8Library = name.startsWith('compileJdk8') && !name.contains('Test')
+        compilerOptions.jvmTarget = isJdk8Library
+                ? org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+                : org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
     }
 }
 
