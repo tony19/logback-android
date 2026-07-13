@@ -65,6 +65,11 @@
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="FileLength"/>
+    <!-- LineLength must be a child of Checker (not TreeWalker): it was moved
+         out of TreeWalker in Checkstyle 8.24, and newer versions reject it as
+         a TreeWalker child ("TreeWalker is not allowed as a parent of
+         LineLength"). -->
+    <module name="LineLength"/>
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -118,7 +123,7 @@
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <module name="LineLength"/>
+        <!-- LineLength moved to the Checker module above. -->
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
 
