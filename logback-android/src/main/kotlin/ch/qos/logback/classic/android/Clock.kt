@@ -13,16 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.qos.logback.classic.android;
+package ch.qos.logback.classic.android
 
-import android.database.sqlite.SQLiteDatabase;
-
-import ch.qos.logback.core.util.Duration;
-
-/**
- * Interface for a SQLite log cleaner, invoked when an expiration time
- * has been exceeded.
- */
-public interface SQLiteLogCleaner {
-  void performLogCleanup(SQLiteDatabase db, Duration expiry);
+internal fun interface Clock {
+    fun currentTimeMillis(): Long
 }
