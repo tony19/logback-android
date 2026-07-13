@@ -42,7 +42,7 @@ jobs:
       # check on findings -- results are surfaced below instead. The Android
       # SDK is preinstalled on the runner (same as the build job).
       - name: Run Checkstyle + PMD
-        run: ./gradlew -PstaticAnalysis staticAnalysis
+        run: ./gradlew -PstaticAnalysis staticAnalysis --stacktrace
 
       # Only upload if the SARIF was produced -- this analysis is advisory, so
       # a missing report (e.g. Checkstyle aborting on a file) must not fail it.
