@@ -1,0 +1,64 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Re-scan weekly so newly published CodeQL queries catch issues in code
+    # that hasn't changed since the last push.
+    - cron: '27 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (Java)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      # required for actions/checkout of private repos and to upload results
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # JDK 17 matches the build job; required to compile logback-android.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+          # Manual build: the Android Gradle plugin needs a real Gradle
+          # invocation, so autobuild can't reliably trace compilation.
+          build-mode: manual
+          queries: security-and-quality
+
+      # Compile the library so CodeQL can observe the bytecode. The Android SDK
+      # is preinstalled on the ubuntu-latest runner (same as the build job).
+      - name: Assemble
+        run: ./gradlew assembleRelease
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:java'
