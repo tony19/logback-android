@@ -41,6 +41,15 @@
 
     <property name="fileExtensions" value="java, properties, xml"/>
 
+    <!-- Log per-file processing exceptions as errors and keep going instead
+         of aborting the whole run. Some type-aware checks (e.g.
+         IllegalInstantiation) mis-resolve local classes that share a name
+         with a JDK type. For example, this project's own
+         ch.qos.logback.core.pattern.parser.Compiler (generic) vs
+         java.lang.Compiler, which would otherwise halt the entire analysis
+         on that one file. -->
+    <property name="haltOnException" value="false"/>
+
     <!-- Checks that a package-info.java file exists for each package.     -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocPackage -->
     <module name="JavadocPackage"/>
@@ -56,6 +65,11 @@
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="FileLength"/>
+    <!-- LineLength must be a child of Checker (not TreeWalker): it was moved
+         out of TreeWalker in Checkstyle 8.24, and newer versions reject it as
+         a TreeWalker child ("TreeWalker is not allowed as a parent of
+         LineLength"). -->
+    <module name="LineLength"/>
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -109,7 +123,7 @@
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <module name="LineLength"/>
+        <!-- LineLength moved to the Checker module above. -->
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
 
@@ -145,7 +159,13 @@
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
         <module name="HiddenField"/>
-        <module name="IllegalInstantiation"/>
+        <!-- IllegalInstantiation is disabled: it resolves instantiated class
+             names against java.lang.* and throws ("Cannot parameterize
+             java/lang/Compiler with [E]") on this project's own generic
+             ch.qos.logback.core.pattern.parser.Compiler<E>, aborting the
+             whole run. This is a known Checkstyle limitation with local
+             classes that share a JDK type name. -->
+        <!-- <module name="IllegalInstantiation"/> -->
         <module name="InnerAssignment"/>
         <module name="MagicNumber"/>
         <module name="MissingSwitchDefault"/>

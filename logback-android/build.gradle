@@ -176,3 +176,7 @@ ext {
 }
 
 apply from: "${rootProject.projectDir}/gradle/publish-module.gradle"
+
+// Checkstyle + PMD static analysis (run on every PR by
+// .github/workflows/static-analysis.yml). No-op unless -PstaticAnalysis is set.
+apply from: "${rootProject.projectDir}/gradle/static-analysis.gradle"

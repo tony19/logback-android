@@ -1,0 +1,73 @@
+// Static analysis run on every pull request (see
+// .github/workflows/static-analysis.yml), replacing the former Codacy
+// integration with an in-repo, GitHub-native setup.
+//
+// Runs Gradle's built-in Checkstyle and PMD over the library's main Java
+// sources. Advisory only: `ignoreFailures` keeps the tasks from breaking the
+// build, so findings are surfaced (as SARIF code-scanning annotations and as
+// uploaded HTML/XML reports) without blocking merges -- mirroring how Codacy
+// reported issues. Gated behind -PstaticAnalysis so ordinary builds, which
+// don't need these tools on the classpath, are unaffected.
+if (!project.hasProperty('staticAnalysis')) {
+  return
+}
+
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+// The Android library plugin doesn't create JavaPluginConvention source sets,
+// so the checkstyle/pmd plugins can't auto-wire per-source-set tasks; point
+// the analysis explicitly at the published main sources instead.
+def mainJava = fileTree(dir: "${projectDir}/src/main/java", includes: ['**/*.java'])
+
+checkstyle {
+  toolVersion = '10.26.1'
+  configFile = rootProject.file('config/checkstyle.xml')
+  // Advisory: never fail the build, and don't let a warning/error count
+  // threshold do so either -- the Sun ruleset is strict and predates most of
+  // this code, so we surface every finding rather than gate on a number.
+  ignoreFailures = true
+  maxWarnings = Integer.MAX_VALUE
+  maxErrors = Integer.MAX_VALUE
+}
+
+pmd {
+  toolVersion = '7.7.0'
+  ignoreFailures = true
+}
+
+tasks.register('checkstyleAnalysis', Checkstyle) {
+  group = 'verification'
+  description = 'Runs Checkstyle over the main Java sources.'
+  source = mainJava
+  // Style checks don't need the compile classpath.
+  classpath = files()
+  reports {
+    // SARIF drives inline PR annotations via code scanning; XML is kept for
+    // the uploaded report artifact.
+    sarif.required = true
+    xml.required = true
+    html.required = false
+  }
+}
+
+tasks.register('pmdAnalysis', Pmd) {
+  group = 'verification'
+  description = 'Runs PMD over the main Java sources.'
+  source = mainJava
+  ruleSets = [
+    'category/java/errorprone.xml',
+    'category/java/bestpractices.xml',
+  ]
+  ignoreFailures = true
+  reports {
+    xml.required = true
+    html.required = true
+  }
+}
+
+tasks.register('staticAnalysis') {
+  group = 'verification'
+  description = 'Runs all static analysis (Checkstyle + PMD).'
+  dependsOn 'checkstyleAnalysis', 'pmdAnalysis'
+}
