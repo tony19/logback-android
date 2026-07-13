@@ -1,0 +1,62 @@
+name: Static Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-analysis:
+    name: Static Analysis (Checkstyle + PMD)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      # upload SARIF results to the Security tab / as PR annotations
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # JDK 17 matches the build job; required to configure the Android Gradle
+      # plugin so the logback-android project (and its analysis tasks) evaluate.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # Advisory: the tasks use ignoreFailures, so this step won't fail the
+      # check on findings -- results are surfaced below instead. The Android
+      # SDK is preinstalled on the runner (same as the build job).
+      - name: Run Checkstyle + PMD
+        run: ./gradlew -PstaticAnalysis staticAnalysis
+
+      # Inline PR annotations + Security tab entries for Checkstyle findings.
+      - name: Upload Checkstyle results to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: logback-android/build/reports/checkstyle/checkstyleAnalysis.sarif
+          category: checkstyle
+
+      # Full HTML/XML reports (Checkstyle + PMD) for download from the run.
+      - name: Upload analysis reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: static-analysis-reports
+          path: logback-android/build/reports/
+          if-no-files-found: warn
