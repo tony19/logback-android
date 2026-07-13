@@ -154,7 +154,13 @@
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
         <module name="HiddenField"/>
-        <module name="IllegalInstantiation"/>
+        <!-- IllegalInstantiation is disabled: it resolves instantiated class
+             names against java.lang.* and throws ("Cannot parameterize
+             java/lang/Compiler with [E]") on this project's own generic
+             ch.qos.logback.core.pattern.parser.Compiler<E>, aborting the
+             whole run. This is a known Checkstyle limitation with local
+             classes that share a JDK type name. -->
+        <!-- <module name="IllegalInstantiation"/> -->
         <module name="InnerAssignment"/>
         <module name="MagicNumber"/>
         <module name="MissingSwitchDefault"/>
