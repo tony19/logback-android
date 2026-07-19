@@ -26,7 +26,17 @@ jobs:
         # made JDK-specific by their compile targets:
         #   logback-android      -> Java 11 bytecode, minSdk 26
         #   logback-android-jdk8 -> Java 8 bytecode, minSdk 21
-        java: [17, 21]
+        #
+        # agp: the Android Gradle Plugin version to build with (overrides the
+        # gradle.properties default). AGP 9.3.0+ lint requires JDK 21, so JDK 17
+        # stays on 9.2.1 while JDK 21 exercises the newer plugin.
+        include:
+          - java: 17
+            agp: '9.2.1'
+          - java: 21
+            agp: '9.3.0'
+    env:
+      ORG_GRADLE_PROJECT_agpVersion: ${{ matrix.agp }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
