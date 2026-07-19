@@ -1,9 +1,12 @@
 version: 2
 updates:
+  # A single scan at the repo root resolves the whole multi-project Gradle
+  # build (root build.gradle plus the logback-android module), so it covers
+  # dependencies in logback-android/build.gradle too. Listing /logback-android
+  # separately made Dependabot scan that module file twice and open duplicate
+  # PRs for the same bump (e.g. greenmail #441 vs #442).
   - package-ecosystem: "gradle"
-    directories:
-      - "/"
-      - "/logback-android"
+    directory: "/"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 100

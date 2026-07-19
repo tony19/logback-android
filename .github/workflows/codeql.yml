@@ -55,8 +55,14 @@ jobs:
 
       # Compile the library so CodeQL can observe the bytecode. The Android SDK
       # is preinstalled on the ubuntu-latest runner (same as the build job).
+      #
+      # --no-daemon keeps javac in a process tree CodeQL's tracer can follow,
+      # and --no-build-cache forces the compile tasks to actually run instead
+      # of resolving FROM-CACHE (the project enables org.gradle.caching). Both
+      # are needed or CodeQL extracts nothing and fails with "no source code
+      # seen during build".
       - name: Assemble
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --no-daemon --no-build-cache
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
