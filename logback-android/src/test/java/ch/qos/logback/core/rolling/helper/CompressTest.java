@@ -18,11 +18,7 @@ package ch.qos.logback.core.rolling.helper;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +26,7 @@ import org.junit.Test;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.status.StatusChecker;
+import ch.qos.logback.core.testUtil.FileTestUtil;
 import ch.qos.logback.core.util.Compare;
 import ch.qos.logback.core.util.CoreTestConstants;
 
@@ -128,15 +125,7 @@ public class CompressTest {
   }
 
   private void copy(File src, File dst) throws IOException {
-    InputStream in = new FileInputStream(src);
-    OutputStream out = new FileOutputStream(dst);
-    byte[] buf = new byte[1024];
-    int len;
-    while ((len = in.read(buf)) > 0) {
-      out.write(buf, 0, len);
-    }
-    in.close();
-    out.close();
+    FileTestUtil.copy(src, dst);
   }
 
 }

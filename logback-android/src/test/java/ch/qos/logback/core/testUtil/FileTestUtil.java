@@ -18,6 +18,11 @@ package ch.qos.logback.core.testUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import static org.junit.Assert.assertTrue;
 
@@ -25,6 +30,8 @@ import static org.junit.Assert.assertTrue;
  * @author Ceki G&uuml;c&uuml;
  */
 public class FileTestUtil {
+
+  private static final int BUFFER_SIZE = 1024;
 
   public static void makeTestOutputDir() {
     File target = new File(CoreTestConstants.TARGET_DIR);
@@ -34,6 +41,53 @@ public class FileTestUtil {
         assertTrue(testoutput.mkdir());
     } else {
       throw new IllegalStateException(CoreTestConstants.TARGET_DIR + " does not exist");
+    }
+  }
+
+  /**
+   * Copies {@code src} over {@code dst}, closing both streams whether the copy
+   * succeeds or fails. Test fixtures call this from setup methods, where a
+   * failed copy that leaked its file handles would otherwise keep the source
+   * file open (and, on Windows, locked) for the rest of the JVM's life.
+   *
+   * @param src file to read
+   * @param dst file to overwrite
+   * @throws IOException if either file cannot be opened, or the transfer fails
+   */
+  public static void copy(File src, File dst) throws IOException {
+    copy(DEFAULT_STREAMS, src, dst);
+  }
+
+  /**
+   * Opens the streams used by {@link #copy(File, File)}. Exists so that tests
+   * can inject streams that fail on demand and record whether they were closed.
+   */
+  interface Streams {
+    InputStream openInput(File file) throws IOException;
+    OutputStream openOutput(File file) throws IOException;
+  }
+
+  static final Streams DEFAULT_STREAMS = new Streams() {
+    public InputStream openInput(File file) throws IOException {
+      return new FileInputStream(file);
+    }
+
+    public OutputStream openOutput(File file) throws IOException {
+      return new FileOutputStream(file);
+    }
+  };
+
+  static void copy(Streams streams, File src, File dst) throws IOException {
+    // try-with-resources closes `in` even when openOutput() throws, and closes
+    // `out` even when in.close() throws -- neither of which a plain
+    // in.close(); out.close(); sequence at the end of the method would do.
+    try (InputStream in = streams.openInput(src);
+         OutputStream out = streams.openOutput(dst)) {
+      byte[] buf = new byte[BUFFER_SIZE];
+      int len;
+      while ((len = in.read(buf)) > 0) {
+        out.write(buf, 0, len);
+      }
     }
   }
 }
