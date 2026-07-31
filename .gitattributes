@@ -1,0 +1,5 @@
+# Java sources are LF everywhere; a handful of files had drifted to CRLF.
+*.java text eol=lf
+
+# Windows launcher must keep CRLF to run under cmd.exe.
+*.bat text eol=crlf
