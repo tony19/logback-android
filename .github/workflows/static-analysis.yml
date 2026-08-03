@@ -36,7 +36,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
 
       # Advisory: the tasks use ignoreFailures, so this step won't fail the
       # check on findings -- results are surfaced below instead. The Android
