@@ -5,18 +5,31 @@ on:
     branches:
       - main
   pull_request:
+    # ready_for_review/labeled so a draft starts CI once it's marked ready or
+    # gets the run-ci-on-drafts label (see the job-level `if` below)
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # a `labeled` event for any other label is skipped by the job-level `if`;
+  # give it its own group so it doesn't cancel a run already in progress
+  group: ${{ github.workflow }}-${{ github.ref }}${{ github.event.action == 'labeled' && github.event.label.name != 'run-ci-on-drafts' && '-skip' || '' }}
   cancel-in-progress: true
 
 jobs:
   build:
     name: Build (JDK ${{ matrix.java }})
+    # Skip draft PRs unless labeled run-ci-on-drafts (marking the PR ready for
+    # review triggers a run). Other labels don't re-run CI.
+    if: >-
+      github.event_name != 'pull_request' ||
+      ((!github.event.pull_request.draft ||
+        contains(github.event.pull_request.labels.*.name, 'run-ci-on-drafts')) &&
+       (github.event.action != 'labeled' ||
+        github.event.label.name == 'run-ci-on-drafts'))
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
