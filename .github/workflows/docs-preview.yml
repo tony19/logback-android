@@ -1,0 +1,145 @@
+name: Docs Preview
+
+# Deploys a preview of a docs-site pull request (one targeting the gh-pages
+# branch) to GitHub Pages at <pages-url>/pr-preview/pr-<number>/, and removes
+# it when the PR is closed. The preview is committed to gh-pages, which
+# GitHub Pages serves, so no separate Pages deployment is needed.
+#
+# Like CI, draft PRs are skipped unless labeled run-ci-on-drafts; marking the
+# PR ready for review deploys it.
+#
+# Triggers:
+#   pull_request      -- GitHub reads workflows for a PR from the PR's merge
+#                        commit, so this only fires once this file also exists
+#                        on gh-pages (or in the PR's own branch).
+#   workflow_dispatch -- run from main (Actions > Docs Preview > Run workflow)
+#                        for any PR number, e.g. to preview a PR whose branch
+#                        doesn't carry this file. Deploys drafts too.
+#
+# The javadoc archive (doc/, ~500 MB) and other previews (pr-preview/) are not
+# copied into the preview, so links into doc/ 404 there.
+
+on:
+  pull_request:
+    branches:
+      - gh-pages
+    types: [opened, synchronize, reopened, ready_for_review, labeled, closed]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Number of the pull request to preview
+        required: true
+        type: number
+      remove:
+        description: Remove the preview instead of deploying it
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || inputs.pr }}${{ github.event.action == 'labeled' && github.event.label.name != 'run-ci-on-drafts' && '-skip' || '' }}
+  cancel-in-progress: ${{ github.event.action != 'closed' && !inputs.remove }}
+
+jobs:
+  preview:
+    name: Deploy docs preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # For pull_request events: same-repo PRs only (fork PRs get a read-only
+    # token), and drafts only when labeled run-ci-on-drafts. Closing always
+    # runs so the preview is cleaned up.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       (github.event.action == 'closed' ||
+        ((!github.event.pull_request.draft ||
+          contains(github.event.pull_request.labels.*.name, 'run-ci-on-drafts')) &&
+         (github.event.action != 'labeled' ||
+          github.event.label.name == 'run-ci-on-drafts'))))
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number || inputs.pr }}
+      REMOVE: ${{ github.event.action == 'closed' || inputs.remove }}
+    steps:
+      - name: Check out gh-pages
+        uses: actions/checkout@v7
+        with:
+          ref: gh-pages
+          path: pages
+
+      # refs/pull/N/head works for fork PRs too (workflow_dispatch only)
+      - name: Check out pull request
+        if: env.REMOVE != 'true'
+        uses: actions/checkout@v7
+        with:
+          ref: refs/pull/${{ env.PR }}/head
+          path: pr
+          sparse-checkout: |
+            /*
+            !/doc/
+            !/pr-preview/
+          sparse-checkout-cone-mode: false
+
+      - name: Update preview
+        working-directory: pages
+        run: |
+          set -euo pipefail
+          dir="pr-preview/pr-${PR}"
+          if [ "$REMOVE" = true ]; then
+            rm -rf "$dir"
+            msg="docs: remove preview for #${PR}"
+          else
+            mkdir -p "$dir"
+            rsync -a --delete \
+              --exclude=.git --exclude=.github --exclude=/doc/ --exclude=/pr-preview/ \
+              ../pr/ "$dir/"
+            msg="docs: deploy preview for #${PR} ($(git -C ../pr rev-parse --short HEAD))"
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A pr-preview
+          if git diff --cached --quiet; then
+            echo "No changes to preview."
+            exit 0
+          fi
+          git commit -m "$msg"
+
+          # other previews may push to gh-pages concurrently; rebase and retry
+          for attempt in 1 2 3 4 5; do
+            git push origin HEAD:gh-pages && exit 0
+            sleep $((attempt * 2))
+            git pull --rebase origin gh-pages
+          done
+          echo "Failed to push to gh-pages" >&2
+          exit 1
+
+      - name: Comment preview URL
+        run: |
+          set -euo pipefail
+          base=$(gh api "repos/${REPO}/pages" --jq .html_url 2>/dev/null || true)
+          [ -n "$base" ] || base="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
+          url="${base%/}/pr-preview/pr-${PR}/"
+          marker='<!-- docs-preview -->'
+          if [ "$REMOVE" = true ]; then
+            body="${marker}
+          Docs preview removed."
+          else
+            body="${marker}
+          📄 Docs preview: ${url}
+
+          Deployed from $(git -C pr rev-parse --short HEAD). GitHub Pages can take a minute or two to publish it. The javadoc archive (\`doc/\`) isn't included in previews."
+          fi
+          id=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate \
+            --jq "[.[] | select(.body | startswith(\"${marker}\"))][0].id // empty" | head -n1)
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/${REPO}/issues/comments/${id}" -f body="$body" > /dev/null
+          else
+            gh api --method POST "repos/${REPO}/issues/${PR}/comments" -f body="$body" > /dev/null
+          fi
+          echo "Preview: ${url}" >> "$GITHUB_STEP_SUMMARY"
