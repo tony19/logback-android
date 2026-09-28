@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>logback-android FAQ</title>
+
+    <link rel="stylesheet" type="text/css" href="css/museo/stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.google-analytics.js"></script>
+    <script type="text/javascript" src="js/custom.js"></script>
+</head>
+<body>
+	<div class="question">
+		<p class="q">
+			Why won't my <code>ConsoleAppender</code> output to <i>logcat</i>?
+		</p>
+		<p class="a">
+			The <code>ConsoleAppender</code> writes to <code>stdout</code>, which is normally suppressed in devices (but is redirected by default in the emulator). The Android documentation provides <a href="http://developer.android.com/guide/developing/tools/adb.html#stdout">instructions</a> to redirect the output of <code>stdout</code> to <i>logcat</i> with priority <code>INFO</code>. Also make sure your <a href="http://developer.android.com/guide/developing/tools/adb.html#filteringoutput">logcat filter</a> allows the <code>INFO</code> level.
+		</p>
+	</div>
+	
+	<div class="question">
+		<p class="q">
+			Why doesn't my <code>FileAppender</code> (or <code>RollingFileAppender</code>) write to the specified location?
+		</p>
+		<p class="a">
+			It's plausible that you don't have write permissions for the specified file. A common mistake when specifying the file location is to use relative paths. Make sure to specify the <b>absolute path</b> to your file where you know your application has write permissions. To write to the SD card, your application must have the <a href="http://developer.android.com/reference/android/Manifest.permission.html#WRITE_EXTERNAL_STORAGE"><code>WRITE_EXTERNAL_STORAGE</code></a> permission.
+		</p>
+	</div>
+
+	<div class="question">
+		<p class="q">
+			Why doesn't <code>logback-android</code> pick up the changes I just made to <i>logback.xml</i> (or <i>AndroidManifest.xml</i>) even after I restarted my app? Is auto-config broken?
+		</p>
+		<p class="a">
+			Auto-configuration occurs only once at initialization when the first logger in your application is instantiated.
+			
+			Android doesn't necessarily end the application when it disappears from view. In order to restart the app (and thus reload the auto-config), you must first kill the app. You can use a TaskManager app or <code>adb</code> (the <code>kill</code> command).
+		</p>
+	</div>
+
+	<div class="question">
+		<p class="q">
+			I tried setting the <code>logback.configurationFile</code> variable with <code>adb setprop</code>, but why doesn't <code>logback-android</code> use it? 
+		</p>
+		<p class="a">
+			Android does not yet officially support a method to pass variables to an application (either directly or indirectly through environment variables). Therefore, <code>logback-android</code> does not support this.
+		</p>
+	</div>
+
+</body>
+</html>

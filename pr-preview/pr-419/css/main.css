@@ -1,0 +1,121 @@
+body {
+margin-top:1em;
+background-color:#f5f5f5;
+font-family: Museo300, Monaco, Century Gothic;
+color:#000;
+}
+
+#container {
+width:700px;
+margin:0 auto;
+}
+
+h1 {
+font-size:3.8em;
+text-shadow: 2px 2px 4px #32cd32;
+color:#260321;
+margin-bottom:3px;
+}
+
+h1 .small {
+font-size:0.4em;
+}
+
+h1 a {
+text-decoration:none;
+}
+
+h2 {
+font-size:1.5em;
+color:#260321;
+}
+
+h3 {
+text-align:center;
+color:#260321;
+}
+
+a {
+outline:none;
+color:darkblue;
+}
+
+.description {
+font-size:1.2em;
+margin-bottom:30px;
+margin-top:30px;
+font-style:italic;
+}
+
+.download {
+float:right;
+}
+
+pre {
+background:#D3D3D3;
+color:#000;
+padding:15px;
+}
+
+.hilite {
+color:#27408B;
+}
+
+hr {
+border:0;
+width:80%;
+border-bottom:1px solid #aaa;
+}
+
+.footer {
+text-align:center;
+padding-top:30px;
+font-style:italic;
+}
+
+#content {
+width:400px;
+border:solid 1px #cbcbcb;
+background:#fafafa;
+-moz-box-shadow:0 0 10px #cbcbcb;
+-webkit-box-shadow:0 0 10px #cbcbcb;
+margin:40px auto 0;
+padding:0 60px 30px;
+}
+
+a img {
+border:1px solid #BBB;
+vertical-align:top;
+margin: 0;
+padding:2px;
+}
+
+a img.last {
+margin-right:0;
+}
+
+li.pad {
+margin-top:10px;
+margin-bottom:10px;
+}
+
+.read-more,.read-less {
+font-size:60%;
+font-style:italic;
+color:blue;
+}
+
+div.block {
+margin-top:5px;
+margin-bottom:10px;
+}
+
+div > p.q {
+font-size:1.1em;
+color:green;
+}
+
+div.version {
+font-size:1.1em;
+color:green;
+}
