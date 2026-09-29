@@ -19,18 +19,28 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.status.Status;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.MockedConstruction;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mockConstruction;
 
 public class SyslogStartConverterTest {
 
@@ -118,6 +128,39 @@ public class SyslogStartConverterTest {
     calendar.set(2012, Calendar.OCTOBER, 11, 22, 14, 15);
     le.setTimeStamp(calendar.getTimeInMillis());
     assertEquals("<191>Oct 11 22:14:15 " + host + " ", converter.convert(le));
+  }
+
+  @Test
+  public void missingFacilityOptionIsReportedAndConverterStaysStopped() {
+    SyslogStartConverter c = new SyslogStartConverter();
+    c.setContext(lc);
+    c.start();
+
+    assertFalse(c.isStarted());
+    List<Status> statuses = lc.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("was expecting a facility string as an option", statuses.get(0).getMessage());
+  }
+
+  @Test
+  public void dateFormatSetupFailureIsReportedAndConverterStaysStopped() {
+    IllegalArgumentException failure = new IllegalArgumentException("injected");
+    SyslogStartConverter c = new SyslogStartConverter();
+    c.setContext(lc);
+    c.setOptionList(Arrays.asList("local7"));
+
+    try (MockedConstruction<SimpleDateFormat> ignored = mockConstruction(SimpleDateFormat.class,
+        (mock, context) -> doThrow(failure).when(mock).setDateFormatSymbols(any(DateFormatSymbols.class)))) {
+      c.start();
+    }
+
+    assertFalse(c.isStarted());
+    List<Status> statuses = lc.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("Could not instantiate SimpleDateFormat", statuses.get(0).getMessage());
+    assertSame(failure, statuses.get(0).getThrowable());
   }
 
   private LoggingEvent createLoggingEvent() {

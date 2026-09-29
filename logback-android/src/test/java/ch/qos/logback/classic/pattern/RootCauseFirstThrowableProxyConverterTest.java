@@ -20,7 +20,10 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.core.CoreConstants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +38,8 @@ import static ch.qos.logback.classic.util.TestHelper.positionOf;
 //import static org.fest.assertions.Assertions.assertThat;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Tomasz Nurkiewicz
@@ -124,4 +129,48 @@ public class RootCauseFirstThrowableProxyConverterTest {
     assertTrue(positionOf("nesting level =1").in(result) < positionOf("nesting level =2").in(result));
   }
 
+  @Test
+  public void suppressedExceptionFollowsItsParentWithPrefix() {
+    //given
+    context.setPackagingDataEnabled(false);
+    StackTraceElement outerFrame = new StackTraceElement("a.A", "m", "A.java", 1);
+    StackTraceElement suppressedFrame = new StackTraceElement("s.S", "m", "S.java", 5);
+    Exception outer = new Exception("outer");
+    outer.setStackTrace(new StackTraceElement[] {outerFrame});
+    Exception suppressed = new Exception("suppressed");
+    suppressed.setStackTrace(new StackTraceElement[] {suppressedFrame, outerFrame});
+    outer.addSuppressed(suppressed);
+
+    //when
+    String result = converter.convert(createLoggingEvent(outer));
+
+    //then
+    String ls = CoreConstants.LINE_SEPARATOR;
+    assertEquals("java.lang.Exception: outer" + ls
+        + "\tat " + outerFrame + ls
+        + "\tSuppressed: java.lang.Exception: suppressed" + ls
+        + "\t\tat " + suppressedFrame + ls
+        + "\t\t... 1 common frames omitted" + ls, result);
+  }
+
+  @Test
+  public void proxyWithoutSuppressedArrayIsPrinted() {
+    //given
+    StackTraceElement frame = new StackTraceElement("a.A", "m", "A.java", 1);
+    IThrowableProxy tp = mock(IThrowableProxy.class);
+    when(tp.getClassName()).thenReturn("x.Boom");
+    when(tp.getMessage()).thenReturn("msg");
+    when(tp.getStackTraceElementProxyArray())
+        .thenReturn(new StackTraceElementProxy[] {new StackTraceElementProxy(frame)});
+    when(tp.getSuppressed()).thenReturn(null);
+    ILoggingEvent event = mock(ILoggingEvent.class);
+    when(event.getThrowableProxy()).thenReturn(tp);
+
+    //when
+    String result = converter.convert(event);
+
+    //then
+    String ls = CoreConstants.LINE_SEPARATOR;
+    assertEquals("x.Boom: msg" + ls + "\tat " + frame + ls, result);
+  }
 }
