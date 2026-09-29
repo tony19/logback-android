@@ -252,18 +252,20 @@ public class ResilientOutputStreamBaseTest {
     ScriptedResilientOutputStream stream = new ScriptedResilientOutputStream(target);
     ByteArrayOutputStream console = new ByteArrayOutputStream();
     PrintStream originalOut = System.out;
+    String warning = "LOGBACK: No context given for " + stream;
     System.setOut(new PrintStream(console, true, "UTF-8"));
     try {
+      // the first status is dropped with a warning...
       stream.addStatus(new InfoStatus("first", this));
+      String afterFirst = console.toString("UTF-8");
+      assertTrue(afterFirst, afterFirst.contains(warning));
+
+      // ...and later ones are dropped silently
       stream.addStatus(new InfoStatus("second", this));
+      assertEquals(afterFirst, console.toString("UTF-8"));
     } finally {
       System.setOut(originalOut);
     }
-
-    String output = console.toString("UTF-8");
-    String warning = "LOGBACK: No context given for " + stream;
-    assertTrue(output, output.contains(warning));
-    assertEquals(output, output.indexOf(warning), output.lastIndexOf(warning));
   }
 
   @Test

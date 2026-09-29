@@ -147,6 +147,48 @@ public class FixedWindowRollingPolicyTest {
   }
 
   @Test
+  public void windowOfMaxWindowSizeIsKept() {
+    startWithWindow(path("archive.%i.log"), 1, 21);
+
+    assertTrue(fwrp.isStarted());
+    assertEquals(1, fwrp.getMinIndex());
+    assertEquals(21, fwrp.getMaxIndex());
+    checker.assertIsWarningOrErrorFree();
+  }
+
+  @Test
+  public void subclassCanRaiseMaxWindowSize() {
+    fwrp = new FixedWindowRollingPolicy() {
+      @Override
+      protected int getMaxWindowSize() {
+        return 50;
+      }
+    };
+    fwrp.setContext(context);
+    fwrp.setParent(rfa);
+
+    startWithWindow(path("archive.%i.log"), 1, 41);
+
+    assertTrue(fwrp.isStarted());
+    assertEquals(41, fwrp.getMaxIndex());
+    checker.assertIsWarningOrErrorFree();
+  }
+
+  @Test
+  public void singleIndexWindowAtZeroRollsActiveFileToIndexZero() throws IOException {
+    startWithWindow(path("archive.%i.log"), 0, 0);
+    checker.assertIsWarningOrErrorFree();
+    write(activeFileName, "active");
+    write(path("archive.0.log"), "previous");
+
+    fwrp.rollover();
+
+    assertFalse(new File(activeFileName).exists());
+    assertEquals("active", read(path("archive.0.log")));
+    assertEquals(1, tmp.getRoot().list().length);
+  }
+
+  @Test
   public void fileNamePatternWithoutIntegerTokenIsRejected() {
     rfa.setFile(activeFileName);
     fwrp.setFileNamePattern(path("archive.log"));
