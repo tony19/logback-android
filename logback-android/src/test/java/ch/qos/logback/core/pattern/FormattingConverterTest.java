@@ -81,6 +81,11 @@ public class FormattingConverterTest {
   }
 
   @Test
+  public void nullConversionIsPaddedToAMinimumOfOne() {
+    assertEquals("[ ]", write(null, new FormatInfo(1, 10)));
+  }
+
+  @Test
   public void nullConversionWithZeroMinimumAppendsNothing() {
     assertEquals("[]", write(null, new FormatInfo(0, 10)));
   }
@@ -88,6 +93,12 @@ public class FormattingConverterTest {
   @Test
   public void nullConversionWithDefaultMinimumAppendsNothing() {
     assertEquals("[]", write(null, new FormatInfo()));
+  }
+
+  @Test
+  public void nullConversionWithNegativeMinimumAppendsNothing() {
+    // SpacePadder.spacePad(buf, -5) would append 27 spaces (the low five bits of -5)
+    assertEquals("[]", write(null, new FormatInfo(-5, 10)));
   }
 
   @Test

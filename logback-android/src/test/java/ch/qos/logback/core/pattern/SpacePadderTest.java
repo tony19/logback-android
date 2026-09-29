@@ -119,7 +119,10 @@ public class SpacePadderTest {
       StringBuilder buf = new StringBuilder("x");
       SpacePadder.spacePad(buf, n);
       assertEquals(n + 1, buf.length());
-      assertEquals("x", buf.toString().trim());
+      assertEquals('x', buf.charAt(0));
+      for (int i = 1; i <= n; i++) {
+        assertEquals(' ', buf.charAt(i));
+      }
     }
   }
 

@@ -21,7 +21,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -29,6 +32,8 @@ import org.junit.Test;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.spi.ScanException;
+import ch.qos.logback.core.status.Status;
 
 public class PatternLayoutBaseTest {
 
@@ -133,6 +138,45 @@ public class PatternLayoutBaseTest {
     assertTrue(layout.isStarted());
     assertEquals("Hello-123", layout.doLayout(new Object()));
     assertTrue(context.getStatusManager().getCopyOfStatusList().isEmpty());
+  }
+
+  @Test
+  public void startReportsAnUnparsablePatternAndStaysStopped() {
+    Context context = new ContextBase();
+    MapPatternLayout layout = new MapPatternLayout(helloAndOttMap());
+    layout.setContext(context);
+    layout.setPattern("%hello%(abc");
+    layout.start();
+
+    assertFalse(layout.isStarted());
+    assertEquals("", layout.doLayout(new Object()));
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    Status last = statuses.get(statuses.size() - 1);
+    assertEquals(Status.ERROR, last.getLevel());
+    assertEquals("Failed to parse pattern \"%hello%(abc\".", last.getMessage());
+    assertSame(layout, last.getOrigin());
+    assertTrue(last.getThrowable() instanceof ScanException);
+  }
+
+  @Test
+  public void startRunsThePostCompileProcessorOnTheCompiledChain() {
+    final Context context = new ContextBase();
+    final List<Context> seenContexts = new ArrayList<Context>();
+    MapPatternLayout layout = new MapPatternLayout(helloAndOttMap());
+    layout.setContext(context);
+    layout.setPattern("%hello");
+    layout.setPostCompileProcessor(new PostCompileProcessor<Object>() {
+      @Override
+      public void process(Context ctx, Converter<Object> head) {
+        seenContexts.add(ctx);
+        ConverterUtil.findTail(head).setNext(new LiteralConverter<Object>("!"));
+      }
+    });
+    layout.start();
+
+    assertTrue(layout.isStarted());
+    assertEquals(Collections.singletonList(context), seenContexts);
+    assertEquals("Hello!", layout.doLayout(new Object()));
   }
 
   @Test
