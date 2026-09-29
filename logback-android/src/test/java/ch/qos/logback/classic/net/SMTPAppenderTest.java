@@ -18,6 +18,7 @@ package ch.qos.logback.classic.net;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -33,9 +34,12 @@ import ch.qos.logback.classic.ClassicConstants;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.classic.boolex.OnErrorEvaluator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.boolex.EvaluationException;
+import ch.qos.logback.core.boolex.EventEvaluator;
 import ch.qos.logback.core.boolex.EventEvaluatorBase;
 import ch.qos.logback.core.helpers.CyclicBuffer;
 
@@ -75,6 +79,12 @@ public class SMTPAppenderTest {
   public void defaultEvaluatorSendsOnErrorEvents() {
     BufferRecordingSMTPAppender appender = configure(new BufferRecordingSMTPAppender());
     appender.start();
+
+    EventEvaluator<ILoggingEvent> evaluator = appender.evaluator();
+    assertTrue(evaluator instanceof OnErrorEvaluator);
+    assertEquals("onError", evaluator.getName());
+    assertSame(context, evaluator.getContext());
+    assertTrue(evaluator.isStarted());
 
     appender.doAppend(event(Level.WARN, "warn"));
     assertTrue(appender.sentBuffers.isEmpty());
@@ -130,6 +140,48 @@ public class SMTPAppenderTest {
     assertTrue(event.hasCallerData());
     assertNotNull(event.getCallerData());
     assertEquals(Collections.<ILoggingEvent>singletonList(event), cb.asList());
+  }
+
+  @Test
+  public void bufferedEventKeepsItsMessageAsFormattedWhenItWasAppended() {
+    SMTPAppender appender = new SMTPAppender();
+    StringBuilder state = new StringBuilder("before");
+    LoggingEvent event = new LoggingEvent(getClass().getName(), context.getLogger("test"), Level.ERROR,
+        "state={}", null, new Object[] {state});
+    CyclicBuffer<ILoggingEvent> cb = new CyclicBuffer<ILoggingEvent>(4);
+
+    appender.subAppend(cb, event);
+    // the argument changes before the buffered event is laid out in an e-mail
+    state.replace(0, state.length(), "after");
+
+    assertEquals("state=before", cb.get().getFormattedMessage());
+  }
+
+  // ------------------------------------------------------------- subject
+
+  @Test
+  public void defaultSubjectIsTheLoggerAndMessageWithoutTheException() {
+    SMTPAppender appender = new SMTPAppender();
+    appender.setContext(context);
+    Layout<ILoggingEvent> subject = appender.makeSubjectLayout(null);
+
+    LoggingEvent event = new LoggingEvent(getClass().getName(), context.getLogger("test"), Level.ERROR,
+        "failed", new IllegalStateException("boom"), null);
+
+    assertTrue(subject.isStarted());
+    assertEquals("test - failed", subject.doLayout(event));
+  }
+
+  @Test
+  public void configuredSubjectPatternIsUsedWithoutTheException() {
+    SMTPAppender appender = new SMTPAppender();
+    appender.setContext(context);
+    Layout<ILoggingEvent> subject = appender.makeSubjectLayout("[%level] %msg");
+
+    LoggingEvent event = new LoggingEvent(getClass().getName(), context.getLogger("test"), Level.ERROR,
+        "failed", new IllegalStateException("boom"), null);
+
+    assertEquals("[ERROR] failed", subject.doLayout(event));
   }
 
   // ------------------------------------------------------------- fillBuffer
@@ -197,6 +249,10 @@ public class SMTPAppenderTest {
 
     BufferRecordingSMTPAppender(EventEvaluatorBase<ILoggingEvent> evaluator) {
       super(evaluator);
+    }
+
+    EventEvaluator<ILoggingEvent> evaluator() {
+      return eventEvaluator;
     }
 
     @Override

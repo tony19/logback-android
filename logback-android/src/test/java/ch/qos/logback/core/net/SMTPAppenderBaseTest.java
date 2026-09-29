@@ -225,6 +225,32 @@ public class SMTPAppenderBaseTest {
   }
 
   @Test
+  public void sslIsEnabledOnTheMailSession() {
+    appender.setSSL(true);
+    start();
+    assertEquals("true", appender.session.getProperty("mail.smtp.ssl.enable"));
+    assertNull(appender.session.getProperty("mail.smtp.starttls.enable"));
+    checker.assertIsErrorFree();
+  }
+
+  @Test
+  public void startTlsIsEnabledOnTheMailSession() {
+    appender.setSTARTTLS(true);
+    start();
+    assertEquals("true", appender.session.getProperty("mail.smtp.starttls.enable"));
+    assertEquals("true", appender.session.getProperty("mail.transport.protocol"));
+    assertNull(appender.session.getProperty("mail.smtp.ssl.enable"));
+    checker.assertIsErrorFree();
+  }
+
+  @Test
+  public void plainSMTPEnablesNeitherSslNorStartTls() {
+    start();
+    assertNull(appender.session.getProperty("mail.smtp.ssl.enable"));
+    assertNull(appender.session.getProperty("mail.smtp.starttls.enable"));
+  }
+
+  @Test
   public void sslTogetherWithStartTlsIsReportedAndEnablesNeither() {
     appender.setSSL(true);
     appender.setSTARTTLS(true);
@@ -350,6 +376,37 @@ public class SMTPAppenderBaseTest {
 
     checker.assertContainsMatch(Status.ERROR, "Attempting to append to a non-started appender: smtp");
     assertFalse(appender.checkEntryConditions());
+    assertEquals(0, appender.getCyclicBufferTracker().getComponentCount());
+    assertTrue(sentMessages.isEmpty());
+  }
+
+  @Test
+  public void appendingWithoutAnEvaluatorIsReportedAndBuffersNothing() throws Exception {
+    startForSending(configure(appender));
+    appender.addTo("to@example.com");
+    appender.setEvaluator(null);
+
+    assertFalse(appender.checkEntryConditions());
+    checker.assertContainsMatch(Status.ERROR, "No EventEvaluator is set for appender \\[smtp\\]\\.");
+
+    appender.append(event(Level.ERROR, "dropped"));
+
+    assertEquals(0, appender.getCyclicBufferTracker().getComponentCount());
+    assertTrue(sentMessages.isEmpty());
+  }
+
+  @Test
+  public void appendingWithoutALayoutIsReportedAndBuffersNothing() throws Exception {
+    startForSending(configure(appender));
+    appender.addTo("to@example.com");
+    appender.setLayout(null);
+
+    assertFalse(appender.checkEntryConditions());
+    checker.assertContainsMatch(Status.ERROR, "No layout set for appender named \\[smtp\\]\\. "
+        + "For more information, please visit http://logback.qos.ch/codes.html#smtp_no_layout");
+
+    appender.append(event(Level.ERROR, "dropped"));
+
     assertEquals(0, appender.getCyclicBufferTracker().getComponentCount());
     assertTrue(sentMessages.isEmpty());
   }
@@ -482,6 +539,24 @@ public class SMTPAppenderBaseTest {
     verify(tracker).endOfLife(DefaultDiscriminator.DEFAULT);
   }
 
+  @Test
+  public void appendRemovesBuffersThatWentStale() throws Exception {
+    CyclicBufferTracker<ILoggingEvent> tracker = new CyclicBufferTracker<ILoggingEvent>();
+    // last used at the epoch: long past the tracker's timeout
+    tracker.getOrCreate("stale", 0);
+    appender.setCyclicBufferTracker(tracker);
+    configure(appender);
+    appender.addTo("to@example.com");
+    startForSending(appender);
+
+    appender.append(event(Level.DEBUG, "fresh"));
+
+    assertNull(tracker.find("stale"));
+    assertEquals(1, tracker.getComponentCount());
+    assertEquals(1, tracker.find(DefaultDiscriminator.DEFAULT).length());
+    checker.assertContainsMatch(Status.INFO, "SMTPAppender \\[smtp\\] is tracking \\[1\\] buffers");
+  }
+
   // --------------------------------------------- append() tracker status messages
 
   @Test
@@ -543,6 +618,7 @@ public class SMTPAppenderBaseTest {
     appender.setLayout(layout);
     appender.setFrom("sender@example.com");
     appender.setSubject("report %msg");
+    assertEquals("report %msg", appender.getSubject());
     appender.addTo("to@example.com");
     startForSending(appender);
 
@@ -576,11 +652,11 @@ public class SMTPAppenderBaseTest {
     appender.addTo("to@example.com");
     startForSending(appender);
 
-    appender.append(event(Level.ERROR, "café"));
+    appender.append(event(Level.ERROR, "caf\u00e9"));
 
     MimeBodyPart part = onlyBodyPart(onlySentMessage());
     assertEquals("text/html; charset=ISO-8859-1", contentType(part));
-    assertEquals("<p>café</p>", part.getContent());
+    assertEquals("<p>caf\u00e9</p>", part.getContent());
   }
 
   @Test
@@ -624,6 +700,21 @@ public class SMTPAppenderBaseTest {
   }
 
   @Test
+  public void subjectIsEncodedWithTheCharsetEncoding() throws Exception {
+    configure(appender);
+    appender.setCharsetEncoding("ISO-8859-1");
+    appender.setSubject("%msg");
+    appender.addTo("to@example.com");
+    startForSending(appender);
+
+    appender.append(event(Level.ERROR, "caf\u00e9"));
+
+    MimeMessage message = onlySentMessage();
+    assertEquals("caf\u00e9", message.getSubject());
+    assertEquals("=?ISO-8859-1?Q?caf=E9?=", message.getHeader("Subject", null));
+  }
+
+  @Test
   public void subjectIsTruncatedAtTheFirstNewLine() throws Exception {
     configure(appender);
     appender.setSubject("%msg");
@@ -633,6 +724,18 @@ public class SMTPAppenderBaseTest {
     appender.append(event(Level.ERROR, "first line\nsecond line"));
 
     assertEquals("first line", onlySentMessage().getSubject());
+  }
+
+  @Test
+  public void subjectStartingWithANewLineIsSentEmpty() throws Exception {
+    configure(appender);
+    appender.setSubject("%msg");
+    appender.addTo("to@example.com");
+    startForSending(appender);
+
+    appender.append(event(Level.ERROR, "\nsecond line"));
+
+    assertEquals("", onlySentMessage().getSubject());
   }
 
   @Test
