@@ -20,6 +20,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
@@ -193,13 +195,15 @@ public class PackagingDataCalculatorTest {
   }
 
   @Test
-  public void classIsResolvedWithClassForNameWhenThereIsNoContextClassLoader() {
+  public void classIsResolvedWithClassForNameWhenThereIsNoContextClassLoader() throws Exception {
     Thread.currentThread().setContextClassLoader(null);
     StackTraceElementProxy step = step(Test.class.getName());
 
-    new PackagingDataCalculator().calculate(proxyOf(step));
+    String err = calculateCapturingStdErr(proxyOf(step));
 
     assertPackagingDataOf(Test.class, step.getClassPackagingData());
+    // a missing class loader is expected, not an error to report
+    assertEquals("", err);
   }
 
   @Test
@@ -209,9 +213,11 @@ public class PackagingDataCalculatorTest {
       Thread.currentThread().setContextClassLoader(bootstrapOnly);
       StackTraceElementProxy step = step(Test.class.getName());
 
-      new PackagingDataCalculator().calculate(proxyOf(step));
+      String err = calculateCapturingStdErr(proxyOf(step));
 
       assertPackagingDataOf(Test.class, step.getClassPackagingData());
+      // the ClassNotFoundException of the context class loader is expected, not reported
+      assertEquals("", err);
     } finally {
       bootstrapOnly.close();
     }
@@ -320,6 +326,34 @@ public class PackagingDataCalculatorTest {
   }
 
   @Test
+  public void leadingSeparatorAloneDoesNotDelimitACodeLocation() throws Exception {
+    // a separator at index 0 is not taken as the start of a file name
+    useSubjectLoader(codeSourceAt("/subject-1.0.jar"));
+    StackTraceElementProxy step = step(PackagingDataCalculatorSubject.class.getName());
+
+    new PackagingDataCalculator().calculate(proxyOf(step));
+
+    assertNull(step.getClassPackagingData().getCodeLocation());
+  }
+
+  @Test
+  public void classWithoutImplementationVersionHasNaVersion() throws Exception {
+    SubjectClassLoader loader = useSubjectLoader(codeSourceAt("file:/opt/lib/subject-1.0.jar"));
+    Class<?> subject = loader.loadClass(PackagingDataCalculatorSubject.class.getName());
+    // precondition: the subject's package is defined without manifest attributes
+    assertNotNull(subject.getPackage());
+    assertNull(subject.getPackage().getImplementationVersion());
+    StackTraceElementProxy step = step(PackagingDataCalculatorSubject.class.getName());
+
+    new PackagingDataCalculator().calculate(proxyOf(step));
+
+    ClassPackagingData cpd = step.getClassPackagingData();
+    assertEquals("na", cpd.getVersion());
+    assertEquals("subject-1.0.jar", cpd.getCodeLocation());
+    assertFalse(cpd.isExact());
+  }
+
+  @Test
   public void failureWhileReadingTheCodeLocationIsSwallowed() throws Exception {
     LocationHandler handler = new LocationHandler("file:/opt/lib/subject-1.0.jar");
     SubjectClassLoader loader = useSubjectLoader(new CodeSource(handler.url(), (Certificate[]) null));
@@ -360,11 +394,35 @@ public class PackagingDataCalculatorTest {
     return tp;
   }
 
+  /**
+   * Runs the calculation and returns what it wrote to System.err. Only the output of
+   * this thread is captured; other threads' output still goes to the original stream.
+   */
   private static String calculateCapturingStdErr(IThrowableProxy tp) throws UnsupportedEncodingException {
-    ByteArrayOutputStream err = new ByteArrayOutputStream();
-    PrintStream originalErr = System.err;
+    final ByteArrayOutputStream err = new ByteArrayOutputStream();
+    final PrintStream originalErr = System.err;
+    final Thread calculatingThread = Thread.currentThread();
+    OutputStream thisThreadOnly = new OutputStream() {
+      @Override
+      public void write(int b) {
+        if (Thread.currentThread() == calculatingThread) {
+          err.write(b);
+        } else {
+          originalErr.write(b);
+        }
+      }
+
+      @Override
+      public void write(byte[] b, int off, int len) {
+        if (Thread.currentThread() == calculatingThread) {
+          err.write(b, off, len);
+        } else {
+          originalErr.write(b, off, len);
+        }
+      }
+    };
     try {
-      System.setErr(new PrintStream(err, true, "UTF-8"));
+      System.setErr(new PrintStream(thisThreadOnly, true, "UTF-8"));
       new PackagingDataCalculator().calculate(tp);
     } finally {
       System.setErr(originalErr);

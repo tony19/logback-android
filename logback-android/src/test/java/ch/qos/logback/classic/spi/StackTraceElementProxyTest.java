@@ -76,6 +76,14 @@ public class StackTraceElementProxyTest {
   }
 
   @Test
+  public void notEqualToInstanceOfASubclass() {
+    StackTraceElementProxy subclassInstance = new StackTraceElementProxy(ste) {
+      private static final long serialVersionUID = 1L;
+    };
+    assertFalse(new StackTraceElementProxy(ste).equals(subclassInstance));
+  }
+
+  @Test
   public void stackTraceElementIsCompared() {
     assertNotEquals(new StackTraceElementProxy(ste), new StackTraceElementProxy(otherSte));
   }

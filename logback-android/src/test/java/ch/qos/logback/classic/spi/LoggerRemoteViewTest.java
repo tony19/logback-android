@@ -17,11 +17,17 @@ package ch.qos.logback.classic.spi;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
 
@@ -42,29 +48,96 @@ public class LoggerRemoteViewTest {
   }
 
   @Test
-  public void contextWithoutRemoteViewFailsTheAssertionWhenAssertionsAreEnabled() {
-    // Gradle runs unit tests with assertions enabled (-ea)
-    assumeTrue(LoggerRemoteView.class.desiredAssertionStatus());
+  public void contextWithRemoteViewPassesTheAssertionWhenAssertionsAreEnabled() throws Exception {
+    Constructor<?> constructor = loggerRemoteViewConstructor(true);
+    LoggerContext lc = new LoggerContext();
 
-    AssertionError e = assertThrows(AssertionError.class,
-        () -> new LoggerRemoteView("a.b.C", new ContextWithoutRemoteView()));
-    assertNull(e.getMessage());
+    Object view = constructor.newInstance("a.b.C", lc);
+
+    assertEquals("a.b.C", view.getClass().getMethod("getName").invoke(view));
+    assertSame(lc.getLoggerContextRemoteView(), view.getClass().getMethod("getLoggerContextView").invoke(view));
   }
 
   @Test
-  public void contextWithoutRemoteViewYieldsNullViewWhenAssertionsAreDisabled() {
-    assumeFalse(LoggerRemoteView.class.desiredAssertionStatus());
+  public void contextWithoutRemoteViewFailsTheAssertionWhenAssertionsAreEnabled() throws Exception {
+    Constructor<?> constructor = loggerRemoteViewConstructor(true);
 
-    LoggerRemoteView view = new LoggerRemoteView("a.b.C", new ContextWithoutRemoteView());
+    InvocationTargetException e = assertThrows(InvocationTargetException.class,
+        () -> constructor.newInstance("a.b.C", new ContextWithoutRemoteView()));
+    assertTrue(String.valueOf(e.getCause()), e.getCause() instanceof AssertionError);
+    assertNull(e.getCause().getMessage());
+  }
 
-    assertEquals("a.b.C", view.getName());
-    assertNull(view.getLoggerContextView());
+  @Test
+  public void contextWithoutRemoteViewYieldsNullViewWhenAssertionsAreDisabled() throws Exception {
+    Constructor<?> constructor = loggerRemoteViewConstructor(false);
+
+    Object view = constructor.newInstance("a.b.C", new ContextWithoutRemoteView());
+
+    assertEquals("a.b.C", view.getClass().getMethod("getName").invoke(view));
+    assertNull(view.getClass().getMethod("getLoggerContextView").invoke(view));
+  }
+
+  /**
+   * Returns the constructor of a fresh copy of {@link LoggerRemoteView} whose assert
+   * statement is enabled or disabled as requested, whatever the JVM's -ea/-da flags are.
+   */
+  private static Constructor<?> loggerRemoteViewConstructor(boolean assertionsEnabled) throws Exception {
+    AssertionStatusClassLoader loader = new AssertionStatusClassLoader();
+    // must precede the loading of the class: its assertion status is fixed when it is initialized
+    loader.setClassAssertionStatus(LoggerRemoteView.class.getName(), assertionsEnabled);
+    Class<?> copy = loader.loadClass(LoggerRemoteView.class.getName());
+    assertNotSame(LoggerRemoteView.class, copy);
+    assertEquals(assertionsEnabled, copy.desiredAssertionStatus());
+    return copy.getConstructor(String.class, LoggerContext.class);
   }
 
   static class ContextWithoutRemoteView extends LoggerContext {
     @Override
     public LoggerContextVO getLoggerContextRemoteView() {
       return null;
+    }
+  }
+
+  /**
+   * Defines its own copy of {@link LoggerRemoteView}, from the same class file and code
+   * source, and delegates every other class to the class loader of this test.
+   */
+  static class AssertionStatusClassLoader extends ClassLoader {
+
+    AssertionStatusClassLoader() {
+      super(LoggerRemoteViewTest.class.getClassLoader());
+    }
+
+    @Override
+    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+      if (!LoggerRemoteView.class.getName().equals(name)) {
+        return super.loadClass(name, resolve);
+      }
+      Class<?> copy = findLoadedClass(name);
+      if (copy == null) {
+        byte[] bytes = readClassBytes(name);
+        copy = defineClass(name, bytes, 0, bytes.length, LoggerRemoteView.class.getProtectionDomain());
+      }
+      return copy;
+    }
+
+    private byte[] readClassBytes(String name) throws ClassNotFoundException {
+      String resource = name.replace('.', '/') + ".class";
+      try (InputStream in = getParent().getResourceAsStream(resource)) {
+        if (in == null) {
+          throw new ClassNotFoundException(name);
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[4096];
+        int n;
+        while ((n = in.read(buffer)) != -1) {
+          out.write(buffer, 0, n);
+        }
+        return out.toByteArray();
+      } catch (IOException e) {
+        throw new ClassNotFoundException(name, e);
+      }
     }
   }
 }
