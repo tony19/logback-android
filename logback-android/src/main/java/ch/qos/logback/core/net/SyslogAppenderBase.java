@@ -49,6 +49,7 @@ public abstract class SyslogAppenderBase<E> extends AppenderBase<E> {
   int maxMessageSize;
   Charset charset;
 
+  @Override
   public void start() {
     int errorCount = 0;
     if (facilityStr == null) {

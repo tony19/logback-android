@@ -113,6 +113,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void start() {
     if (isStarted()) return;
     int errorCount = 0;
@@ -155,6 +156,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     if (taskSubmitted) return;
     taskSubmitted = true;
     task = getContext().getScheduledExecutorService().submit(new Runnable() {
+      @Override
       public void run() {
         resolveHostAndDispatchEvents();
       }
@@ -291,6 +293,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void connectionFailed(SocketConnector connector, Exception ex) {
     if (ex instanceof InterruptedException) {
       addInfo("connector interrupted");

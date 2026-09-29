@@ -107,6 +107,7 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
    * {@link #openFile} is called with the values of <b>File</b> and
    * <b>Append</b> properties.
    */
+  @Override
   public void start() {
     int errors = 0;
 

@@ -54,6 +54,7 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
 
   }
 
+  @Override
   public void start() {    
     if (eventEvaluator == null) {
       OnErrorEvaluator onError = new OnErrorEvaluator();
@@ -77,6 +78,7 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
    * Perform SMTPAppender specific appending actions, mainly adding the event to
    * a cyclic buffer.
    */
+  @Override
   protected void subAppend(CyclicBuffer<ILoggingEvent> cb, ILoggingEvent event) {
     if(includeCallerData) {
       event.getCallerData();
@@ -94,6 +96,7 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
     }
   }
 
+  @Override
   protected boolean eventMarksEndOfLife(ILoggingEvent eventObject) {
     List<Marker> markers = eventObject.getMarkers();
     if(markers == null || markers.isEmpty())
@@ -124,6 +127,7 @@ public class SMTPAppender extends SMTPAppenderBase<ILoggingEvent> {
     return pl;
   }
 
+  @Override
   protected PatternLayout makeNewToPatternLayout(String toPattern) {
     PatternLayout pl = new PatternLayout();
     pl.setPattern(toPattern+"%nopex");

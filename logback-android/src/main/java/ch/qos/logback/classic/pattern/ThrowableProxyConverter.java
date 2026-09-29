@@ -46,6 +46,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
   int errorCount = 0;
 
   @SuppressWarnings("unchecked")
+  @Override
   public void start() {
 
     String lengthStr = getFirstOption();
@@ -103,6 +104,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
     ignoredStackTraceLines.add(ignoredStackTraceLine);
   }
 
+  @Override
   public void stop() {
     evaluatorList = null;
     super.stop();
@@ -112,6 +114,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
     // nop
   }
 
+  @Override
   public String convert(ILoggingEvent event) {
 
     IThrowableProxy tp = event.getThrowableProxy();

@@ -98,6 +98,7 @@ public interface ILoggingEvent extends DeferredProcessingAware {
   Map<String, String> getMdc();
   long getTimeStamp();
 
+  @Override
   void prepareForDeferredProcessing();
 
 }

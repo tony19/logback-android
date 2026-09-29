@@ -68,22 +68,27 @@ public abstract class RollingPolicyBase extends ContextAwareBase implements
     return fileNamePatternStr;
   }
 
+  @Override
   public CompressionMode getCompressionMode() {
     return compressionMode;
   }
 
+  @Override
   public boolean isStarted() {
     return started;
   }
 
+  @Override
   public void start() {
     started = true;
   }
 
+  @Override
   public void stop() {
     started = false;
   }
 
+  @Override
   public void setParent(FileAppender<?> appender) {
     this.parent = appender;
   }

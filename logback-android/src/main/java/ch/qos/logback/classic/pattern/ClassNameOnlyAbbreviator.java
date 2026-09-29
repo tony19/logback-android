@@ -25,6 +25,7 @@ import ch.qos.logback.core.CoreConstants;
  */
 public class ClassNameOnlyAbbreviator implements Abbreviator {
 
+  @Override
   public String abbreviate(String fqClassName) {
     // we ignore the fact that the separator character can also be a dollar
     // If the inner class is org.good.AClass#Inner, returning

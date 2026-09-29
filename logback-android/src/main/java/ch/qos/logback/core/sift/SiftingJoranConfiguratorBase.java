@@ -83,6 +83,7 @@ public abstract class SiftingJoranConfiguratorBase<E> extends
     }
   }
 
+  @Override
   public void doConfigure(final List<SaxEvent> eventList) throws JoranException {
     super.doConfigure(eventList);
   }

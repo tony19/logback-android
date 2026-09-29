@@ -68,6 +68,7 @@ public class SiftingJoranConfigurator  extends SiftingJoranConfiguratorBase<ILog
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public Appender<ILoggingEvent> getAppender() {
     Map<String, Object> omap = interpreter.getInterpretationContext().getObjectMap();
     HashMap<String, Appender<?>> appenderMap = (HashMap<String, Appender<?>>) omap.get(ActionConst.APPENDER_BAG);

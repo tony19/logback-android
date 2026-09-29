@@ -108,6 +108,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   /**
    * Start the appender
    */
+  @Override
   public void start() {
 
     if (cbTracker == null) {
@@ -174,6 +175,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
    * Perform SMTPAppender specific appending actions, delegating some of them to
    * a subclass and checking if the event triggers an e-mail to be sent.
    */
+  @Override
   protected void append(E eventObject) {
 
     if (!checkEntryConditions()) {
@@ -258,6 +260,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
     return true;
   }
 
+  @Override
   synchronized public void stop() {
     this.started = false;
   }
@@ -648,6 +651,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       this.e = e;
     }
 
+    @Override
     public void run() {
       sendBuffer(cyclicBuffer, e);
     }

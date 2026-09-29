@@ -88,6 +88,7 @@ public class SimpleSocketServer extends Thread {
   }
 
 
+  @Override
   public void run() {
 
     final String oldThreadName = Thread.currentThread().getName();

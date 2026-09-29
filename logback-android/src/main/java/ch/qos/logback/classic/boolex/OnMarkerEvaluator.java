@@ -42,6 +42,7 @@ public class OnMarkerEvaluator extends EventEvaluatorBase<ILoggingEvent> {
    * Return true if event passed as parameter contains one of the specified
    * user-markers.
    */
+  @Override
   public boolean evaluate(ILoggingEvent event) throws NullPointerException,
       EvaluationException {
 

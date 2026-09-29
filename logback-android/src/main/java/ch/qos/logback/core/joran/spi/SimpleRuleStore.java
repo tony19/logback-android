@@ -49,6 +49,7 @@ public class SimpleRuleStore extends ContextAwareBase implements RuleStore {
    * Add a new rule, i.e. a pattern, action pair to the rule store. <p> Note
    * that the added action's LoggerRepository will be set in the process.
    */
+  @Override
   public void addRule(ElementSelector elementSelector, Action action) {
     action.setContext(context);
 
@@ -62,6 +63,7 @@ public class SimpleRuleStore extends ContextAwareBase implements RuleStore {
     a4p.add(action);
   }
 
+  @Override
   public void addRule(ElementSelector elementSelector, String actionClassName) {
     Action action = null;
 
@@ -83,6 +85,7 @@ public class SimpleRuleStore extends ContextAwareBase implements RuleStore {
   // if no suffix match, check for prefix match, i.e. matches for x/*
   // match for x/y/* has higher priority than matches for x/*
 
+  @Override
   public List<Action> matchActions(ElementPath elementPath) {
     List<Action> actionList;
 
@@ -198,6 +201,7 @@ public class SimpleRuleStore extends ContextAwareBase implements RuleStore {
   }
   
 
+  @Override
   public String toString() {
     final String TAB = "  ";
 

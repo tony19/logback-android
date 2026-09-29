@@ -24,6 +24,7 @@ public class ReplacingCompositeConverter<E> extends CompositeConverter<E> {
   String regex;
   String replacement;
 
+  @Override
   public void start() {
     final List<String> optionList = getOptionList();
     if (optionList == null) {

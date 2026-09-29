@@ -52,6 +52,7 @@ public class FileExistsPropertyDefiner extends PropertyDefinerBase {
    *
    * @return "true"|"false" depending on the existence of file
    */
+  @Override
   public String getPropertyValue() {
     if (OptionHelper.isEmpty(path)) {
       addError("The \"path\" property must be set.");

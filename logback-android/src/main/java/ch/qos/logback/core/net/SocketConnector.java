@@ -44,6 +44,7 @@ public interface SocketConnector extends Callable<Socket> {
    * @return the connected socket
    * @throws InterruptedException the running connection thread was cancelled
    */
+  @Override
   Socket call() throws InterruptedException;
 
   /**

@@ -48,6 +48,7 @@ public class SSLSocketAppender extends AbstractSSLSocketAppender<ILoggingEvent> 
     this.includeCallerData = includeCallerData;
   }
 
+  @Override
   public PreSerializationTransformer<ILoggingEvent> getPST() {
     return pst;
   }

@@ -74,6 +74,7 @@ public abstract class ConcurrentServerRunner<T extends Client>
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isRunning() {
     return running;
   }
@@ -85,9 +86,11 @@ public abstract class ConcurrentServerRunner<T extends Client>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void stop() throws IOException {
     listener.close();
     accept(new ClientVisitor<T>() {
+      @Override
       public void visit(T client) {
         client.close();
       }
@@ -97,6 +100,7 @@ public abstract class ConcurrentServerRunner<T extends Client>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void accept(ClientVisitor<T> visitor) {
     Collection<T> clients = copyClients();
     for (T client : clients) {
@@ -128,6 +132,7 @@ public abstract class ConcurrentServerRunner<T extends Client>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void run() {
     setRunning(true);
     try {
@@ -212,6 +217,7 @@ public abstract class ConcurrentServerRunner<T extends Client>
       this.delegate = client;
     }
 
+    @Override
     public void run() {
       addClient(delegate);
       try {
@@ -222,6 +228,7 @@ public abstract class ConcurrentServerRunner<T extends Client>
       }
     }
 
+    @Override
     public void close() {
       delegate.close();
     }

@@ -105,6 +105,7 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
     }
   }
 
+  @Override
   public void startDocument() {
   }
 
@@ -112,10 +113,12 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
     return locator;
   }
 
+  @Override
   public void setDocumentLocator(Locator l) {
     locator = l;
   }
 
+  @Override
   public void startElement(String namespaceURI, String localName, String qName,
       Attributes atts) {
 
@@ -127,6 +130,7 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
         atts, getLocator()));
   }
 
+  @Override
   public void characters(char[] ch, int start, int length) {
     String bodyStr = new String(ch, start, length);
     SaxEvent lastEvent = getLastEvent();
@@ -154,6 +158,7 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
     return saxEventList.get(size - 1);
   }
 
+  @Override
   public void endElement(String namespaceURI, String localName, String qName) {
     String q = qName == null || qName.length() == 0 ? localName : qName;
     saxEventList
@@ -169,53 +174,65 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
     return tagName;
   }
 
+  @Override
   public void error(SAXParseException spe) throws SAXException {
     addError(XML_PARSING +" - Parsing error on line " + spe.getLineNumber() + " and column "
         + spe.getColumnNumber(), spe);
   }
 
+  @Override
   public void fatalError(SAXParseException spe) throws SAXException {
     addError(XML_PARSING +" - Parsing fatal error on line " + spe.getLineNumber()
         + " and column " + spe.getColumnNumber(), spe);
   }
 
+  @Override
   public void warning(SAXParseException spe) throws SAXException {
     addWarn(XML_PARSING +" - Parsing warning on line " + spe.getLineNumber() + " and column "
         + spe.getColumnNumber(), spe);
   }
 
+  @Override
   public void addError(String msg) {
     cai.addError(msg);
   }
 
+  @Override
   public void addError(String msg, Throwable ex) {
     cai.addError(msg, ex);
   }
 
+  @Override
   public void addInfo(String msg) {
     cai.addInfo(msg);
   }
 
+  @Override
   public void addInfo(String msg, Throwable ex) {
     cai.addInfo(msg, ex);
   }
 
+  @Override
   public void addStatus(Status status) {
     cai.addStatus(status);
   }
 
+  @Override
   public void addWarn(String msg) {
     cai.addWarn(msg);
   }
 
+  @Override
   public void addWarn(String msg, Throwable ex) {
     cai.addWarn(msg, ex);
   }
 
+  @Override
   public Context getContext() {
     return cai.getContext();
   }
 
+  @Override
   public void setContext(Context context) {
     cai.setContext(context);
   }

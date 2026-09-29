@@ -48,10 +48,12 @@ public class SyslogOutputStream extends OutputStream {
     this.ds = new DatagramSocket();
   }
 
+  @Override
   public void write(byte[] byteArray, int offset, int len) throws IOException {
     baos.write(byteArray, offset, len);
   }
 
+  @Override
   public void flush() throws IOException {
     byte[] bytes = baos.toByteArray();
     DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address,
@@ -75,6 +77,7 @@ public class SyslogOutputStream extends OutputStream {
   
   }
 
+  @Override
   public void close() {
     if (ds != null) {
       ds.close();

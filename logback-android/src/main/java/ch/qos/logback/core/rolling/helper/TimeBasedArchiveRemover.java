@@ -50,6 +50,7 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     this.fileSorter = new FileSorter(dateParser, new IntParser(fileNamePattern));
   }
 
+  @Override
   public void clean(final Date now) {
     List<String> files = this.findFiles();
     List<String> expiredFiles = this.filterFiles(files, this.createExpiredFileFilter(now));
@@ -132,18 +133,22 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     addInfo("Removed  "+ new FileSize(totalRemoved) + " of files");
   }
 
+  @Override
   public void setMaxHistory(int maxHistory) {
     this.maxHistory = maxHistory;
   }
 
+  @Override
   public void setTotalSizeCap(long totalSizeCap) {
     this.totalSizeCap = totalSizeCap;
   }
 
+  @Override
   public String toString() {
     return "c.q.l.core.rolling.helper.TimeBasedArchiveRemover";
   }
 
+  @Override
   public Future<?> cleanAsynchronously(Date now) {
     ArchiveRemoverRunnable runnable = new ArchiveRemoverRunnable(now);
     ExecutorService executorService = context.getScheduledExecutorService();

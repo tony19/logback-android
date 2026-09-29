@@ -30,6 +30,7 @@ public class ScanException extends Exception {
     this.cause = rootCause;
   }
 
+  @Override
   public Throwable getCause() {
    return cause;
   }

@@ -96,6 +96,7 @@ public class XMLLayout extends LayoutBase<ILoggingEvent> {
   /**
    * Formats a {@link ILoggingEvent} in conformity with the log4j.dtd.
    */
+  @Override
   public String doLayout(ILoggingEvent event) {
 
     // Reset working buffer. If the buffer is too large, then we need a new

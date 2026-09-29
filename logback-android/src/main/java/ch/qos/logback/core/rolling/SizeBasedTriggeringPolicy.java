@@ -43,6 +43,7 @@ public class SizeBasedTriggeringPolicy<E> extends TriggeringPolicyBase<E> {
   public SizeBasedTriggeringPolicy() {
   }
 
+  @Override
   public boolean isTriggeringEvent(final File activeFile, final E event) {
     return (activeFile.length() >= maxFileSize.getSize());
   }

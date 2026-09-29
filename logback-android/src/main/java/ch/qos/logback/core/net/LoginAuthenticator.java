@@ -31,6 +31,7 @@ public class LoginAuthenticator extends Authenticator {
     this.password = password;
   }
   
+  @Override
   public PasswordAuthentication getPasswordAuthentication() {
     return new PasswordAuthentication(username, password);
 }

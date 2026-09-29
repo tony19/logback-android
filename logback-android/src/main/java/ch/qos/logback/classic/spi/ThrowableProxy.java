@@ -109,6 +109,7 @@ public class ThrowableProxy implements IThrowableProxy {
     return throwable;
   }
 
+  @Override
   public String getMessage() {
     return message;
   }
@@ -118,14 +119,17 @@ public class ThrowableProxy implements IThrowableProxy {
    * 
    * @see ch.qos.logback.classic.spi.IThrowableProxy#getClassName()
    */
+  @Override
   public String getClassName() {
     return className;
   }
 
+  @Override
   public StackTraceElementProxy[] getStackTraceElementProxyArray() {
     return stackTraceElementProxyArray;
   }
 
+  @Override
   public int getCommonFrames() {
     return commonFrames;
   }
@@ -135,10 +139,12 @@ public class ThrowableProxy implements IThrowableProxy {
    * 
    * @see ch.qos.logback.classic.spi.IThrowableProxy#getCause()
    */
+  @Override
   public IThrowableProxy getCause() {
     return cause;
   }
 
+  @Override
   public IThrowableProxy[] getSuppressed() {
     return suppressed;
   }

@@ -69,6 +69,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
    * Checks that requires parameters are set and if everything is in order,
    * activates this appender.
    */
+  @Override
   public void start() {
     int errors = 0;
     if (this.encoder == null) {
@@ -114,6 +115,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
    * <p>
    * Stopped appenders cannot be reused.
    */
+  @Override
   public void stop() {
     lock.lock();
     try {

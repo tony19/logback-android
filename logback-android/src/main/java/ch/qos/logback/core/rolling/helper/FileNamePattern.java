@@ -79,6 +79,7 @@ public class FileNamePattern extends ContextAwareBase {
     return pattern.replace(")", "\\)");
   }
 
+  @Override
   public String toString() {
     return pattern;
   }

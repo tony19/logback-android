@@ -59,6 +59,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
 
   boolean cleanHistoryOnStart = false;
 
+  @Override
   public void start() {
     // set the LR for our utility object
     renameUtil.setContext(this.context);
@@ -157,6 +158,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     return timeBasedFileNamingAndTriggeringPolicy;
   }
 
+  @Override
   public void rollover() throws RolloverFailure {
 
     // when rollover is called the elapsed period's file has
@@ -213,6 +215,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
    * the change of the file name.
    *
    */
+  @Override
   public String getActiveFileName() {
     String parentsRawFileProperty = getParentsRawFileProperty();
     if (parentsRawFileProperty != null) {
@@ -223,6 +226,7 @@ public class TimeBasedRollingPolicy<E> extends RollingPolicyBase implements
     }
   }
 
+  @Override
   public boolean isTriggeringEvent(File activeFile, final E event) {
     return timeBasedFileNamingAndTriggeringPolicy.isTriggeringEvent(activeFile, event);
   }

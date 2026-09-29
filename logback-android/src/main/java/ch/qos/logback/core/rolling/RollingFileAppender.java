@@ -49,6 +49,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
   static private String RFA_LATE_FILE_URL = CODES_URL + "#rfa_file_after";
   static private String MORE_INFO_PREFIX = "For more information, please visit ";
 
+  @Override
   public void start() {
     if (triggeringPolicy == null) {
       addWarn("No TriggeringPolicy was set for the RollingFileAppender named "

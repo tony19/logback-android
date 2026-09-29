@@ -47,6 +47,7 @@ public class Loader {
 
     HAS_GET_CLASS_LOADER_PERMISSION =
             AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+              @Override
               public Boolean run() {
                 try {
                   AccessController.checkPermission(
@@ -161,6 +162,7 @@ public class Loader {
     else
       return AccessController.doPrivileged(
               new PrivilegedAction<ClassLoader>() {
+                @Override
                 public ClassLoader run() {
                   return clazz.getClassLoader();
                 }

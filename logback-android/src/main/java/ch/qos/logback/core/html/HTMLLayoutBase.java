@@ -188,6 +188,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
     return sbuf.toString();
   }
 
+  @Override
   public String getPresentationHeader() {
     StringBuilder sbuf = new StringBuilder();
     sbuf.append("<hr/>");
@@ -229,6 +230,7 @@ public abstract class HTMLLayoutBase<E> extends LayoutBase<E> {
     sbuf.append(LINE_SEPARATOR);
   }
 
+  @Override
   public String getPresentationFooter() {
     StringBuilder sbuf = new StringBuilder();
     sbuf.append("</table>");

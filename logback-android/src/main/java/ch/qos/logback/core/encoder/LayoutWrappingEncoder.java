@@ -113,15 +113,18 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
     }
   }
 
+  @Override
   public byte[] encode(E event) {
     String txt = layout.doLayout(event);
     return convertToBytes(txt);
   }
 
+  @Override
   public boolean isStarted() {
     return false;
   }
 
+  @Override
   public void start() {
     if (immediateFlush != null) {
       if (parent instanceof OutputStreamAppender) {
@@ -136,6 +139,7 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
     started = true;
   }
 
+  @Override
   public void stop() {
     started = false;
   }

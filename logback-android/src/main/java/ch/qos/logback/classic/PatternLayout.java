@@ -139,10 +139,12 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
     this.postCompileProcessor = new EnsureExceptionHandling();
   }
 
+  @Override
   public Map<String, String> getDefaultConverterMap() {
     return defaultConverterMap;
   }
 
+  @Override
   public String doLayout(ILoggingEvent event) {
     if (!isStarted()) {
       return CoreConstants.EMPTY_STRING;

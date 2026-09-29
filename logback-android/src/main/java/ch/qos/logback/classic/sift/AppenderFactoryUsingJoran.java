@@ -33,6 +33,7 @@ public class AppenderFactoryUsingJoran extends AbstractAppenderFactoryUsingJoran
     super(eventList, key, parentPropertyMap);
   }
 
+  @Override
   public SiftingJoranConfiguratorBase<ILoggingEvent> getSiftingJoranConfigurator(String discriminatingValue) {
     return new SiftingJoranConfigurator(key, discriminatingValue, parentPropertyMap);
   }

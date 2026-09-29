@@ -58,6 +58,7 @@ public class BasicStatusManager implements StatusManager {
    * @param newStatus
    *                the status message to add
    */
+  @Override
   public void add(Status newStatus) {
     // LBCORE-72: fire event before the count check
     fireStatusAddEvent(newStatus);
@@ -77,6 +78,7 @@ public class BasicStatusManager implements StatusManager {
 
   }
 
+  @Override
   public List<Status> getCopyOfStatusList() {
     synchronized (statusListLock) {
       List<Status> tList = new ArrayList<Status>(statusList);
@@ -93,6 +95,7 @@ public class BasicStatusManager implements StatusManager {
     }
   }
 
+  @Override
   public void clear() {
     synchronized (statusListLock) {
       count = 0;
@@ -105,6 +108,7 @@ public class BasicStatusManager implements StatusManager {
     return level;
   }
 
+  @Override
   public int getCount() {
     return count;
   }
@@ -113,6 +117,7 @@ public class BasicStatusManager implements StatusManager {
    * This implementation does not allow duplicate installations of OnConsoleStatusListener
    * @param listener
    */
+  @Override
   public boolean add(StatusListener listener) {
     synchronized (statusListenerListLock) {
       if (listener instanceof OnConsoleStatusListener) {
@@ -135,6 +140,7 @@ public class BasicStatusManager implements StatusManager {
     return false;
   }
 
+  @Override
   public boolean addUniquely(StatusListener newListener, Object origin) {
     for (StatusListener listener : getCopyOfStatusListenerList()) {
       if (listener.getClass().isInstance(newListener)) {
@@ -147,12 +153,14 @@ public class BasicStatusManager implements StatusManager {
     return true;
   }
 
+  @Override
   public void remove(StatusListener listener) {
     synchronized (statusListenerListLock) {
       statusListenerList.remove(listener);
     }
   }
 
+  @Override
   public List<StatusListener> getCopyOfStatusListenerList() {
     synchronized (statusListenerListLock) {
       return new ArrayList<StatusListener>(statusListenerList);

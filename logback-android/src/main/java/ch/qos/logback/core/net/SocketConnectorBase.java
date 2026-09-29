@@ -138,6 +138,7 @@ public class SocketConnectorBase implements SocketConnector {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setExceptionHandler(ExceptionHandler exceptionHandler) {
     this.exceptionHandler = exceptionHandler;
   }
@@ -145,6 +146,7 @@ public class SocketConnectorBase implements SocketConnector {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setSocketFactory(SocketFactory socketFactory) {
     this.socketFactory = socketFactory;
   }
@@ -154,6 +156,7 @@ public class SocketConnectorBase implements SocketConnector {
    */
   private static class ConsoleExceptionHandler implements ExceptionHandler {
 
+    @Override
     public void connectionFailed(SocketConnector connector, Exception ex) {
       System.out.println(ex);
     }
@@ -173,6 +176,7 @@ public class SocketConnectorBase implements SocketConnector {
       this.retryDelay = retryDelay;
     }
 
+    @Override
     public int nextDelay() {
       int delay = nextDelay;
       nextDelay = retryDelay;
@@ -181,6 +185,7 @@ public class SocketConnectorBase implements SocketConnector {
 
   }
 
+  @Override
   public Socket call() throws InterruptedException {
     // TODO Auto-generated method stub
     return null;

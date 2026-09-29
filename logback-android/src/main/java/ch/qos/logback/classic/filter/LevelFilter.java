@@ -51,6 +51,7 @@ public class LevelFilter extends AbstractMatcherFilter<ILoggingEvent> {
     this.level = level;
   }
 
+  @Override
   public void start() {
     if (this.level != null) {
       super.start();

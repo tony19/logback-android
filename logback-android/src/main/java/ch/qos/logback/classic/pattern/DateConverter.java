@@ -27,6 +27,7 @@ public class DateConverter extends ClassicConverter {
 
   CachingDateFormatter cachingDateFormatter = null;
 
+  @Override
   public void start() {
 
 
@@ -79,6 +80,7 @@ public class DateConverter extends ClassicConverter {
     return locale;
   }
 
+  @Override
   public String convert(ILoggingEvent le) {
     long timestamp = le.getTimeStamp();
     return cachingDateFormatter.format(timestamp);

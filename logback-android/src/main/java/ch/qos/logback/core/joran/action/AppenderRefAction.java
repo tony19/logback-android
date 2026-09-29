@@ -30,6 +30,7 @@ public class AppenderRefAction<E> extends Action {
   boolean inError = false;
 
   @SuppressWarnings("unchecked")
+  @Override
   public void begin(InterpretationContext ec, String tagName, Attributes attributes) {
     // Let us forget about previous errors (in this object)
     inError = false;
@@ -78,6 +79,7 @@ public class AppenderRefAction<E> extends Action {
     appenderAttachable.addAppender(appender);
   }
 
+  @Override
   public void end(InterpretationContext ec, String n) {
   }
 
