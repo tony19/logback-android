@@ -71,6 +71,18 @@ public class ServerSocketListenerTest {
   }
 
   @Test
+  public void toStringShowsALocalAddressWithoutAHostNameWithoutTheSlash()
+      throws Exception {
+    ServerSocket socket = mock(ServerSocket.class);
+    // an address with no host name prints as "/127.0.0.1:4560"
+    when(socket.getLocalSocketAddress()).thenReturn(new InetSocketAddress(
+        InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), 4560));
+
+    assertEquals("127.0.0.1:4560",
+        new InstrumentedServerSocketListener(socket).toString());
+  }
+
+  @Test
   public void toStringShowsALocalAddressWithoutASlashUnchanged() {
     ServerSocket socket = mock(ServerSocket.class);
     when(socket.getLocalSocketAddress()).thenReturn(new SocketAddress() {

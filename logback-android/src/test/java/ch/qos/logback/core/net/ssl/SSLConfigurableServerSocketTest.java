@@ -82,13 +82,19 @@ public class SSLConfigurableServerSocketTest {
   @Test
   public void needClientAuthIsSetOnTheSocket() {
     configurable.setNeedClientAuth(true);
+    configurable.setNeedClientAuth(false);
+
     verify(socket).setNeedClientAuth(true);
+    verify(socket).setNeedClientAuth(false);
   }
 
   @Test
   public void wantClientAuthIsSetOnTheSocket() {
     configurable.setWantClientAuth(true);
+    configurable.setWantClientAuth(false);
+
     verify(socket).setWantClientAuth(true);
+    verify(socket).setWantClientAuth(false);
   }
 
   @Test
