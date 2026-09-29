@@ -54,7 +54,7 @@ public final class Logger implements org.slf4j.Logger, LocationAwareLogger,
   private String name;
 
   // The assigned levelInt of this logger. Can be null.
-  transient private Level level;
+  transient private volatile Level level;
 
   // The effective levelInt is the assigned levelInt and if null, a levelInt is
   // inherited form a parent.

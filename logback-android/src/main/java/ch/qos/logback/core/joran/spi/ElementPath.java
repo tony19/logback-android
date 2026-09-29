@@ -91,6 +91,20 @@ public class ElementPath {
     return x.equalsIgnoreCase(y);
   }
 
+  // consistent with equalityCheck(): String.equalsIgnoreCase() compares
+  // characters after folding each one through upper and then lower case
+  @Override
+  public int hashCode() {
+    int h = 1;
+    for (String part : partList) {
+      for (int i = 0; i < part.length(); i++) {
+        h = 31 * h + Character.toLowerCase(Character.toUpperCase(part.charAt(i)));
+      }
+      h = 31 * h + part.length();
+    }
+    return h;
+  }
+
   public List<String> getCopyOfPartList() {
     return new ArrayList<String>(partList);
   }

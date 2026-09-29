@@ -43,7 +43,7 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
   /**
    * Constructs a new client.
    * @param id a display name for the client
-   * @param inputStream input stream from which events will be read
+   * @param socket socket from which events will be read
    */
   public RemoteAppenderStreamClient(String id, Socket socket) {
     this.id = id;

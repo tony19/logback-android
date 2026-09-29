@@ -70,7 +70,7 @@ public class ContextAwareImpl implements ContextAware {
   public void addStatus(Status status) {
     if (context == null) {
       if (noContextWarning++ == 0) {
-        System.out.println("LOGBACK: No context given for " + this);
+        System.out.println("LOGBACK: No context given for " + origin);
       }
       return;
     }

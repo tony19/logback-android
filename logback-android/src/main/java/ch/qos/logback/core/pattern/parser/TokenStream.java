@@ -90,7 +90,7 @@ class TokenStream {
           handleFormatModifierState(c, tokenList, buf);
           break;
         case OPTION_STATE:
-          processOption(c, tokenList, buf);
+          processOption(c, tokenList);
           break;
         case KEYWORD_STATE:
           handleKeywordState(c, tokenList, buf);
@@ -141,7 +141,7 @@ class TokenStream {
     }
   }
 
-  private void processOption(char c, List<Token> tokenList, StringBuffer buf) throws ScanException {
+  private void processOption(char c, List<Token> tokenList) throws ScanException {
     OptionTokenizer ot = new OptionTokenizer(this);
     ot.tokenize(c, tokenList);
   }

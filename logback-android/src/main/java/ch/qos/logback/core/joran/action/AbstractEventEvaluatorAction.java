@@ -22,7 +22,6 @@ import org.xml.sax.Attributes;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.boolex.EventEvaluator;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
-import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.util.OptionHelper;
 
 abstract public class AbstractEventEvaluatorAction extends Action {
@@ -95,10 +94,8 @@ abstract public class AbstractEventEvaluatorAction extends Action {
       return;
     }
 
-    if (evaluator instanceof LifeCycle) {
-      ((LifeCycle) evaluator).start();
-      addInfo("Starting evaluator named [" + evaluator.getName() + "]");
-    }
+    evaluator.start();
+    addInfo("Starting evaluator named [" + evaluator.getName() + "]");
 
     Object o = ec.peekObject();
 

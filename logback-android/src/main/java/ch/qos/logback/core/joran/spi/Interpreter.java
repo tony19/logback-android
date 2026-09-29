@@ -129,11 +129,10 @@ public class Interpreter {
 
   public void startElement(StartEvent se) {
     setDocumentLocator(se.getLocator());
-    startElement(se.namespaceURI, se.localName, se.qName, se.attributes);
+    startElement(se.localName, se.qName, se.attributes);
   }
 
-  private void startElement(String namespaceURI, String localName,
-      String qName, Attributes atts) {
+  private void startElement(String localName, String qName, Attributes atts) {
 
     String tagName = getTagName(localName, qName);
     elementPath.push(tagName);
@@ -182,10 +181,10 @@ public class Interpreter {
 
   public void endElement(EndEvent endEvent) {
     setDocumentLocator(endEvent.locator);
-    endElement(endEvent.namespaceURI, endEvent.localName, endEvent.qName);
+    endElement(endEvent.localName, endEvent.qName);
   }
 
-  private void endElement(String namespaceURI, String localName, String qName) {
+  private void endElement(String localName, String qName) {
     // given that an action list is always pushed for every startElement, we
     // need
     // to always pop for every endElement

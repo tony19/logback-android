@@ -75,8 +75,8 @@ public class MDCFilter extends MatchingFilter {
       return FilterReply.NEUTRAL;
     }
 
-    String value = MDC.get(MDCKey);
-    if (this.value.equals(value)) {
+    String mdcValue = MDC.get(MDCKey);
+    if (value.equals(mdcValue)) {
       return onMatch;
     }
     return onMismatch;

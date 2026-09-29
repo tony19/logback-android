@@ -281,8 +281,7 @@ public class PropertySetter extends ContextAwareBase {
     // first let us use the addXXX method
     if (adderMethod != null) {
       Class<?>[] paramTypes = adderMethod.getParameterTypes();
-      if (!isSanityCheckSuccessful(name, adderMethod, paramTypes,
-          complexProperty)) {
+      if (!isSanityCheckSuccessful(name, paramTypes, complexProperty)) {
         return;
       }
       invokeMethodWithSingleParameterOnThisObject(adderMethod, complexProperty);
@@ -319,7 +318,7 @@ public class PropertySetter extends ContextAwareBase {
     }
 
     Class<?>[] paramTypes = adderMethod.getParameterTypes();
-    isSanityCheckSuccessful(name, adderMethod, paramTypes, strValue);
+    isSanityCheckSuccessful(name, paramTypes, strValue);
 
     Object arg;
     try {
@@ -355,7 +354,7 @@ public class PropertySetter extends ContextAwareBase {
 
     Class<?>[] paramTypes = setter.getParameterTypes();
 
-    if (!isSanityCheckSuccessful(name, setter, paramTypes, complexProperty)) {
+    if (!isSanityCheckSuccessful(name, paramTypes, complexProperty)) {
       return;
     }
     try {
@@ -367,8 +366,8 @@ public class PropertySetter extends ContextAwareBase {
     }
   }
 
-  private boolean isSanityCheckSuccessful(String name, Method method,
-      Class<?>[] params, Object complexProperty) {
+  private boolean isSanityCheckSuccessful(String name, Class<?>[] params,
+      Object complexProperty) {
     Class<?> ccc = complexProperty.getClass();
     if (params.length != 1) {
       addError("Wrong number of parameters in setter method for property ["
@@ -442,7 +441,7 @@ public class PropertySetter extends ContextAwareBase {
     return relevantMethod;
   }
 
-  <T extends Annotation> T getAnnotation(String name, Class<T> annonationClass,
+  <T extends Annotation> T getAnnotation(Class<T> annonationClass,
       Method relevantMethod) {
 
     if (relevantMethod != null) {
@@ -453,15 +452,14 @@ public class PropertySetter extends ContextAwareBase {
   }
 
   Class<?> getDefaultClassNameByAnnonation(String name, Method relevantMethod) {
-    DefaultClass defaultClassAnnon = getAnnotation(name, DefaultClass.class,
-        relevantMethod);
+    DefaultClass defaultClassAnnon = getAnnotation(DefaultClass.class, relevantMethod);
     if (defaultClassAnnon != null) {
       return defaultClassAnnon.value();
     }
     return null;
   }
 
-  Class<?> getByConcreteType(String name, Method relevantMethod) {
+  Class<?> getByConcreteType(Method relevantMethod) {
 
     Class<?> paramType = getParameterClassForMethod(relevantMethod);
     if (paramType == null) {
@@ -494,7 +492,7 @@ public class PropertySetter extends ContextAwareBase {
     if (byAnnotation != null) {
       return byAnnotation;
     }
-    return getByConcreteType(name, relevantMethod);
+    return getByConcreteType(relevantMethod);
   }
 
 }

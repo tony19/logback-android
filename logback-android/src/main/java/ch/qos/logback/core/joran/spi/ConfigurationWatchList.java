@@ -19,6 +19,7 @@ package ch.qos.logback.core.joran.spi;
 import ch.qos.logback.core.spi.ContextAwareBase;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -91,11 +92,15 @@ public class ConfigurationWatchList extends ContextAwareBase {
     //return (lastModified != fileToScan.lastModified() && lastModified != SENTINEL);
   }
 
-  @SuppressWarnings("deprecation")
   File convertToFile(URL url) {
     String protocol = url.getProtocol();
     if ("file".equals(protocol)) {
-      return new File(URLDecoder.decode(url.getFile()));
+      try {
+        return new File(URLDecoder.decode(url.getFile(), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        // unreachable: every Java platform supports UTF-8
+        throw new IllegalStateException(e);
+      }
     } else {
       addInfo("URL [" + url + "] is not of type file");
       return null;

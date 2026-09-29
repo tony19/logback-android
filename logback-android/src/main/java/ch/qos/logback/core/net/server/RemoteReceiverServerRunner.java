@@ -36,7 +36,7 @@ class RemoteReceiverServerRunner
    *    clients
    * @param executor that will be used to execute asynchronous tasks
    *    on behalf of the runner.
-   * @param queueSize size of the event queue that will be maintained for
+   * @param clientQueueSize size of the event queue that will be maintained for
    *    each client
    */
   public RemoteReceiverServerRunner(

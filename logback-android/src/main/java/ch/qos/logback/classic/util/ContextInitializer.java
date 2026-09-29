@@ -62,7 +62,7 @@ public class ContextInitializer {
         File file = new File(logbackConfigFile);
         if (file.exists() && file.isFile()) {
           if (updateStatus) {
-            statusOnResourceSearch(logbackConfigFile, this.classLoader, logbackConfigFile);
+            statusOnResourceSearch(logbackConfigFile, logbackConfigFile);
           }
           result = file.toURI().toURL();
         } else {
@@ -78,7 +78,7 @@ public class ContextInitializer {
         }
       } finally {
         if (updateStatus) {
-          statusOnResourceSearch(logbackConfigFile, this.classLoader, result != null ? result.toString() : null);
+          statusOnResourceSearch(logbackConfigFile, result != null ? result.toString() : null);
         }
       }
     }
@@ -104,7 +104,7 @@ public class ContextInitializer {
       if (url != null) {
         resourcePath = filename;
       }
-      statusOnResourceSearch(filename, myClassLoader, resourcePath);
+      statusOnResourceSearch(filename, resourcePath);
     }
     return url;
   }
@@ -149,7 +149,7 @@ public class ContextInitializer {
   /**
    * Adds a status message for the result of the resource search
    */
-  private void statusOnResourceSearch(String resourceName, ClassLoader classLoader, String path) {
+  private void statusOnResourceSearch(String resourceName, String path) {
     StatusManager sm = loggerContext.getStatusManager();
     if (path == null) {
       sm.add(new InfoStatus("Could NOT find resource [" + resourceName + "]",
