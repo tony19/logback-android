@@ -125,6 +125,20 @@ public class AppenderActionTest {
   }
 
   @Test
+  public void failedBeginForgetsThePreviousAppender() throws ActionException {
+    Appender<?> appender = beginWithListAppender();
+    assertSame(appender, action.appender);
+
+    atts.setValue(Action.CLASS_ATTRIBUTE, "");
+    action.begin(ic, "appender", atts);
+
+    assertNull(action.appender);
+    assertStatus(Status.ERROR, "Missing class name for appender. Near [appender] line 7");
+    action.end(ic, "appender");
+    assertFalse(appender.isStarted());
+  }
+
+  @Test
   public void uninstantiableClassIsAnErrorThatAbortsTheElement() {
     atts.setValue(Action.CLASS_ATTRIBUTE, "no.such.Appender");
     atts.setValue(Action.NAME_ATTRIBUTE, "A1");

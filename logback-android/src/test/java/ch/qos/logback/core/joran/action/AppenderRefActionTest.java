@@ -106,6 +106,18 @@ public class AppenderRefActionTest {
   }
 
   @Test
+  public void emptyRefAttributeIsAnError() {
+    ic.pushObject(attachable);
+    atts.setValue(ActionConst.REF_ATTRIBUTE, "");
+
+    action.begin(ic, "appender-ref", atts);
+
+    assertTrue(action.inError);
+    assertStatus(Status.ERROR, "Missing appender ref attribute in <appender-ref> tag.");
+    assertFalse(attachable.iteratorForAppenders().hasNext());
+  }
+
+  @Test
   public void unknownAppenderIsAnError() {
     ic.pushObject(attachable);
     atts.setValue(ActionConst.REF_ATTRIBUTE, "nope");

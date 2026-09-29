@@ -105,6 +105,30 @@ public class ConversionRuleActionTest {
   }
 
   @Test
+  public void emptyConversionWordIsAnError() {
+    atts.setValue(ActionConst.CONVERSION_WORD_ATTRIBUTE, "");
+    atts.setValue(ActionConst.CONVERTER_CLASS_ATTRIBUTE, CONVERTER_CLASS);
+
+    action.begin(ic, "conversionRule", atts);
+
+    assertTrue(action.inError);
+    assertNull(ruleRegistry());
+    assertStatus(Status.ERROR, "No 'conversionWord' attribute in <conversionRule>");
+  }
+
+  @Test
+  public void emptyConverterClassIsAnError() {
+    atts.setValue(ActionConst.CONVERSION_WORD_ATTRIBUTE, "my");
+    atts.setValue(ActionConst.CONVERTER_CLASS_ATTRIBUTE, "");
+
+    action.begin(ic, "conversionRule", atts);
+
+    assertTrue(action.inError);
+    assertNull(ruleRegistry());
+    assertStatus(Status.ERROR, "No 'converterClass' attribute in <conversionRule>");
+  }
+
+  @Test
   public void failureToRegisterTheRuleIsAnError() {
     Map<String, String> readOnly = Collections.emptyMap();
     context.putObject(CoreConstants.PATTERN_RULE_REGISTRY, readOnly);

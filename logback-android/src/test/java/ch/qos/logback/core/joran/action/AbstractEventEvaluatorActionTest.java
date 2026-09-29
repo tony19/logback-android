@@ -87,6 +87,19 @@ public class AbstractEventEvaluatorActionTest {
   }
 
   @Test
+  public void emptyClassAttributeFallsBackToTheDefaultClass() {
+    action.defaultClassName = EVALUATOR_CLASS;
+    atts.setValue(Action.CLASS_ATTRIBUTE, "");
+    atts.setValue(Action.NAME_ATTRIBUTE, "myEval");
+
+    action.begin(ic, "evaluator", atts);
+
+    assertFalse(action.inError);
+    assertTrue(ic.peekObject() instanceof TestEvaluator);
+    assertStatus(Status.INFO, "Assuming default evaluator class [" + EVALUATOR_CLASS + "]");
+  }
+
+  @Test
   public void missingClassWithoutDefaultIsAnError() {
     action.defaultClassName = null;
     atts.setValue(Action.NAME_ATTRIBUTE, "myEval");
@@ -108,6 +121,19 @@ public class AbstractEventEvaluatorActionTest {
     assertTrue(action.inError);
     assertNull(action.evaluator);
     assertTrue(ic.isEmpty());
+    assertStatus(Status.ERROR, "Mandatory \"name\" attribute not set for <evaluator>");
+  }
+
+  @Test
+  public void failedBeginForgetsThePreviousEvaluator() {
+    beginWithValidEvaluator();
+    assertTrue(action.evaluator instanceof TestEvaluator);
+
+    atts.setValue(Action.NAME_ATTRIBUTE, "");
+    action.begin(ic, "evaluator", atts);
+
+    assertTrue(action.inError);
+    assertNull(action.evaluator);
     assertStatus(Status.ERROR, "Mandatory \"name\" attribute not set for <evaluator>");
   }
 

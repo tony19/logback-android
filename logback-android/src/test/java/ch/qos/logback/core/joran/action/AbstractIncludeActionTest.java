@@ -196,6 +196,19 @@ public class AbstractIncludeActionTest {
   }
 
   @Test
+  public void urlAttributeIsSubstitutedBeforeUse() throws Exception {
+    URL url = tmp.newFile("included.xml").toURI().toURL();
+    context.putProperty("includeUrl", url.toString());
+    atts.setValue("url", "${includeUrl}");
+
+    action.begin(ic, "include", atts);
+
+    assertEquals(url.toString(), action.getAttributeInUse());
+    assertEquals(Collections.singletonList(url), action.includedUrls);
+    assertNoStatus();
+  }
+
+  @Test
   public void malformedUrlIsAnError() throws Exception {
     atts.setValue("url", "htp://logback.qos.ch");
 
@@ -228,6 +241,31 @@ public class AbstractIncludeActionTest {
 
     assertEquals(Collections.singletonList(url), action.includedUrls);
     assertEquals(RESOURCE, action.getAttributeInUse());
+    assertNoStatus();
+  }
+
+  @Test
+  public void resourceAttributeIsSubstitutedBeforeUse() throws Exception {
+    context.putProperty("includeResource", RESOURCE);
+    atts.setValue("resource", "${includeResource}");
+
+    action.begin(ic, "include", atts);
+
+    assertEquals(RESOURCE, action.getAttributeInUse());
+    assertEquals(Collections.singletonList(Loader.getResourceBySelfClassLoader(RESOURCE)), action.includedUrls);
+    assertNoStatus();
+  }
+
+  @Test
+  public void emptySourceAttributesCountAsUnset() throws Exception {
+    atts.setValue("file", "");
+    atts.setValue("url", "");
+    atts.setValue("resource", RESOURCE);
+
+    action.begin(ic, "include", atts);
+
+    assertEquals(RESOURCE, action.getAttributeInUse());
+    assertEquals(Collections.singletonList(Loader.getResourceBySelfClassLoader(RESOURCE)), action.includedUrls);
     assertNoStatus();
   }
 
@@ -278,6 +316,21 @@ public class AbstractIncludeActionTest {
     action.begin(ic, "include", atts);
 
     assertFalse(action.isOptional());
+    assertStatus(Status.ERROR, NO_SOURCE_MESSAGE);
+  }
+
+  @Test
+  public void attributeInUseIsForgottenOnEachBegin() throws Exception {
+    File file = tmp.newFile("included.xml");
+    atts.setValue("file", file.getPath());
+    action.begin(ic, "include", atts);
+    assertEquals(file.getPath(), action.getAttributeInUse());
+
+    atts.setValue("file", null);
+    action.begin(ic, "include", atts);
+
+    assertNull(action.getAttributeInUse());
+    assertEquals(1, action.includedUrls.size());
     assertStatus(Status.ERROR, NO_SOURCE_MESSAGE);
   }
 
