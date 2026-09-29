@@ -89,38 +89,31 @@ public class ContextAwareBaseTest {
   @Test
   public void everyStatusFlavorReachesTheStatusManagerWithThisAsOrigin() {
     cab.setContext(context);
-    Exception infoEx = new Exception("i");
-    Exception warnEx = new Exception("w");
-    Exception errorEx = new Exception("e");
 
-    cab.addInfo("info");
-    cab.addInfo("info with ex", infoEx);
-    cab.addWarn("warn");
-    cab.addWarn("warn with ex", warnEx);
-    cab.addError("error");
-    cab.addError("error with ex", errorEx);
-
-    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
-    assertEquals(6, statuses.size());
-    assertStatus(statuses.get(0), Status.INFO, "info", null, cab);
-    assertStatus(statuses.get(1), Status.INFO, "info with ex", infoEx, cab);
-    assertStatus(statuses.get(2), Status.WARN, "warn", null, cab);
-    assertStatus(statuses.get(3), Status.WARN, "warn with ex", warnEx, cab);
-    assertStatus(statuses.get(4), Status.ERROR, "error", null, cab);
-    assertStatus(statuses.get(5), Status.ERROR, "error with ex", errorEx, cab);
+    assertEveryStatusFlavorIsAddedWithOrigin(cab, cab);
   }
 
   @Test
-  public void declaredOriginIsTheOriginOfStatuses() {
+  public void declaredOriginIsTheOriginOfEveryStatusFlavor() {
     ContextAwareBase declaredOrigin = new ContextAwareBase();
     ContextAwareBase delegate = new ContextAwareBase(declaredOrigin);
     delegate.setContext(context);
 
-    delegate.addInfo("hello");
+    assertEveryStatusFlavorIsAddedWithOrigin(delegate, declaredOrigin);
+  }
 
-    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
-    assertEquals(1, statuses.size());
-    assertStatus(statuses.get(0), Status.INFO, "hello", null, declaredOrigin);
+  @Test
+  public void overriddenDeclaredOriginIsTheOriginOfEveryStatusFlavor() {
+    final Object overriddenOrigin = new Object();
+    ContextAwareBase subclass = new ContextAwareBase() {
+      @Override
+      protected Object getDeclaredOrigin() {
+        return overriddenOrigin;
+      }
+    };
+    subclass.setContext(context);
+
+    assertEveryStatusFlavorIsAddedWithOrigin(subclass, overriddenOrigin);
   }
 
   @Test
@@ -144,6 +137,29 @@ public class ContextAwareBaseTest {
 
     verify(contextWithoutStatusManager).getStatusManager();
     assertEquals("", capturedOut.toString("UTF-8"));
+  }
+
+  private void assertEveryStatusFlavorIsAddedWithOrigin(ContextAwareBase contextAware,
+                                                        Object expectedOrigin) {
+    Exception infoEx = new Exception("i");
+    Exception warnEx = new Exception("w");
+    Exception errorEx = new Exception("e");
+
+    contextAware.addInfo("info");
+    contextAware.addInfo("info with ex", infoEx);
+    contextAware.addWarn("warn");
+    contextAware.addWarn("warn with ex", warnEx);
+    contextAware.addError("error");
+    contextAware.addError("error with ex", errorEx);
+
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(6, statuses.size());
+    assertStatus(statuses.get(0), Status.INFO, "info", null, expectedOrigin);
+    assertStatus(statuses.get(1), Status.INFO, "info with ex", infoEx, expectedOrigin);
+    assertStatus(statuses.get(2), Status.WARN, "warn", null, expectedOrigin);
+    assertStatus(statuses.get(3), Status.WARN, "warn with ex", warnEx, expectedOrigin);
+    assertStatus(statuses.get(4), Status.ERROR, "error", null, expectedOrigin);
+    assertStatus(statuses.get(5), Status.ERROR, "error with ex", errorEx, expectedOrigin);
   }
 
   private static void assertStatus(Status status, int level, String message, Throwable throwable,

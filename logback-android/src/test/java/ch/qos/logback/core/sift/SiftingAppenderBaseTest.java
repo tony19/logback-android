@@ -112,6 +112,31 @@ public class SiftingAppenderBaseTest {
   }
 
   @Test
+  public void eventTimestampsKeepTheirNestedAppenderAliveWhileIdleOnesTimeOut() {
+    StringSiftingAppender sa = newStringSiftingAppender();
+    sa.setTimeout(Duration.buildByMilliseconds(10000));
+    sa.start();
+    sa.now = 3000;
+    sa.doAppend("idle:1");
+    sa.doAppend("busy:1");
+    Appender<String> idle = sa.getAppenderTracker().find("idle");
+    Appender<String> busy = sa.getAppenderTracker().find("busy");
+
+    // "busy" is used again within the timeout, "idle" is not
+    sa.now = 3000 + 9000;
+    sa.doAppend("busy:2");
+    // past the timeout of "idle" (3000 + 10000) but not of "busy" (12000 + 10000)
+    sa.now = 3000 + 10001;
+    sa.doAppend("busy:3");
+
+    assertNull(sa.getAppenderTracker().find("idle"));
+    assertFalse(idle.isStarted());
+    assertSame(busy, sa.getAppenderTracker().find("busy"));
+    assertTrue(busy.isStarted());
+    assertEquals(Arrays.asList("busy:1", "busy:2", "busy:3"), nestedEvents(sa, "busy"));
+  }
+
+  @Test
   public void stopStopsLiveAndLingeringNestedAppenders() {
     StringSiftingAppender sa = newStringSiftingAppender();
     sa.start();
@@ -171,6 +196,8 @@ public class SiftingAppenderBaseTest {
    */
   static class StringSiftingAppender extends SiftingAppenderBase<String> {
     final RecordingListAppenderFactory factory = new RecordingListAppenderFactory();
+    /** the timestamp of the events appended next */
+    long now = 0;
 
     StringSiftingAppender() {
       PrefixDiscriminator prefixDiscriminator = new PrefixDiscriminator();
@@ -181,7 +208,7 @@ public class SiftingAppenderBaseTest {
 
     @Override
     protected long getTimestamp(String event) {
-      return 0;
+      return now;
     }
 
     @Override

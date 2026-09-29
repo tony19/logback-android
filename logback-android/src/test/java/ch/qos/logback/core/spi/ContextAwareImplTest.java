@@ -98,25 +98,21 @@ public class ContextAwareImplTest {
   @Test
   public void everyStatusFlavorReachesTheStatusManagerWithTheGivenOrigin() {
     ContextAwareImpl cai = new ContextAwareImpl(context, origin);
-    Exception infoEx = new Exception("i");
-    Exception warnEx = new Exception("w");
-    Exception errorEx = new Exception("e");
 
-    cai.addInfo("info");
-    cai.addInfo("info with ex", infoEx);
-    cai.addWarn("warn");
-    cai.addWarn("warn with ex", warnEx);
-    cai.addError("error");
-    cai.addError("error with ex", errorEx);
+    assertEveryStatusFlavorIsAddedWithOrigin(cai, origin);
+  }
 
-    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
-    assertEquals(6, statuses.size());
-    assertStatus(statuses.get(0), Status.INFO, "info", null);
-    assertStatus(statuses.get(1), Status.INFO, "info with ex", infoEx);
-    assertStatus(statuses.get(2), Status.WARN, "warn", null);
-    assertStatus(statuses.get(3), Status.WARN, "warn with ex", warnEx);
-    assertStatus(statuses.get(4), Status.ERROR, "error", null);
-    assertStatus(statuses.get(5), Status.ERROR, "error with ex", errorEx);
+  @Test
+  public void overriddenOriginIsTheOriginOfEveryStatusFlavor() {
+    final Object overriddenOrigin = new Object();
+    ContextAwareImpl cai = new ContextAwareImpl(context, origin) {
+      @Override
+      protected Object getOrigin() {
+        return overriddenOrigin;
+      }
+    };
+
+    assertEveryStatusFlavorIsAddedWithOrigin(cai, overriddenOrigin);
   }
 
   @Test
@@ -143,10 +139,33 @@ public class ContextAwareImplTest {
     assertEquals("", capturedOut.toString("UTF-8"));
   }
 
-  private void assertStatus(Status status, int level, String message, Throwable throwable) {
+  private void assertEveryStatusFlavorIsAddedWithOrigin(ContextAwareImpl cai, Object expectedOrigin) {
+    Exception infoEx = new Exception("i");
+    Exception warnEx = new Exception("w");
+    Exception errorEx = new Exception("e");
+
+    cai.addInfo("info");
+    cai.addInfo("info with ex", infoEx);
+    cai.addWarn("warn");
+    cai.addWarn("warn with ex", warnEx);
+    cai.addError("error");
+    cai.addError("error with ex", errorEx);
+
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(6, statuses.size());
+    assertStatus(statuses.get(0), Status.INFO, "info", null, expectedOrigin);
+    assertStatus(statuses.get(1), Status.INFO, "info with ex", infoEx, expectedOrigin);
+    assertStatus(statuses.get(2), Status.WARN, "warn", null, expectedOrigin);
+    assertStatus(statuses.get(3), Status.WARN, "warn with ex", warnEx, expectedOrigin);
+    assertStatus(statuses.get(4), Status.ERROR, "error", null, expectedOrigin);
+    assertStatus(statuses.get(5), Status.ERROR, "error with ex", errorEx, expectedOrigin);
+  }
+
+  private static void assertStatus(Status status, int level, String message, Throwable throwable,
+                                   Object expectedOrigin) {
     assertEquals(level, status.getLevel());
     assertEquals(message, status.getMessage());
     assertSame(throwable, status.getThrowable());
-    assertSame(origin, status.getOrigin());
+    assertSame(expectedOrigin, status.getOrigin());
   }
 }
