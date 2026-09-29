@@ -83,20 +83,16 @@ public class HardenedObjectInputStream extends ObjectInputStream {
             oifConfigClass = Class.forName("java.io.ObjectInputFilter$Config");
             setObjectInputFilterMethod = ObjectInputStream.class.getMethod("setObjectInputFilter", oifClass);
             createFilterMethod = oifConfigClass.getMethod("createFilter", String.class);
-        } catch (ClassNotFoundException e) {
-            return;
-        } catch (NoSuchMethodException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            // no ObjectInputFilter (Java 8, Android)
             return;
         }
 
         try {
             Object filter = createFilterMethod.invoke(null, "maxarray=" + ARRAY_LIMIT + ";maxdepth=" + DEPTH_LIMIT + ";");
             setObjectInputFilterMethod.invoke(this, filter);
-        } catch (IllegalAccessException e) {
-            // this code should be unreachable
-            throw new RuntimeException("Failed to initialize object filter", e);
-        } catch (InvocationTargetException e) {
-            // this code should be unreachable
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            // e.g. a subclass already set a filter on this stream
             throw new RuntimeException("Failed to initialize object filter", e);
         }
     }
