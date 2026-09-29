@@ -17,6 +17,7 @@ package ch.qos.logback.core.pattern.parser;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -419,5 +420,26 @@ public class TokenStreamTest {
 
       assertEquals(witness, tl);
     }
+  }
+
+  @Test
+  public void patternEndingInFormatModifierIsRejected() {
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("abc %-5").tokenize());
+    assertEquals("Unexpected end of pattern string", e.getMessage());
+  }
+
+  @Test
+  public void patternEndingWithPercentIsRejected() {
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("abc %").tokenize());
+    assertEquals("Unexpected end of pattern string", e.getMessage());
+  }
+
+  @Test
+  public void patternEndingInOpeningCurlyBraceIsRejected() {
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("%x{").tokenize());
+    assertEquals("Unexpected end of pattern string", e.getMessage());
   }
 }
