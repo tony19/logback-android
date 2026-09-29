@@ -85,9 +85,13 @@ flavors separately.
 Write the failing test first where the phase fixes a bug. Before pushing, run what CI runs:
 
 ```
-./gradlew lint testJdk11DebugUnitTest testJdk8DebugUnitTest
+./gradlew lint testJdk11DebugUnitTest testJdk8DebugUnitTest verifyCoverage
 ./scripts/check-architecture-docs.sh
 ```
+
+`verifyCoverage` fails unless the unit tests cover every line and branch of every class, so new
+or changed code comes with the tests that cover it. When it fails, `./gradlew
+coverageReportJdk11Debug` and `scripts/coverage-gaps.py` on the XML report list what is missing.
 
 Open the PR as a draft (see `AGENTS.md`), with a Conventional Commits title and a short
 "deferred work considered" note naming what you folded in and what you deliberately left. Two
