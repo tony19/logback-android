@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -137,26 +138,54 @@ public class OutputStreamAppenderTest {
   }
 
   @Test
-  public void eventsAreWrittenThroughWriteOut() {
-    final List<Object> writtenOut = new ArrayList<Object>();
-    OutputStreamAppender<Object> appender = new OutputStreamAppender<Object>() {
-      @Override
-      protected void writeOut(Object event) throws IOException {
-        writtenOut.add(event);
-        super.writeOut(event);
-      }
-    };
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    appender.setContext(context);
-    appender.setEncoder(new Utf8LineEncoder());
-    appender.setOutputStream(baos);
+  public void writeOutWritesEncodedEventAndFlushes() throws IOException {
+    OutputStreamAppender<Object> appender = newAppender(new Utf8LineEncoder());
+    FaultInjectingOutputStream out = new FaultInjectingOutputStream();
+    appender.setOutputStream(out);
     appender.start();
 
-    appender.doAppend("a");
-    appender.doAppend("b");
+    appender.writeOut("a");
+    appender.writeOut("b");
 
-    assertEquals(Arrays.<Object>asList("a", "b"), writtenOut);
-    assertEquals("a\nb\n", utf8(baos));
+    assertEquals("a\nb\n", out.text());
+    assertEquals(2, out.flushCount);
+    statusChecker.assertIsErrorFree();
+  }
+
+  @Test
+  public void writeOutWritesNothingForEmptyOrNullEncoding() throws IOException {
+    Utf8LineEncoder encoder = new Utf8LineEncoder() {
+      @Override
+      public byte[] encode(Object event) {
+        return event == null ? null : new byte[0];
+      }
+    };
+    OutputStreamAppender<Object> appender = newAppender(encoder);
+    FaultInjectingOutputStream out = new FaultInjectingOutputStream();
+    appender.setOutputStream(out);
+    appender.start();
+
+    appender.writeOut("empty");
+    appender.writeOut(null);
+
+    assertEquals("", out.text());
+    assertEquals(0, out.flushCount);
+  }
+
+  @Test
+  public void writeOutPropagatesWriteFailure() {
+    OutputStreamAppender<Object> appender = newAppender(new Utf8LineEncoder());
+    FaultInjectingOutputStream out = new FaultInjectingOutputStream();
+    appender.setOutputStream(out);
+    appender.start();
+    out.failWrites = true;
+
+    IOException e = assertThrows(IOException.class, () -> appender.writeOut("lost"));
+
+    assertEquals("write failed", e.getMessage());
+    // it is up to the caller to handle the failure
+    assertTrue(appender.isStarted());
+    statusChecker.assertIsErrorFree();
   }
 
   @Test
