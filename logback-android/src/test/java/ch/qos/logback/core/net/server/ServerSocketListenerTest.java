@@ -15,14 +15,20 @@
  */
 package ch.qos.logback.core.net.server;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,6 +51,39 @@ public class ServerSocketListenerTest {
     serverSocket = ServerSocketUtil.createServerSocket();
     assertNotNull(serverSocket);
     listener = new InstrumentedServerSocketListener(serverSocket);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    serverSocket.close();
+  }
+
+  @Test
+  public void toStringShowsTheLocalAddressWithoutTheHostNamePrefix()
+      throws Exception {
+    ServerSocket socket = mock(ServerSocket.class);
+    when(socket.getLocalSocketAddress()).thenReturn(new InetSocketAddress(
+        InetAddress.getByAddress("localhost", new byte[] { 127, 0, 0, 1 }),
+        4560));
+
+    assertEquals("127.0.0.1:4560",
+        new InstrumentedServerSocketListener(socket).toString());
+  }
+
+  @Test
+  public void toStringShowsALocalAddressWithoutASlashUnchanged() {
+    ServerSocket socket = mock(ServerSocket.class);
+    when(socket.getLocalSocketAddress()).thenReturn(new SocketAddress() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public String toString() {
+        return "local:4560";
+      }
+    });
+
+    assertEquals("local:4560",
+        new InstrumentedServerSocketListener(socket).toString());
   }
 
   @Test
