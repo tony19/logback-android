@@ -197,6 +197,9 @@ public class LoaderTest {
     assertEquals(Collections.singletonList(FileSize.class.getName()), tcl.requested);
   }
 
+  // Loader's permission check evaluates the protection domain of the copy.
+  // That needs a functional AccessController (JDK 23 and older, e.g. CI's
+  // JDK 17 and 21); from JDK 24 on, checkPermission always throws.
   @Test
   public void classLoaderAsPrivilegedIsAvailableWithGetClassLoaderPermission() throws Exception {
     Permissions all = new Permissions();
