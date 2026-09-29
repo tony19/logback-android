@@ -176,8 +176,15 @@ public class SMTPAppenderBaseTest {
     return (String) onlyBodyPart(message).getContent();
   }
 
-  private static String contentType(MimeBodyPart part) throws MessagingException {
-    return part.getDataHandler().getContentType();
+  /**
+   * The content type the appender gave the part, as held by its DataHandler.
+   * Read reflectively: DataHandler implements java.awt.datatransfer.Transferable,
+   * which Android's Java library (that the unit tests are compiled against)
+   * doesn't have, so the test can't name the type.
+   */
+  private static String contentType(MimeBodyPart part) throws Exception {
+    Object dataHandler = MimeBodyPart.class.getMethod("getDataHandler").invoke(part);
+    return (String) dataHandler.getClass().getMethod("getContentType").invoke(dataHandler);
   }
 
   private static List<String> addresses(Address[] addresses) {
