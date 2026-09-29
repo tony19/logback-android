@@ -71,6 +71,7 @@ public class NodeToStringTransformer {
           handleLiteral(n, stringBuilder);
           break;
         case VARIABLE:
+        default:
           handleVariable(n, stringBuilder, cycleCheckStack);
           break;
       }

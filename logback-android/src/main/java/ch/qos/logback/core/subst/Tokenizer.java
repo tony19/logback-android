@@ -52,8 +52,8 @@ public class Tokenizer {
           handleStartState(c, tokenList, buf);
           break;
         case DEFAULT_VAL_STATE:
-          handleDefaultValueState(c, tokenList, buf);
         default:
+          handleDefaultValueState(c, tokenList, buf);
       }
     }
     // EOS
@@ -67,6 +67,7 @@ public class Tokenizer {
         addLiteralToken(tokenList, buf);
         break;
       case START_STATE:
+      default:
         // trailing $. see also LOGBACK-1149
         buf.append(CoreConstants.DOLLAR);
         addLiteralToken(tokenList, buf);

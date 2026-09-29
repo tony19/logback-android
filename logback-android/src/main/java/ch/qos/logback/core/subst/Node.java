@@ -59,6 +59,7 @@ public class Node {
                 ", payload='" + payload +
                 "'}";
       case VARIABLE:
+      default:
         StringBuilder payloadBuf = new StringBuilder();
         StringBuilder defaultPartBuf2 = new StringBuilder();
         if (defaultPart != null)
@@ -73,7 +74,6 @@ public class Node {
         r += '}';
         return r;
     }
-    return null;
   }
 
   public void dump() {
