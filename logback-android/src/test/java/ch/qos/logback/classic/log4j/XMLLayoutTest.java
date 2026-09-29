@@ -17,7 +17,10 @@ package ch.qos.logback.classic.log4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -208,4 +211,138 @@ public class XMLLayoutTest {
         return builder.parse(new ByteArrayInputStream(output.getBytes("UTF-8")));
     }
 
+
+    @Test
+    public void locationInfoAndPropertiesAreOffByDefault() {
+        XMLLayout fresh = new XMLLayout();
+        Assert.assertFalse(fresh.getLocationInfo());
+        Assert.assertFalse(fresh.getProperties());
+        fresh.setLocationInfo(true);
+        fresh.setProperties(true);
+        Assert.assertTrue(fresh.getLocationInfo());
+        Assert.assertTrue(fresh.getProperties());
+    }
+
+    @Test
+    public void contentTypeIsTextXml() {
+        Assert.assertEquals("text/xml", layout.getContentType());
+    }
+
+    @Test
+    public void simpleEventRendersOnlyTheMessage() {
+        layout.setLocationInfo(false);
+        layout.setProperties(false);
+        LoggingEvent event = createSimpleEvent("hello");
+
+        Assert.assertEquals("<log4j:event logger=\"com.example.Simple\"\r\n"
+            + "             timestamp=\"42\" level=\"INFO\" thread=\"main\">\r\n"
+            + "  <log4j:message>hello</log4j:message>\r\n"
+            + "\r\n</log4j:event>\r\n\r\n", layout.doLayout(event));
+    }
+
+    @Test
+    public void noLocationInfoWhenDisabled() {
+        layout.setLocationInfo(false);
+        String result = layout.doLayout(createLoggingEvent());
+        Assert.assertFalse(result.contains("<log4j:locationInfo"));
+        Assert.assertTrue(result.contains("<log4j:throwable>"));
+    }
+
+    @Test
+    public void noLocationInfoWhenCallerDataIsEmpty() {
+        LoggingEvent event = createSimpleEvent("hello");
+        event.setCallerData(new StackTraceElement[0]);
+        Assert.assertFalse(layout.doLayout(event).contains("<log4j:locationInfo"));
+    }
+
+    @Test
+    public void noLocationInfoWhenCallerDataIsNull() {
+        LoggingEvent event = new LoggingEvent("fqcn", root, Level.INFO, "hello", null, null) {
+            @Override
+            public StackTraceElement[] getCallerData() {
+                return null;
+            }
+        };
+        Assert.assertFalse(layout.doLayout(event).contains("<log4j:locationInfo"));
+    }
+
+    @Test
+    public void locationInfoIsTakenFromTheImmediateCaller() {
+        LoggingEvent event = createSimpleEvent("hello");
+        event.setCallerData(new StackTraceElement[] {
+            new StackTraceElement("a.B", "m<1>", "B.java", 7),
+            new StackTraceElement("c.D", "n", "D.java", 9)});
+        String result = layout.doLayout(event);
+        Assert.assertTrue(result, result.contains("  <log4j:locationInfo class=\"a.B\"\r\n"
+            + "                      method=\"m&lt;1&gt;\" file=\"B.java\" line=\"7\"/>\r\n"));
+        Assert.assertFalse(result.contains("c.D"));
+    }
+
+    @Test
+    public void noPropertiesWhenDisabled() {
+        layout.setProperties(false);
+        LoggingEvent event = createSimpleEvent("hello");
+        event.setMDCPropertyMap(Collections.singletonMap("k", "v"));
+        Assert.assertFalse(layout.doLayout(event).contains("<log4j:properties>"));
+    }
+
+    @Test
+    public void noPropertiesWhenMdcMapIsEmpty() {
+        LoggingEvent event = createSimpleEvent("hello");
+        event.setMDCPropertyMap(Collections.<String, String>emptyMap());
+        Assert.assertFalse(layout.doLayout(event).contains("<log4j:properties>"));
+    }
+
+    @Test
+    public void noPropertiesWhenMdcMapIsNull() {
+        LoggingEvent event = new LoggingEvent("fqcn", root, Level.INFO, "hello", null, null) {
+            @Override
+            public Map<String, String> getMDCPropertyMap() {
+                return null;
+            }
+        };
+        event.setCallerData(new StackTraceElement[0]);
+        Assert.assertFalse(layout.doLayout(event).contains("<log4j:properties>"));
+    }
+
+    @Test
+    public void propertiesAreRenderedWhenEnabled() {
+        LoggingEvent event = createSimpleEvent("hello");
+        event.setCallerData(new StackTraceElement[0]);
+        event.setMDCPropertyMap(Collections.singletonMap("k", "v"));
+        Assert.assertTrue(layout.doLayout(event).endsWith(
+            "  <log4j:properties>\r\n    <log4j:data name=\"k\" value=\"v\" />\r\n  </log4j:properties>"
+            + "\r\n</log4j:event>\r\n\r\n"));
+    }
+
+    @Test
+    public void oversizedBufferIsReplacedAndPreviousEventDoesNotLeak() throws Exception {
+        layout.setLocationInfo(false);
+        layout.setProperties(false);
+        LoggingEvent small = createSimpleEvent("small");
+        String expected = layout.doLayout(small);
+
+        StringBuilder big = new StringBuilder();
+        for (int i = 0; i < 3000; i++) {
+            big.append('x');
+        }
+        Assert.assertTrue(layout.doLayout(createSimpleEvent(big.toString())).contains(big));
+        Assert.assertTrue(bufferCapacity() > 2048);
+
+        Assert.assertEquals(expected, layout.doLayout(small));
+        Assert.assertTrue(bufferCapacity() <= 2048);
+    }
+
+    private int bufferCapacity() throws Exception {
+        Field field = XMLLayout.class.getDeclaredField("buf");
+        field.setAccessible(true);
+        return ((StringBuilder) field.get(layout)).capacity();
+    }
+
+    private LoggingEvent createSimpleEvent(String message) {
+        LoggingEvent event = new LoggingEvent("fqcn", lc.getLogger("com.example.Simple"), Level.INFO, message, null, null);
+        event.setThreadName("main");
+        event.setTimeStamp(42);
+        return event;
+    }
 }
