@@ -16,22 +16,41 @@
 package ch.qos.logback.core.rolling;
 
 import ch.qos.logback.core.encoder.EchoEncoder;
+import ch.qos.logback.core.rolling.helper.FileFilterUtil;
+import ch.qos.logback.core.rolling.helper.FileNamePattern;
 import ch.qos.logback.core.status.InfoStatus;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.util.FileSize;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
 
 public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
+  @Rule
+  public TemporaryFolder tmp = new TemporaryFolder();
+
   private SizeAndTimeBasedFNATP<Object> sizeAndTimeBasedFNATP = null;
   private RollingFileAppender<Object> rfa1 = new RollingFileAppender<Object>();
   private TimeBasedRollingPolicy<Object> tbrp1 = new TimeBasedRollingPolicy<Object>();
@@ -222,6 +241,122 @@ public class SizeAndTimeBasedFNATP_Test extends ScaffoldingForRollingTests {
     assertFalse(rfa1.isStarted());
     StatusChecker checker = new StatusChecker(context);
     checker.assertContainsMatch("The date format in FileNamePattern");
+  }
+
+  /**
+   * Starts {@link #tbrp1} (but not its appender) with a size-and-time based
+   * policy in embedded mode, as SizeAndTimeBasedRollingPolicy does.
+   */
+  private SizeAndTimeBasedFNATP<Object> startTimeBasedRollingPolicy(String fileNamePattern, FileSize maxFileSize) {
+    SizeAndTimeBasedFNATP<Object> fnatp = new SizeAndTimeBasedFNATP<Object>(SizeAndTimeBasedFNATP.Usage.EMBEDDED);
+    fnatp.setMaxFileSize(maxFileSize);
+    fnatp.setCurrentTime(currentTime);
+    tbrp1.setContext(context);
+    tbrp1.setParent(rfa1);
+    tbrp1.setFileNamePattern(fileNamePattern);
+    tbrp1.setTimeBasedFileNamingAndTriggeringPolicy(fnatp);
+    tbrp1.start();
+    return fnatp;
+  }
+
+  private String tmpDir() {
+    return tmp.getRoot().getAbsolutePath() + "/";
+  }
+
+  private File fileOfLength(String name, int length) throws IOException {
+    File file = new File(tmpDir() + name);
+    Files.write(file.toPath(), new byte[length]);
+    return file;
+  }
+
+  @Test
+  public void checkMissingDateToken() {
+    // TimeBasedFileNamingAndTriggeringPolicyBase.start() already refuses a pattern without a
+    // date token, so simulate a pattern whose date token is gone by the time tokens are validated
+    String fileNamePattern = tmpDir() + "checkMissingDateToken-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt";
+    startTimeBasedRollingPolicy(fileNamePattern, new FileSize(300));
+    FileNamePattern pattern = spy(tbrp1.fileNamePattern);
+    doCallRealMethod().doReturn(null).when(pattern).getPrimaryDateTokenConverter();
+    tbrp1.fileNamePattern = pattern;
+    SizeAndTimeBasedFNATP<Object> fnatp = new SizeAndTimeBasedFNATP<Object>(SizeAndTimeBasedFNATP.Usage.EMBEDDED);
+    fnatp.setContext(context);
+    fnatp.setMaxFileSize(new FileSize(300));
+    fnatp.setCurrentTime(currentTime);
+    fnatp.setTimeBasedRollingPolicy(tbrp1);
+
+    fnatp.start();
+
+    assertFalse(fnatp.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR,
+        Pattern.quote(SizeAndTimeBasedFNATP.MISSING_DATE_TOKEN + fileNamePattern + "]"));
+  }
+
+  @Test
+  public void checkMissingMaxFileSize() {
+    SizeAndTimeBasedFNATP<Object> fnatp = startTimeBasedRollingPolicy(
+        tmpDir() + "checkMissingMaxFileSize-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt", null);
+
+    assertFalse(fnatp.isStarted());
+    assertFalse(tbrp1.isStarted());
+    new StatusChecker(context).assertContainsMatch(Status.ERROR, "maxFileSize property is mandatory.");
+  }
+
+  @Test
+  public void missingActiveFileDoesNotTriggerWithinPeriod() {
+    SizeAndTimeBasedFNATP<Object> fnatp = startTimeBasedRollingPolicy(
+        tmpDir() + "nullActiveFile-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt", new FileSize(1));
+    assertTrue(fnatp.isStarted());
+
+    assertFalse(fnatp.isTriggeringEvent(null, null));
+
+    new StatusChecker(context).assertContainsMatch(Status.WARN, "activeFile == null");
+    assertEquals(0, fnatp.currentPeriodsCounter);
+  }
+
+  @Test
+  public void missingMaxFileSizeDoesNotTriggerWithinPeriod() throws IOException {
+    SizeAndTimeBasedFNATP<Object> fnatp = startTimeBasedRollingPolicy(
+        tmpDir() + "nullMaxFileSize-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt", new FileSize(1));
+    assertTrue(fnatp.isStarted());
+    File activeFile = fileOfLength("nullMaxFileSize.log", 10);
+    fnatp.setMaxFileSize(null);
+
+    assertFalse(fnatp.isTriggeringEvent(activeFile, null));
+
+    new StatusChecker(context).assertContainsMatch(Status.WARN, "maxFileSize = null");
+    assertEquals(0, fnatp.currentPeriodsCounter);
+  }
+
+  @Test
+  public void compressedArchivesOfCurrentPeriodAdvanceCounterWhenFileIsBlank() throws IOException {
+    // currentTime is 2018-07-11 12:30 GMT
+    fileOfLength("blankFile-2018-07-11-0.log.gz", 1);
+    fileOfLength("blankFile-2018-07-11-3.log.gz", 1);
+
+    SizeAndTimeBasedFNATP<Object> fnatp = startTimeBasedRollingPolicy(
+        tmpDir() + "blankFile-%d{yyyy-MM-dd, GMT}-%i.log.gz", new FileSize(100));
+
+    assertTrue(fnatp.isStarted());
+    assertEquals(4, fnatp.currentPeriodsCounter);
+    assertEquals(tmpDir() + "blankFile-2018-07-11-4.log", tbrp1.getActiveFileName());
+  }
+
+  @Test
+  public void unlistableArchiveFolderResetsCounter() {
+    SizeAndTimeBasedFNATP<Object> fnatp = startTimeBasedRollingPolicy(
+        tmpDir() + "unlistable-%d{" + DATE_PATTERN_WITH_SECONDS + ", GMT}-%i.txt", new FileSize(100));
+    fnatp.currentPeriodsCounter = 5;
+
+    try (MockedStatic<FileFilterUtil> fileFilterUtil = mockStatic(FileFilterUtil.class, Mockito.CALLS_REAL_METHODS)) {
+      // File.listFiles() returns null when the folder cannot be read
+      fileFilterUtil.when(() -> FileFilterUtil.filesInFolderMatchingStemRegex(any(File.class), anyString()))
+          .thenReturn(null);
+
+      fnatp.computeCurrentPeriodsHighestCounterValue("unlistable-.*");
+    }
+
+    assertEquals(0, fnatp.currentPeriodsCounter);
   }
 
 //  @Test
