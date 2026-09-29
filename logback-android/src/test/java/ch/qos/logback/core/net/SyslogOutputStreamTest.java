@@ -16,7 +16,11 @@
 package ch.qos.logback.core.net;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -86,6 +90,27 @@ public class SyslogOutputStreamTest {
   }
 
   @Test
+  public void reusesItsBufferUpTo1024BytesAndDiscardsLargerOnes() throws Exception {
+    ByteArrayOutputStream buffer = bufferOf(outputStream);
+
+    outputStream.write(new byte[1024]);
+    outputStream.flush();
+
+    // a buffer of up to 1024 bytes is kept for the next message...
+    assertSame(buffer, bufferOf(outputStream));
+    assertEquals(0, buffer.size());
+
+    outputStream.write(new byte[1025]);
+    outputStream.flush();
+
+    // ...a larger one is dropped, so that its memory can be reclaimed
+    assertNotSame(buffer, bufferOf(outputStream));
+    assertEquals(0, bufferOf(outputStream).size());
+    assertEquals(1024, receive().length());
+    assertEquals(1025, receive().length());
+  }
+
+  @Test
   public void reportsTheSendBufferSizeOfItsDatagramSocket() throws Exception {
     DatagramSocket defaultSocket = new DatagramSocket();
     try {
@@ -120,6 +145,12 @@ public class SyslogOutputStreamTest {
 
     // does not fail although the datagram socket is gone
     outputStream.close();
+  }
+
+  private static ByteArrayOutputStream bufferOf(SyslogOutputStream stream) throws Exception {
+    Field field = SyslogOutputStream.class.getDeclaredField("baos");
+    field.setAccessible(true);
+    return (ByteArrayOutputStream) field.get(stream);
   }
 
   private String receive() throws Exception {

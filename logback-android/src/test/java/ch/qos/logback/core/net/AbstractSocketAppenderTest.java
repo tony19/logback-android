@@ -17,6 +17,7 @@ package ch.qos.logback.core.net;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -720,6 +721,33 @@ public class AbstractSocketAppenderTest {
     verify(socket).close();
     verify(syncAppender, never()).addInfo(contains("connection failed"));
     verify(syncAppender).addInfo("remote peer 127.0.0.1:" + AbstractSocketAppender.DEFAULT_PORT + ": connection closed");
+  }
+
+  @Test
+  public void waitsTheDefaultReconnectionDelayAfterSslHandshakeFailure() throws Exception {
+
+    // the wait is pinned by the two tests above; its length can be changed
+    // only by unit tests, so check the default directly
+    Field handshakeFailureDelay = AbstractSocketAppender.class.getDeclaredField("handshakeFailureDelay");
+    handshakeFailureDelay.setAccessible(true);
+
+    assertEquals(AbstractSocketAppender.DEFAULT_RECONNECTION_DELAY, handshakeFailureDelay.getInt(appender));
+  }
+
+  @Test
+  public void stopInterruptsTheDispatcherWaitingForEvents() throws Exception {
+
+    // given
+    mockOneSuccessfulSocketConnection();
+    appender.start();
+    awaitStartOfEventDispatching();
+
+    // when
+    appender.stop();
+
+    // then: the dispatch task, blocked on the empty deque, is cancelled
+    verify(appender, timeout(TIMEOUT)).addInfo("shutting down");
+    verify(socketConnector, times(1)).call();
   }
 
   @Test
