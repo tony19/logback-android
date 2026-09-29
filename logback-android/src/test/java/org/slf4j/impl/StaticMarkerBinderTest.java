@@ -39,9 +39,14 @@ public class StaticMarkerBinderTest {
 
     assertTrue(factory instanceof BasicMarkerFactory);
     assertSame(factory, StaticMarkerBinder.getSingleton().getMarkerFactory());
-    Marker marker = factory.getMarker("STATIC_MARKER_BINDER_TEST");
-    assertSame(marker, StaticMarkerBinder.getSingleton().getMarkerFactory()
-        .getMarker("STATIC_MARKER_BINDER_TEST"));
+    try {
+      Marker marker = factory.getMarker("STATIC_MARKER_BINDER_TEST");
+      assertSame(marker, StaticMarkerBinder.getSingleton().getMarkerFactory()
+          .getMarker("STATIC_MARKER_BINDER_TEST"));
+    } finally {
+      // the factory is JVM-wide: leave no marker behind
+      factory.detachMarker("STATIC_MARKER_BINDER_TEST");
+    }
   }
 
   @Test

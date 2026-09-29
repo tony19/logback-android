@@ -58,6 +58,17 @@ public class DefaultThrowableRendererTest {
   }
 
   @Test
+  public void frameTextIsHtmlEscaped() {
+    DummyThrowableProxy tp = proxy("a.Failure", "ctor", 0, frame("a.B", "<init>", 7));
+
+    StringBuilder sb = new StringBuilder();
+    renderer.render(sb, tp);
+
+    assertEquals("a.Failure: ctor" + LINE_SEPARATOR
+        + TRACE_PREFIX + "at a.B.&lt;init&gt;(f7:7)" + LINE_SEPARATOR, sb.toString());
+  }
+
+  @Test
   public void printFirstLinePrefixesCausedByOnlyWhenFramesAreShared() {
     StringBuilder top = new StringBuilder();
     renderer.printFirstLine(top, proxy("a.Top", "top", 0));

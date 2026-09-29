@@ -95,6 +95,17 @@ public class HTMLLayoutJvmTest {
   }
 
   @Test
+  public void cellContentIsHtmlEscaped() {
+    layout.setPattern("%msg");
+    layout.start();
+
+    String row = layout.doLayout(event(Level.INFO, "<b>\"x\" & 'y'</b>"));
+
+    assertTrue(row, row.contains("<td class=\"Message\">"
+        + "&lt;b&gt;&quot;x&quot; &amp; &#39;y&#39;&lt;/b&gt;</td>"));
+  }
+
+  @Test
   public void mdcColumnIsNamedAfterItsKeyOrMdcWhenNoKeyIsGiven() {
     layout.setPattern("%mdc{user}%mdc");
     layout.start();

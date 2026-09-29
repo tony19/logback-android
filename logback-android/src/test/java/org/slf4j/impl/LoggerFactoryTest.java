@@ -17,6 +17,7 @@ package org.slf4j.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -45,6 +46,15 @@ public class LoggerFactoryTest {
 
     assertSame(first, factory.getLogger("repeated"));
     assertSame(first, factory.loggerMap.get("repeated"));
+  }
+
+  @Test
+  public void cachedLoggerIsReturnedWithoutCreatingOneInTheContext() {
+    Logger cached = new LoggerFactory().getLogger("preset");
+    factory.loggerMap.put("preset", cached);
+
+    assertSame(cached, factory.getLogger("preset"));
+    assertNull(factory.loggerContext.exists("preset"));
   }
 
   @Test
