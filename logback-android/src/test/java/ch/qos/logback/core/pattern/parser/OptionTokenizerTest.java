@@ -15,13 +15,28 @@
  */
 package ch.qos.logback.core.pattern.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
 
+import ch.qos.logback.core.spi.ScanException;
+
 public class OptionTokenizerTest {
+
+  static final String UNEXPECTED_END = "Unexpected end of pattern string in OptionTokenizer";
 
   @Test
    public void testEmpty() {
 
+  }
+
+  @Test
+  public void escapeConsumingLastCharOfQuotedOptionIsReportedAsScanException() {
+    // the backslash escapes the closing quote, which is the last char of the pattern
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("%x{'a\\'").tokenize());
+    assertEquals(UNEXPECTED_END, e.getMessage());
   }
 
 //
