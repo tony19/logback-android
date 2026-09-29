@@ -21,6 +21,8 @@ import java.util.List;
 
 import javax.net.ssl.SSLEngine;
 
+import android.os.Build;
+
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.OptionHelper;
 import ch.qos.logback.core.util.StringCollectionUtil;
@@ -58,12 +60,34 @@ public class SSLParametersConfiguration extends ContextAwareBase {
     if (isWantClientAuth() != null) {
       socket.setWantClientAuth(isWantClientAuth());
     }
-    if (hostnameVerification != null) {
-      addInfo("hostnameVerification="+hostnameVerification);
-      socket.setHostnameVerification(hostnameVerification);
+    boolean verifyHostname = isHostnameVerification(socket);
+    addInfo("hostnameVerification=" + verifyHostname);
+    if (verifyHostname && Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+      addWarn("hostnameVerification requires Android 7.0 (API 24) or newer;"
+          + " the peer's hostname will not be verified");
     }
+    socket.setHostnameVerification(verifyHostname);
   }
 
+  /**
+   * Client sockets verify the server's hostname unless hostnameVerification
+   * is explicitly set to false, as in upstream logback. Server sockets verify
+   * the client's hostname only when it is explicitly set to true: upstream also
+   * defaults them to true, but that would reject the client certificate of
+   * every existing mutual-TLS receiver whose clients' certificates don't name
+   * the client host.
+   */
+  private boolean isHostnameVerification(SSLConfigurable socket) {
+    if (hostnameVerification != null) {
+      return hostnameVerification;
+    }
+    return socket instanceof SSLConfigurableSocket;
+  }
+
+  /**
+   * @return the explicitly configured value, or {@code false} if none was set
+   *    (client sockets still verify the server's hostname in that case)
+   */
   public boolean getHostnameVerification() {
     if(hostnameVerification == null)
       return false;
