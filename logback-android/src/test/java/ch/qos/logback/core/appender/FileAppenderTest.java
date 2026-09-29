@@ -19,17 +19,25 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.encoder.EncoderBase;
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
 import ch.qos.logback.core.status.StatusChecker;
@@ -47,6 +55,7 @@ import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
+import ch.qos.logback.core.util.FileSize;
 import ch.qos.logback.core.util.StatusPrinter;
 
 public class FileAppenderTest extends AbstractAppenderTest<Object> {
@@ -260,6 +269,296 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     assertEquals("hello\n", readUtf8(file));
   }
 
+  @Test
+  public void startWithoutFileReportsErrorAndDoesNotStart() {
+    FileAppender<Object> fa = new FileAppender<Object>();
+    fa.setContext(context);
+    fa.setName("nofile");
+    fa.setEncoder(new Utf8LineEncoder());
+
+    fa.start();
+
+    assertFalse(fa.isStarted());
+    assertNull(fa.getOutputStream());
+    new StatusChecker(context).assertContainsMatch(Status.ERROR,
+        "\"File\" property not set for appender named \\[nofile\\]");
+  }
+
+  @Test
+  public void startReportsErrorWhenFileCannotBeOpened() {
+    // a directory cannot be opened as a log file
+    File dir = tmp.getRoot();
+    FileAppender<Object> fa = newFileAppender("dir", dir, new Utf8LineEncoder());
+
+    fa.start();
+
+    assertFalse(fa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR,
+        Pattern.quote("openFile(" + dir.getAbsolutePath() + ",true) failed"));
+    checker.asssertContainsException(FileNotFoundException.class);
+  }
+
+  @Test
+  public void startReportsErrorWhenParentDirectoryCannotBeCreated() throws IOException {
+    // the parent directory would have to be created under a regular file
+    File blocker = tmp.newFile("blocker");
+    File file = new File(new File(blocker, "sub"), "app.log");
+    FileAppender<Object> fa = newFileAppender("noparent", file, new Utf8LineEncoder());
+
+    fa.start();
+
+    assertFalse(fa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR,
+        Pattern.quote("Failed to create parent directories for [" + file.getAbsolutePath() + "]"));
+    checker.assertContainsMatch(Status.ERROR,
+        Pattern.quote("openFile(" + file.getAbsolutePath() + ",true) failed"));
+  }
+
+  @Test
+  public void appenderWorksWithoutFilenameCollisionMap() throws IOException {
+    ContextBase contextWithoutMap = new ContextBase();
+    contextWithoutMap.removeObject(CoreConstants.FA_FILENAME_COLLISION_MAP);
+    File file = new File(tmp.getRoot(), "nomap.log");
+    FileAppender<Object> fa = new FileAppender<Object>();
+    fa.setContext(contextWithoutMap);
+    fa.setName("nomap");
+    fa.setEncoder(new Utf8LineEncoder());
+    fa.setFile(file.getAbsolutePath());
+
+    fa.start();
+    fa.doAppend("hello");
+    fa.stop();
+
+    assertFalse(fa.isStarted());
+    assertEquals("hello\n", readUtf8(file));
+    assertNull(contextWithoutMap.getObject(CoreConstants.FA_FILENAME_COLLISION_MAP));
+    new StatusChecker(contextWithoutMap).assertIsErrorFree();
+  }
+
+  @Test
+  public void stoppedAppenderReleasesItsFileForLaterAppenders() {
+    File file = new File(tmp.getRoot(), "released.log");
+    FileAppender<Object> first = newFileAppender("first", file, new Utf8LineEncoder());
+    first.start();
+    first.stop();
+
+    FileAppender<Object> second = newFileAppender("second", file, new Utf8LineEncoder());
+    second.start();
+
+    assertTrue(second.isStarted());
+    second.stop();
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void unnamedAppenderCanBeStartedAndStopped() throws IOException {
+    File file = new File(tmp.getRoot(), "unnamed.log");
+    FileAppender<Object> fa = newFileAppender(null, file, new Utf8LineEncoder());
+
+    fa.start();
+    fa.doAppend("hello");
+    fa.stop();
+
+    assertFalse(fa.isStarted());
+    assertEquals("hello\n", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void lazyAndSyncOnFlushAreOffByDefault() {
+    FileAppender<Object> fa = new FileAppender<Object>();
+    assertFalse(fa.getLazy());
+    assertFalse(fa.isSyncOnFlush());
+
+    fa.setLazy(true);
+    fa.setSyncOnFlush(true);
+
+    assertTrue(fa.getLazy());
+    assertTrue(fa.isSyncOnFlush());
+  }
+
+  @Test
+  public void eventsStayInDefaultBufferWithoutImmediateFlush() throws IOException {
+    File file = new File(tmp.getRoot(), "buffered.log");
+    FileAppender<Object> fa = newFileAppender("buffered", file, new Utf8LineEncoder());
+    fa.setImmediateFlush(false);
+    fa.start();
+
+    fa.doAppend("hello");
+
+    assertEquals("", readUtf8(file));
+    fa.stop();
+    assertEquals("hello\n", readUtf8(file));
+  }
+
+  @Test
+  public void eventsLargerThanBufferSizeReachFileWithoutFlush() throws IOException {
+    File file = new File(tmp.getRoot(), "small-buffer.log");
+    FileAppender<Object> fa = newFileAppender("small-buffer", file, new Utf8LineEncoder());
+    fa.setImmediateFlush(false);
+    fa.setBufferSize(new FileSize(4));
+    fa.start();
+
+    fa.doAppend("hello");
+
+    assertEquals("hello\n", readUtf8(file));
+    new StatusChecker(context).assertContainsMatch(Status.INFO, "Setting bufferSize to \\[4 Bytes\\]");
+    fa.stop();
+  }
+
+  @Test
+  public void prudentWriteSeeksPastDataAppendedByAnotherWriter() throws IOException {
+    File file = new File(tmp.getRoot(), "shared.log");
+    FileAppender<Object> fa = newFileAppender("shared", file, new Utf8LineEncoder());
+    // not in append mode, so the stream's position does not follow the end of file
+    fa.setAppend(false);
+    fa.start();
+    fa.doAppend("a");
+    appendUtf8(file, "other\n");
+    fa.setPrudent(true);
+
+    fa.doAppend("b");
+    fa.stop();
+
+    assertEquals("a\nother\nb\n", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void prudentWriteRestoresInterruptFlag() throws IOException {
+    File file = new File(tmp.getRoot(), "interrupted.log");
+    FileAppender<Object> fa = newFileAppender("interrupted", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+
+    boolean interruptedAfterAppend;
+    Thread.currentThread().interrupt();
+    try {
+      fa.doAppend("hello");
+    } finally {
+      // also clears the flag for later tests
+      interruptedAfterAppend = Thread.interrupted();
+    }
+    fa.stop();
+
+    assertTrue(interruptedAfterAppend);
+    // the interrupt was cleared while locking, so the write went through
+    assertEquals("hello\n", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void prudentWriteToClosedChannelIsReportedAsIOFailure() throws IOException {
+    File file = new File(tmp.getRoot(), "closed.log");
+    FileAppender<Object> fa = newFileAppender("closed", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+    ((ResilientFileOutputStream) fa.getOutputStream()).getChannel().close();
+
+    fa.doAppend("lost");
+
+    // the failure is left to the resilient stream to recover from
+    assertTrue(fa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR, "IO failure while writing to file");
+    checker.asssertContainsException(ClosedChannelException.class);
+    checker.assertNoMatch("failed to append");
+    assertEquals("", readUtf8(file));
+    fa.stop();
+  }
+
+  @Test
+  public void prudentWriteDoesNotReleaseLockInvalidatedDuringWrite() throws IOException {
+    File file = new File(tmp.getRoot(), "invalidated.log");
+    ChannelClosingEncoder encoder = new ChannelClosingEncoder();
+    FileAppender<Object> fa = newFileAppender("invalidated", file, encoder);
+    encoder.appender = fa;
+    fa.setPrudent(true);
+    fa.start();
+
+    fa.doAppend("lost");
+
+    // releasing the invalidated lock would have thrown and stopped the appender
+    assertTrue(fa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertNoMatch("IO failure in appender");
+    checker.assertContainsMatch(Status.ERROR, "IO failure while writing to file");
+    fa.stop();
+  }
+
+  @Test
+  public void prudentWriteIsSkippedWhenStreamHasNoChannel() throws IOException {
+    File file = new File(tmp.getRoot(), "no-channel.log");
+    FileAppender<Object> fa = newFileAppender("no-channel", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+    fa.setOutputStream(new ChannelLessResilientFileOutputStream(file));
+
+    fa.doAppend("dropped");
+    fa.stop();
+
+    assertEquals("", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void lazyAppenderOpensFileOnlyOnce() throws IOException {
+    File file = new File(tmp.getRoot(), "lazy-once.log");
+    FileAppender<Object> fa = newFileAppender("lazy-once", file, new Utf8LineEncoder());
+    fa.setLazy(true);
+    fa.start();
+
+    fa.doAppend("a");
+    OutputStream opened = fa.getOutputStream();
+    fa.doAppend("b");
+
+    // the file was not reopened for the second event
+    assertSame(opened, fa.getOutputStream());
+    assertEquals("a\nb\n", readUtf8(file));
+    fa.stop();
+  }
+
+  @Test
+  public void lazyAppenderReportsCollisionOnFirstAppend() throws IOException {
+    File file = new File(tmp.getRoot(), "lazy-collision.log");
+    FileAppender<Object> first = newFileAppender("first", file, new Utf8LineEncoder());
+    first.start();
+    FileAppender<Object> lazy = newFileAppender("lazy", file, new Utf8LineEncoder());
+    lazy.setLazy(true);
+    lazy.start();
+    assertTrue(lazy.isStarted());
+
+    lazy.doAppend("from lazy");
+
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR,
+        "Collisions detected with FileAppender/RollingAppender instances defined earlier. Aborting.");
+    checker.assertContainsMatch(Status.ERROR, "'File' option has the same value");
+    assertTrue(lazy.getOutputStream() instanceof NOPOutputStream);
+    assertEquals("", readUtf8(file));
+    first.stop();
+    lazy.stop();
+  }
+
+  @Test
+  public void lazyAppenderStopsWhenFileCannotBeOpened() {
+    File dir = tmp.getRoot();
+    FileAppender<Object> fa = newFileAppender("lazy-dir", dir, new Utf8LineEncoder());
+    fa.setLazy(true);
+    fa.start();
+    assertTrue(fa.isStarted());
+
+    fa.doAppend("lost");
+
+    assertFalse(fa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR,
+        Pattern.quote("openFile(" + dir.getAbsolutePath() + ",true) failed"));
+    checker.asssertContainsException(FileNotFoundException.class);
+  }
+
   private FileAppender<Object> newFileAppender(String name, File file, EncoderBase<Object> encoder) {
     FileAppender<Object> fa = new FileAppender<Object>();
     fa.setContext(context);
@@ -297,6 +596,45 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     @Override
     public byte[] footerBytes() {
       return null;
+    }
+  }
+
+  static void appendUtf8(File file, String text) throws IOException {
+    FileOutputStream out = new FileOutputStream(file, true);
+    try {
+      out.write(text.getBytes(StandardCharsets.UTF_8));
+    } finally {
+      out.close();
+    }
+  }
+
+  /**
+   * Closes the appender's file channel while encoding, i.e. after the prudent
+   * write locked the file, which invalidates that lock.
+   */
+  static class ChannelClosingEncoder extends Utf8LineEncoder {
+    FileAppender<Object> appender;
+
+    @Override
+    public byte[] encode(Object event) {
+      try {
+        ((ResilientFileOutputStream) appender.getOutputStream()).getChannel().close();
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+      return super.encode(event);
+    }
+  }
+
+  /**
+   * A ResilientFileOutputStream whose underlying stream is gone, so it has no
+   * file channel.
+   */
+  static class ChannelLessResilientFileOutputStream extends ResilientFileOutputStream {
+    ChannelLessResilientFileOutputStream(File file) throws IOException {
+      super(file, true, FileAppender.DEFAULT_BUFFER_SIZE);
+      close();
+      os = null;
     }
   }
 

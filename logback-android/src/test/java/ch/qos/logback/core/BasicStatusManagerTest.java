@@ -23,6 +23,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -34,6 +35,7 @@ import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusListener;
+import ch.qos.logback.core.status.TrivialStatusListener;
 
 
 public class BasicStatusManagerTest {
@@ -135,5 +137,27 @@ public class BasicStatusManagerTest {
     statusList = bsm.getCopyOfStatusListenerList();
     assertEquals(1, statusList.size());
     assertEquals(csl, statusList.get(0));
+  }
+
+  @Test
+  public void consoleListenerIsAddedWhenOnlyListenersOfOtherTypesArePresent() {
+    StatusListener other = new TrivialStatusListener();
+    assertTrue(bsm.add(other));
+
+    assertTrue(bsm.add(csl));
+
+    assertEquals(Arrays.asList(other, csl), bsm.getCopyOfStatusListenerList());
+  }
+
+  @Test
+  public void addUniquelyAddsListenerWhenRegisteredListenersAreOfUnrelatedTypes() {
+    StatusListener other = new TrivialStatusListener();
+    bsm.add(other);
+
+    assertTrue(bsm.addUniquely(csl, contextAware));
+
+    assertEquals(Arrays.asList(other, csl), bsm.getCopyOfStatusListenerList());
+    // no "already registered" warning was issued
+    assertEquals(0, bsm.getCount());
   }
 }
