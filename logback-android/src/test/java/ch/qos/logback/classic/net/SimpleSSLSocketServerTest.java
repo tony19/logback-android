@@ -15,6 +15,8 @@
  */
 package ch.qos.logback.classic.net;
 
+import static ch.qos.logback.classic.net.SimpleSocketServerMainRule.CONFIG_FILE;
+import static ch.qos.logback.classic.net.SimpleSocketServerMainRule.OUT_OF_RANGE_PORT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
@@ -31,21 +33,24 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 
 /**
  * Unit tests for {@link SimpleSSLSocketServer}.
- * <p>
- * Its {@code main} is tested in {@link SimpleSocketServerMainTest}.
  */
 public class SimpleSSLSocketServerTest {
 
   private final LoggerContext lc = new LoggerContext();
+
+  @Rule
+  public final SimpleSocketServerMainRule main = new SimpleSocketServerMainRule();
 
   @After
   public void tearDown() {
@@ -98,5 +103,19 @@ public class SimpleSSLSocketServerTest {
     } finally {
       socket.close();
     }
+  }
+
+  @Test
+  public void mainConfiguresTheDefaultContextFromTheFileAndStartsAnSslServerOnThePort()
+      throws Throwable {
+    main.run(() -> SimpleSSLSocketServer.main(new String[] {OUT_OF_RANGE_PORT, CONFIG_FILE}));
+
+    main.assertConfiguredDefaultContextFrom(CONFIG_FILE);
+    ILoggingEvent failure = main.awaitServerFailure();
+    assertEquals("Logback SimpleSSLSocketServer (port " + OUT_OF_RANGE_PORT + ")",
+        failure.getThreadName());
+    assertEquals(IllegalArgumentException.class.getName(),
+        failure.getThrowableProxy().getClassName());
+    assertTrue(main.logged("Listening on port " + OUT_OF_RANGE_PORT));
   }
 }

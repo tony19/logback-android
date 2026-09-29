@@ -173,15 +173,15 @@ public class ServerSocketReceiverTest {
     configured.setContext(context);
     configured.setPort(1234);
     configured.setBacklog(7);
-    configured.setAddress("127.0.0.1");
+    configured.setAddress("127.0.0.2");
 
     configured.start();
 
     assertTrue(configured.isStarted());
     assertEquals(1234, configured.getPort());
     assertEquals(7, configured.getBacklog());
-    assertEquals("127.0.0.1", configured.getAddress());
-    assertEquals(Arrays.<Object>asList(1234, 7, InetAddress.getByName("127.0.0.1")), socketArgs);
+    assertEquals("127.0.0.2", configured.getAddress());
+    assertEquals(Arrays.<Object>asList(1234, 7, InetAddress.getByName("127.0.0.2")), socketArgs);
     configured.stop();
   }
 

@@ -15,13 +15,18 @@
  */
 package ch.qos.logback.classic.net;
 
+import static ch.qos.logback.classic.net.SimpleSocketServerMainRule.CONFIG_FILE;
+import static ch.qos.logback.classic.net.SimpleSocketServerMainRule.OUT_OF_RANGE_PORT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 
@@ -33,6 +38,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -40,13 +46,17 @@ import javax.net.ServerSocketFactory;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
+import org.mockito.InOrder;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.net.mock.MockAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
@@ -56,9 +66,6 @@ import ch.qos.logback.core.util.CloseUtil;
 
 /**
  * Unit tests for {@link SimpleSocketServer}.
- * <p>
- * {@code main} with valid arguments configures a context from XML, which needs
- * the Android XML parser; it is tested in {@link SimpleSocketServerMainTest}.
  */
 public class SimpleSocketServerTest {
 
@@ -70,6 +77,9 @@ public class SimpleSocketServerTest {
   private final List<ServerSocket> createdSockets = new ArrayList<ServerSocket>();
   private final String testThreadName = Thread.currentThread().getName();
   private SimpleSocketServer server;
+
+  @Rule
+  public final SimpleSocketServerMainRule main = new SimpleSocketServerMainRule();
 
   @Before
   public void setUp() {
@@ -89,6 +99,7 @@ public class SimpleSocketServerTest {
       CloseUtil.closeQuietly(socket);
     }
     Thread.currentThread().setName(testThreadName);
+    RecordingServer.started.clear();
     lc.stop();
   }
 
@@ -122,6 +133,9 @@ public class SimpleSocketServerTest {
 
       server.close();
       server.join(TIMEOUT_MILLIS);
+      // the client's node ends once the server closed it, and says so to the
+      // server; after that, nothing else logs to the server's logger
+      assertTrue(awaitMessageStartingWith(serverEvents, "Removing "));
     } finally {
       client.close();
     }
@@ -287,6 +301,75 @@ public class SimpleSocketServerTest {
         + System.lineSeparator(), stderr);
   }
 
+  @Test
+  public void mainPrintsUsageAndExitsOnTooManyArguments() throws Throwable {
+    Runtime runtime = mock(Runtime.class);
+    String stderr;
+    try (MockedStatic<Runtime> runtimeStatic = mockStatic(Runtime.class)) {
+      runtimeStatic.when(Runtime::getRuntime).thenReturn(runtime);
+      StderrCapture capture = new StderrCapture();
+      try {
+        main.run(() -> SimpleSocketServer.main(new String[] {"4560", CONFIG_FILE, "extra"}));
+      } finally {
+        stderr = capture.stop();
+      }
+    }
+
+    verify(runtime).exit(1);
+    assertTrue(stderr, stderr.startsWith("Wrong number of arguments." + System.lineSeparator()));
+    // only reached because the mocked exit returns: the port was never parsed
+    assertEquals("Logback SimpleSocketServer (port -1)", main.awaitServerFailure().getThreadName());
+  }
+
+  @Test
+  public void mainConfiguresTheDefaultContextFromTheFileAndStartsASocketServerOnThePort()
+      throws Throwable {
+    main.run(() -> SimpleSocketServer.main(new String[] {OUT_OF_RANGE_PORT, CONFIG_FILE}));
+
+    main.assertConfiguredDefaultContextFrom(CONFIG_FILE);
+    ILoggingEvent failure = main.awaitServerFailure();
+    assertEquals("Logback SimpleSocketServer (port " + OUT_OF_RANGE_PORT + ")",
+        failure.getThreadName());
+    assertEquals(IllegalArgumentException.class.getName(),
+        failure.getThrowableProxy().getClassName());
+    assertTrue(main.logged("Listening on port " + OUT_OF_RANGE_PORT));
+  }
+
+  @Test
+  public void doMainStartsAServerOfTheGivenClassForTheDefaultContextOnThePort() throws Throwable {
+    main.run(() -> SimpleSocketServer.doMain(RecordingServer.class,
+        new String[] {"4560", CONFIG_FILE}));
+
+    main.assertConfiguredDefaultContextFrom(CONFIG_FILE);
+    assertEquals(1, RecordingServer.started.size());
+    RecordingServer started = RecordingServer.started.get(0);
+    assertSame(main.defaultContext(), started.context);
+    assertEquals(4560, started.port);
+  }
+
+  @Test
+  public void configureLCResetsTheContextThenConfiguresItFromTheFile() throws Exception {
+    final Logger stale = lc.getLogger("stale");
+    stale.setLevel(Level.ERROR);
+    final List<Level> staleLevelWhenConfigured = new ArrayList<Level>();
+    try (MockedConstruction<JoranConfigurator> configurators = mockConstruction(
+        JoranConfigurator.class, (configurator, context) -> doAnswer(invocation -> {
+          staleLevelWhenConfigured.add(stale.getLevel());
+          return null;
+        }).when(configurator).doConfigure("server.xml"))) {
+
+      SimpleSocketServer.configureLC(lc, "server.xml");
+
+      assertEquals(1, configurators.constructed().size());
+      JoranConfigurator configurator = configurators.constructed().get(0);
+      InOrder inOrder = inOrder(configurator);
+      inOrder.verify(configurator).setContext(lc);
+      inOrder.verify(configurator).doConfigure("server.xml");
+    }
+    // the context was reset before it was configured
+    assertEquals(Collections.<Level>singletonList(null), staleLevelWhenConfigured);
+  }
+
   private SimpleSocketServer newServer(final ServerSocketFactory factory) {
     SimpleSocketServer server = new SimpleSocketServer(lc, 0) {
       @Override
@@ -303,6 +386,17 @@ public class SimpleSocketServerTest {
     ILoggingEvent event;
     while ((event = appender.awaitAppend(TIMEOUT_MILLIS)) != null) {
       if (message.equals(event.getFormattedMessage())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean awaitMessageStartingWith(MockAppender appender, String prefix)
+      throws InterruptedException {
+    ILoggingEvent event;
+    while ((event = appender.awaitAppend(TIMEOUT_MILLIS)) != null) {
+      if (event.getFormattedMessage().startsWith(prefix)) {
         return true;
       }
     }
@@ -362,6 +456,28 @@ public class SimpleSocketServerTest {
     @Override
     public ServerSocket createServerSocket(int port, int backlog, InetAddress address) {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  /**
+   * A server that {@code doMain} can create; it records that it was started
+   * instead of listening.
+   */
+  public static class RecordingServer extends SimpleSocketServer {
+    static final List<RecordingServer> started = new ArrayList<RecordingServer>();
+
+    final LoggerContext context;
+    final int port;
+
+    public RecordingServer(LoggerContext context, int port) {
+      super(context, port);
+      this.context = context;
+      this.port = port;
+    }
+
+    @Override
+    public synchronized void start() {
+      started.add(this);
     }
   }
 
