@@ -40,6 +40,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # Blocking, unlike the advisory Checkstyle/PMD step: every Java package
+      # must be catalogued in docs/architecture/components.md, and the
+      # dependency rules in docs/architecture/README.md must hold.
+      - name: Check architecture docs
+        run: ./scripts/check-architecture-docs.sh
+
       # JDK 17 matches the build job; required to configure the Android Gradle
       # plugin so the logback-android project (and its analysis tasks) evaluate.
       - name: Set up JDK 17
