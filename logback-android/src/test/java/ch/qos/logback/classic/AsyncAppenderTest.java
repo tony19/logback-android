@@ -107,6 +107,8 @@ public class AsyncAppenderTest {
     asyncAppender.setQueueSize(10);
     // remaining capacity (at most 10) is always below this threshold
     asyncAppender.setDiscardingThreshold(11);
+    // stop() returns as soon as the worker has flushed; a generous bound keeps a slow machine from losing events
+    asyncAppender.setMaxFlushTime(60000);
     asyncAppender.start();
 
     for (Level level : new Level[] {Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR}) {

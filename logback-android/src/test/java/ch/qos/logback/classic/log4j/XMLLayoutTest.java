@@ -326,11 +326,23 @@ public class XMLLayoutTest {
         for (int i = 0; i < 3000; i++) {
             big.append('x');
         }
-        Assert.assertTrue(layout.doLayout(createSimpleEvent(big.toString())).contains(big));
+        Assert.assertEquals(expected.replace(">small<", ">" + big + "<"),
+            layout.doLayout(createSimpleEvent(big.toString())));
         Assert.assertTrue(bufferCapacity() > 2048);
 
         Assert.assertEquals(expected, layout.doLayout(small));
         Assert.assertTrue(bufferCapacity() <= 2048);
+    }
+
+    @Test
+    public void consecutiveEventsDoNotAccumulateInTheOutput() {
+        layout.setLocationInfo(false);
+        layout.setProperties(false);
+        String first = layout.doLayout(createSimpleEvent("first"));
+
+        String second = layout.doLayout(createSimpleEvent("second"));
+
+        Assert.assertEquals(first.replace(">first<", ">second<"), second);
     }
 
     private int bufferCapacity() throws Exception {
