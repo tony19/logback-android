@@ -1,10 +1,12 @@
 apply plugin: 'com.android.library'
-// Compiles src/main/kotlin. Applied as the standalone plugin (AGP's
-// built-in Kotlin support is opted out in gradle.properties) because this
-// project needs per-flavor Kotlin bytecode targets; see the afterEvaluate
-// block below.
+// Compiles src/main/kotlin and src/test/kotlin. Applied as the standalone
+// plugin (AGP's built-in Kotlin support is opted out in gradle.properties)
+// because this project needs per-flavor Kotlin bytecode targets; see the
+// afterEvaluate block below.
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'org.gradle.test-retry'
+// Unit-test coverage; see the coverage tasks at the end of this file.
+apply plugin: 'jacoco'
 
 kotlin {
     // Library mode: every public declaration in the Kotlin sources must
@@ -60,17 +62,29 @@ android {
         }
         debug {
             debuggable true
+            // Records JaCoCo coverage of the debug unit tests, which the
+            // Android-layer coverage gate at the end of this file checks.
+            enableUnitTestCoverage true
         }
     }
     lint {
         checkAllWarnings = true
         lintConfig = rootProject.file('gradle/lint.xml')
     }
+    testCoverage {
+        jacocoVersion = '0.8.15'
+    }
     testOptions {
         unitTests {
             includeAndroidResources = true
 
             all {
+                jacoco {
+                    // Robolectric's sandbox classloader defines the classes
+                    // under test without a code-source location; record them.
+                    includeNoLocationClasses = true
+                    excludes = ['jdk.internal.*']
+                }
                 testLogging {
                     events 'failed'
                     showStackTraces = true
@@ -123,6 +137,52 @@ afterEvaluate {
     }
 }
 
+// Coverage gate for the Android-specific layer (ch.qos.logback.{classic,core}.android):
+// its unit tests must cover 100% of its lines and branches, so that they pin
+// the behavior of every path. For each debug variant,
+// androidLayerCoverageReport<Variant> writes an HTML/XML report and
+// androidLayerCoverageVerification<Variant> enforces the rule;
+// verifyAndroidLayerCoverage runs both variants' checks.
+def androidLayerClasses = ['ch/qos/logback/classic/android/**', 'ch/qos/logback/core/android/**']
+def androidLayerCoverage = { JacocoReportBase task, String variant ->
+    def testTask = tasks.named("test${variant}UnitTest", Test)
+    task.dependsOn(testTask)
+    task.executionData.from(testTask.map { it.extensions.getByType(JacocoTaskExtension).destinationFile })
+    task.classDirectories.from(files(
+            tasks.named("compile${variant}Kotlin").flatMap { it.destinationDirectory },
+            tasks.named("compile${variant}JavaWithJavac").flatMap { it.destinationDirectory },
+    ).asFileTree.matching { include androidLayerClasses })
+    task.sourceDirectories.from(files('src/main/kotlin', 'src/main/java'))
+}
+def androidLayerVerifications = ['Jdk11Debug', 'Jdk8Debug'].collect { variant ->
+    tasks.register("androidLayerCoverageReport${variant}", JacocoReport) {
+        group = 'verification'
+        description = "Reports the ${variant} unit tests' coverage of the Android-specific layer."
+        androidLayerCoverage(it, variant)
+        reports {
+            html.required = true
+            xml.required = true
+        }
+    }
+    tasks.register("androidLayerCoverageVerification${variant}", JacocoCoverageVerification) {
+        group = 'verification'
+        description = "Fails unless the ${variant} unit tests cover every line and branch of the Android-specific layer."
+        androidLayerCoverage(it, variant)
+        violationRules {
+            rule {
+                element = 'CLASS'
+                limit { counter = 'LINE'; value = 'COVEREDRATIO'; minimum = 1.0 }
+                limit { counter = 'BRANCH'; value = 'COVEREDRATIO'; minimum = 1.0 }
+            }
+        }
+    }
+}
+tasks.register('verifyAndroidLayerCoverage') {
+    group = 'verification'
+    description = 'Fails unless the unit tests cover every line and branch of the Android-specific layer.'
+    dependsOn androidLayerVerifications
+}
+
 dependencies {
 
     testImplementation('junit:junit:4.13.2') {
@@ -134,6 +194,10 @@ dependencies {
     // Mockito 5 uses the inline mock maker by default, which is required to
     // mock final/JDK classes on JDK 17+ (older versions fail with NPEs).
     testImplementation 'org.mockito:mockito-core:5.24.0'
+    // Kotlin unit tests: kotlin.test assertions (versioned by the Kotlin
+    // plugin) and Mockito's Kotlin API
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:6.4.0'
     testImplementation 'joda-time:joda-time:2.14.4'
 
     testImplementation 'com.icegreen:greenmail:2.1.14'
