@@ -17,13 +17,20 @@ package ch.qos.logback.core;
 
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ch.qos.logback.core.encoder.EncoderBase;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import ch.qos.logback.core.pattern.parser.SamplePatternLayout;
 
@@ -120,5 +127,59 @@ public class OutputStreamAppenderTest {
   
   String emtptyIfNull(String s) {
     return s == null ? "" : s;
+  }
+
+  @Test
+  public void eventsAreWrittenThroughWriteOut() {
+    final List<Object> writtenOut = new ArrayList<Object>();
+    OutputStreamAppender<Object> appender = new OutputStreamAppender<Object>() {
+      @Override
+      protected void writeOut(Object event) throws IOException {
+        writtenOut.add(event);
+        super.writeOut(event);
+      }
+    };
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    appender.setContext(context);
+    appender.setEncoder(new Utf8LineEncoder());
+    appender.setOutputStream(baos);
+    appender.start();
+
+    appender.doAppend("a");
+    appender.doAppend("b");
+
+    assertEquals(Arrays.<Object>asList("a", "b"), writtenOut);
+    assertEquals("a\nb\n", utf8(baos));
+  }
+
+  static String utf8(ByteArrayOutputStream baos) {
+    return new String(baos.toByteArray(), StandardCharsets.UTF_8);
+  }
+
+  /**
+   * Encodes each event as its string form in UTF-8 followed by a newline.
+   */
+  static class Utf8LineEncoder extends EncoderBase<Object> {
+    byte[] header;
+    byte[] footer;
+
+    @Override
+    public byte[] headerBytes() {
+      return header;
+    }
+
+    @Override
+    public byte[] encode(Object event) {
+      return toUtf8(event + "\n");
+    }
+
+    @Override
+    public byte[] footerBytes() {
+      return footer;
+    }
+
+    static byte[] toUtf8(String s) {
+      return s.getBytes(StandardCharsets.UTF_8);
+    }
   }
 }

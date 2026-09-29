@@ -21,12 +21,22 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import ch.qos.logback.core.encoder.EncoderBase;
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
 import ch.qos.logback.core.status.StatusChecker;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
@@ -42,6 +52,9 @@ import ch.qos.logback.core.util.StatusPrinter;
 public class FileAppenderTest extends AbstractAppenderTest<Object> {
 
   private int diff = RandomUtil.getPositiveInt();
+
+  @Rule
+  public TemporaryFolder tmp = new TemporaryFolder();
 
   protected Appender<Object> getAppender() {
     return new FileAppender<Object>();
@@ -215,6 +228,114 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     StatusPrinter.print(context);
     StatusChecker checker = new StatusChecker(context);
     checker.assertContainsMatch(Status.ERROR, "'File' option has the same value");
+  }
+
+  @Test
+  public void prudentModeHoldsFileLockWhileEventIsWritten() throws Exception {
+    File file = new File(tmp.getRoot(), "prudent-lock.log");
+    LockProbingEncoder encoder = new LockProbingEncoder(file);
+    FileAppender<Object> fa = newFileAppender("prudent-lock", file, encoder);
+    fa.setPrudent(true);
+    fa.start();
+
+    fa.doAppend("hello");
+    fa.stop();
+
+    assertEquals(Collections.singletonList(Boolean.TRUE), encoder.lockHeldDuringEncode);
+    assertEquals("hello\n", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void nonPrudentModeDoesNotLockFile() throws Exception {
+    File file = new File(tmp.getRoot(), "non-prudent.log");
+    LockProbingEncoder encoder = new LockProbingEncoder(file);
+    FileAppender<Object> fa = newFileAppender("non-prudent", file, encoder);
+    fa.start();
+
+    fa.doAppend("hello");
+    fa.stop();
+
+    assertEquals(Collections.singletonList(Boolean.FALSE), encoder.lockHeldDuringEncode);
+    assertEquals("hello\n", readUtf8(file));
+  }
+
+  private FileAppender<Object> newFileAppender(String name, File file, EncoderBase<Object> encoder) {
+    FileAppender<Object> fa = new FileAppender<Object>();
+    fa.setContext(context);
+    fa.setName(name);
+    fa.setEncoder(encoder);
+    fa.setFile(file.getAbsolutePath());
+    return fa;
+  }
+
+  static String readUtf8(File file) throws IOException {
+    RandomAccessFile raf = new RandomAccessFile(file, "r");
+    try {
+      byte[] bytes = new byte[(int) raf.length()];
+      raf.readFully(bytes);
+      return new String(bytes, StandardCharsets.UTF_8);
+    } finally {
+      raf.close();
+    }
+  }
+
+  /**
+   * Encodes each event as its string form in UTF-8 followed by a newline.
+   */
+  static class Utf8LineEncoder extends EncoderBase<Object> {
+    @Override
+    public byte[] headerBytes() {
+      return null;
+    }
+
+    @Override
+    public byte[] encode(Object event) {
+      return (event + "\n").getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public byte[] footerBytes() {
+      return null;
+    }
+  }
+
+  /**
+   * Records, for each encoded event, whether this JVM held a lock on the file
+   * while the event was being encoded (i.e. written).
+   */
+  static class LockProbingEncoder extends Utf8LineEncoder {
+    final File file;
+    final List<Boolean> lockHeldDuringEncode = new ArrayList<Boolean>();
+
+    LockProbingEncoder(File file) {
+      this.file = file;
+    }
+
+    @Override
+    public byte[] encode(Object event) {
+      lockHeldDuringEncode.add(isLockedByThisJvm());
+      return super.encode(event);
+    }
+
+    private boolean isLockedByThisJvm() {
+      try {
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        try {
+          FileLock lock = raf.getChannel().tryLock();
+          if (lock != null) {
+            lock.release();
+          }
+          return false;
+        } catch (OverlappingFileLockException e) {
+          return true;
+        } finally {
+          raf.close();
+        }
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+    }
   }
 
   // helper class used to access protected fields

@@ -241,8 +241,10 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
       // are writing. It also prevents multiple threads from entering the same
       // converter. Converters assume that they are in a synchronized block.
       //lock.lock();
-      byte[] byteArray = this.encoder.encode(event);
-      writeBytes(byteArray);
+      // Go through writeOut() so that subclasses can wrap the write, e.g.
+      // FileAppender in prudent mode, which locks the file around it
+      // (as upstream logback does since 1.3.0).
+      writeOut(event);
 
     } catch (IOException ioe) {
       // as soon as an exception occurs, move to non-started state
