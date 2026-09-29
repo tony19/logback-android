@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 public class CyclicBufferAppenderTest {
 
@@ -45,6 +47,58 @@ public class CyclicBufferAppenderTest {
     // get() now has type information, assigning to String should work without cast.
     String foo = cyclicBufferAppender.get(0);
     assertEquals("Some string", foo);
+  }
+
+  @Test
+  public void maxSizeDefaultsTo512() {
+    assertEquals(512, new CyclicBufferAppender<String>().getMaxSize());
+  }
+
+  @Test
+  public void setMaxSizeBoundsTheBufferCreatedOnStart() {
+    CyclicBufferAppender<String> appender = new CyclicBufferAppender<String>();
+    appender.setMaxSize(2);
+    assertEquals(2, appender.getMaxSize());
+    appender.start();
+
+    appender.append("a");
+    appender.append("b");
+    appender.append("c");
+
+    assertEquals(2, appender.getLength());
+    assertEquals("b", appender.get(0));
+    assertEquals("c", appender.get(1));
+  }
+
+  @Test
+  public void stopDiscardsTheBuffer() {
+    cyclicBufferAppender.append("foobar");
+
+    cyclicBufferAppender.stop();
+
+    assertFalse(cyclicBufferAppender.isStarted());
+    assertNull(cyclicBufferAppender.cb);
+    assertEquals(0, cyclicBufferAppender.getLength());
+    assertNull(cyclicBufferAppender.get(0));
+  }
+
+  @Test
+  public void appendIsIgnoredWhenNotStarted() {
+    CyclicBufferAppender<String> appender = new CyclicBufferAppender<String>();
+
+    // no buffer exists before start(); append must not touch it
+    appender.append("ignored");
+
+    appender.start();
+    assertEquals(0, appender.getLength());
+  }
+
+  @Test
+  public void getLengthAndGetAreEmptyBeforeStart() {
+    CyclicBufferAppender<String> appender = new CyclicBufferAppender<String>();
+
+    assertEquals(0, appender.getLength());
+    assertNull(appender.get(0));
   }
 
 
