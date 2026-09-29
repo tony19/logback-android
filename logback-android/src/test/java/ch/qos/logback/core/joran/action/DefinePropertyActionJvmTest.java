@@ -29,7 +29,10 @@ import org.junit.Test;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.PropertyDefinerBase;
+import ch.qos.logback.core.joran.spi.ElementPath;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
+import ch.qos.logback.core.joran.spi.Interpreter;
+import ch.qos.logback.core.joran.spi.SimpleRuleStore;
 import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.status.Status;
 
@@ -97,6 +100,31 @@ public class DefinePropertyActionJvmTest {
     action.end(ic, "define");
 
     assertEquals("in context", context.getProperty("foo"));
+  }
+
+  @Test
+  public void previousErrorIsForgottenByTheNextElement() throws Exception {
+    // the error message gives the line number, which needs an interpreter
+    InterpretationContext withInterpreter = new Interpreter(context, new SimpleRuleStore(context), new ElementPath())
+        .getInterpretationContext();
+    action.begin(withInterpreter, "define", defineAttributes("", DefinePropertyActionDefiner.class, null));
+    assertTrue(action.inError);
+    assertTrue(withInterpreter.isEmpty());
+    assertEquals(Status.ERROR, lastStatus().getLevel());
+    assertEquals("Missing property name for property definer. Near [define] line -1", lastStatus().getMessage());
+
+    action.begin(withInterpreter, "define", defineAttributes("foo", DefinePropertyActionDefiner.class, null));
+    ((DefinePropertyActionDefiner) withInterpreter.peekObject()).setValue("defined");
+    action.end(withInterpreter, "define");
+
+    assertFalse(action.inError);
+    assertEquals("defined", withInterpreter.getProperty("foo"));
+    assertTrue(withInterpreter.isEmpty());
+  }
+
+  private Status lastStatus() {
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    return statuses.get(statuses.size() - 1);
   }
 
   @Test

@@ -22,6 +22,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -48,11 +50,13 @@ import ch.qos.logback.core.joran.event.EndEvent;
 import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.event.SaxEventRecorder;
 import ch.qos.logback.core.joran.event.StartEvent;
+import ch.qos.logback.core.joran.spi.ConfigurationWatchList;
 import ch.qos.logback.core.joran.spi.ElementPath;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
 import ch.qos.logback.core.joran.spi.Interpreter;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.joran.spi.SimpleRuleStore;
+import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import ch.qos.logback.core.status.Status;
 
 /**
@@ -109,6 +113,29 @@ public class IncludeActionJvmTest {
     assertSame(url, action.recordedUrl);
     assertSame(context, action.recorder.getContext());
     assertTrue(handler.opened.closed);
+  }
+
+  @Test
+  public void includedFileIsAddedToTheConfigurationWatchList() throws Exception {
+    ConfigurationWatchList watchList = new ConfigurationWatchList();
+    watchList.setContext(context);
+    ConfigurationWatchListUtil.registerConfigurationWatchList(context, watchList);
+    File included = tmp.newFile("watched.xml");
+    URL fileUrl = included.toURI().toURL();
+    action.script = new Script() {
+      public void record(SaxEventRecorder recorder) {
+        start(recorder, "included");
+        start(recorder, "stack");
+        end(recorder, "stack");
+        end(recorder, "included");
+      }
+    };
+
+    action.processInclude(ic, fileUrl);
+
+    assertEquals(Collections.singletonList(included.getAbsoluteFile()), watchList.getCopyOfFileWatchList());
+    assertEquals(Status.INFO, findStatus("Adding [" + fileUrl + "] to configuration watch list.").getLevel());
+    assertEquals(Arrays.asList("include", "/include", "stack", "/stack", "/x"), describe(played));
   }
 
   @Test

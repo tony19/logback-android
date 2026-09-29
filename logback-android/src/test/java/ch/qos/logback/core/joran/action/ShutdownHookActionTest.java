@@ -115,6 +115,19 @@ public class ShutdownHookActionTest {
   }
 
   @Test
+  public void previousErrorIsForgottenByTheNextElement() throws ActionException {
+    assertThrows(ActionException.class,
+        () -> action.begin(ic, "shutdownHook", hookAttributes("no.such.Hook")));
+
+    action.begin(ic, "shutdownHook", hookAttributes(ShutdownHookActionHook.class.getName()));
+    action.end(ic, "shutdownHook");
+
+    assertTrue(ic.isEmpty());
+    Thread hookThread = (Thread) context.getObject(CoreConstants.SHUTDOWN_HOOK_THREAD);
+    assertTrue(Runtime.getRuntime().removeShutdownHook(hookThread));
+  }
+
+  @Test
   public void foreignObjectOnTopOfTheStackIsReportedAndNothingIsRegistered() throws ActionException {
     action.begin(ic, "shutdownHook", hookAttributes(ShutdownHookActionHook.class.getName()));
     Object foreign = new Object();

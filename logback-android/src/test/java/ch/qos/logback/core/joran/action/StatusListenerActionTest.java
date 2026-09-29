@@ -140,6 +140,20 @@ public class StatusListenerActionTest {
   }
 
   @Test
+  public void previousErrorIsForgottenByTheNextElement() throws ActionException {
+    action.begin(ic, "statusListener", listenerAttributes(""));
+    assertTrue(action.inError);
+
+    action.begin(ic, "statusListener", listenerAttributes(StartableStatusListenerActionListener.class.getName()));
+    StartableStatusListenerActionListener listener = (StartableStatusListenerActionListener) ic.peekObject();
+    action.end(ic, "statusListener");
+
+    assertFalse(action.inError);
+    assertTrue(listener.isStarted());
+    assertTrue(ic.isEmpty());
+  }
+
+  @Test
   public void uninstantiableListenerIsReportedAndRethrown() {
     ActionException e = assertThrows(ActionException.class,
         () -> action.begin(ic, "statusListener", listenerAttributes("no.such.Listener")));

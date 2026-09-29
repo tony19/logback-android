@@ -17,8 +17,6 @@ package ch.qos.logback.core.joran.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -26,7 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +45,9 @@ public class TimestampActionTest {
 
   /** 2001-07-01T12:00:00.123Z: in 2001 in every time zone, and long before "now". */
   private static final long BIRTH_TIME = 993_988_800_123L;
+  /** Year and milliseconds: the same for BIRTH_TIME in every time zone. */
   private static final String PATTERN = "yyyy.SSS";
+  private static final String BIRTH_TIME_FORMATTED = "2001.123";
 
   private final Context context = new ContextBase() {
     @Override
@@ -64,23 +67,29 @@ public class TimestampActionTest {
   public void contextBirthIsUsedAsTimeReference() throws ActionException {
     action.begin(ic, "timestamp", timestampAttributes("birth", PATTERN, "ContextBirth", null));
 
-    String expected = new SimpleDateFormat(PATTERN).format(new Date(BIRTH_TIME));
-    assertTrue(expected, expected.startsWith("2001."));
-    assertEquals(expected, ic.getProperty("birth"));
+    // the date is formatted in the US locale (Gregorian calendar, ASCII digits) whatever the default one
+    assertEquals(BIRTH_TIME_FORMATTED, ic.getProperty("birth"));
     assertNull(context.getProperty("birth"));
     List<String> messages = messages();
     assertTrue(messages.contains("Using context birth as time reference."));
     assertTrue(messages.contains("Adding property to the context with key=\"birth\" and value=\""
-        + expected + "\" to the LOCAL scope"));
+        + BIRTH_TIME_FORMATTED + "\" to the LOCAL scope"));
   }
 
   @Test
   public void interpretationTimeIsUsedAsTimeReferenceByDefault() throws ActionException {
+    long before = System.currentTimeMillis();
     action.begin(ic, "timestamp", timestampAttributes("now", PATTERN, null, "context"));
+    long after = System.currentTimeMillis();
 
+    // the value is the time of the call, formatted like the action does (US locale, default time zone)
+    SimpleDateFormat format = new SimpleDateFormat(PATTERN, Locale.US);
+    Set<String> possibleValues = new HashSet<String>();
+    for (long t = Math.min(before, after); t <= Math.max(before, after); t++) {
+      possibleValues.add(format.format(new Date(t)));
+    }
     String value = context.getProperty("now");
-    assertNotNull(value);
-    assertNotEquals(new SimpleDateFormat(PATTERN).format(new Date(BIRTH_TIME)), value);
+    assertTrue(value + " not in " + possibleValues, possibleValues.contains(value));
     List<String> messages = messages();
     assertTrue(messages.contains("Using current interpretation time, i.e. now, as time reference."));
     assertFalse(messages.contains("Using context birth as time reference."));
