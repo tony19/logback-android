@@ -19,7 +19,9 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -27,8 +29,13 @@ import org.junit.Test;
 
 import org.slf4j.MDC;
 
+import java.util.List;
+
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Ceki G&uuml;c&uuml;
@@ -76,5 +83,60 @@ public class MDCBasedDiscriminatorTest {
     assertTrue(event.getMDCPropertyMap().isEmpty());
     String discriminatorValue = discriminator.getDiscriminatingValue(event);
     assertEquals(DEFAULT_VAL, discriminatorValue);
+  }
+
+  // LBCLASSIC-213: events, e.g. deserialized ones, may carry no MDC map at all
+  @Test
+  public void eventWithoutMDCMapYieldsTheDefaultValue() {
+    ILoggingEvent eventWithoutMDCMap = mock(ILoggingEvent.class);
+    when(eventWithoutMDCMap.getMDCPropertyMap()).thenReturn(null);
+
+    assertEquals(DEFAULT_VAL, discriminator.getDiscriminatingValue(eventWithoutMDCMap));
+  }
+
+  @Test
+  public void defaultValueIsExposed() {
+    assertEquals(DEFAULT_VAL, discriminator.getDefaultValue());
+  }
+
+  @Test
+  public void startFailsWithoutKey() {
+    MDCBasedDiscriminator withoutKey = new MDCBasedDiscriminator();
+    withoutKey.setContext(context);
+    withoutKey.setDefaultValue(DEFAULT_VAL);
+
+    withoutKey.start();
+
+    assertFalse(withoutKey.isStarted());
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("The \"Key\" property must be set", statuses.get(0).getMessage());
+  }
+
+  @Test
+  public void startFailsWithoutDefaultValue() {
+    MDCBasedDiscriminator withoutDefaultValue = new MDCBasedDiscriminator();
+    withoutDefaultValue.setContext(context);
+    withoutDefaultValue.setKey(key);
+
+    withoutDefaultValue.start();
+
+    assertFalse(withoutDefaultValue.isStarted());
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("The \"DefaultValue\" property must be set", statuses.get(0).getMessage());
+  }
+
+  @Test
+  public void startReportsBothMissingProperties() {
+    MDCBasedDiscriminator unconfigured = new MDCBasedDiscriminator();
+    unconfigured.setContext(context);
+
+    unconfigured.start();
+
+    assertFalse(unconfigured.isStarted());
+    assertEquals(2, context.getStatusManager().getCount());
   }
 }

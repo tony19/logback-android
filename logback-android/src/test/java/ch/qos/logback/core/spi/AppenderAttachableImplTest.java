@@ -20,6 +20,8 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import java.util.Iterator;
 
@@ -162,6 +164,71 @@ public class AppenderAttachableImplTest {
     assertTrue(aai.detachAppender("test"));
     assertTrue(aai.detachAppender("test1"));
     assertFalse( aai.detachAppender("test1"));
+  }
+
+  @Test
+  public void addingANullAppenderIsRejected() {
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        () -> aai.addAppender(null));
+    assertEquals("Null argument disallowed", e.getMessage());
+    assertFalse(aai.iteratorForAppenders().hasNext());
+  }
+
+  @Test
+  public void addingTheSameAppenderTwiceAttachesItOnce() {
+    NOPAppender<TestEvent> ta = new NOPAppender<TestEvent>();
+    aai.addAppender(ta);
+    aai.addAppender(ta);
+    assertEquals(1, aai.appendLoopOnAppenders(new TestEvent()));
+  }
+
+  @Test
+  public void getAppenderWithNullNameReturnsNull() {
+    NOPAppender<TestEvent> unnamed = new NOPAppender<TestEvent>();
+    aai.addAppender(unnamed);
+    assertNull(aai.getAppender(null));
+  }
+
+  @Test
+  public void nullOrUnattachedAppenderIsNotAttached() {
+    NOPAppender<TestEvent> attached = new NOPAppender<TestEvent>();
+    attached.setName("same");
+    aai.addAppender(attached);
+    NOPAppender<TestEvent> other = new NOPAppender<TestEvent>();
+    other.setName("same");
+
+    assertFalse(aai.isAttached(null));
+    // attachment is by identity, not by name
+    assertFalse(aai.isAttached(other));
+    assertTrue(aai.isAttached(attached));
+  }
+
+  @Test
+  public void detachingANullAppenderReturnsFalseAndKeepsTheOthers() {
+    NOPAppender<TestEvent> ta = new NOPAppender<TestEvent>();
+    aai.addAppender(ta);
+
+    assertFalse(aai.detachAppender((Appender<TestEvent>) null));
+    assertTrue(aai.isAttached(ta));
+  }
+
+  @Test
+  public void detachingByNullNameReturnsFalseAndKeepsUnnamedAppenders() {
+    NOPAppender<TestEvent> unnamed = new NOPAppender<TestEvent>();
+    aai.addAppender(unnamed);
+
+    assertFalse(aai.detachAppender((String) null));
+    assertTrue(aai.isAttached(unnamed));
+  }
+
+  @Test
+  public void detachingByUnknownNameReturnsFalseAndKeepsTheOthers() {
+    NOPAppender<TestEvent> ta = new NOPAppender<TestEvent>();
+    ta.setName("known");
+    aai.addAppender(ta);
+
+    assertFalse(aai.detachAppender("unknown"));
+    assertTrue(aai.isAttached(ta));
   }
 
   private static class TestEvent {
