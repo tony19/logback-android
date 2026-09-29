@@ -21,15 +21,69 @@ import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.EnvUtil;
 import ch.qos.logback.core.util.FileUtil;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class FileStoreUtilTest {
+
+  @Rule
+  public TemporaryFolder tmpDir = new TemporaryFolder();
+
+  @Test
+  public void isInstantiable() {
+    // only static members, but the class is public and has a public constructor
+    assertNotNull(new FileStoreUtil());
+  }
+
+  @Test
+  public void missingFirstFileIsRejected() throws IOException {
+    File missing = new File(tmpDir.getRoot(), "missing");
+    File existing = tmpDir.newFile("existing");
+
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        () -> FileStoreUtil.areOnSameFileStore(missing, existing));
+
+    assertEquals("File [" + missing + "] does not exist.", e.getMessage());
+  }
+
+  @Test
+  public void missingSecondFileIsRejected() throws IOException {
+    File existing = tmpDir.newFile("existing");
+    File missing = new File(tmpDir.getRoot(), "missing");
+
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        () -> FileStoreUtil.areOnSameFileStore(existing, missing));
+
+    assertEquals("File [" + missing + "] does not exist.", e.getMessage());
+  }
+
+  @Test
+  public void failedFileStoreLookupIsReportedAsRolloverFailure() throws IOException {
+    File existing = tmpDir.newFile("existing");
+    // passes the existence check, but is gone by the time its store is looked up
+    File vanished = new File(tmpDir.getRoot(), "vanished") {
+      @Override
+      public boolean exists() {
+        return true;
+      }
+    };
+
+    RolloverFailure e = assertThrows(RolloverFailure.class,
+        () -> FileStoreUtil.areOnSameFileStore(existing, vanished));
+
+    assertEquals("Failed to check file store equality for [" + existing + "] and [" + vanished + "]", e.getMessage());
+    assertNotNull(e.getCause());
+  }
 
 
   int diff = RandomUtil.getPositiveInt();

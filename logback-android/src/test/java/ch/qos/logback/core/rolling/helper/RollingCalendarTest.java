@@ -17,6 +17,7 @@ package ch.qos.logback.core.rolling.helper;
 
 import static ch.qos.logback.core.rolling.helper.RollingCalendar.GMT_TIMEZONE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
@@ -24,10 +25,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.Test;
 
+import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.spi.ContextAwareBase;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.util.EnvUtil;
 
 public class RollingCalendarTest {
@@ -87,6 +92,77 @@ public class RollingCalendarTest {
     assertEquals(0, cal.get(Calendar.MINUTE));
     assertEquals(48, cal.get(Calendar.SECOND));
     assertEquals(0, cal.get(Calendar.MILLISECOND));
+  }
+
+  @Test
+  public void weeklyPeriodsStartOnTheFirstDayOfTheWeek() throws ParseException {
+    // a Wednesday; weeks start on Sunday in the US locale
+    final Date REF_DATE = parseDate("yyyy-MM-dd HH:mm:ss.SSS", "2000-12-27 09:30:49.876");
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS EEE", Locale.US);
+    format.setTimeZone(GMT_TIMEZONE);
+
+    assertEquals("2000-12-17 00:00:00.000 Sun", format.format(getEndOfNextNthPeriod("yyyy-ww", REF_DATE, -1).getTime()));
+    assertEquals("2000-12-24 00:00:00.000 Sun", format.format(getEndOfNextNthPeriod("yyyy-ww", REF_DATE, 0).getTime()));
+    assertEquals("2000-12-31 00:00:00.000 Sun", format.format(getEndOfNextNthPeriod("yyyy-ww", REF_DATE, 1).getTime()));
+    assertEquals("2001-01-07 00:00:00.000 Sun", format.format(getEndOfNextNthPeriod("yyyy-ww", REF_DATE, 2).getTime()));
+  }
+
+  @Test
+  public void periodicityIsErroneousWithoutDatePattern() {
+    RollingCalendar rc = new RollingCalendar(null, GMT_TIMEZONE, Locale.US);
+
+    assertEquals(PeriodicityType.ERRONEOUS, rc.getPeriodicityType());
+  }
+
+  @Test
+  public void periodicityIsErroneousWithoutAnyTimeUnit() {
+    RollingCalendar rc = new RollingCalendar("yyyy", GMT_TIMEZONE, Locale.US);
+
+    assertEquals(PeriodicityType.ERRONEOUS, rc.getPeriodicityType());
+  }
+
+  @Test
+  public void amPmMarkerMeansHalfDayPeriodicity() {
+    RollingCalendar rc = new RollingCalendar("yyyy-MM-dd a", GMT_TIMEZONE, Locale.US);
+
+    assertEquals(PeriodicityType.HALF_DAY, rc.getPeriodicityType());
+  }
+
+  @Test
+  public void endOfPeriodIsUndefinedForErroneousPeriodicity() {
+    RollingCalendar rc = new RollingCalendar("yyyy", GMT_TIMEZONE, Locale.US);
+
+    IllegalStateException e = assertThrows(IllegalStateException.class,
+        () -> rc.getEndOfNextNthPeriod(new Date(0), 1));
+
+    assertEquals("Unknown periodicity type.", e.getMessage());
+  }
+
+  @Test
+  public void endOfPeriodIsUndefinedForHalfDayPeriodicity() {
+    RollingCalendar rc = new RollingCalendar("yyyy-MM-dd a", GMT_TIMEZONE, Locale.US);
+
+    IllegalStateException e = assertThrows(IllegalStateException.class,
+        () -> rc.getNextTriggeringDate(new Date(0)));
+
+    assertEquals("Unknown periodicity type.", e.getMessage());
+  }
+
+  @Test
+  public void printsPeriodicity() {
+    assertEquals("Roll-over at midday and midnight.", printedPeriodicity("yyyy-MM-dd a"));
+    assertEquals("Rollover at the start of week.", printedPeriodicity("yyyy-ww"));
+    assertEquals("Unknown periodicity.", printedPeriodicity("yyyy"));
+  }
+
+  private String printedPeriodicity(String datePattern) {
+    ContextAwareBase cab = new ContextAwareBase();
+    cab.setContext(new ContextBase());
+    new RollingCalendar(datePattern, GMT_TIMEZONE, Locale.US).printPeriodicity(cab);
+    List<Status> statuses = cab.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.INFO, statuses.get(0).getLevel());
+    return statuses.get(0).getMessage();
   }
 
   private Calendar getEndOfNextNthPeriod(String dateFormat, Date date, int n) {
