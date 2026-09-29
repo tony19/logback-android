@@ -40,7 +40,7 @@ import ch.qos.logback.core.util.Duration
  */
 public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
-    private var db: SQLiteDatabase? = null
+    private lateinit var db: SQLiteDatabase
     private lateinit var insertPropertiesSQL: String
     private lateinit var insertExceptionSQL: String
     private lateinit var insertSQL: String
@@ -52,17 +52,17 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * The database name resolver, used to customize the names of the
      * table names and columns in the database.
      */
-    public var dbNameResolver: DBNameResolver? = null
+    public open var dbNameResolver: DBNameResolver? = null
 
     /**
      * The absolute path to the SQLite database
      */
-    public var filename: String? = null
+    public open var filename: String? = null
 
     /**
      * The maximum history in time duration (e.g., "1 day") of records to keep
      */
-    public var maxHistory: String
+    public open var maxHistory: String
         get() = maxHistoryDuration?.toString() ?: ""
         set(value) {
             maxHistoryDuration = Duration.valueOf(value)
@@ -71,7 +71,7 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     /**
      * The maximum history in milliseconds
      */
-    public val maxHistoryMs: Long
+    public open val maxHistoryMs: Long
         get() = maxHistoryDuration?.milliseconds ?: 0
 
     /**
@@ -79,7 +79,7 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * startup and in between logging events. Reading this property creates
      * the default log cleaner if none was set.
      */
-    public var logCleaner: SQLiteLogCleaner? = null
+    public open var logCleaner: SQLiteLogCleaner? = null
         get() {
             if (field == null) {
                 field = SQLiteLogCleaner { db, expiry ->
@@ -101,7 +101,7 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * @param filename absolute path to database file
      * @return the file object if a valid file found; otherwise, null
      */
-    public fun getDatabaseFile(filename: String?): File? {
+    public open fun getDatabaseFile(filename: String?): File? {
         var dbFile: File? = null
         if (!filename.isNullOrBlank()) {
             dbFile = File(filename)
@@ -122,7 +122,7 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         }
 
         val db = try {
-            dbFile.parentFile?.mkdirs()
+            dbFile.absoluteFile.parentFile.mkdirs()
             addInfo("db path: ${dbFile.absolutePath}")
             SQLiteDatabase.openOrCreateDatabase(dbFile.path, null)
         } catch (e: SQLiteException) {
@@ -155,7 +155,9 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     }
 
     override fun stop() {
-        db?.close()
+        if (this::db.isInitialized) {
+            db.close()
+        }
         this.lastCleanupTime = 0
     }
 
@@ -163,7 +165,6 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         if (!isStarted) {
             return
         }
-        val db = this.db ?: return
 
         try {
             clearExpiredLogs(db)
@@ -190,10 +191,10 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * Removes expired logs from the database
      */
     private fun clearExpiredLogs(db: SQLiteDatabase) {
-        val maxHistory = this.maxHistoryDuration
+        val maxHistory = this.maxHistoryDuration ?: return
         if (lastCheckExpired(maxHistory, this.lastCleanupTime)) {
             this.lastCleanupTime = clock.currentTimeMillis()
-            logCleaner?.performLogCleanup(db, maxHistory!!)
+            logCleaner?.performLogCleanup(db, maxHistory)
         }
     }
 
@@ -204,8 +205,8 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * @param lastCleanupTime timestamp (ms) of last cleanup
      * @return true if last check has expired
      */
-    private fun lastCheckExpired(expiry: Duration?, lastCleanupTime: Long): Boolean {
-        if (expiry == null || expiry.milliseconds <= 0) {
+    private fun lastCheckExpired(expiry: Duration, lastCleanupTime: Long): Boolean {
+        if (expiry.milliseconds <= 0) {
             return false
         }
         val timeDiff = clock.currentTimeMillis() - lastCleanupTime
@@ -319,7 +320,6 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         if (mergedMap.isEmpty()) {
             return
         }
-        val db = this.db ?: return
         db.compileStatement(insertPropertiesSQL).use { stmt ->
             for ((key, value) in mergedMap) {
                 stmt.bindLong(1, eventId)
@@ -361,7 +361,6 @@ public open class SQLiteAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     }
 
     private fun insertThrowable(throwableProxy: IThrowableProxy, eventId: Long) {
-        val db = this.db ?: return
         db.compileStatement(insertExceptionSQL).use { stmt ->
             var tp: IThrowableProxy? = throwableProxy
             var baseIndex: Short = 0
