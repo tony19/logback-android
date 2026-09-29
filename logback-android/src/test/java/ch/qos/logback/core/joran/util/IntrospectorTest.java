@@ -63,6 +63,30 @@ public class IntrospectorTest {
     }
   }
 
+  public static class ValueGetter {
+    public Object getValue() {
+      return null;
+    }
+  }
+
+  /** Declares the setter and inherits the getter. */
+  public static class InheritedGetterBean extends ValueGetter {
+    public void setValue(String value) {
+    }
+  }
+
+  public static class ValueSetter {
+    public void setValue(String value) {
+    }
+  }
+
+  /** Declares the getter and inherits the setter. */
+  public static class InheritedSetterBean extends ValueSetter {
+    public Object getValue() {
+      return null;
+    }
+  }
+
   private static Map<String, PropertyDescriptor> descriptorsOf(Class<?> clazz) {
     Map<String, PropertyDescriptor> map = new HashMap<String, PropertyDescriptor>();
     for (PropertyDescriptor pd : Introspector.getPropertyDescriptors(clazz)) {
@@ -81,6 +105,7 @@ public class IntrospectorTest {
     assertNull(Introspector.decapitalize(null));
     assertEquals("", Introspector.decapitalize(""));
     assertEquals("x", Introspector.decapitalize("X"));
+    assertEquals("aB", Introspector.decapitalize("AB"));
     assertEquals("fooBar", Introspector.decapitalize("FooBar"));
   }
 
@@ -105,6 +130,22 @@ public class IntrospectorTest {
     PropertyDescriptor pd = descriptorsOf(Bean.class).get("value");
     assertEquals(Bean.class.getMethod("getValue"), pd.getReadMethod());
     assertEquals(String.class, pd.getPropertyType());
+  }
+
+  @Test
+  public void setterTypeTakesPriorityWhicheverAccessorIsVisitedFirst() throws Exception {
+    // Class.getMethods() usually lists a class's own methods before the
+    // inherited ones, so these two beans present the setter and the getter of
+    // "value" in opposite orders. The setter's type must win either way.
+    PropertyDescriptor setterFirst = descriptorsOf(InheritedGetterBean.class).get("value");
+    assertEquals(ValueGetter.class.getMethod("getValue"), setterFirst.getReadMethod());
+    assertEquals(InheritedGetterBean.class.getMethod("setValue", String.class), setterFirst.getWriteMethod());
+    assertEquals(String.class, setterFirst.getPropertyType());
+
+    PropertyDescriptor getterFirst = descriptorsOf(InheritedSetterBean.class).get("value");
+    assertEquals(InheritedSetterBean.class.getMethod("getValue"), getterFirst.getReadMethod());
+    assertEquals(ValueSetter.class.getMethod("setValue", String.class), getterFirst.getWriteMethod());
+    assertEquals(String.class, getterFirst.getPropertyType());
   }
 
   @Test

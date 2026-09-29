@@ -440,6 +440,22 @@ public class PropertySetterTest {
   }
 
   @Test
+  public void setPropertyWarnsWhenValueConvertsToNothing() {
+    // "maybe" is neither true nor false, so the conversion yields no value and
+    // the setter must not be invoked
+    house.setOpen(true);
+    setter.setProperty("open", "maybe");
+    assertTrue(house.isOpen());
+    Status s = statusWithMessage("Failed to set property [open] to value \"maybe\". ");
+    assertEquals(Status.WARN, s.getLevel());
+    Throwable t = s.getThrowable();
+    assertTrue(t instanceof PropertySetterException);
+    assertEquals("Conversion to type [boolean] failed.", t.getMessage());
+    assertNull(t.getCause());
+    assertEquals(1, statuses().size());
+  }
+
+  @Test
   public void setPropertyWarnsWhenSetterThrows() {
     gizmoSetter().setProperty("exploding", "x");
     Status s = statusWithMessage("Failed to set property [exploding] to value \"x\". ");
