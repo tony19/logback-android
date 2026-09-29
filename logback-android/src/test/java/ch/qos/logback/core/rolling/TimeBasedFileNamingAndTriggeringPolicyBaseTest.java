@@ -32,7 +32,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Ceki G&uuml;c&uuml;
@@ -166,19 +165,30 @@ public class TimeBasedFileNamingAndTriggeringPolicyBaseTest {
     // Friday January 7th 12:00:00 UTC 2000
     File activeFile = tmp.newFile("active.log");
     assertTrue(activeFile.setLastModified(947246400000L));
-    // read permissions cannot be withdrawn on some platforms, nor from a privileged user
-    assumeTrue(activeFile.setReadable(false, false) && !activeFile.canRead());
-    try {
-      rfa.setFile(activeFile.getAbsolutePath());
-      tbrp.setFileNamePattern("foo-%d{yyyy-MM-dd, UTC}.log");
-      // Tuesday December 20th 16:59:01 UTC 2011
-      timeBasedFNATP.setCurrentTime(1324400341553L);
+    // file permissions can't make a file unreadable for a privileged user, or
+    // at all on some platforms, so hand the policy a file that reports it
+    // can't be read
+    DefaultTimeBasedFileNamingAndTriggeringPolicy<Object> fnatp = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>() {
+      @Override
+      File newActiveFile(String fileName) {
+        return new File(fileName) {
+          @Override
+          public boolean canRead() {
+            return false;
+          }
+        };
+      }
+    };
+    fnatp.setContext(context);
+    tbrp.setTimeBasedFileNamingAndTriggeringPolicy(fnatp);
+    fnatp.setTimeBasedRollingPolicy(tbrp);
+    rfa.setFile(activeFile.getAbsolutePath());
+    tbrp.setFileNamePattern("foo-%d{yyyy-MM-dd, UTC}.log");
+    // Tuesday December 20th 16:59:01 UTC 2011
+    fnatp.setCurrentTime(1324400341553L);
 
-      tbrp.start();
+    tbrp.start();
 
-      assertEquals("foo-2011-12-20.log", timeBasedFNATP.getCurrentPeriodsFileNameWithoutCompressionSuffix());
-    } finally {
-      activeFile.setReadable(true, false);
-    }
+    assertEquals("foo-2011-12-20.log", fnatp.getCurrentPeriodsFileNameWithoutCompressionSuffix());
   }
 }
