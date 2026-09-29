@@ -99,15 +99,21 @@ public class LoggerContextListenerActionTest {
     StartableContextListener listener = (StartableContextListener) ic.peekObject();
     assertSame(context, listener.getContext());
     assertFalse(listener.isStarted());
+    List<Status> statuses = statuses();
+    assertEquals(statuses.toString(), 1, statuses.size());
+    assertEquals(Status.INFO, statuses.get(0).getLevel());
     assertEquals("Adding LoggerContextListener of type [" + StartableContextListener.class.getName()
-        + "] to the object stack", statuses().get(0).getMessage());
+        + "] to the object stack", statuses.get(0).getMessage());
 
     action.end(ic, "loggerContextListener");
 
     assertTrue(listener.isStarted());
     assertEquals(Collections.<LoggerContextListener>singletonList(listener), context.getCopyOfListenerList());
     assertTrue(ic.isEmpty());
-    assertEquals(1, statusCount("Starting LoggerContextListener"));
+    statuses = statuses();
+    assertEquals(statuses.toString(), 2, statuses.size());
+    assertEquals(Status.INFO, statuses.get(1).getLevel());
+    assertEquals("Starting LoggerContextListener", statuses.get(1).getMessage());
   }
 
   @Test

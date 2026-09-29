@@ -25,10 +25,12 @@ import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
@@ -139,7 +141,13 @@ public class LogbackMDCAdapterTest {
 
   @Test
   public void getWithNullKeyReturnsNullEvenWithAMap() {
-    mdcAdapter.put("k0", "v0");
+    // put() rejects a null key, but setContextMap() copies whatever it is given
+    Map<String, String> contextMap = new HashMap<String, String>();
+    contextMap.put("k0", "v0");
+    contextMap.put(null, "valueOfNullKey");
+    mdcAdapter.setContextMap(contextMap);
+
+    assertEquals("v0", mdcAdapter.get("k0"));
     assertNull(mdcAdapter.get(null));
   }
 
@@ -153,6 +161,19 @@ public class LogbackMDCAdapterTest {
     mdcAdapter.put("k0", "v0");
     mdcAdapter.put("k1", "v1");
     assertEquals(new HashSet<String>(Arrays.asList("k0", "k1")), mdcAdapter.getKeys());
+  }
+
+  @Test
+  public void keysHandedOutByGetKeysAreNotChangedByLaterWrites() {
+    mdcAdapter.put("k0", "v0");
+    Set<String> keys = mdcAdapter.getKeys();
+
+    // getKeys() hands out a view of the map, so the next writes must copy it
+    mdcAdapter.put("k1", "v1");
+    mdcAdapter.remove("k0");
+
+    assertEquals(Collections.singleton("k0"), keys);
+    assertEquals(Collections.singleton("k1"), mdcAdapter.getKeys());
   }
 
   @Test

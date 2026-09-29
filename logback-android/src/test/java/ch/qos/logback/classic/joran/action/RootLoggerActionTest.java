@@ -55,6 +55,21 @@ public class RootLoggerActionTest {
     assertFalse(action.inError);
     assertSame(root, ic.peekObject());
     assertEquals(Level.ERROR, root.getLevel());
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(statuses.toString(), 1, statuses.size());
+    assertEquals(Status.INFO, statuses.get(0).getLevel());
+    assertEquals("Setting level of ROOT logger to ERROR", statuses.get(0).getMessage());
+  }
+
+  @Test
+  public void beginWithoutLevelLeavesTheRootLevelAlone() {
+    root.setLevel(Level.WARN);
+
+    action.begin(ic, "root", new AttributesImpl());
+
+    assertSame(root, ic.peekObject());
+    assertEquals(Level.WARN, root.getLevel());
+    assertTrue(context.getStatusManager().getCopyOfStatusList().isEmpty());
   }
 
   @Test
