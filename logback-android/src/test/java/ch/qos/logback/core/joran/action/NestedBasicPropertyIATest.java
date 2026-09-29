@@ -17,10 +17,12 @@ package ch.qos.logback.core.joran.action;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -30,6 +32,8 @@ import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.joran.spi.ElementPath;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
+import ch.qos.logback.core.joran.util.PropertySetter;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.util.AggregationType;
 
 /**
@@ -77,6 +81,64 @@ public class NestedBasicPropertyIATest {
   @Test
   public void isApplicableToBasicPropertyCollection() {
     assertApplicable("name", AggregationType.AS_BASIC_PROPERTY_COLLECTION);
+  }
+
+  @Test
+  public void bodySetsTheBasicPropertyAfterVariableSubstitution() {
+    context.putProperty("tens", "4");
+    ic.pushObject(bean);
+    assertTrue(action.isApplicable(new ElementPath("bean/count"), new DummyAttributes(), ic));
+
+    action.begin(ic, "count", new DummyAttributes());
+    action.body(ic, "${tens}2");
+
+    assertEquals(42, bean.count);
+    assertEquals(1, action.actionDataStack.size());
+    assertTrue(context.getStatusManager().getCopyOfStatusList().isEmpty());
+  }
+
+  @Test
+  public void bodyAddsToTheBasicPropertyCollection() {
+    ic.pushObject(bean);
+    assertTrue(action.isApplicable(new ElementPath("bean/name"), new DummyAttributes(), ic));
+
+    action.body(ic, "first");
+    action.body(ic, "second");
+
+    assertEquals(Arrays.asList("first", "second"), bean.names);
+    assertTrue(context.getStatusManager().getCopyOfStatusList().isEmpty());
+  }
+
+  @Test
+  public void endPopsOnlyTheActionDataOfTheEndingElement() {
+    ic.pushObject(bean);
+    assertTrue(action.isApplicable(new ElementPath("bean/count"), new DummyAttributes(), ic));
+    assertTrue(action.isApplicable(new ElementPath("bean/name"), new DummyAttributes(), ic));
+
+    action.end(ic, "name");
+
+    assertEquals(1, action.actionDataStack.size());
+    assertEquals("count", action.actionDataStack.peek().propertyName);
+    assertSame(bean, ic.peekObject());
+
+    action.end(ic, "count");
+
+    assertTrue(action.actionDataStack.isEmpty());
+    assertSame(bean, ic.peekObject());
+  }
+
+  @Test
+  public void bodyReportsActionDataOfAnUnexpectedAggregationType() {
+    action.actionDataStack.push(new IADataForBasicProperty(new PropertySetter(bean),
+        AggregationType.AS_COMPLEX_PROPERTY, "child"));
+
+    action.body(ic, "value");
+
+    assertNull(bean.child);
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("Unexpected aggregationType AS_COMPLEX_PROPERTY", statuses.get(0).getMessage());
   }
 
   private void assertNotApplicable(String tagName) {
