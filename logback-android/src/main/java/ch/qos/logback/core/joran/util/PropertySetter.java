@@ -182,12 +182,10 @@ public class PropertySetter extends ContextAwareBase {
         return AggregationType.NOT_FOUND;
       case AS_BASIC_PROPERTY:
         return AggregationType.AS_BASIC_PROPERTY_COLLECTION;
-      case AS_COMPLEX_PROPERTY:
+      default:
+        // AS_COMPLEX_PROPERTY: computeRawAggregationType() never returns a
+        // *_COLLECTION type
         return AggregationType.AS_COMPLEX_PROPERTY_COLLECTION;
-      case AS_BASIC_PROPERTY_COLLECTION:
-      case AS_COMPLEX_PROPERTY_COLLECTION:
-        addError("Unexpected AggregationType " + type);
-        break;
       }
     }
 
@@ -253,14 +251,10 @@ public class PropertySetter extends ContextAwareBase {
     // checking for constructors would be more elegant, but in
     // classes without any declared constructors, Class.getConstructor()
     // returns null.
-    Object o;
     try {
-      o = clazz.getDeclaredConstructor().newInstance();
-      if (o != null) {
-        return true;
-      } else {
-        return false;
-      }
+      // newInstance() either returns a non-null instance or throws
+      clazz.getDeclaredConstructor().newInstance();
+      return true;
     } catch (InstantiationException e) {
       return false;
     } catch (IllegalAccessException e) {

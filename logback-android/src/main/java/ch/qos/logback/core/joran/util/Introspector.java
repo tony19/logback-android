@@ -100,7 +100,7 @@ public class Introspector {
             pd.setWriteMethod(m);
             pd.setPropertyType(parmTypes[0]);
           }
-        } else if (isGet) {
+        } else { // isGet
           if (parmTypes.length == 0) { // we only want the zero-parm getter
             pd.setReadMethod(m);
 
