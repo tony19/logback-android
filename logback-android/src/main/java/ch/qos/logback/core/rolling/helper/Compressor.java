@@ -73,6 +73,7 @@ public class Compressor extends ContextAwareBase {
         zipCompress(nameOfFile2Compress, nameOfCompressedFile, innerEntryName);
         break;
       case NONE:
+      default:
         throw new UnsupportedOperationException(
                 "compress method called in NONE compression mode");
     }
@@ -312,9 +313,9 @@ public class Compressor extends ContextAwareBase {
         else
           return fileNamePatternStr;
       case NONE:
+      default:
         return fileNamePatternStr;
     }
-    throw new IllegalStateException("Execution should not reach this point");
   }
 
   void createMissingTargetDirsIfNecessary(File file) {
