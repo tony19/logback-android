@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.qos.logback.classic.android;
+package ch.qos.logback.classic.android
 
-final class SystemClock implements Clock {
-    public long currentTimeMillis() {
-        return System.currentTimeMillis();
-    }
+internal class SystemClock : Clock {
+    override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }
