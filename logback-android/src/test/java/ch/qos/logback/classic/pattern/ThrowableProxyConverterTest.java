@@ -355,6 +355,30 @@ public class ThrowableProxyConverterTest {
   }
 
   @Test
+  public void commonFramesAreOmittedOnlyWhenLengthExceedsStackDepth() {
+    Exception cause = new Exception("cause");
+    cause.setStackTrace(new StackTraceElement[] {FRAME_C, FRAME_A, FRAME_B});
+    Exception outer = new Exception("outer", cause);
+    outer.setStackTrace(new StackTraceElement[] {FRAME_A, FRAME_B});
+    String outerLines = "java.lang.Exception: outer" + LS
+        + "\tat " + FRAME_A + LS
+        + "\tat " + FRAME_B + LS
+        + "Caused by: java.lang.Exception: cause" + LS;
+
+    restartWithOptions("4");
+    assertEquals(outerLines
+        + "\tat " + FRAME_C + LS
+        + "\t... 2 common frames omitted" + LS, tpc.convert(createLoggingEvent(outer)));
+
+    // a length equal to the cause's depth restricts printing, which lists the common frames
+    restartWithOptions("3");
+    assertEquals(outerLines
+        + "\tat " + FRAME_C + LS
+        + "\tat " + FRAME_A + LS
+        + "\tat " + FRAME_B + LS, tpc.convert(createLoggingEvent(outer)));
+  }
+
+  @Test
   public void proxyWithoutSuppressedArrayIsPrinted() {
     IThrowableProxy tp = mock(IThrowableProxy.class);
     when(tp.getClassName()).thenReturn("x.Boom");

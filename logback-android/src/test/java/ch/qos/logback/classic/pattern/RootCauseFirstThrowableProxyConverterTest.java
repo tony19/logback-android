@@ -154,6 +154,36 @@ public class RootCauseFirstThrowableProxyConverterTest {
   }
 
   @Test
+  public void suppressedPrefixIsPrintedOnlyOnTheRootCauseOfTheSuppressedException() {
+    //given
+    context.setPackagingDataEnabled(false);
+    StackTraceElement outerFrame = new StackTraceElement("a.A", "m", "A.java", 1);
+    StackTraceElement suppressedFrame = new StackTraceElement("s.S", "m", "S.java", 5);
+    StackTraceElement causeFrame = new StackTraceElement("c.C", "m", "C.java", 9);
+    Exception outer = new Exception("outer");
+    outer.setStackTrace(new StackTraceElement[] {outerFrame});
+    Exception cause = new Exception("cause");
+    cause.setStackTrace(new StackTraceElement[] {causeFrame, suppressedFrame, outerFrame});
+    Exception suppressed = new Exception("suppressed", cause);
+    suppressed.setStackTrace(new StackTraceElement[] {suppressedFrame, outerFrame});
+    outer.addSuppressed(suppressed);
+
+    //when
+    String result = converter.convert(createLoggingEvent(outer));
+
+    //then
+    String ls = CoreConstants.LINE_SEPARATOR;
+    assertEquals("java.lang.Exception: outer" + ls
+        + "\tat " + outerFrame + ls
+        + "\tSuppressed: java.lang.Exception: cause" + ls
+        + "\t\tat " + causeFrame + ls
+        + "\t\t... 2 common frames omitted" + ls
+        + "\tWrapped by: java.lang.Exception: suppressed" + ls
+        + "\t\tat " + suppressedFrame + ls
+        + "\t\t... 1 common frames omitted" + ls, result);
+  }
+
+  @Test
   public void proxyWithoutSuppressedArrayIsPrinted() {
     //given
     StackTraceElement frame = new StackTraceElement("a.A", "m", "A.java", 1);
