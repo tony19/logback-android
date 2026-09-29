@@ -35,6 +35,7 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 
 public class LoggingEventVOTest {
 
@@ -53,6 +54,21 @@ public class LoggingEventVOTest {
     List<Marker> list = new ArrayList<Marker>();
     Collections.addAll(list, markers);
     return list;
+  }
+
+  /** A list that is not even equal to itself. */
+  static final class SelfUnequalList<E> extends ArrayList<E> {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean equals(Object o) {
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
   }
 
   static Map<String, String> mdc(String key, String value) {
@@ -104,6 +120,21 @@ public class LoggingEventVOTest {
   }
 
   @Test
+  public void buildConvertsTheThrowableProxyToAValueObject() {
+    DummyThrowableProxy proxy = new DummyThrowableProxy();
+    proxy.setClassName("java.lang.IllegalStateException");
+    proxy.setMessage("boom");
+    PubLoggingEventVO source = fullSource();
+    source.throwableProxy = proxy;
+
+    IThrowableProxy converted = LoggingEventVO.build(source).getThrowableProxy();
+
+    assertTrue(converted instanceof ThrowableProxyVO);
+    assertEquals(ThrowableProxyVO.build(proxy), converted);
+    assertEquals("boom", converted.getMessage());
+  }
+
+  @Test
   public void getMdcReturnsTheMdcPropertyMap() {
     PubLoggingEventVO source = fullSource();
     LoggingEventVO vo = LoggingEventVO.build(source);
@@ -139,6 +170,20 @@ public class LoggingEventVOTest {
 
     assertFalse(vo.hasCallerData());
     assertNull(vo.getCallerData());
+  }
+
+  @Test
+  public void buildDoesNotComputeCallerDataTheSourceHasNotComputedYet() {
+    // LoggingEvent computes its caller data lazily in getCallerData(); building
+    // a VO must not trigger that (LBCLASSIC-145)
+    LoggerContext lc = new LoggerContext();
+    LoggingEvent event = new LoggingEvent(getClass().getName(), lc.getLogger("a.b.C"), Level.INFO, "msg", null, null);
+
+    LoggingEventVO vo = LoggingEventVO.build(event);
+
+    assertFalse(vo.hasCallerData());
+    assertNull(vo.getCallerData());
+    assertFalse(event.hasCallerData());
   }
 
   @Test
@@ -185,6 +230,17 @@ public class LoggingEventVOTest {
   public void equalsIsReflexive() {
     LoggingEventVO vo = LoggingEventVO.build(fullSource());
     assertTrue(vo.equals(vo));
+  }
+
+  @Test
+  public void equalsIsTrueForTheSameInstanceWithoutComparingFields() throws Exception {
+    List<Marker> selfUnequal = new SelfUnequalList<Marker>();
+    LoggingEventVO vo = fullEventWith("markers", selfUnequal);
+
+    assertTrue(vo.equals(vo));
+    // another instance with the very same field values is not equal: the
+    // markers are compared, and they never match
+    assertFalse(vo.equals(fullEventWith("markers", selfUnequal)));
   }
 
   @Test

@@ -40,6 +40,21 @@ public class LoggerContextVOTest {
     return map;
   }
 
+  /** A map that is not even equal to itself. */
+  static final class SelfUnequalMap extends HashMap<String, String> {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean equals(Object o) {
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+  }
+
   static String distinctCopy(String s) {
     return new StringBuilder(s).toString();
   }
@@ -60,10 +75,13 @@ public class LoggerContextVOTest {
     lc.setName("fromContext");
     lc.putProperty("key", "value");
 
+    Map<String, String> expectedProperties = lc.getCopyOfPropertyMap();
+
     LoggerContextVO vo = new LoggerContextVO(lc);
 
     assertEquals("fromContext", vo.getName());
     assertEquals("value", vo.getPropertyMap().get("key"));
+    assertEquals(expectedProperties, vo.getPropertyMap());
     assertEquals(lc.getBirthTime(), vo.getBirthTime());
 
     // the property map is a snapshot, later changes to the context are not seen
@@ -87,6 +105,17 @@ public class LoggerContextVOTest {
   public void equalsIsReflexive() {
     LoggerContextVO vo = new LoggerContextVO("ctx", props("k", "v"), BIRTH_TIME);
     assertTrue(vo.equals(vo));
+  }
+
+  @Test
+  public void equalsIsTrueForTheSameInstanceWithoutComparingFields() {
+    Map<String, String> selfUnequal = new SelfUnequalMap();
+    LoggerContextVO vo = new LoggerContextVO("ctx", selfUnequal, BIRTH_TIME);
+
+    assertTrue(vo.equals(vo));
+    // another instance with the very same field values is not equal: the
+    // property maps are compared, and they never match
+    assertFalse(vo.equals(new LoggerContextVO("ctx", selfUnequal, BIRTH_TIME)));
   }
 
   @Test
