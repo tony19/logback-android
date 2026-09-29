@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -245,6 +246,44 @@ public class SocketReceiverTest {
 
     assertEquals(1, scripted.connectors.size());
     assertEquals(1, scripted.connectors.get(0).calls);
+    assertEquals("shutting down", lastStatus().getMessage());
+    new StatusChecker(lc).assertNoMatch("connection established");
+  }
+
+  @Test
+  public void runEndsWhenInterruptedWhileWaitingForTheConnector() throws Exception {
+    final CountDownLatch release = new CountDownLatch(1);
+    ScriptedSocketReceiver scripted = new ScriptedSocketReceiver() {
+      @Override
+      protected SocketConnector newConnector(InetAddress address, int port,
+          int initialDelay, int retryDelay) {
+        // run() is on this (the test) thread: interrupt it before it waits
+        // for a connector that can't finish, so that the wait is always
+        // interrupted rather than only when stop() happens to land there
+        Thread.currentThread().interrupt();
+        return new ScriptedConnector(null) {
+          @Override
+          public Socket call() {
+            try {
+              release.await();
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+            }
+            return null;
+          }
+        };
+      }
+    };
+    configure(scripted);
+
+    try {
+      scripted.run();
+    } finally {
+      release.countDown();
+    }
+
+    // the wait consumed the interrupt
+    assertFalse(Thread.interrupted());
     assertEquals("shutting down", lastStatus().getMessage());
     new StatusChecker(lc).assertNoMatch("connection established");
   }
