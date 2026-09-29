@@ -29,8 +29,10 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
+import org.junit.rules.TestName;
 import org.slf4j.Marker;
 import org.slf4j.event.DefaultLoggingEvent;
 import org.slf4j.helpers.BasicMarkerFactory;
@@ -74,6 +76,9 @@ public class LoggerApiTest {
   Logger root = lc.getLogger(Logger.ROOT_LOGGER_NAME);
   Logger logger = lc.getLogger(LoggerApiTest.class);
   CallerDataCapturingAppender appender = new CallerDataCapturingAppender();
+
+  @Rule
+  public TestName testName = new TestName();
 
   @Before
   public void setUp() {
@@ -491,7 +496,8 @@ public class LoggerApiTest {
   /**
    * Checks the 15 events appended by the calls of a {@code *Overloads} test:
    * the five argument shapes without markers, with the {@code BLUE} marker and
-   * with the {@code MARKERS} list.
+   * with the {@code MARKERS} list. Each event must name the test method as its
+   * caller, i.e. {@link Logger#FQCN} must be the caller boundary.
    */
   private void assertOverloadEvents(Level level) {
     List<ILoggingEvent> events = appender.list;
@@ -505,6 +511,10 @@ public class LoggerApiTest {
       assertEquals(call, SHAPE_MESSAGES[shape], e.getMessage());
       assertArrayEquals(call, SHAPE_ARGS[shape], e.getArgumentArray());
       assertSame(call, shape == THROWABLE_SHAPE ? EX : null, throwableOf(e));
+      StackTraceElement[] callerData = e.getCallerData();
+      assertTrue(call + " has no caller data", callerData.length > 0);
+      assertEquals(call, LoggerApiTest.class.getName(), callerData[0].getClassName());
+      assertEquals(call, testName.getMethodName(), callerData[0].getMethodName());
       if (i < 5) {
         assertNull(call, e.getMarkers());
       } else if (i < 10) {
