@@ -1,6 +1,6 @@
 ---
 name: architecture-sync
-description: Read this WHEN A CHANGE ALTERS THE SHAPE OF THE LIBRARY — adding, removing, renaming or moving a Java package under logback-android/src/main/java; moving a responsibility between packages; adding an android.* import to a new package or any core→classic import; adding a published output (artifact, flavor, the XSD, consumer R8 rules) or a runtime dependency; or changing how configuration is discovered or a log call is dispatched. Also read it before opening the PR for such a change, and when asked to check whether docs/architecture is still accurate.
+description: Read this WHEN A CHANGE ALTERS THE SHAPE OF THE LIBRARY — adding, removing, renaming or moving a Java or Kotlin package under logback-android/src/main/java or src/main/kotlin; moving a responsibility between packages; adding an android.* import to a new package or any core→classic import; adding a published output (artifact, flavor, the XSD, consumer R8 rules) or a runtime dependency; or changing how configuration is discovered or a log call is dispatched. Also read it before opening the PR for such a change, and when asked to check whether docs/architecture is still accurate.
 ---
 
 # Keeping the architecture docs true
@@ -44,7 +44,7 @@ is a design question, not a documentation question — ask before writing it dow
 ```
 
 Add, remove or rename the entry to match. The backticked directory path (relative to
-`logback-android/src/main/java`) is what the gate matches on, so it has to be exact. Mark
+`logback-android/src/main/java` or `logback-android/src/main/kotlin`) is what the gate matches on, so it has to be exact. Mark
 Android-only packages as such.
 
 Then read the entries **either side of the change**, not just the one you added. A

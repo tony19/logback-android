@@ -1,6 +1,7 @@
 # Component catalogue
 
-One entry per Java package under `logback-android/src/main/java`. The heading's backticked
+One entry per package under `logback-android/src/main/java` (the upstream logback port) or
+`logback-android/src/main/kotlin` (the Android layer, #388). The heading's backticked
 path is what `scripts/check-architecture-docs.sh` matches on, so it must be exact. Each entry
 says what the package is responsible for, and anything that must stay true of it.
 
@@ -29,7 +30,7 @@ safety of `Logger` and `LoggerContext` is load-bearing: they are called from eve
 
 ### `ch/qos/logback/classic/android` — `ch.qos.logback.classic.android`
 
-Android-only appenders: `LogcatAppender`, `SQLiteAppender` (+ `SQLiteLogCleaner`), and
+Kotlin. Android-only appenders: `LogcatAppender`, `SQLiteAppender` (+ `SQLiteLogCleaner`), and
 `BasicLogcatConfigurator`, which an app calls to log to logcat without a `logback.xml`. One of the few
 packages allowed to import `android.*`.
 
@@ -133,7 +134,7 @@ the locking model of every appender built on them.
 
 ### `ch/qos/logback/core/android` — `ch.qos.logback.core.android`
 
-Android-only: `AndroidContextUtil` (resolves `DATA_DIR`, `EXT_DIR`, package name, etc. for
+Kotlin. Android-only: `AndroidContextUtil` (resolves `DATA_DIR`, `EXT_DIR`, package name, etc. for
 configuration properties) and `SystemPropertiesProxy`. Lookups are lazy so configuration does
 not read disk on the main thread (see #383).
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# docs/architecture/components.md claims to catalogue every Java package in the
-# library. A catalogue with a hole in it reads as complete, so the next reader
+# docs/architecture/components.md claims to catalogue every package in the
+# library, Java or Kotlin. A catalogue with a hole in it reads as complete, so the next reader
 # concludes the package they cannot find does not exist. This makes the hole a
 # failing check instead.
 #
@@ -18,7 +18,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-SRC=logback-android/src/main/java
+# The upstream logback port is Java; the Android layer is Kotlin (#388).
+SRCS="logback-android/src/main/java logback-android/src/main/kotlin"
 CATALOGUE=docs/architecture/components.md
 
 # Keep in step with docs/architecture/README.md §4.
@@ -30,7 +31,7 @@ ch/qos/logback/core/net/ssl
 
 status=0
 
-packages=$(find "$SRC" -name '*.java' -exec dirname {} \; | sed "s|^$SRC/||" | sort -u)
+packages=$(for src in $SRCS; do find "$src" \( -name '*.java' -o -name '*.kt' \) -exec dirname {} \; | sed "s|^$src/||"; done | sort -u)
 catalogued=$(sed -n 's/^### `\([^`]*\)`.*/\1/p' "$CATALOGUE" | sort -u)
 
 missing=$(comm -23 <(echo "$packages") <(echo "$catalogued"))
@@ -43,19 +44,19 @@ if [ -n "$missing" ]; then
 fi
 
 if [ -n "$stale" ]; then
-  echo "$CATALOGUE: entries for packages that no longer exist under $SRC:"
+  echo "$CATALOGUE: entries for packages that no longer exist under $SRCS:"
   echo "$stale" | sed 's/^/  /'
   status=1
 fi
 
-core_to_classic=$(grep -rl 'import ch\.qos\.logback\.classic' "$SRC/ch/qos/logback/core" || true)
+core_to_classic=$(for src in $SRCS; do grep -rl 'import ch\.qos\.logback\.classic' "$src/ch/qos/logback/core" || true; done)
 if [ -n "$core_to_classic" ]; then
   echo "core must not depend on classic (docs/architecture/README.md §4):"
   echo "$core_to_classic" | sed 's/^/  /'
   status=1
 fi
 
-android_users=$({ grep -rlE '^import (static )?android\.' "$SRC" || true; } | xargs -r -n1 dirname | sed "s|^$SRC/||" | sort -u)
+android_users=$(for src in $SRCS; do { grep -rlE '^import (static )?android\.' "$src" || true; } | xargs -r -n1 dirname | sed "s|^$src/||"; done | sort -u)
 unexpected=$(comm -23 <(echo "$android_users") <(echo "$ANDROID_PACKAGES" | sed '/^$/d' | sort -u))
 if [ -n "$unexpected" ]; then
   echo "android.* imported outside the packages allowed in docs/architecture/README.md §4:"
