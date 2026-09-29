@@ -18,19 +18,30 @@ package ch.qos.logback.classic.net.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Executor;
+
+import javax.net.ServerSocketFactory;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ch.qos.logback.core.net.AbstractSocketAppender;
 import ch.qos.logback.core.net.mock.MockContext;
 import ch.qos.logback.core.net.server.MockServerListener;
 import ch.qos.logback.core.net.server.MockServerRunner;
+import ch.qos.logback.core.net.server.ServerListener;
+import ch.qos.logback.core.net.server.ServerRunner;
 import ch.qos.logback.core.net.server.ServerSocketUtil;
 import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.Status;
@@ -102,6 +113,103 @@ public class ServerSocketReceiverTest {
   public void testStopWhenNotStarted() throws Exception {
     receiver.stop();
     assertEquals(0, runner.getStartCount());
+  }
+
+  @Test
+  public void startupFailureIsReportedAndClosesTheServerSocket() throws Exception {
+    final RuntimeException failure = new IllegalStateException("no listener");
+    ServerSocketReceiver failing = new InstrumentedServerSocketReceiver(serverSocket, listener, runner) {
+      @Override
+      protected ServerListener<RemoteAppenderClient> createServerListener(ServerSocket socket) {
+        throw failure;
+      }
+    };
+    failing.setContext(context);
+
+    failing.start();
+
+    assertFalse(failing.isStarted());
+    assertEquals(0, runner.getStartCount());
+    assertTrue(serverSocket.isClosed());
+    Status status = context.getLastStatus();
+    assertTrue(status instanceof ErrorStatus);
+    assertEquals("server startup error: " + failure, status.getMessage());
+    assertSame(failure, status.getThrowable());
+  }
+
+  @Test
+  public void startOpensTheServerSocketOnTheConfiguredPortBacklogAndAddress() throws Exception {
+    final List<Object> socketArgs = new ArrayList<Object>();
+    ServerSocketReceiver configured = new ServerSocketReceiver() {
+      @Override
+      protected ServerSocketFactory getServerSocketFactory() {
+        return new ServerSocketFactory() {
+          @Override
+          public ServerSocket createServerSocket(int port) {
+            throw new UnsupportedOperationException();
+          }
+
+          @Override
+          public ServerSocket createServerSocket(int port, int backlog) {
+            throw new UnsupportedOperationException();
+          }
+
+          @Override
+          public ServerSocket createServerSocket(int port, int backlog, InetAddress address) {
+            socketArgs.add(port);
+            socketArgs.add(backlog);
+            socketArgs.add(address);
+            return serverSocket;
+          }
+        };
+      }
+
+      @Override
+      protected ServerRunner createServerRunner(ServerListener<RemoteAppenderClient> listener,
+          Executor executor) {
+        return runner;
+      }
+    };
+    configured.setContext(context);
+    configured.setPort(1234);
+    configured.setBacklog(7);
+    configured.setAddress("127.0.0.1");
+
+    configured.start();
+
+    assertTrue(configured.isStarted());
+    assertEquals(1234, configured.getPort());
+    assertEquals(7, configured.getBacklog());
+    assertEquals("127.0.0.1", configured.getAddress());
+    assertEquals(Arrays.<Object>asList(1234, 7, InetAddress.getByName("127.0.0.1")), socketArgs);
+    configured.stop();
+  }
+
+  @Test
+  public void defaultsListenOnAllInterfacesOfTheDefaultPort() throws Exception {
+    ServerSocketReceiver defaults = new ServerSocketReceiver();
+    assertEquals(AbstractSocketAppender.DEFAULT_PORT, defaults.getPort());
+    assertEquals(ServerSocketReceiver.DEFAULT_BACKLOG, defaults.getBacklog());
+    assertNull(defaults.getAddress());
+    assertNull(defaults.getInetAddress());
+    assertSame(ServerSocketFactory.getDefault(), defaults.getServerSocketFactory());
+  }
+
+  @Test
+  public void defaultListenerOwnsTheServerSocket() throws Exception {
+    ServerListener<RemoteAppenderClient> defaultListener =
+        new ServerSocketReceiver().createServerListener(serverSocket);
+
+    assertTrue(defaultListener instanceof RemoteAppenderServerListener);
+    defaultListener.close();
+    assertTrue(serverSocket.isClosed());
+  }
+
+  @Test
+  public void onStopBeforeAnyStartDoesNothing() throws Exception {
+    // there is no runner to stop yet
+    receiver.onStop();
+    assertNull(context.getLastStatus());
   }
 
 }

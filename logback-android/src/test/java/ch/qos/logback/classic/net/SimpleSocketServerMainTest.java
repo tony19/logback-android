@@ -18,6 +18,8 @@ package ch.qos.logback.classic.net;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -77,6 +80,21 @@ public class SimpleSocketServerMainTest {
   }
 
   @Test
+  public void mainConfiguresTheDefaultContextAndStartsASocketServerOnThePort() throws Exception {
+    SimpleSocketServer.main(new String[] {OUT_OF_RANGE_PORT, writeCapturingConfig()});
+
+    CapturingAppender capture = CapturingAppender.from(defaultContext);
+    assertNotNull("main did not apply the config file", capture);
+    ILoggingEvent failure = capture.awaitMessage("Unexpected failure in run method");
+    capture.joinLoggingThreads();
+
+    assertNotNull(failure);
+    assertEquals("Logback SimpleSocketServer (port " + OUT_OF_RANGE_PORT + ")", failure.getThreadName());
+    assertEquals(IllegalArgumentException.class.getName(), failure.getThrowableProxy().getClassName());
+    assertTrue(capture.hasMessage("Listening on port " + OUT_OF_RANGE_PORT));
+  }
+
+  @Test
   public void sslMainStartsAnSslSocketServer() throws Exception {
     SimpleSSLSocketServer.main(new String[] {OUT_OF_RANGE_PORT, writeCapturingConfig()});
 
@@ -87,6 +105,22 @@ public class SimpleSocketServerMainTest {
 
     assertNotNull(failure);
     assertEquals("Logback SimpleSSLSocketServer (port " + OUT_OF_RANGE_PORT + ")", failure.getThreadName());
+  }
+
+  @Test
+  public void configureLCResetsTheContextAndAppliesTheConfigFile() throws Exception {
+    LoggerContext lc = new LoggerContext();
+    Logger stale = lc.getLogger("stale");
+    stale.setLevel(Level.ERROR);
+    try {
+      SimpleSocketServer.configureLC(lc, writeCapturingConfig());
+
+      assertNull(stale.getLevel());
+      assertNotNull(CapturingAppender.from(lc));
+      assertEquals(Level.DEBUG, lc.getLogger(Logger.ROOT_LOGGER_NAME).getLevel());
+    } finally {
+      lc.stop();
+    }
   }
 
   /**
