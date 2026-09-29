@@ -26,12 +26,15 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 
+import android.os.Build;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.util.ReflectionHelpers;
 
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.status.Status;
@@ -104,9 +107,17 @@ public class SSLHostnameVerificationTest {
   }
 
   @Test
-  @Config(sdk = 23)
+  @Config(sdk = 29)
   public void belowApi24HostnameIsNotVerifiedAndAWarningIsLogged() {
-    configuration.configure(new SSLConfigurableSocket(socket));
+    // the jdk11 flavor's minSdk is 26, so Robolectric can't run at sdk 23;
+    // fake the API level instead
+    int sdkInt = Build.VERSION.SDK_INT;
+    ReflectionHelpers.setStaticField(Build.VERSION.class, "SDK_INT", 23);
+    try {
+      configuration.configure(new SSLConfigurableSocket(socket));
+    } finally {
+      ReflectionHelpers.setStaticField(Build.VERSION.class, "SDK_INT", sdkInt);
+    }
 
     verify(socket, never()).setSSLParameters(any(SSLParameters.class));
     assertEquals(Status.WARN, new StatusUtil(context).getHighestLevel(0));
