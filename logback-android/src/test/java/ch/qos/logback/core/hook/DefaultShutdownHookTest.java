@@ -84,7 +84,9 @@ public class DefaultShutdownHookTest {
     checker.assertContainsMatch(Status.INFO, "Logback context being closed via shutdown hook");
   }
 
-  @Test
+  // the timeout makes a regression (the interrupt no longer cutting the sleep
+  // short) fail fast instead of blocking the build for the whole delay
+  @Test(timeout = 30000)
   public void runStillStopsContextWhenInterruptedWhileSleeping() {
     // a delay long enough that the test could only finish because the sleep
     // was cut short by the pending interrupt
