@@ -65,6 +65,7 @@ public class NestedBasicPropertyIA extends ImplicitAction {
     case NOT_FOUND:
     case AS_COMPLEX_PROPERTY:
     case AS_COMPLEX_PROPERTY_COLLECTION:
+    default: // every AggregationType has a case; default shares this one's
       return false;
 
     case AS_BASIC_PROPERTY:
@@ -74,9 +75,6 @@ public class NestedBasicPropertyIA extends ImplicitAction {
       actionDataStack.push(ad);
       // addInfo("NestedSimplePropertyIA deemed applicable [" + pattern + "]");
       return true;
-    default:
-      addError("PropertySetter.canContainComponent returned " + aggregationType);
-      return false;
     }
   }
 
