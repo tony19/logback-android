@@ -62,6 +62,7 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
   static InternetAddress[] EMPTY_IA_ARRAY = new InternetAddress[0];
   // ~ 14 days
   static final long MAX_DELAY_BETWEEN_STATUS_MESSAGES = 1228800 * CoreConstants.MILLIS_IN_ONE_SECOND;
+  static final String MAIL_SMTP_SSL_CHECKSERVERIDENTITY = "mail.smtp.ssl.checkserveridentity";
 
   long lastTrackerStatusPrint = 0;
   long delayBetweenStatusMessages = 300 * CoreConstants.MILLIS_IN_ONE_SECOND;
@@ -153,6 +154,14 @@ public abstract class SMTPAppenderBase<E> extends AppenderBase<E> {
       }
       if (isSSL()) {
         props.put("mail.smtp.ssl.enable", "true");
+      }
+      // Divergence from upstream logback: JavaMail 1.x does not check that the
+      // server's certificate matches smtpHost unless told to, which leaves
+      // SSL/STARTTLS open to man-in-the-middle attacks. Turn the check on,
+      // unless a system property has already set it.
+      if ((isSTARTTLS() || isSSL())
+          && props.getProperty(MAIL_SMTP_SSL_CHECKSERVERIDENTITY) == null) {
+        props.put(MAIL_SMTP_SSL_CHECKSERVERIDENTITY, "true");
       }
     }
 

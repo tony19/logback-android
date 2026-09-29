@@ -75,9 +75,9 @@ for anything larger than a fix.
 | R4a | Logcat destination | — | `LogcatAppenderTest` | ✅ |
 | R4b | File destination with rolling | M0.3, M1.2 | `FileAppenderTest`, `RollingFileAppenderTest`, `TimeBasedRollingTest`, `SizeBasedRollingTest` | 🔶 |
 | R4c | SQLite destination | — | `SQLiteAppenderTest` | ✅ |
-| R4d | Socket destinations | — | `SocketAppenderMessageLossTest`, `ServerSocketReceiverTest` | ✅ |
+| R4d | Socket destinations | — | `SocketAppenderMessageLossTest`, `ServerSocketReceiverTest`, `HardenedObjectInputStreamTest`, `SSLHostnameVerificationTest` | ✅ |
 | R4e | Syslog destination | — | `SyslogAppenderTest`, `SyslogAppenderBaseTest` | ✅ |
-| R4f | Email destination | — | `SMTPAppender_GreenTest` | ✅ |
+| R4f | Email destination | — | `SMTPAppender_GreenTest`, `SMTPAppenderBaseTest` | ✅ |
 | R5 | Android storage properties resolve on every supported API level | M0.4, M1.1 | `AndroidContextUtilTest` | 🔶 |
 | R6 | No disk reads on the main thread during initialization | M0.4 | `Issue383StrictModeTest` | ✅ |
 | R7 | Works in R8/ProGuard-minified release builds | M0.2, M1.3 | `consumer-rules.pro`; no automated minified-build test yet | 🔶 |

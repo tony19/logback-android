@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +39,12 @@ public class HardenedObjectInputStream extends ObjectInputStream {
 
     final List<String> whitelistedClassNames;
     final static String[] JAVA_PACKAGES = new String[] { "java.lang", "java.util" };
+    final private static int DEPTH_LIMIT = 16;
+    final private static int ARRAY_LIMIT = 10000;
 
     public HardenedObjectInputStream(InputStream in, String[] whilelist) throws IOException {
         super(in);
+        initObjectFilter();
 
         this.whitelistedClassNames = new ArrayList<String>();
         if (whilelist != null) {
@@ -51,8 +56,49 @@ public class HardenedObjectInputStream extends ObjectInputStream {
 
     public HardenedObjectInputStream(InputStream in, List<String> whitelist) throws IOException {
         super(in);
+        initObjectFilter();
         this.whitelistedClassNames = new ArrayList<String>();
         this.whitelistedClassNames.addAll(whitelist);
+    }
+
+    /**
+     * Limits the depth and array sizes of the object graph (CVE-2023-6378), as in upstream
+     * logback 1.2.13. Equivalent to:
+     * <pre>
+     * setObjectInputFilter(ObjectInputFilter.Config.createFilter(
+     *     "maxarray=" + ARRAY_LIMIT + ";maxdepth=" + DEPTH_LIMIT + ";"));
+     * </pre>
+     * {@code java.io.ObjectInputFilter} is Java 9+ and absent from Android, so it is invoked by
+     * reflection. Upstream gates this on the {@code java.version} property and throws if the class
+     * is missing; Android reports {@code java.version} as "0", so this checks for the class itself
+     * and, where it is missing, relies on the class allowlist alone.
+     */
+    private void initObjectFilter() {
+        final Class<?> oifClass;
+        final Class<?> oifConfigClass;
+        final Method setObjectInputFilterMethod;
+        final Method createFilterMethod;
+        try {
+            oifClass = Class.forName("java.io.ObjectInputFilter");
+            oifConfigClass = Class.forName("java.io.ObjectInputFilter$Config");
+            setObjectInputFilterMethod = ObjectInputStream.class.getMethod("setObjectInputFilter", oifClass);
+            createFilterMethod = oifConfigClass.getMethod("createFilter", String.class);
+        } catch (ClassNotFoundException e) {
+            return;
+        } catch (NoSuchMethodException e) {
+            return;
+        }
+
+        try {
+            Object filter = createFilterMethod.invoke(null, "maxarray=" + ARRAY_LIMIT + ";maxdepth=" + DEPTH_LIMIT + ";");
+            setObjectInputFilterMethod.invoke(this, filter);
+        } catch (IllegalAccessException e) {
+            // this code should be unreachable
+            throw new RuntimeException("Failed to initialize object filter", e);
+        } catch (InvocationTargetException e) {
+            // this code should be unreachable
+            throw new RuntimeException("Failed to initialize object filter", e);
+        }
     }
 
     @Override

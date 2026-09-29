@@ -196,8 +196,9 @@ Server-socket runner, listeners and client handling for server-socket appenders.
 
 ### `ch/qos/logback/core/net/ssl` — `ch.qos.logback.core.net.ssl`
 
-SSL configuration beans (`<ssl>`: keystore, truststore, protocols, cipher suites). Imports
-`android.annotation.TargetApi` to mark API-level-dependent socket settings.
+SSL configuration beans (`<ssl>`: keystore, truststore, protocols, cipher suites, hostname
+verification). Imports `android.os.Build` to guard API-level-dependent socket settings
+(hostname verification needs API 24).
 
 ### `ch/qos/logback/core/pattern` — `ch.qos.logback.core.pattern`
 
