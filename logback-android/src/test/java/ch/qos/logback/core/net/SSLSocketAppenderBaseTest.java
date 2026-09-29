@@ -15,13 +15,22 @@
  */
 package ch.qos.logback.core.net;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import java.security.NoSuchAlgorithmException;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.net.mock.MockContext;
+import ch.qos.logback.core.net.ssl.SSLConfiguration;
 import ch.qos.logback.core.spi.PreSerializationTransformer;
+import ch.qos.logback.core.status.Status;
 
 /**
  * Unit tests for {@link SSLSocketAppenderBase}.
@@ -45,6 +54,31 @@ public class SSLSocketAppenderBaseTest {
     // should be able to start successfully with no SSL configuration at all
     appender.start();
     assertNotNull(appender.getSocketFactory());
+  }
+
+  @Test
+  public void usesTheSslConfigurationThatWasSet() throws Exception {
+    SSLConfiguration ssl = new SSLConfiguration();
+
+    appender.setSsl(ssl);
+
+    assertSame(ssl, appender.getSsl());
+  }
+
+  @Test
+  public void reportsErrorAndDoesNotStartWhenSslContextCannotBeCreated() throws Exception {
+    SSLConfiguration ssl = new SSLConfiguration();
+    ssl.setProtocol("NO-SUCH-PROTOCOL");
+    appender.setSsl(ssl);
+
+    appender.start();
+
+    assertFalse(appender.isStarted());
+    assertNull(appender.getSocketFactory());
+    Status status = context.getLastStatus();
+    assertEquals(Status.ERROR, status.getLevel());
+    assertTrue(status.getThrowable() instanceof NoSuchAlgorithmException);
+    assertEquals(status.getThrowable().getMessage(), status.getMessage());
   }
 
   private static class InstrumentedSSLSocketAppenderBase

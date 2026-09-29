@@ -15,7 +15,10 @@
  */
 package ch.qos.logback.core.net;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.net.ConnectException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -29,17 +32,27 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.SocketFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.net.SocketConnector.ExceptionHandler;
 import ch.qos.logback.core.net.server.ServerSocketUtil;
+import ch.qos.logback.core.util.DelayStrategy;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultSocketConnector}.
@@ -72,6 +85,80 @@ public class DefaultSocketConnectorTest {
     if (serverSocket != null) {
       serverSocket.close();
     }
+    executor.shutdownNow();
+  }
+
+  @Test
+  public void retriesAfterTheDelayUntilConnected() throws Exception {
+    InetAddress address = InetAddress.getByAddress(new byte[] {127, 0, 0, 1});
+    ConnectException failure = new ConnectException("refused");
+    Socket socket = mock(Socket.class);
+    SocketFactory socketFactory = mock(SocketFactory.class);
+    when(socketFactory.createSocket(address, 4560)).thenThrow(failure).thenReturn(socket);
+    DelayStrategy delayStrategy = mock(DelayStrategy.class);
+    ExceptionHandler handler = mock(ExceptionHandler.class);
+    DefaultSocketConnector dsc = new DefaultSocketConnector(address, 4560, delayStrategy);
+    dsc.setSocketFactory(socketFactory);
+    dsc.setExceptionHandler(handler);
+
+    assertSame(socket, dsc.call());
+
+    verify(handler).connectionFailed(dsc, failure);
+    verify(delayStrategy, times(1)).nextDelay();
+    verify(socketFactory, times(2)).createSocket(address, 4560);
+  }
+
+  @Test
+  public void givesUpWithoutSocketWhenInterruptedAfterFailedAttempt() throws Exception {
+    InetAddress address = InetAddress.getByAddress(new byte[] {127, 0, 0, 1});
+    final ConnectException failure = new ConnectException("refused");
+    SocketFactory socketFactory = mock(SocketFactory.class);
+    when(socketFactory.createSocket(address, 4560)).thenAnswer(invocation -> {
+      Thread.currentThread().interrupt();
+      throw failure;
+    });
+    DelayStrategy delayStrategy = mock(DelayStrategy.class);
+    ExceptionHandler handler = mock(ExceptionHandler.class);
+    DefaultSocketConnector dsc = new DefaultSocketConnector(address, 4560, delayStrategy);
+    dsc.setSocketFactory(socketFactory);
+    dsc.setExceptionHandler(handler);
+
+    Socket socket;
+    boolean interrupted;
+    try {
+      socket = dsc.call();
+    } finally {
+      interrupted = Thread.interrupted();
+    }
+
+    assertNull(socket);
+    // the interrupt status is left for the caller
+    assertTrue(interrupted);
+    verify(handler).connectionFailed(dsc, failure);
+    verify(socketFactory, times(1)).createSocket(address, 4560);
+    verifyNoInteractions(delayStrategy);
+  }
+
+  @Test
+  public void reportsFailuresOnTheConsoleWithoutExceptionHandler() throws Exception {
+    InetAddress address = InetAddress.getByAddress(new byte[] {127, 0, 0, 1});
+    Socket socket = mock(Socket.class);
+    SocketFactory socketFactory = mock(SocketFactory.class);
+    when(socketFactory.createSocket(address, 4560))
+        .thenThrow(new ConnectException("refused (test)")).thenReturn(socket);
+    DefaultSocketConnector dsc = new DefaultSocketConnector(address, 4560, mock(DelayStrategy.class));
+    dsc.setSocketFactory(socketFactory);
+
+    PrintStream originalOut = System.out;
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(out, true, "UTF-8"));
+    try {
+      assertSame(socket, dsc.call());
+    } finally {
+      System.setOut(originalOut);
+    }
+
+    assertTrue(out.toString("UTF-8").contains("java.net.ConnectException: refused (test)"));
   }
 
   @Test
