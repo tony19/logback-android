@@ -15,8 +15,11 @@
  */
 package ch.qos.logback.core.pattern.parser;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -118,5 +121,45 @@ public class FormatInfoTest  {
       witness.setLeftTruncate(false);
       assertEquals(witness, fi);
     }
+  }
+
+  @Test
+  public void emptyStringKeepsAllDefaults() {
+    FormatInfo fi = FormatInfo.valueOf("");
+    assertEquals(new FormatInfo(), fi);
+    assertEquals(Integer.MIN_VALUE, fi.getMin());
+    assertEquals(Integer.MAX_VALUE, fi.getMax());
+    assertTrue(fi.isLeftPad());
+    assertTrue(fi.isLeftTruncate());
+  }
+
+  @Test
+  public void emptyMinPartBeforeDotKeepsDefaultMinAndPadding() {
+    FormatInfo fi = FormatInfo.valueOf(".-7");
+    assertEquals(Integer.MIN_VALUE, fi.getMin());
+    assertTrue(fi.isLeftPad());
+    assertEquals(7, fi.getMax());
+    assertFalse(fi.isLeftTruncate());
+  }
+
+  @Test
+  public void withoutDotMaxKeepsDefaultAndTruncatesLeft() {
+    FormatInfo fi = FormatInfo.valueOf("-3");
+    assertEquals(3, fi.getMin());
+    assertFalse(fi.isLeftPad());
+    assertEquals(Integer.MAX_VALUE, fi.getMax());
+    assertTrue(fi.isLeftTruncate());
+  }
+
+  @Test
+  public void loneDotIsRejectedAsEndingInDot() {
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> FormatInfo.valueOf("."));
+    assertEquals("Formatting string [.] should not end with '.'", e.getMessage());
+  }
+
+  @Test
+  public void numberEndingInDotIsRejectedWithMessage() {
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> FormatInfo.valueOf("-4."));
+    assertEquals("Formatting string [-4.] should not end with '.'", e.getMessage());
   }
 }
