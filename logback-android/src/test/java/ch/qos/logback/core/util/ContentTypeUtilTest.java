@@ -43,4 +43,24 @@ public class ContentTypeUtilTest {
     assertTrue(ContentTypeUtil.isTextual(contextType));
     assertNull(ContentTypeUtil.getSubType(contextType));
   }
+
+  @Test
+  public void noSubtypeWithoutSlash() {
+    String contextType = "text";
+    assertTrue(ContentTypeUtil.isTextual(contextType));
+    assertNull(ContentTypeUtil.getSubType(contextType));
+  }
+
+  @Test
+  public void nonTextualType() {
+    String contextType = "application/json";
+    assertFalse(ContentTypeUtil.isTextual(contextType));
+    assertEquals("json", ContentTypeUtil.getSubType(contextType));
+  }
+
+  @Test
+  public void isInstantiable() {
+    // the class only has static members, but its implicit constructor is public
+    assertNotNull(new ContentTypeUtil());
+  }
 }

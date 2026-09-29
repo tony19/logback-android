@@ -17,20 +17,35 @@ package ch.qos.logback.core.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.MockedStatic;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.android.SystemPropertiesProxy;
 import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.spi.ContextAwareBase;
+import ch.qos.logback.core.spi.ScanException;
+import ch.qos.logback.core.status.Status;
 
 
 public class OptionHelperTest  {
@@ -302,6 +317,96 @@ public class OptionHelperTest  {
   }
 
   @Test
+  public void substVarsWrapsScanExceptions() {
+    String input = "${a:-b:-c}";
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        () -> OptionHelper.substVars(input, context));
+    assertEquals("Failed to parse input [" + input + "]", e.getMessage());
+    assertTrue(e.getCause() instanceof ScanException);
+  }
+
+  @Test
+  public void isInstantiable() {
+    // the class only has static members, but its implicit constructor is public
+    assertNotNull(new OptionHelper());
+  }
+
+  @Test
+  public void instantiateByClassNameUsesTheNoArgConstructor() throws Exception {
+    Object o = OptionHelper.instantiateByClassName(ContextBase.class.getName(), Context.class, context);
+    assertTrue(o instanceof ContextBase);
+  }
+
+  @Test
+  public void instantiateByClassNameAndParameterUsesTheMatchingConstructor() throws Exception {
+    Object o = OptionHelper.instantiateByClassNameAndParameter(FileSize.class.getName(), FileSize.class,
+        getClass().getClassLoader(), long.class, 42L);
+    assertEquals(42L, ((FileSize) o).getSize());
+  }
+
+  @Test
+  public void instantiateByClassNameRejectsNullClassName() {
+    assertThrows(NullPointerException.class,
+        () -> OptionHelper.instantiateByClassName(null, Object.class, getClass().getClassLoader()));
+  }
+
+  @Test
+  public void instantiateByClassNameRejectsIncompatibleClass() {
+    IncompatibleClassException e = assertThrows(IncompatibleClassException.class,
+        () -> OptionHelper.instantiateByClassName(FileSize.class.getName(), Context.class, context));
+    assertSame(Context.class, e.requestedClass);
+    assertSame(FileSize.class, e.obtainedClass);
+  }
+
+  @Test
+  public void instantiateByClassNameWrapsLoadingFailures() {
+    DynamicClassLoadingException e = assertThrows(DynamicClassLoadingException.class,
+        () -> OptionHelper.instantiateByClassName("no.such.Clazz", Object.class, context));
+    assertEquals("Failed to instantiate type no.such.Clazz", e.getMessage());
+    assertTrue(e.getCause() instanceof ClassNotFoundException);
+  }
+
+  static final String DENIED_KEY = "optionHelperTest.denied";
+
+  @Test
+  public void getSystemPropertyWithDefaultReturnsDefaultWhenAccessIsDenied() {
+    withDeniedSystemProperty(() -> assertEquals("def", OptionHelper.getSystemProperty(DENIED_KEY, "def")));
+  }
+
+  @Test
+  public void getSystemPropertyWithDefaultReturnsValueOrDefault() {
+    System.setProperty(DENIED_KEY, "value");
+    try {
+      assertEquals("value", OptionHelper.getSystemProperty(DENIED_KEY, "def"));
+    } finally {
+      System.clearProperty(DENIED_KEY);
+    }
+    assertEquals("def", OptionHelper.getSystemProperty(DENIED_KEY, "def"));
+  }
+
+  @Test
+  public void getSystemPropertyReturnsNullWhenAccessIsDenied() {
+    withDeniedSystemProperty(() -> assertNull(OptionHelper.getSystemProperty(DENIED_KEY)));
+  }
+
+  @Test
+  public void getSystemPropertyPrefersSystemPropertyOverAndroidProperty() {
+    SystemPropertiesProxy proxy = mock(SystemPropertiesProxy.class);
+    when(proxy.get(DENIED_KEY, null)).thenReturn("android");
+    try (MockedStatic<SystemPropertiesProxy> mocked = mockStatic(SystemPropertiesProxy.class)) {
+      mocked.when(SystemPropertiesProxy::getInstance).thenReturn(proxy);
+
+      assertEquals("android", OptionHelper.getSystemProperty(DENIED_KEY));
+      System.setProperty(DENIED_KEY, "system");
+      try {
+        assertEquals("system", OptionHelper.getSystemProperty(DENIED_KEY));
+      } finally {
+        System.clearProperty(DENIED_KEY);
+      }
+    }
+  }
+
+  @Test
   public void getEnvReadsTheEnvironment() {
     for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
       assertEquals(entry.getValue(), OptionHelper.getEnv(entry.getKey()));
@@ -312,5 +417,132 @@ public class OptionHelperTest  {
   @Test
   public void getSystemPropertiesReturnsTheSystemProperties() {
     assertSame(System.getProperties(), OptionHelper.getSystemProperties());
+  }
+
+  @Test
+  public void getAndroidSystemPropertyReturnsNullForRejectedKey() {
+    SystemPropertiesProxy proxy = mock(SystemPropertiesProxy.class);
+    when(proxy.get(DENIED_KEY, null)).thenThrow(new IllegalArgumentException("key too long"));
+    try (MockedStatic<SystemPropertiesProxy> mocked = mockStatic(SystemPropertiesProxy.class)) {
+      mocked.when(SystemPropertiesProxy::getInstance).thenReturn(proxy);
+
+      assertNull(OptionHelper.getAndroidSystemProperty(DENIED_KEY));
+    }
+  }
+
+  @Test
+  public void setSystemPropertiesSetsEveryProperty() {
+    Properties props = new Properties();
+    props.setProperty("optionHelperTest.a", "1");
+    props.setProperty("optionHelperTest.b", "2");
+    ContextAwareBase contextAware = new ContextAwareBase();
+    contextAware.setContext(context);
+    try {
+      OptionHelper.setSystemProperties(contextAware, props);
+
+      assertEquals("1", System.getProperty("optionHelperTest.a"));
+      assertEquals("2", System.getProperty("optionHelperTest.b"));
+      assertTrue(context.getStatusManager().getCopyOfStatusList().isEmpty());
+    } finally {
+      System.clearProperty("optionHelperTest.a");
+      System.clearProperty("optionHelperTest.b");
+    }
+  }
+
+  @Test
+  public void setSystemPropertyReportsDeniedAccess() {
+    final ContextAwareBase contextAware = new ContextAwareBase();
+    contextAware.setContext(context);
+
+    withDeniedSystemProperty(() -> OptionHelper.setSystemProperty(contextAware, DENIED_KEY, "value"));
+
+    assertNull(System.getProperty(DENIED_KEY));
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("Failed to set system property [" + DENIED_KEY + "]", statuses.get(0).getMessage());
+    assertTrue(statuses.get(0).getThrowable() instanceof SecurityException);
+  }
+
+  @Test
+  public void extractDefaultReplacementSplitsKeyAndDefaultValue() {
+    assertArrayEquals(new String[] { "key", "def" }, OptionHelper.extractDefaultReplacement("key:-def"));
+    assertArrayEquals(new String[] { "key", "" }, OptionHelper.extractDefaultReplacement("key:-"));
+    assertArrayEquals(new String[] { "key", null }, OptionHelper.extractDefaultReplacement("key"));
+    assertArrayEquals(new String[] { null, null }, OptionHelper.extractDefaultReplacement(null));
+  }
+
+  @Test
+  public void toBooleanParsesTrueAndFalseIgnoringCaseAndWhitespace() {
+    assertTrue(OptionHelper.toBoolean("true", false));
+    assertTrue(OptionHelper.toBoolean(" TRUE ", false));
+    assertFalse(OptionHelper.toBoolean("false", true));
+    assertFalse(OptionHelper.toBoolean(" False ", true));
+  }
+
+  @Test
+  public void toBooleanFallsBackToDefault() {
+    assertTrue(OptionHelper.toBoolean(null, true));
+    assertFalse(OptionHelper.toBoolean(null, false));
+    assertTrue(OptionHelper.toBoolean("yes", true));
+    assertFalse(OptionHelper.toBoolean("yes", false));
+  }
+
+  @Test
+  public void isEmptyIsTrueOnlyForNullOrEmptyString() {
+    assertTrue(OptionHelper.isEmpty(null));
+    assertTrue(OptionHelper.isEmpty(""));
+    assertFalse(OptionHelper.isEmpty(" "));
+    assertFalse(OptionHelper.isEmpty("a"));
+  }
+
+  /**
+   * Runs {@code r} with system properties that throw a
+   * {@link SecurityException} on any access to {@link #DENIED_KEY}, like a
+   * security manager denying that access would.
+   */
+  private static void withDeniedSystemProperty(Runnable r) {
+    Properties original = System.getProperties();
+    System.setProperties(new DenyingProperties(original, DENIED_KEY));
+    try {
+      r.run();
+    } finally {
+      System.setProperties(original);
+    }
+  }
+
+  /** A copy of other properties that denies access to one key. */
+  private static class DenyingProperties extends Properties {
+    private static final long serialVersionUID = 1L;
+    private final String deniedKey;
+
+    DenyingProperties(Properties source, String deniedKey) {
+      this.deniedKey = deniedKey;
+      putAll(source);
+    }
+
+    @Override
+    public String getProperty(String key) {
+      check(key);
+      return super.getProperty(key);
+    }
+
+    @Override
+    public String getProperty(String key, String defaultValue) {
+      check(key);
+      return super.getProperty(key, defaultValue);
+    }
+
+    @Override
+    public synchronized Object setProperty(String key, String value) {
+      check(key);
+      return super.setProperty(key, value);
+    }
+
+    private void check(String key) {
+      if (deniedKey.equals(key)) {
+        throw new SecurityException("access to [" + key + "] denied");
+      }
+    }
   }
 }

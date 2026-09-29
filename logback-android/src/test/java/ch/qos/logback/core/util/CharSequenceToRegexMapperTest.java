@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 
 public class CharSequenceToRegexMapperTest {
@@ -83,5 +84,38 @@ public class CharSequenceToRegexMapperTest {
     }
   }
 
+  private static CharSequenceState css(char c, int occurrences) {
+    CharSequenceState state = new CharSequenceState(c);
+    for (int i = 1; i < occurrences; i++) {
+      state.incrementOccurrences();
+    }
+    return state;
+  }
+
+  @Test
+  public void backslashIsRejected() {
+    final CharSequenceToRegexMapper mapper = new CharSequenceToRegexMapper();
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> mapper.toRegex(css('\\', 1)));
+    assertEquals("Forward slashes are not allowed", e.getMessage());
+  }
+
+  @Test
+  public void singleQuoteMapsToEmptyString() {
+    assertEquals("", new CharSequenceToRegexMapper().toRegex(css('\'', 1)));
+  }
+
+  @Test
+  public void repeatedSingleQuotesAreRejected() {
+    final CharSequenceToRegexMapper mapper = new CharSequenceToRegexMapper();
+    IllegalStateException e = assertThrows(IllegalStateException.class, () -> mapper.toRegex(css('\'', 2)));
+    assertEquals("Too many single quotes", e.getMessage());
+  }
+
+  @Test
+  public void otherCharactersMapToThemselvesRepeatedByOccurrences() {
+    CharSequenceToRegexMapper mapper = new CharSequenceToRegexMapper();
+    assertEquals("-", mapper.toRegex(css('-', 1)));
+    assertEquals("-{3}", mapper.toRegex(css('-', 3)));
+  }
 
 }
