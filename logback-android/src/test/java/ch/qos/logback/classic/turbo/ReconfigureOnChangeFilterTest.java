@@ -17,6 +17,7 @@ package ch.qos.logback.classic.turbo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -67,6 +68,7 @@ import ch.qos.logback.core.status.StatusChecker;
 public class ReconfigureOnChangeFilterTest {
 
   static final String MARKER_KEY = "rocFilterMarker";
+  static final String NEW_CONFIGURATION_KEY = "rocFilterNewConfiguration";
   static final String FALLING_BACK = "Falling back to previously registered safe configuration.";
   static final String RE_REGISTERING = "Re-registering previous fallback configuration once more as a fallback configuration point";
   static final String NO_PREVIOUS_CONFIGURATION = "No previous configuration to fall back on.";
@@ -304,6 +306,7 @@ public class ReconfigureOnChangeFilterTest {
     }
 
     assertContextWasReset();
+    assertAndroidPropertiesWereSetUp();
     statusChecker.assertContainsMatch(Status.INFO,
         Pattern.quote(CoreConstants.RESET_MSG_PREFIX + "named [rocFilter]"));
     statusChecker.assertIsWarningOrErrorFree();
@@ -320,6 +323,8 @@ public class ReconfigureOnChangeFilterTest {
           if (ctx.getCount() == 1) {
             when(mock.recallSafeConfiguration()).thenReturn(safeEvents);
             doAnswer(invocation -> {
+              // part of the broken file is applied before the parsing error
+              loggerContext.putProperty(NEW_CONFIGURATION_KEY, "partly applied");
               loggerContext.getStatusManager().add(new ErrorStatus(
                   CoreConstants.XML_PARSING + " - Parsing fatal error on line 2 and column 9", mock));
               return null;
@@ -335,6 +340,9 @@ public class ReconfigureOnChangeFilterTest {
       verify(fallbackConfigurator).registerSafeConfiguration(safeEvents);
     }
 
+    assertNull("the partly applied configuration should have been reset",
+        loggerContext.getProperty(NEW_CONFIGURATION_KEY));
+    assertAndroidPropertiesWereSetUp();
     statusChecker.assertContainsMatch(Status.WARN, Pattern.quote(FALLING_BACK));
     statusChecker.assertContainsMatch(Status.INFO, Pattern.quote(RE_REGISTERING));
     // the context is told about the main URL again, so that it keeps being watched
@@ -448,6 +456,11 @@ public class ReconfigureOnChangeFilterTest {
 
   private void assertContextWasReset() {
     assertNull("the context should have been reset", loggerContext.getProperty(MARKER_KEY));
+  }
+
+  private void assertAndroidPropertiesWereSetUp() {
+    assertNotNull("the Android properties should be set up again after the last reset",
+        loggerContext.getProperty(CoreConstants.PACKAGE_NAME_KEY));
   }
 
   private Level rootLevel() {

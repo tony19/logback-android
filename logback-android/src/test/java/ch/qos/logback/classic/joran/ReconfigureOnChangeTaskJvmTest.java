@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.LocatorImpl;
@@ -56,6 +57,7 @@ import ch.qos.logback.core.joran.event.SaxEventRecorder;
 import ch.qos.logback.core.joran.spi.ConfigurationWatchList;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
+import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 
@@ -68,6 +70,7 @@ import ch.qos.logback.core.status.StatusChecker;
 public class ReconfigureOnChangeTaskJvmTest {
 
     static final String MARKER_KEY = "rocTaskMarker";
+    static final String NEW_CONFIGURATION_KEY = "rocTaskNewConfiguration";
     static final String NO_PREVIOUS_CONFIGURATION = "No previous configuration to fall back on.";
     static final String SAFE_CONFIGURATION_FAILED = "Unexpected exception thrown by a configuration considered safe.";
 
@@ -242,6 +245,114 @@ public class ReconfigureOnChangeTaskJvmTest {
         assertEquals(mainXml, watchList.getMainURL());
     }
 
+    @Test
+    public void runLeavesTheContextAloneWhenNoChangeIsDetected() throws IOException {
+        StubWatchList watchList = new StubWatchList(xmlUrl("main.xml"),
+                Collections.singletonList(new File(tmp.getRoot(), "main.xml")), false);
+        ConfigurationWatchListUtil.registerConfigurationWatchList(loggerContext, watchList);
+        task.addListener(new RecordingListener("l"));
+
+        try (MockedConstruction<JoranConfigurator> configurators = mockConstruction(JoranConfigurator.class)) {
+            task.run();
+
+            assertEquals("no reconfiguration expected", 0, configurators.constructed().size());
+        }
+
+        assertEquals(1, watchList.changeDetectedCalls);
+        assertEquals(Collections.singletonList("l:entered"), notifications);
+        statusChecker.assertNoMatch(Pattern.quote(DETECTED_CHANGE_IN_CONFIGURATION_FILES));
+        assertContextWasNotReset();
+    }
+
+    @Test
+    public void changedMainXmlReconfiguresTheResetContextWithoutFallingBack() throws Exception {
+        final URL mainXml = xmlUrl("main.xml");
+        registerChangedWatchList(mainXml);
+        task.addListener(new RecordingListener("l"));
+
+        try (MockedConstruction<JoranConfigurator> configurators = mockConstruction(JoranConfigurator.class,
+                (mock, ctx) -> doAnswer(invocation -> {
+                    JoranConfigurator.informContextOfURLUsedForConfiguration(loggerContext, mainXml);
+                    loggerContext.putProperty(NEW_CONFIGURATION_KEY, "applied");
+                    return null;
+                }).when(mock).doConfigure(mainXml))) {
+
+            task.run();
+
+            assertEquals("no fallback configurator expected", 1, configurators.constructed().size());
+            verify(configurators.constructed().get(0)).setContext(loggerContext);
+        }
+
+        assertNull("the context should have been reset", loggerContext.getProperty(MARKER_KEY));
+        assertNotNull("the Android properties should be set up again after the reset",
+                loggerContext.getProperty(CoreConstants.PACKAGE_NAME_KEY));
+        assertEquals("applied", loggerContext.getProperty(NEW_CONFIGURATION_KEY));
+        assertEquals(mainXml, ConfigurationWatchListUtil.getMainWatchURL(loggerContext));
+        statusChecker.assertIsWarningOrErrorFree();
+        assertEquals(Arrays.asList("l:entered", "l:changeDetected", "l:done"), notifications);
+    }
+
+    @Test
+    public void xmlParsingErrorsFallBackToSafeConfigurationWithoutItsIncludes() throws Exception {
+        final URL mainXml = xmlUrl("main.xml");
+        registerChangedWatchList(mainXml);
+        final List<SaxEvent> safeEvents = configurationWithIncludeAndRootLevel(Level.WARN);
+        assertEquals(6, safeEvents.size());
+
+        List<SaxEvent> replayedEvents;
+        try (MockedConstruction<JoranConfigurator> configurators = mockConstruction(JoranConfigurator.class,
+                (mock, ctx) -> {
+                    if (ctx.getCount() == 1) {
+                        // the configurator of the main file: it applies part of the file and reports a parsing error
+                        when(mock.recallSafeConfiguration()).thenReturn(safeEvents);
+                        doAnswer(invocation -> {
+                            JoranConfigurator.informContextOfURLUsedForConfiguration(loggerContext, mainXml);
+                            loggerContext.putProperty(NEW_CONFIGURATION_KEY, "partly applied");
+                            loggerContext.getStatusManager().add(new ErrorStatus(
+                                    CoreConstants.XML_PARSING + " - Parsing fatal error on line 2 and column 9", mock));
+                            return null;
+                        }).when(mock).doConfigure(mainXml);
+                    }
+                })) {
+
+            task.run();
+
+            assertEquals(2, configurators.constructed().size());
+            JoranConfigurator fallbackConfigurator = configurators.constructed().get(1);
+            verify(fallbackConfigurator).setContext(loggerContext);
+            @SuppressWarnings("unchecked")
+            ArgumentCaptor<List<SaxEvent>> replayed = ArgumentCaptor.forClass(List.class);
+            verify(fallbackConfigurator).doConfigure(replayed.capture());
+            replayedEvents = replayed.getValue();
+            // the whole safe configuration, includes and all, is registered once more
+            verify(fallbackConfigurator).registerSafeConfiguration(safeEvents);
+        }
+
+        // only the <include> start and end events are left out of the replay
+        List<SaxEvent> expected = new ArrayList<SaxEvent>(safeEvents);
+        expected.remove(safeEvents.get(2));
+        expected.remove(safeEvents.get(1));
+        assertEquals(expected, replayedEvents);
+
+        assertNull("the partly applied configuration should have been reset",
+                loggerContext.getProperty(NEW_CONFIGURATION_KEY));
+        assertNotNull("the Android properties should be set up again after the second reset",
+                loggerContext.getProperty(CoreConstants.PACKAGE_NAME_KEY));
+        statusChecker.assertContainsMatch(Status.WARN, Pattern.quote(FALLING_BACK_TO_SAFE_CONFIGURATION));
+        statusChecker.assertContainsMatch(Status.INFO, Pattern.quote(RE_REGISTERING_PREVIOUS_SAFE_CONFIGURATION));
+        statusChecker.assertContainsMatch(Status.INFO,
+                Pattern.quote("after registerSafeConfiguration: " + safeEvents));
+        statusChecker.assertNoMatch(Pattern.quote(NO_PREVIOUS_CONFIGURATION));
+        assertEquals(mainXml, ConfigurationWatchListUtil.getMainWatchURL(loggerContext));
+    }
+
+    @Test
+    public void toStringShowsTheBirthdate() {
+        task.birthdate = 1234L;
+
+        assertEquals("ReconfigureOnChangeTask(born:1234)", task.toString());
+    }
+
     private URL xmlUrl(String name) throws IOException {
         return new File(tmp.getRoot(), name).toURI().toURL();
     }
@@ -278,6 +389,26 @@ public class ReconfigureOnChangeTaskJvmTest {
         SaxEventRecorder recorder = new SaxEventRecorder(loggerContext);
         recorder.setDocumentLocator(new LocatorImpl());
         recorder.startElement("", "configuration", "configuration", new AttributesImpl());
+        AttributesImpl rootAttributes = new AttributesImpl();
+        rootAttributes.addAttribute("", "level", "level", "CDATA", level.toString());
+        recorder.startElement("", "root", "root", rootAttributes);
+        recorder.endElement("", "root", "root");
+        recorder.endElement("", "configuration", "configuration");
+        return recorder.getSaxEventList();
+    }
+
+    /**
+     * The SAX events of
+     * {@code <configuration><include file="included.xml"/><root level="..."/></configuration>}.
+     */
+    private List<SaxEvent> configurationWithIncludeAndRootLevel(Level level) {
+        SaxEventRecorder recorder = new SaxEventRecorder(loggerContext);
+        recorder.setDocumentLocator(new LocatorImpl());
+        recorder.startElement("", "configuration", "configuration", new AttributesImpl());
+        AttributesImpl includeAttributes = new AttributesImpl();
+        includeAttributes.addAttribute("", "file", "file", "CDATA", "included.xml");
+        recorder.startElement("", "include", "include", includeAttributes);
+        recorder.endElement("", "include", "include");
         AttributesImpl rootAttributes = new AttributesImpl();
         rootAttributes.addAttribute("", "level", "level", "CDATA", level.toString());
         recorder.startElement("", "root", "root", rootAttributes);
