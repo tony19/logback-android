@@ -156,7 +156,10 @@ public class CyclicBuffer<E> {
       throw new IllegalArgumentException("Negative array size [" + newSize
           + "] not allowed.");
     }
-    if (newSize == numElems)
+    // Upstream compares with numElems here and in the loop below, which ignores a
+    // resize to the current length and wraps a partially filled buffer at the wrong
+    // index; the capacity (maxSize) is what both checks are about.
+    if (newSize == maxSize)
       return; // nothing to do
 
     //
@@ -167,7 +170,7 @@ public class CyclicBuffer<E> {
     for (int i = 0; i < loopLen; i++) {
       temp[i] = ea[first];
       ea[first] = null;
-      if (++first == numElems)
+      if (++first == maxSize)
         first = 0;
     }
     ea = temp;
