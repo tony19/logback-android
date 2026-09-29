@@ -23,9 +23,14 @@ import org.junit.Test;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.spi.FilterReply;
+import ch.qos.logback.core.status.Status;
+import ch.qos.logback.core.status.StatusChecker;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.regex.Pattern;
 
 public class MarkerFilterTest {
 
@@ -76,6 +81,46 @@ public class MarkerFilterTest {
     assertEquals(FilterReply.DENY, mkt.decide(null, null, null, null, null, null));
     assertEquals(FilterReply.ACCEPT, mkt.decide(Collections.singletonList(totoMarker), null, null, null, null, null));
     assertEquals(FilterReply.ACCEPT, mkt.decide(Collections.singletonList(compositeMarker), null, null, null, null, null));
+  }
+
+  @Test
+  public void markersNotContainingTheMarkerToMatchYieldOnMismatch() {
+    Marker unrelated = MarkerFactory.getDetachedMarker("UNRELATED");
+    MarkerFilter mkt = new MarkerFilter();
+    mkt.setMarker(TOTO);
+    mkt.setOnMatch("ACCEPT");
+    mkt.setOnMismatch("DENY");
+    mkt.start();
+
+    assertEquals(FilterReply.DENY, mkt.decide(Collections.<Marker>emptyList(), null, null, null, null, null));
+    assertEquals(FilterReply.DENY, mkt.decide(Collections.singletonList(unrelated), null, null, null, null, null));
+    assertEquals(FilterReply.ACCEPT, mkt.decide(Arrays.asList(unrelated, totoMarker), null, null, null, null, null));
+  }
+
+  @Test
+  public void settingANullMarkerKeepsThePreviousMarker() {
+    MarkerFilter mkt = new MarkerFilter();
+    mkt.setMarker(TOTO);
+    mkt.setMarker(null);
+    mkt.setOnMatch("ACCEPT");
+    mkt.start();
+
+    assertTrue(mkt.isStarted());
+    assertEquals(FilterReply.ACCEPT, mkt.decide(Collections.singletonList(totoMarker), null, null, null, null, null));
+  }
+
+  @Test
+  public void settingOnlyANullMarkerLeavesTheFilterUnstarted() {
+    ContextBase context = new ContextBase();
+    MarkerFilter mkt = new MarkerFilter();
+    mkt.setContext(context);
+    mkt.setName("mkt");
+    mkt.setMarker(null);
+    mkt.start();
+
+    assertFalse(mkt.isStarted());
+    new StatusChecker(context).assertContainsMatch(Status.ERROR,
+        Pattern.quote("The marker property must be set for [mkt]"));
   }
 
 }
