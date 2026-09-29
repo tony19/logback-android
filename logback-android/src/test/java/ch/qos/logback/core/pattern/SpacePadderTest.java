@@ -16,6 +16,7 @@
 package ch.qos.logback.core.pattern;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -104,6 +105,22 @@ public class SpacePadderTest {
       assertEquals("abc                              ", buf.toString());
     }
     
+  }
+
+  @Test
+  public void isInstantiable() {
+    // the implicit public constructor is part of the published API
+    assertNotNull(new SpacePadder());
+  }
+
+  @Test
+  public void spacePadAppendsExactlyTheRequestedNumberOfSpaces() {
+    for (int n = 0; n <= 70; n++) {
+      StringBuilder buf = new StringBuilder("x");
+      SpacePadder.spacePad(buf, n);
+      assertEquals(n + 1, buf.length());
+      assertEquals("x", buf.toString().trim());
+    }
   }
 
 }

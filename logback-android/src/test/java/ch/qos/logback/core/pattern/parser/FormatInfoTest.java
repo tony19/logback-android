@@ -17,6 +17,7 @@ package ch.qos.logback.core.pattern.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -161,5 +162,57 @@ public class FormatInfoTest  {
   public void numberEndingInDotIsRejectedWithMessage() {
     IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> FormatInfo.valueOf("-4."));
     assertEquals("Formatting string [-4.] should not end with '.'", e.getMessage());
+  }
+
+  @Test
+  public void nullStringIsRejected() {
+    NullPointerException e = assertThrows(NullPointerException.class, () -> FormatInfo.valueOf(null));
+    assertEquals("Argument cannot be null", e.getMessage());
+  }
+
+  @Test
+  public void twoArgConstructorKeepsLeftPadAndLeftTruncate() {
+    FormatInfo fi = new FormatInfo(3, 9);
+    assertEquals(new FormatInfo(3, 9, true, true), fi);
+  }
+
+  @Test
+  public void equalsIsReflexive() {
+    FormatInfo fi = new FormatInfo(1, 2, false, false);
+    assertTrue(fi.equals(fi));
+  }
+
+  @Test
+  public void equalsRejectsNullAndOtherTypes() {
+    FormatInfo fi = new FormatInfo(1, 2, true, true);
+    assertFalse(fi.equals(null));
+    assertFalse(fi.equals("FormatInfo(1, 2, true, true)"));
+  }
+
+  @Test
+  public void equalsComparesEveryField() {
+    FormatInfo fi = new FormatInfo(1, 2, true, true);
+    assertTrue(fi.equals(new FormatInfo(1, 2, true, true)));
+    assertFalse(fi.equals(new FormatInfo(9, 2, true, true)));
+    assertFalse(fi.equals(new FormatInfo(1, 9, true, true)));
+    assertFalse(fi.equals(new FormatInfo(1, 2, false, true)));
+    assertFalse(fi.equals(new FormatInfo(1, 2, true, false)));
+  }
+
+  @Test
+  public void hashCodeCombinesEveryField() {
+    // ((min * 31 + max) * 31 + leftPad) * 31 + leftTruncate
+    assertEquals(31745, new FormatInfo(1, 2, true, true).hashCode());
+    assertEquals(31744, new FormatInfo(1, 2, true, false).hashCode());
+    assertEquals(31714, new FormatInfo(1, 2, false, true).hashCode());
+    assertEquals(31713, new FormatInfo(1, 2, false, false).hashCode());
+    assertEquals(new FormatInfo(4, 5).hashCode(), FormatInfo.valueOf("4.5").hashCode());
+    assertNotEquals(new FormatInfo(4, 5).hashCode(), new FormatInfo(5, 4).hashCode());
+  }
+
+  @Test
+  public void toStringListsEveryField() {
+    assertEquals("FormatInfo(1, 2, true, false)", new FormatInfo(1, 2, true, false).toString());
+    assertEquals("FormatInfo(3, 4, false, true)", FormatInfo.valueOf("-3.4").toString());
   }
 }
