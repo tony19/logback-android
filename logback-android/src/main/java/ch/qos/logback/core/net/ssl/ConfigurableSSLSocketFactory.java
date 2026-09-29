@@ -62,8 +62,7 @@ public class ConfigurableSSLSocketFactory extends SocketFactory {
       InetAddress localAddress, int localPort) throws IOException {
     SSLSocket socket = (SSLSocket) delegate.createSocket(address, port,
         localAddress, localPort);
-    parameters.configure(new SSLConfigurableSocket(socket));
-    return socket;
+    return configure(socket);
   }
 
   /**
@@ -72,8 +71,7 @@ public class ConfigurableSSLSocketFactory extends SocketFactory {
   @Override
   public Socket createSocket(InetAddress host, int port) throws IOException {
     SSLSocket socket = (SSLSocket) delegate.createSocket(host, port);
-    parameters.configure(new SSLConfigurableSocket(socket));
-    return socket;
+    return configure(socket);
   }
 
   /**
@@ -84,8 +82,7 @@ public class ConfigurableSSLSocketFactory extends SocketFactory {
       int localPort) throws IOException, UnknownHostException {
     SSLSocket socket = (SSLSocket) delegate.createSocket(host, port,
         localHost, localPort);
-    parameters.configure(new SSLConfigurableSocket(socket));
-    return socket;
+    return configure(socket);
   }
 
   /**
@@ -95,8 +92,13 @@ public class ConfigurableSSLSocketFactory extends SocketFactory {
   public Socket createSocket(String host, int port) throws IOException,
       UnknownHostException {
     SSLSocket socket = (SSLSocket) delegate.createSocket(host, port);
-    parameters.configure(new SSLConfigurableSocket(socket));
-    return socket;
+    return configure(socket);
+  }
+
+  private SSLSocket configure(SSLSocket socket) {
+    boolean verifyHostname = parameters.configureExceptHostnameVerification(
+        new SSLConfigurableSocket(socket));
+    return SSLConfigurableSocket.applyHostnameVerification(socket, verifyHostname);
   }
 
 }

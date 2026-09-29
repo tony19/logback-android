@@ -16,15 +16,22 @@
 package ch.qos.logback.core.net.ssl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import android.os.Build;
 
@@ -89,6 +96,27 @@ public class SSLHostnameVerificationTest {
 
   @Test
   @Config(sdk = 29)
+  public void socketFactoryVerifiesHostnameByDefault() throws IOException {
+    Socket created = newSocketFactory().createSocket(InetAddress.getLoopbackAddress(), 4560);
+
+    assertSame(socket, created);
+    ArgumentCaptor<SSLParameters> captor = ArgumentCaptor.forClass(SSLParameters.class);
+    verify(socket).setSSLParameters(captor.capture());
+    assertEquals("HTTPS", captor.getValue().getEndpointIdentificationAlgorithm());
+  }
+
+  @Test
+  @Config(sdk = 29)
+  public void socketFactoryHostnameVerificationCanBeDisabled() throws IOException {
+    configuration.setHostnameVerification(false);
+    Socket created = newSocketFactory().createSocket("localhost", 4560);
+
+    assertSame(socket, created);
+    verify(socket, never()).setSSLParameters(any(SSLParameters.class));
+  }
+
+  @Test
+  @Config(sdk = 29)
   public void serverSocketDoesNotVerifyHostnameByDefault() {
     configuration.configure(new SSLConfigurableServerSocket(serverSocket));
 
@@ -121,5 +149,12 @@ public class SSLHostnameVerificationTest {
 
     verify(socket, never()).setSSLParameters(any(SSLParameters.class));
     assertEquals(Status.WARN, new StatusUtil(context).getHighestLevel(0));
+  }
+
+  private ConfigurableSSLSocketFactory newSocketFactory() throws IOException {
+    SSLSocketFactory delegate = mock(SSLSocketFactory.class);
+    when(delegate.createSocket(any(InetAddress.class), anyInt())).thenReturn(socket);
+    when(delegate.createSocket(any(String.class), anyInt())).thenReturn(socket);
+    return new ConfigurableSSLSocketFactory(configuration, delegate);
   }
 }

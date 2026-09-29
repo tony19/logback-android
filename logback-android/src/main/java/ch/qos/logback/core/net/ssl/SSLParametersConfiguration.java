@@ -50,6 +50,18 @@ public class SSLParametersConfiguration extends ContextAwareBase {
    * @param socket the subject configurable
    */
   public void configure(SSLConfigurable socket) {
+    socket.setHostnameVerification(configureExceptHostnameVerification(socket));
+  }
+
+  /**
+   * Configures every SSL parameter but hostname verification on an
+   * {@link SSLConfigurable}, and decides whether the peer's hostname should be
+   * verified. {@link ConfigurableSSLSocketFactory} applies that decision to the
+   * {@link javax.net.ssl.SSLSocket} it returns itself.
+   * @param socket the subject configurable
+   * @return whether the peer's hostname should be verified
+   */
+  boolean configureExceptHostnameVerification(SSLConfigurable socket) {
     socket.setEnabledProtocols(enabledProtocols(
         socket.getSupportedProtocols(), socket.getDefaultProtocols()));
     socket.setEnabledCipherSuites(enabledCipherSuites(
@@ -66,7 +78,7 @@ public class SSLParametersConfiguration extends ContextAwareBase {
       addWarn("hostnameVerification requires Android 7.0 (API 24) or newer;"
           + " the peer's hostname will not be verified");
     }
-    socket.setHostnameVerification(verifyHostname);
+    return verifyHostname;
   }
 
   /**
