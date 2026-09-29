@@ -78,7 +78,8 @@ public class SimpleSocketServer extends Thread {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
     configureLC(lc, configFile);
 
-    SimpleSocketServer sss = new SimpleSocketServer(lc, port);
+    SimpleSocketServer sss = serverClass.getConstructor(LoggerContext.class, int.class)
+        .newInstance(lc, port);
     sss.start();
   }
 
