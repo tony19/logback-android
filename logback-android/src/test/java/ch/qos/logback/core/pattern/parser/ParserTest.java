@@ -17,13 +17,17 @@ package ch.qos.logback.core.pattern.parser;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.spi.ScanException;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 import org.junit.Test;
 
@@ -288,6 +292,74 @@ public class ParserTest {
     StatusChecker sc = new StatusChecker(context);
     sc.assertContainsMatch("Expecting RIGHT_PARENTHESIS");
     sc.assertContainsMatch("See also " + Parser.MISSING_RIGHT_PARENTHESIS);
+  }
+
+  /** A token stream that yields the given tokens instead of tokenizing a pattern. */
+  static TokenStream fixedTokens(final Token... tokens) {
+    return new TokenStream("unused") {
+      @Override
+      List<Token> tokenize() {
+        return Arrays.asList(tokens);
+      }
+    };
+  }
+
+  @Test
+  public void tokenStreamConstructorParsesTheStreamsTokens() throws Exception {
+    Parser<Object> p = new Parser<Object>(new TokenStream("a%x"));
+    Node witness = new Node(Node.LITERAL, "a");
+    witness.next = new SimpleKeywordNode("x");
+    assertEquals(witness, p.parse());
+  }
+
+  @Test
+  public void compositeKeepsOptionsFollowingItsClosingParenthesis() throws Exception {
+    Parser<Object> p = new Parser<Object>("%replace(%msg){'a', 'b'} x");
+    Node t = p.parse();
+    CompositeNode witness = new CompositeNode("replace");
+    witness.setChildNode(new SimpleKeywordNode("msg"));
+    witness.setOptions(Arrays.asList("a", "b"));
+    witness.next = new Node(Node.LITERAL, " x");
+    assertEquals(witness, t);
+  }
+
+  @Test
+  public void patternWithoutTokensIsRejected() throws Exception {
+    // a lone trailing backslash produces no token at all
+    Parser<Object> p = new Parser<Object>("\\");
+    IllegalStateException e = assertThrows(IllegalStateException.class, p::parse);
+    assertEquals("All tokens consumed but was expecting a LITERAL or '%'", e.getMessage());
+  }
+
+  @Test
+  public void compositeWithoutContentIsRejected() throws Exception {
+    Parser<Object> p = new Parser<Object>("%(");
+    IllegalStateException e = assertThrows(IllegalStateException.class, p::parse);
+    assertEquals("All tokens consumed but was expecting a LITERAL or '%'", e.getMessage());
+  }
+
+  @Test
+  public void percentFollowedByNonKeywordTokenIsRejected() throws Exception {
+    Parser<Object> p = new Parser<Object>(
+        fixedTokens(Token.PERCENT_TOKEN, new Token(Token.LITERAL, "x")));
+    IllegalStateException e = assertThrows(IllegalStateException.class, p::parse);
+    assertEquals("Unexpected token Token(LITERAL, \"x\")", e.getMessage());
+  }
+
+  @Test
+  public void compositeClosedByNonParenthesisTokenIsRejected() throws Exception {
+    Parser<Object> p = new Parser<Object>(fixedTokens(Token.PERCENT_TOKEN,
+        Token.BARE_COMPOSITE_KEYWORD_TOKEN, new Token(Token.LITERAL, "a"),
+        new Token(Token.SIMPLE_KEYWORD, "b")));
+    p.setContext(context);
+
+    ScanException e = assertThrows(ScanException.class, p::parse);
+
+    String expected = "Expecting RIGHT_PARENTHESIS token but got Token(SIMPLE_KEYWORD, \"b\")";
+    assertEquals(expected, e.getMessage());
+    StatusChecker sc = new StatusChecker(context);
+    sc.assertContainsMatch(Status.ERROR, Pattern.quote(expected));
+    sc.assertContainsMatch(Status.ERROR, Pattern.quote("See also " + Parser.MISSING_RIGHT_PARENTHESIS));
   }
 
 }

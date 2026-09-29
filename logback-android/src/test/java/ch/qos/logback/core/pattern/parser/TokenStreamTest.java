@@ -423,6 +423,13 @@ public class TokenStreamTest {
   }
 
   @Test
+  public void nullPatternIsRejected() {
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        () -> new TokenStream(null));
+    assertEquals("null or empty pattern string not allowed", e.getMessage());
+  }
+
+  @Test
   public void patternEndingInFormatModifierIsRejected() {
     ScanException e = assertThrows(ScanException.class,
         () -> new TokenStream("abc %-5").tokenize());
@@ -441,5 +448,61 @@ public class TokenStreamTest {
     ScanException e = assertThrows(ScanException.class,
         () -> new TokenStream("%x{").tokenize());
     assertEquals("Unexpected end of pattern string", e.getMessage());
+  }
+
+  @Test
+  public void escapedCurlyBraceAfterRightParenthesisIsLiteral() throws ScanException {
+    List<Token> tl = new TokenStream("%(x)\\{y}").tokenize();
+    List<Token> witness = new ArrayList<Token>();
+    witness.add(Token.PERCENT_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
+    witness.add(new Token(Token.LITERAL, "x"));
+    witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
+    witness.add(new Token(Token.LITERAL, "{y}"));
+    assertEquals(witness, tl);
+  }
+
+  @Test
+  public void trailingBackslashAfterKeywordIsDropped() throws ScanException {
+    List<Token> tl = new TokenStream("%x\\").tokenize();
+    List<Token> witness = new ArrayList<Token>();
+    witness.add(Token.PERCENT_TOKEN);
+    witness.add(new Token(Token.SIMPLE_KEYWORD, "x"));
+    assertEquals(witness, tl);
+  }
+
+  @Test
+  public void trailingBackslashAfterLiteralIsDropped() throws ScanException {
+    List<Token> tl = new TokenStream("abc\\").tokenize();
+    List<Token> witness = new ArrayList<Token>();
+    witness.add(new Token(Token.LITERAL, "abc"));
+    assertEquals(witness, tl);
+  }
+
+  @Test
+  public void optionEscapeKeepsOnlyListedCharsUnescaped() {
+    TokenStream ts = new TokenStream("x'b");
+    ts.pointer = 1;
+    StringBuffer buf = new StringBuffer();
+
+    ts.optionEscape("'", buf);
+    assertEquals("'", buf.toString());
+    assertEquals(2, ts.pointer);
+
+    ts.optionEscape("'", buf);
+    assertEquals("'\\b", buf.toString());
+    assertEquals(3, ts.pointer);
+  }
+
+  @Test
+  public void optionEscapeAtEndOfPatternIsNoOp() {
+    TokenStream ts = new TokenStream("x");
+    ts.pointer = 1;
+    StringBuffer buf = new StringBuffer("a");
+
+    ts.optionEscape("'", buf);
+
+    assertEquals("a", buf.toString());
+    assertEquals(1, ts.pointer);
   }
 }
