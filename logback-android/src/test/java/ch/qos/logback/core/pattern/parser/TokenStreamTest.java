@@ -463,6 +463,19 @@ public class TokenStreamTest {
   }
 
   @Test
+  public void escapedPercentAfterRightParenthesisIsLiteral() throws ScanException {
+    // without the escape, '%' would start a new conversion word
+    List<Token> tl = new TokenStream("%(x)\\%y").tokenize();
+    List<Token> witness = new ArrayList<Token>();
+    witness.add(Token.PERCENT_TOKEN);
+    witness.add(Token.BARE_COMPOSITE_KEYWORD_TOKEN);
+    witness.add(new Token(Token.LITERAL, "x"));
+    witness.add(Token.RIGHT_PARENTHESIS_TOKEN);
+    witness.add(new Token(Token.LITERAL, "%y"));
+    assertEquals(witness, tl);
+  }
+
+  @Test
   public void trailingBackslashAfterKeywordIsDropped() throws ScanException {
     List<Token> tl = new TokenStream("%x\\").tokenize();
     List<Token> witness = new ArrayList<Token>();

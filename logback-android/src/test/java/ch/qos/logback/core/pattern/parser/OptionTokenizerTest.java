@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,6 +75,27 @@ public class OptionTokenizerTest {
     Token option = tokens.get(2);
     assertEquals(Token.OPTION, option.getType());
     assertEquals(Collections.singletonList("a\\'b"), option.getOptionsList());
+  }
+
+  @Test
+  public void unquotedOptionsAreTrimmedButQuotedOptionsAreKeptVerbatim() throws ScanException {
+    List<Token> tokens = new TokenStream("%x{ a b , ' c ' , d } z").tokenize();
+
+    assertEquals(4, tokens.size());
+    Token option = tokens.get(2);
+    assertEquals(Token.OPTION, option.getType());
+    assertEquals(Arrays.asList("a b", " c ", "d"), option.getOptionsList());
+    assertEquals(new Token(Token.LITERAL, " z"), tokens.get(3));
+  }
+
+  @Test
+  public void lastUnquotedOptionIsTrimmedWhenItsCurlyBraceEndsThePattern() throws ScanException {
+    List<Token> tokens = new TokenStream("%x{ a , b }").tokenize();
+
+    assertEquals(3, tokens.size());
+    Token option = tokens.get(2);
+    assertEquals(Token.OPTION, option.getType());
+    assertEquals(Arrays.asList("a", "b"), option.getOptionsList());
   }
 
   @Test
