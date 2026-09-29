@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.Context;
@@ -31,13 +33,37 @@ import ch.qos.logback.core.ContextBase;
 
 public class DateParserTest {
 
+  // a fixed default time zone that differs from GMT, so that parsing in the
+  // default zone and parsing in GMT give different dates
+  private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT+05:30");
+
   private final Context context = new ContextBase();
+  private TimeZone originalDefaultTimeZone;
+
+  @Before
+  public void setUp() {
+    originalDefaultTimeZone = TimeZone.getDefault();
+    TimeZone.setDefault(DEFAULT_TIME_ZONE);
+  }
+
+  @After
+  public void tearDown() {
+    TimeZone.setDefault(originalDefaultTimeZone);
+  }
 
   @Test
-  public void parsesPrimaryDateOfMatchingFilename() throws ParseException {
+  public void parsesPrimaryDateOfMatchingFilenameInItsTimeZone() throws ParseException {
     DateParser parser = new DateParser(new FileNamePattern("/logs/app-%d{yyyy-MM-dd, GMT}.log", context));
 
     assertEquals(parse("yyyy-MM-dd", TimeZone.getTimeZone("GMT"), "2019-11-04"),
+        parser.parseFilename("/logs/app-2019-11-04.log"));
+  }
+
+  @Test
+  public void parsesPrimaryDateWithoutTimeZoneInDefaultTimeZone() throws ParseException {
+    DateParser parser = new DateParser(new FileNamePattern("/logs/app-%d{yyyy-MM-dd}.log", context));
+
+    assertEquals(parse("yyyy-MM-dd", DEFAULT_TIME_ZONE, "2019-11-04"),
         parser.parseFilename("/logs/app-2019-11-04.log"));
   }
 
@@ -60,7 +86,7 @@ public class DateParserTest {
   public void patternWithoutPrimaryDateParsesWithDefaultDatePatternAndTimeZone() throws ParseException {
     DateParser parser = new DateParser(new FileNamePattern("/logs/app-%d{yyyy/MM, aux}-%i.log", context));
 
-    assertEquals(parse(DateTokenConverter.DEFAULT_DATE_PATTERN, TimeZone.getDefault(), "2019-11-04"),
+    assertEquals(parse(DateTokenConverter.DEFAULT_DATE_PATTERN, DEFAULT_TIME_ZONE, "2019-11-04"),
         parser.parseDate("2019-11-04"));
   }
 

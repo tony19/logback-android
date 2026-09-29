@@ -83,4 +83,13 @@ public class FileFilterUtilTest {
 
     assertEquals("The regex [" + STEM_REGEX + "] should match [other.log]", e.getMessage());
   }
+
+  @Test
+  public void extractingCounterRequiresTheWholeNameToMatch() {
+    // the stem regex occurs in the name, but does not match all of it
+    IllegalStateException e = assertThrows(IllegalStateException.class,
+        () -> FileFilterUtil.extractCounter(new File("logs", "app.12.log.gz"), STEM_REGEX));
+
+    assertEquals("The regex [" + STEM_REGEX + "] should match [app.12.log.gz]", e.getMessage());
+  }
 }

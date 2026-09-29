@@ -133,12 +133,16 @@ public class CompressorTest {
     // the target's grandparent is a regular file, so its parent can't be created
     File blocker = tmpDir.newFile("blocker");
     File target = new File(new File(blocker, "sub"), "app.log.gz");
+    File tmpFile = new File(target.getPath() + Compressor.TMP_SUFFIX);
 
     compressor(CompressionMode.GZ).compress(source.getPath(), target.getPath(), null);
 
     assertTrue(hasStatus(Status.ERROR, "Failed to create parent directories for [" + target.getAbsolutePath() + "]"));
     assertTrue(hasStatusStartingWith(Status.ERROR, "Error occurred while compressing"));
     assertFalse(target.exists());
+    // the temp file was never created, so there is nothing to clean up
+    assertFalse(tmpFile.exists());
+    assertFalse(hasStatusStartingWith(Status.WARN, "Could not delete temporary file"));
     assertEquals(CONTENT, read(source));
   }
 

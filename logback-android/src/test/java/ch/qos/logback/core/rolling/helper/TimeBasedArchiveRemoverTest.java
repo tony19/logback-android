@@ -257,6 +257,26 @@ public class TimeBasedArchiveRemoverTest {
   }
 
   @Test
+  public void keepsParentOfARemovedEmptyDirWhenItHoldsOtherEntries() throws IOException {
+    File emptyMonth = tmpDir.newFolder("shared_2017", "05");
+    File year = emptyMonth.getParentFile();
+    File unrelatedFile = new File(year, "notes.txt");
+    assertTrue(unrelatedFile.createNewFile());
+    TimeBasedArchiveRemover gmtRemover = newGmtArchiveRemover(
+        "shared_%d{yyyy/MM, " + TIMEZONE_NAME + ", aux}/app_%d{" + DATE_FORMAT + ", " + TIMEZONE_NAME + "}.log");
+
+    gmtRemover.clean(EXPIRY);
+
+    verify(fileProvider).deleteFile(emptyMonth);
+    assertFalse(emptyMonth.exists());
+    // the year directory still holds another entry once its empty month is
+    // gone, so its removal is not even attempted
+    verify(fileProvider, never()).deleteFile(year);
+    assertTrue(unrelatedFile.exists());
+    assertFalse(hasStatus(gmtRemover.getContext(), Status.WARN, "cannot delete " + year));
+  }
+
+  @Test
   public void toStringNamesTheRemover() {
     assertEquals("c.q.l.core.rolling.helper.TimeBasedArchiveRemover", remover.toString());
   }
