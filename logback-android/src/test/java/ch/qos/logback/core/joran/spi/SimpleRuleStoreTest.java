@@ -273,6 +273,16 @@ public class SimpleRuleStoreTest {
   }
 
   @Test
+  public void selectorsStarredAtOneEndOnlyAreNotMiddleMatches() {
+    // "x/b/*" and "*/b/y" both contain "b", but only a selector starred at
+    // both ends matches a part found anywhere in the path
+    srs.addRule(new ElementSelector("x/b/*"), new XAction(1));
+    srs.addRule(new ElementSelector("*/b/y"), new XAction(2));
+
+    assertNull(srs.matchActions(new ElementPath("a/b/c")));
+  }
+
+  @Test
   public void starStarSelectorDoesNotMatchOrdinaryPaths() {
     // "*/*" has nothing between its two stars, so the middle part looked up
     // in the path is "*/*" itself

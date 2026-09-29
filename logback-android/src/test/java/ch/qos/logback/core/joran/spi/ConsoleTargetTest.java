@@ -19,6 +19,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,17 +33,34 @@ import org.junit.Test;
 @SuppressWarnings("deprecation")
 public class ConsoleTargetTest {
 
+  /** A console stand-in that counts how often it is flushed. */
+  private static class FlushCountingPrintStream extends PrintStream {
+    int flushes;
+
+    FlushCountingPrintStream(OutputStream out) {
+      super(out);
+    }
+
+    @Override
+    public void flush() {
+      flushes++;
+      super.flush();
+    }
+  }
+
   private PrintStream originalOut;
   private PrintStream originalErr;
   private final ByteArrayOutputStream capturedOut = new ByteArrayOutputStream();
   private final ByteArrayOutputStream capturedErr = new ByteArrayOutputStream();
+  private final FlushCountingPrintStream out = new FlushCountingPrintStream(capturedOut);
+  private final FlushCountingPrintStream err = new FlushCountingPrintStream(capturedErr);
 
   @Before
   public void redirectConsole() {
     originalOut = System.out;
     originalErr = System.err;
-    System.setOut(new PrintStream(capturedOut));
-    System.setErr(new PrintStream(capturedErr));
+    System.setOut(out);
+    System.setErr(err);
   }
 
   @After
@@ -74,6 +92,22 @@ public class ConsoleTargetTest {
 
     assertArrayEquals(EXPECTED, capturedErr.toByteArray());
     assertEquals(0, capturedOut.size());
+  }
+
+  @Test
+  public void systemOutStreamFlushesTheCurrentSystemOut() throws IOException {
+    int before = out.flushes;
+    ConsoleTarget.SystemOut.getStream().flush();
+
+    assertTrue(out.flushes > before);
+  }
+
+  @Test
+  public void systemErrStreamFlushesTheCurrentSystemErr() throws IOException {
+    int before = err.flushes;
+    ConsoleTarget.SystemErr.getStream().flush();
+
+    assertTrue(err.flushes > before);
   }
 
   @Test

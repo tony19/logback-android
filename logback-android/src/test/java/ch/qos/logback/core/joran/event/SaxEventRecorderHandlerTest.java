@@ -27,12 +27,15 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.List;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -233,12 +236,34 @@ public class SaxEventRecorderHandlerTest {
 
       assertEquals(1, drivers.constructed().size());
       Driver driver = drivers.constructed().get(0);
+      verify(driver).setFeature(VALIDATION_FEATURE, false);
       verify(driver).setFeature(NAMESPACES_FEATURE, true);
       verify(driver).setContentHandler(recorder);
       verify(driver).setErrorHandler(recorder);
       verify(driver).parse(input);
       assertTrue(statuses().isEmpty());
     }
+  }
+
+  @Test
+  public void recordEventsFromStreamParsesThatStream() throws Exception {
+    InputStream in = new ByteArrayInputStream("<x/>".getBytes("UTF-8"));
+    try (MockedConstruction<Driver> drivers = mockConstruction(Driver.class)) {
+      recorder.recordEvents(in);
+
+      ArgumentCaptor<InputSource> source = ArgumentCaptor.forClass(InputSource.class);
+      verify(drivers.constructed().get(0)).parse(source.capture());
+      assertSame(in, source.getValue().getByteStream());
+    }
+  }
+
+  @Test
+  public void startDocumentRecordsNothing() {
+    recorder.startDocument();
+
+    assertTrue(recorder.getSaxEventList().isEmpty());
+    assertNull(recorder.getLocator());
+    assertTrue(statuses().isEmpty());
   }
 
   @Test
