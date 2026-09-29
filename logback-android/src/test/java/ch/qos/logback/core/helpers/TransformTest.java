@@ -60,7 +60,7 @@ public class TransformTest {
 
   @Test
   public void escapeTagsReplacesOtherControlCharactersWithReplacementCharacter() {
-    assertEquals("a�b�c� d", Transform.escapeTags("a\u0000b\u000bc\u001f d"));
+    assertEquals("a\uFFFDb\uFFFDc\uFFFD d", Transform.escapeTags("a\u0000b\u000bc\u001f d"));
   }
 
   @Test
@@ -69,8 +69,8 @@ public class TransformTest {
 
     String result = Transform.escapeTags(buf);
 
-    assertEquals("x&lt;�y", result);
-    assertEquals("x&lt;�y", buf.toString());
+    assertEquals("x&lt;\uFFFDy", result);
+    assertEquals("x&lt;\uFFFDy", buf.toString());
   }
 
   @Test
