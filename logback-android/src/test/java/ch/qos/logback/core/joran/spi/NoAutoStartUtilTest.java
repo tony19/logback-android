@@ -16,6 +16,7 @@
 package ch.qos.logback.core.joran.spi;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 import org.junit.Test;
@@ -34,5 +35,16 @@ public class NoAutoStartUtilTest {
   public void markedWithNoAutoStart() {
     DoNotAutoStart o = new DoNotAutoStart();
     assertFalse(NoAutoStartUtil.notMarkedWithNoAutoStart(o));
+  }
+
+  @Test
+  public void nullIsNeverAutoStarted() {
+    assertFalse(NoAutoStartUtil.notMarkedWithNoAutoStart(null));
+  }
+
+  @Test
+  public void canBeInstantiated() {
+    // the class only has static members but keeps its implicit public constructor
+    assertNotNull(new NoAutoStartUtil());
   }
 }
