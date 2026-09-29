@@ -61,6 +61,7 @@ public interface Context extends PropertyContainer {
    * @param key the key of the property
    * @return the associated string value
    */
+  @Override
   String getProperty(String key);
 
   /**
@@ -76,6 +77,7 @@ public interface Context extends PropertyContainer {
    * @return the property map copy
    * @since 0.9.20
    */
+  @Override
   Map<String, String> getCopyOfPropertyMap();
 
   /**

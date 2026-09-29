@@ -26,6 +26,7 @@ public class TargetLengthBasedClassNameAbbreviator implements Abbreviator {
     this.targetLength = targetLength;
   }
 
+  @Override
   public String abbreviate(String fqClassName) {
     StringBuilder buf = new StringBuilder(targetLength);
     if (fqClassName == null) {

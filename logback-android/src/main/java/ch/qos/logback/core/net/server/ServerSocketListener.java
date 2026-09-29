@@ -43,6 +43,7 @@ public abstract class ServerSocketListener<T extends Client>
   /**
    * {@inheritDoc}
    */
+  @Override
   public T acceptClient() throws IOException {
     Socket socket = serverSocket.accept();
     return createClient(
@@ -62,6 +63,7 @@ public abstract class ServerSocketListener<T extends Client>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void close() {
     CloseUtil.closeQuietly(serverSocket);
   }

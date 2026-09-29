@@ -116,6 +116,7 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
     return getLogger(clazz.getName());
   }
 
+  @Override
   public Logger getLogger(final String name) {
 
     if (name == null) {
@@ -350,11 +351,13 @@ public class LoggerContext extends ContextBase implements ILoggerFactory,
 
   // === end listeners ==============================================
 
+  @Override
   public void start() {
     super.start();
     fireOnStart();
   }
 
+  @Override
   public void stop() {
     reset();
     fireOnStop();

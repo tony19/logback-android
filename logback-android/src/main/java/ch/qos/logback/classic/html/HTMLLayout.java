@@ -71,10 +71,12 @@ public class HTMLLayout extends HTMLLayoutBase<ILoggingEvent> {
     }
   }
 
+  @Override
   protected Map<String, String> getDefaultConverterMap() {
     return PatternLayout.defaultConverterMap;
   }
 
+  @Override
   public String doLayout(ILoggingEvent event) {
     StringBuilder buf = new StringBuilder();
     startNewTableIfLimitReached(buf);

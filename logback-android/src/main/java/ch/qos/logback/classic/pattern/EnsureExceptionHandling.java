@@ -40,6 +40,7 @@ public class EnsureExceptionHandling implements
    * 
    * 
    */
+  @Override
   public void process(Context context, Converter<ILoggingEvent> head) {
     if(head == null) {
       // this should never happen

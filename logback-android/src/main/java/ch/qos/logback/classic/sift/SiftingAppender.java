@@ -48,6 +48,7 @@ public class SiftingAppender extends SiftingAppenderBase<ILoggingEvent> {
     super.setDiscriminator(discriminator);
   }
 
+  @Override
   protected boolean eventMarksEndOfLife(ILoggingEvent event) {
     List<Marker> markers = event.getMarkers();
     if(markers == null)

@@ -46,6 +46,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
   int errorCount = 0;
 
   @SuppressWarnings("unchecked")
+  @Override
   public void start() {
 
     String lengthStr = getFirstOption();
@@ -103,6 +104,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
     ignoredStackTraceLines.add(ignoredStackTraceLine);
   }
 
+  @Override
   public void stop() {
     evaluatorList = null;
     super.stop();
@@ -112,6 +114,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
     // nop
   }
 
+  @Override
   public String convert(ILoggingEvent event) {
 
     IThrowableProxy tp = event.getThrowableProxy();
@@ -139,7 +142,7 @@ public class ThrowableProxyConverter extends ThrowableHandlingConverter {
                     "Exception thrown for evaluator named [" + ee.getName() + "].",
                     this, eex);
             errorStatus.add(new ErrorStatus(
-                    "This was the last warning about this evaluator's errors."
+                    "This was the last warning about this evaluator's errors. "
                             + "We don't want the StatusManager to get flooded.", this));
             addStatus(errorStatus);
           }

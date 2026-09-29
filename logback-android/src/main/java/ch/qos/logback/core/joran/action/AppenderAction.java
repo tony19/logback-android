@@ -22,7 +22,6 @@ import org.xml.sax.Attributes;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.joran.spi.ActionException;
 import ch.qos.logback.core.joran.spi.InterpretationContext;
-import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.util.OptionHelper;
 
 public class AppenderAction<E> extends Action {
@@ -36,6 +35,7 @@ public class AppenderAction<E> extends Action {
    * appender bag.
    */
   @SuppressWarnings("unchecked")
+  @Override
   public void begin(InterpretationContext ec, String localName,
       Attributes attributes) throws ActionException {
     // We are just beginning, reset variables
@@ -96,14 +96,13 @@ public class AppenderAction<E> extends Action {
    * Once the children elements are also parsed, now is the time to activate the
    * appender options.
    */
+  @Override
   public void end(InterpretationContext ec, String name) {
     if (inError) {
       return;
     }
 
-    if (appender instanceof LifeCycle) {
-      ((LifeCycle) appender).start();
-    }
+    appender.start();
 
     Object o = ec.peekObject();
 

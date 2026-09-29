@@ -46,6 +46,7 @@ public class NestedComplexPropertyIA extends ImplicitAction {
   // be followed by a corresponding pop.
   Stack<IADataForComplexProperty> actionDataStack = new Stack<IADataForComplexProperty>();
 
+  @Override
   public boolean isApplicable(ElementPath elementPath, Attributes attributes,
       InterpretationContext ic) {
 
@@ -84,6 +85,7 @@ public class NestedComplexPropertyIA extends ImplicitAction {
     }
   }
 
+  @Override
   public void begin(InterpretationContext ec, String localName,
       Attributes attributes) {
     // LogLog.debug("in NestComponentIA begin method");
@@ -141,6 +143,7 @@ public class NestedComplexPropertyIA extends ImplicitAction {
 
   }
 
+  @Override
   public void end(InterpretationContext ec, String tagName) {
 
     // pop the action data object pushed in isApplicable() method call

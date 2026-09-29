@@ -49,6 +49,7 @@ abstract public class AppenderBase<E> extends ContextAwareBase implements
 
   private FilterAttachableImpl<E> fai = new FilterAttachableImpl<E>();
 
+  @Override
   public String getName() {
     return name;
   }
@@ -58,6 +59,7 @@ abstract public class AppenderBase<E> extends ContextAwareBase implements
 
   static final int ALLOWED_REPEATS = 5;
 
+  @Override
   public synchronized void doAppend(E eventObject) {
     // WARNING: The guard check MUST be the first statement in the
     // doAppend() method.
@@ -100,38 +102,47 @@ abstract public class AppenderBase<E> extends ContextAwareBase implements
   /**
    * Set the name of this appender.
    */
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public void start() {
     started = true;
   }
 
+  @Override
   public void stop() {
     started = false;
   }
 
+  @Override
   public boolean isStarted() {
     return started;
   }
 
+  @Override
   public String toString() {
     return this.getClass().getName() + "[" + name + "]";
   }
 
+  @Override
   public void addFilter(Filter<E> newFilter) {
     fai.addFilter(newFilter);
   }
 
+  @Override
   public void clearAllFilters() {
     fai.clearAllFilters();
   }
 
+  @Override
   public List<Filter<E>> getCopyOfAttachedFiltersList() {
     return fai.getCopyOfAttachedFiltersList();
   }
 
+  @Override
   public FilterReply getFilterChainDecision(E event) {
     return fai.getFilterChainDecision(event);
   }

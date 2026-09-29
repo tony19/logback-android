@@ -128,6 +128,7 @@ public class FormatInfo {
     this.leftTruncate = leftTruncate;
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -150,6 +151,7 @@ public class FormatInfo {
     return result;
   }
 
+  @Override
   public String toString() {
     return "FormatInfo(" + min + ", " + max + ", " + leftPad + ", "
         + leftTruncate + ")";

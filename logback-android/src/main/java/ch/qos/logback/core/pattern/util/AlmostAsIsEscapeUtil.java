@@ -40,6 +40,7 @@ public class AlmostAsIsEscapeUtil extends RestrictedEscapeUtil {
    * Note that this method assumes that it is called after the escape character
    * has been consumed.
    */
+  @Override
   public void escape(String escapeChars, StringBuffer buf, char next,
       int pointer) {
     super.escape(""+CoreConstants.PERCENT_CHAR+CoreConstants.RIGHT_PARENTHESIS_CHAR, buf, next, pointer);

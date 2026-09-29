@@ -36,14 +36,17 @@ public abstract class Filter<E> extends ContextAwareBase implements LifeCycle {
 
   boolean start = false;
 
+  @Override
   public void start() {
     this.start = true;
   }
 
+  @Override
   public boolean isStarted() {
     return this.start;
   }
 
+  @Override
   public void stop() {
     this.start = false;
   }

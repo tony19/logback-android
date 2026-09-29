@@ -42,6 +42,7 @@ public class IntegerTokenConverter extends DynamicConverter<Object> implements M
     return sbuf.append(s).toString();
   }
 
+  @Override
   public String convert(Object o) {
     if(o == null) {
       throw new IllegalArgumentException("Null argument forbidden");
@@ -53,6 +54,7 @@ public class IntegerTokenConverter extends DynamicConverter<Object> implements M
     throw new IllegalArgumentException("Cannot convert "+o+" of type"+o.getClass().getName());
   }
 
+  @Override
   public boolean isApplicable(Object o) {
     return (o instanceof Integer);
   }

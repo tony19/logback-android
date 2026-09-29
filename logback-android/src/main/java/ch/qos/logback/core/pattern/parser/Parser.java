@@ -51,7 +51,7 @@ public class Parser<E> extends ContextAwareBase {
   public final static Map<String, String> DEFAULT_COMPOSITE_CONVERTER_MAP = new HashMap<String, String>();
   public final static String REPLACE_CONVERTER_WORD = "replace";
   static {
-    DEFAULT_COMPOSITE_CONVERTER_MAP.put(Token.BARE_COMPOSITE_KEYWORD_TOKEN.getValue().toString(),
+    DEFAULT_COMPOSITE_CONVERTER_MAP.put(Token.BARE_COMPOSITE_KEYWORD_TOKEN.getValue(),
             IdentityCompositeConverter.class.getName());
     DEFAULT_COMPOSITE_CONVERTER_MAP.put(REPLACE_CONVERTER_WORD,
              ReplacingCompositeConverter.class.getName());
@@ -165,7 +165,7 @@ public class Parser<E> extends ContextAwareBase {
       return SINGLE();
     case Token.COMPOSITE_KEYWORD:
       advanceTokenPointer();
-      return COMPOSITE(t.getValue().toString());
+      return COMPOSITE(t.getValue());
     default:
       throw new IllegalStateException("Unexpected token " + t);
     }

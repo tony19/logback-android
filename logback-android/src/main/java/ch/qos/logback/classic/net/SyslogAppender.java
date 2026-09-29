@@ -49,6 +49,7 @@ public class SyslogAppender extends SyslogAppenderBase<ILoggingEvent> {
   boolean throwableExcluded = false;
 
 
+  @Override
   public void start() {
     super.start();
     setupStackTraceLayout();
@@ -118,11 +119,7 @@ public class SyslogAppender extends SyslogAppenderBase<ILoggingEvent> {
     sw.flush();
   }
 
-  boolean stackTraceHeaderLine(StringBuilder sb, boolean topException) {
-
-    return false;
-  }
-
+  @Override
   public Layout<ILoggingEvent> buildLayout() {
     PatternLayout layout = new PatternLayout();
     layout.getInstanceConverterMap().put("syslogStart",

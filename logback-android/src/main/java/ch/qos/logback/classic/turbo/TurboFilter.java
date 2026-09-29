@@ -57,14 +57,17 @@ public abstract class TurboFilter extends ContextAwareBase implements LifeCycle 
   public abstract FilterReply decide(List<Marker> markers, Logger logger,
                                      Level level, String format, Object[] params, Throwable t);
 
+  @Override
   public void start() {
     this.start = true;
   }
 
+  @Override
   public boolean isStarted() {
     return this.start;
   }
 
+  @Override
   public void stop() {
     this.start = false;
   }

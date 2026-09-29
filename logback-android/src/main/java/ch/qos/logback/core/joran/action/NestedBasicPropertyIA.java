@@ -42,6 +42,7 @@ public class NestedBasicPropertyIA extends ImplicitAction {
   // be followed by the corresponding pop.
   Stack<IADataForBasicProperty> actionDataStack = new Stack<IADataForBasicProperty>();
 
+  @Override
   public boolean isApplicable(ElementPath elementPath, Attributes attributes,
       InterpretationContext ec) {
     // System.out.println("in NestedSimplePropertyIA.isApplicable [" + pattern +
@@ -79,11 +80,13 @@ public class NestedBasicPropertyIA extends ImplicitAction {
     }
   }
 
+  @Override
   public void begin(InterpretationContext ec, String localName,
       Attributes attributes) {
     // NOP
   }
 
+  @Override
   public void body(InterpretationContext ec, String body) {
 
     String finalBody = ec.subst(body);
@@ -102,6 +105,7 @@ public class NestedBasicPropertyIA extends ImplicitAction {
     }
   }
 
+  @Override
   public void end(InterpretationContext ec, String tagName) {
     // pop the action data object pushed in isApplicable() method call
     actionDataStack.pop();

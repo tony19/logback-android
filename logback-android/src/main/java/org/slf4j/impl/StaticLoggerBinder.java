@@ -99,6 +99,7 @@ public class StaticLoggerBinder implements SLF4JServiceProvider {
     }
   }
 
+  @Override
   public ILoggerFactory getLoggerFactory() {
     if (!initialized) {
       return defaultLoggerContext;

@@ -50,6 +50,7 @@ public class ServerSocketReceiver extends ReceiverBase {
   /**
    * Starts the server.
    */
+  @Override
   protected boolean shouldStart() {
     ServerSocket serverSocket = null;
     try {
@@ -89,6 +90,7 @@ public class ServerSocketReceiver extends ReceiverBase {
   /**
    * {@inheritDoc}
    */
+  @Override
   protected void onStop() {
     try {
       if (runner == null) return;

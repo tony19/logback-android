@@ -76,9 +76,10 @@ public class FileNamePattern extends ContextAwareBase {
   }
 
   String escapeRightParantesis(String in) {
-    return pattern.replace(")", "\\)");
+    return in.replace(")", "\\)");
   }
 
+  @Override
   public String toString() {
     return pattern;
   }

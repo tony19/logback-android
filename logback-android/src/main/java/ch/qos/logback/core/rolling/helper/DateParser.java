@@ -37,6 +37,7 @@ class DateParser implements FilenameParser<Date> {
     return this.dateFormatter.parse(dateString);
   }
 
+  @Override
   public Date parseFilename(String filename) {
     Date date = null;
 

@@ -71,6 +71,7 @@ class RemoteReceiverStreamClient
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setQueue(BlockingQueue<Serializable> queue) {
     this.queue = queue;
   }
@@ -78,6 +79,7 @@ class RemoteReceiverStreamClient
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean offer(Serializable event) {
     if (queue == null) {
       throw new IllegalStateException("client has no event queue");
@@ -88,6 +90,7 @@ class RemoteReceiverStreamClient
   /**
    * {@inheritDoc}
    */
+  @Override
   public void close() {
     if (socket == null) return;
     CloseUtil.closeQuietly(socket);
@@ -96,6 +99,7 @@ class RemoteReceiverStreamClient
   /**
    * {@inheritDoc}
    */
+  @Override
   public void run() {
     addInfo(clientId + "connected");
 

@@ -49,6 +49,7 @@ public class DefaultTimeBasedFileNamingAndTriggeringPolicy<E> extends
     started = true;
   }
 
+  @Override
   public boolean isTriggeringEvent(File activeFile, final E event) {
     long time = getCurrentTime();
     if (time >= nextCheck) {

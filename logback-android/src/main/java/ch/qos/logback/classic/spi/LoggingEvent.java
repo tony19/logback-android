@@ -143,14 +143,17 @@ public class LoggingEvent implements ILoggingEvent {
     this.argumentArray = argArray;
   }
 
+  @Override
   public Object[] getArgumentArray() {
     return this.argumentArray;
   }
 
+  @Override
   public Level getLevel() {
     return level;
   }
 
+  @Override
   public String getLoggerName() {
     return loggerName;
   }
@@ -159,6 +162,7 @@ public class LoggingEvent implements ILoggingEvent {
     this.loggerName = loggerName;
   }
 
+  @Override
   public String getThreadName() {
     if (threadName == null) {
       threadName = (Thread.currentThread()).getName();
@@ -181,6 +185,7 @@ public class LoggingEvent implements ILoggingEvent {
    * Returns the throwable information contained within this event. May be
    * <code>null</code> if there is no such information.
    */
+  @Override
   public IThrowableProxy getThrowableProxy() {
     return throwableProxy;
   }
@@ -204,6 +209,7 @@ public class LoggingEvent implements ILoggingEvent {
    * Note that due to performance concerns, this method does NOT extract caller
    * data. It is the responsibility of the caller to extract caller information.
    */
+  @Override
   public void prepareForDeferredProcessing() {
     this.getFormattedMessage();
     this.getThreadName();
@@ -211,6 +217,7 @@ public class LoggingEvent implements ILoggingEvent {
     this.getMDCPropertyMap();
   }
 
+  @Override
   public LoggerContextVO getLoggerContextVO() {
     return loggerContextVO;
   }
@@ -219,6 +226,7 @@ public class LoggingEvent implements ILoggingEvent {
     this.loggerContextVO = loggerContextVO;
   }
 
+  @Override
   public String getMessage() {
     return message;
   }
@@ -231,6 +239,7 @@ public class LoggingEvent implements ILoggingEvent {
     this.message = message;
   }
 
+  @Override
   public long getTimeStamp() {
     return timeStamp;
   }
@@ -256,6 +265,7 @@ public class LoggingEvent implements ILoggingEvent {
    * information.
    * </p>
    */
+  @Override
   public StackTraceElement[] getCallerData() {
     if (callerDataArray == null) {
       callerDataArray = CallerData.extract(new Throwable(), fqnOfLoggerClass,
@@ -264,6 +274,7 @@ public class LoggingEvent implements ILoggingEvent {
     return callerDataArray;
   }
 
+  @Override
   public boolean hasCallerData() {
     return (callerDataArray != null);
   }
@@ -272,6 +283,7 @@ public class LoggingEvent implements ILoggingEvent {
     this.callerDataArray = callerDataArray;
   }
 
+  @Override
   public List<Marker> getMarkers() {
     return markers;
   }
@@ -289,6 +301,7 @@ public class LoggingEvent implements ILoggingEvent {
   }
 
   // lazy computation as suggested in LOGBACK-495
+  @Override
   public String getFormattedMessage() {
     if (formattedMessage != null) {
       return formattedMessage;
@@ -303,6 +316,7 @@ public class LoggingEvent implements ILoggingEvent {
     return formattedMessage;
   }
 
+  @Override
   public Map<String, String> getMDCPropertyMap() {
     // populate mdcPropertyMap if null
     if (mdcPropertyMap == null) {
@@ -339,6 +353,7 @@ public class LoggingEvent implements ILoggingEvent {
    *
    * @deprecated Replaced by [@link #getMDCPropertyMap}
    */
+  @Override
   public Map<String, String> getMdc() {
     return getMDCPropertyMap();
   }

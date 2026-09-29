@@ -30,10 +30,12 @@ import ch.qos.logback.core.joran.spi.InterpretationContext;
  */
 public class NOPAction extends Action {
   
+  @Override
   public void begin(InterpretationContext ec, String name, Attributes attributes) {
   }
 
 
+  @Override
   public void end(InterpretationContext ec, String name) {
   }
 }

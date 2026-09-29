@@ -43,7 +43,7 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
   /**
    * Constructs a new client.
    * @param id a display name for the client
-   * @param inputStream input stream from which events will be read
+   * @param socket socket from which events will be read
    */
   public RemoteAppenderStreamClient(String id, Socket socket) {
     this.id = id;
@@ -69,6 +69,7 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setLoggerContext(LoggerContext lc) {
     this.lc = lc;
     this.logger = lc.getLogger(getClass().getPackage().getName());
@@ -77,6 +78,7 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void close() {
     if (socket == null) return;
     CloseUtil.closeQuietly(socket);
@@ -85,6 +87,7 @@ class RemoteAppenderStreamClient implements RemoteAppenderClient {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void run() {
     logger.info(this + ": connected");
     HardenedObjectInputStream ois = null;

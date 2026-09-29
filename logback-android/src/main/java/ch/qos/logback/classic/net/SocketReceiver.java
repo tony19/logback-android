@@ -61,6 +61,7 @@ public class SocketReceiver extends ReceiverBase
   /**
    * {@inheritDoc}
    */
+  @Override
   protected boolean shouldStart() {
     int errorCount = 0;
     if (port == 0) {
@@ -98,6 +99,7 @@ public class SocketReceiver extends ReceiverBase
   /**
    * {@inheritDoc}
    */
+  @Override
   protected void onStop() {
     if (socket != null) {
       CloseUtil.closeQuietly(socket);
@@ -112,6 +114,7 @@ public class SocketReceiver extends ReceiverBase
   /**
    * {@inheritDoc}
    */
+  @Override
   public void run() {
     try {
       LoggerContext lc = (LoggerContext) getContext();
@@ -192,6 +195,7 @@ public class SocketReceiver extends ReceiverBase
   /**
    * {@inheritDoc}
    */
+  @Override
   public void connectionFailed(SocketConnector connector, Exception ex) {
     if (ex instanceof InterruptedException) {
       addWarn("connector interrupted", ex);

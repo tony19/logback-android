@@ -30,6 +30,7 @@ public abstract class NamedConverter extends ClassicConverter {
    */
   protected abstract String getFullyQualifiedName(final ILoggingEvent event);
 
+  @Override
   public void start() {
     String optStr = getFirstOption();
     if (optStr != null) {
@@ -46,6 +47,7 @@ public abstract class NamedConverter extends ClassicConverter {
     }
   }
 
+  @Override
   public String convert(ILoggingEvent event) {
     String fqn = getFullyQualifiedName(event);
 

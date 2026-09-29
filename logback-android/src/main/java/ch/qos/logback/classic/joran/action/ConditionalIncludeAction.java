@@ -35,7 +35,7 @@ public class ConditionalIncludeAction extends AbstractIncludeAction {
    * Path container, used to determine whether an include has found a path,
    * in which case subsequent includes are ignored
    */
-  class State {
+  static class State {
     private URL url;
     URL getUrl() { return url; }
     void setUrl(URL url) { this.url = url; }

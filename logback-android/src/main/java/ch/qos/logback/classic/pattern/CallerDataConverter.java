@@ -48,6 +48,7 @@ public class CallerDataConverter extends ClassicConverter {
   int errorCount = 0;
 
   @SuppressWarnings("unchecked")
+  @Override
   public void start() {
     String depthStr = getFirstOption();
     if (depthStr == null) {
@@ -114,6 +115,7 @@ public class CallerDataConverter extends ClassicConverter {
     evaluatorList.add(ee);
   }
 
+  @Override
   public String convert(ILoggingEvent le) {
     StringBuilder buf = new StringBuilder();
 
@@ -136,7 +138,7 @@ public class CallerDataConverter extends ClassicConverter {
                 "Exception thrown for evaluator named [" + ee.getName() + "].",
                 this, eex);
             errorStatus.add(new ErrorStatus(
-                "This was the last warning about this evaluator's errors."
+                "This was the last warning about this evaluator's errors. "
                     + "We don't want the StatusManager to get flooded.", this));
             addStatus(errorStatus);
           }

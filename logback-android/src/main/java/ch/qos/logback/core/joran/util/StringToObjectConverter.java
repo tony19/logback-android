@@ -78,7 +78,7 @@ public class StringToObjectConverter {
         return Boolean.FALSE;
       }
     } else if (type.isEnum()) {
-      return convertToEnum(ca, v, (Class<? extends Enum<?>>) type);
+      return convertToEnum(v, (Class<? extends Enum<?>>) type);
     } else if (StringToObjectConverter.followsTheValueOfConvention(type)) {
       return convertByValueOfMethod(ca, type, v);
     } else if (isOfTypeCharset(type)) {
@@ -136,7 +136,7 @@ public class StringToObjectConverter {
   }
 
   @SuppressWarnings("unchecked")
-  private static Object convertToEnum(ContextAware ca, String val,
+  private static Object convertToEnum(String val,
       Class<? extends Enum> enumType) {
     return Enum.valueOf(enumType, val);
   }

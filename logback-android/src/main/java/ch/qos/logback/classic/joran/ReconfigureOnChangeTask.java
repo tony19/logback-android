@@ -114,17 +114,16 @@ public class ReconfigureOnChangeTask extends ContextAwareBase implements Runnabl
         StatusUtil statusUtil = new StatusUtil(lc);
         List<SaxEvent> eventList = jc.recallSafeConfiguration();
 
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(lc);
         lc.reset();
         new AndroidContextUtil().setupProperties(lc);
         long threshold = System.currentTimeMillis();
         try {
             jc.doConfigure(mainConfigurationURL);
             if (statusUtil.hasXMLParsingErrors(threshold)) {
-                fallbackConfiguration(lc, eventList, mainURL);
+                fallbackConfiguration(lc, eventList);
             }
         } catch (JoranException e) {
-            fallbackConfiguration(lc, eventList, mainURL);
+            fallbackConfiguration(lc, eventList);
         }
     }
 
@@ -141,7 +140,7 @@ public class ReconfigureOnChangeTask extends ContextAwareBase implements Runnabl
         return sanitizedEvents;
     }
 
-    private void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList, URL mainURL) {
+    private void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList) {
         // failsafe events are used only in case of errors. Therefore, we must *not*
         // invoke file inclusion since the included files may be the cause of the error.
 

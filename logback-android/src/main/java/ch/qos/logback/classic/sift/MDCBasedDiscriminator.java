@@ -39,6 +39,7 @@ public class MDCBasedDiscriminator extends AbstractDiscriminator<ILoggingEvent> 
    * property. If that value is null, then return the value assigned to the
    * DefaultValue property.
    */
+  @Override
   public String getDiscriminatingValue(ILoggingEvent event) {
     // http://jira.qos.ch/browse/LBCLASSIC-213
     Map<String, String> mdcMap = event.getMDCPropertyMap();
@@ -69,6 +70,7 @@ public class MDCBasedDiscriminator extends AbstractDiscriminator<ILoggingEvent> 
     }
   }
 
+  @Override
   public String getKey() {
     return key;
   }

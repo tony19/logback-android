@@ -103,6 +103,7 @@ public abstract class ServerSocketAppenderBase<E> extends AppenderBase<E> {
     postProcessEvent(event);
     final Serializable serEvent = getPST().transform(event);
     runner.accept(new ClientVisitor<RemoteReceiverClient>() {
+      @Override
       public void visit(RemoteReceiverClient client) {
         client.offer(serEvent);
       }

@@ -51,6 +51,7 @@ public class FixedDelay implements DelayStrategy {
   /**
    * {@inheritDoc}
    */
+  @Override
   public long nextDelay() {
     long delay = nextDelay;
     nextDelay = subsequentDelay;

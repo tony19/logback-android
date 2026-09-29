@@ -35,6 +35,7 @@ public class LoggerAction extends Action {
 
   boolean inError = false;
   Logger logger;
+  @Override
   public void begin(InterpretationContext ec, String name, Attributes attributes) {
     // Let us forget about previous errors (in this object)
     inError = false;
@@ -79,6 +80,7 @@ public class LoggerAction extends Action {
     ec.pushObject(logger);
   }
 
+  @Override
   public void end(InterpretationContext ec, String e) {
     if (inError) {
       return;

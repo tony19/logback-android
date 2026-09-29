@@ -25,6 +25,7 @@ import ch.qos.logback.core.spi.PreSerializationTransformer;
 public class LoggingEventPreSerializationTransformer implements
     PreSerializationTransformer<ILoggingEvent> {
 
+  @Override
   public Serializable transform(ILoggingEvent event) {
     if(event == null) {
       return null;

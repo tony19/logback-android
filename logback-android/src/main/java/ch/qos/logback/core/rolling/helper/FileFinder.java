@@ -176,10 +176,12 @@ class LiteralPathPart extends PathPart {
     super(part);
   }
 
+  @Override
   boolean matches(File file) {
     return file.getName().equals(part);
   }
 
+  @Override
   List<File> listFiles(FileProvider fileProvider) {
     return listFiles(fileProvider, part);
   }
@@ -193,10 +195,12 @@ class RegexPathPart extends PathPart {
     pattern = Pattern.compile(part);
   }
 
+  @Override
   boolean matches(File file) {
     return pattern.matcher(file.getName()).find();
   }
 
+  @Override
   List<File> listFiles(FileProvider fileProvider) {
     return listFiles(fileProvider, ".");
   }

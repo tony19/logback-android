@@ -22,9 +22,11 @@ import ch.qos.logback.core.joran.spi.InterpretationContext;
 
 public class ContextNameAction extends Action {
 
+  @Override
   public void begin(InterpretationContext ec, String name, Attributes attributes) {
   }
 
+  @Override
   public void body(InterpretationContext ec, String body) {
 
     String finalBody = ec.subst(body);
@@ -37,6 +39,7 @@ public class ContextNameAction extends Action {
     }
   }
 
+  @Override
   public void end(InterpretationContext ec, String name) {
   }
 }

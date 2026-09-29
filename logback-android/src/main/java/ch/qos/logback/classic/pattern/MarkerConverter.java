@@ -30,6 +30,7 @@ public class MarkerConverter extends ClassicConverter {
 
   private static String EMPTY = "";
 
+  @Override
   public String convert(ILoggingEvent le) {
     List<Marker> markers = le.getMarkers();
     if (markers == null || markers.isEmpty()) {

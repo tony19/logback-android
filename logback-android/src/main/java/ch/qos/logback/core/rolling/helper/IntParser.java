@@ -28,6 +28,7 @@ class IntParser implements FilenameParser<Integer> {
     this.pathPattern = Pattern.compile(pathRegexString);
   }
 
+  @Override
   public Integer parseFilename(String filename) {
     Integer intValue = -1;
 

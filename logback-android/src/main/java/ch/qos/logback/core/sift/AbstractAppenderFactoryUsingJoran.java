@@ -47,6 +47,7 @@ public abstract class AbstractAppenderFactoryUsingJoran<E> implements AppenderFa
 
   public abstract SiftingJoranConfiguratorBase<E> getSiftingJoranConfigurator(String k);
 
+  @Override
   public Appender<E> buildAppender(Context context, String discriminatingValue) throws JoranException {
     SiftingJoranConfiguratorBase<E> sjc = getSiftingJoranConfigurator(discriminatingValue);
     sjc.setContext(context);

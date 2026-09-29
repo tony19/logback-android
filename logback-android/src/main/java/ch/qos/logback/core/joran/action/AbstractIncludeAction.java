@@ -107,11 +107,8 @@ public abstract class AbstractIncludeAction extends Action {
     } else if (count > 1) {
       optionalWarning(String.format("Only one of \"%1$s\", \"%2$s\" or \"%3$s\" attributes should be set.", FILE_ATTR, RESOURCE_ATTR, URL_ATTR), null);
       return false;
-    } else if (count == 1) {
-      return true;
     }
-    throw new IllegalStateException("Count value [" + count
-            + "] is not expected");
+    return true;
   }
 
   private URL attributeToURL(String urlAttribute) {

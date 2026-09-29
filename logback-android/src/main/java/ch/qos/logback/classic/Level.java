@@ -96,6 +96,7 @@ public final class Level implements java.io.Serializable {
    * Returns the string representation of this Level.
    * @return the string value of this level
    */
+  @Override
   public String toString() {
     return levelStr;
   }

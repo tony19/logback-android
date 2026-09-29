@@ -74,6 +74,7 @@ public abstract class AbstractSSLSocketAppender<E> extends AbstractSocketAppende
    * @return SSL configuration; if no configuration has been set, a
    *    default configuration is returned
    */
+  @Override
   public SSLConfiguration getSsl() {
     if (ssl == null) {
       ssl = new SSLConfiguration();
@@ -85,6 +86,7 @@ public abstract class AbstractSSLSocketAppender<E> extends AbstractSocketAppende
    * Sets the SSL configuration.
    * @param ssl the SSL configuration to set
    */
+  @Override
   public void setSsl(SSLConfiguration ssl) {
     this.ssl = ssl;
   }

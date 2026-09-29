@@ -201,10 +201,12 @@ public class Compressor extends ContextAwareBase {
     File tmpFile = new File(nameOfgzedFile + TMP_SUFFIX);
     boolean streamed = false;
     BufferedInputStream bis = null;
+    FileOutputStream fos = null;
     GZIPOutputStream gzos = null;
     try {
       bis = new BufferedInputStream(new FileInputStream(nameOfFile2gz));
-      gzos = new GZIPOutputStream(new FileOutputStream(tmpFile));
+      fos = new FileOutputStream(tmpFile);
+      gzos = new GZIPOutputStream(fos);
       byte[] inbuf = new byte[BUFFER_SIZE];
       int n;
 
@@ -216,6 +218,7 @@ public class Compressor extends ContextAwareBase {
       // counts as a failed compression
       gzos.close();
       gzos = null;
+      fos = null;
       bis.close();
       bis = null;
       streamed = true;
@@ -225,6 +228,8 @@ public class Compressor extends ContextAwareBase {
     } finally {
       closeQuietly(bis);
       closeQuietly(gzos);
+      // gzos is null if its constructor threw, leaving fos open
+      closeQuietly(fos);
     }
 
     finishCompression(file2gz, tmpFile, gzedFile, streamed);
@@ -343,6 +348,7 @@ public class Compressor extends ContextAwareBase {
       this.innerEntryName = innerEntryName;
     }
 
+    @Override
     public void run() {
       Compressor.this.compress(nameOfFile2Compress, nameOfCompressedFile, innerEntryName);
     }

@@ -31,6 +31,7 @@ public class CompositeNode extends SimpleKeywordNode {
     this.childNode = childNode;
   }
 
+  @Override
   public boolean equals(Object o) {
     if(!super.equals(o)) {
       return false;
@@ -49,6 +50,7 @@ public class CompositeNode extends SimpleKeywordNode {
     return super.hashCode();
   }
 
+  @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     if(childNode != null) {

@@ -36,6 +36,7 @@ public class BasicConfigurator extends ContextAwareBase implements Configurator 
   public BasicConfigurator() {
   }
 
+  @Override
   public void configure(LoggerContext lc) {
     addInfo("Setting up default configuration.");
     ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<ILoggingEvent>();

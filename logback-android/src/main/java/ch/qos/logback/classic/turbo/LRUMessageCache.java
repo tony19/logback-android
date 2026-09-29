@@ -57,6 +57,7 @@ class LRUMessageCache extends LinkedHashMap<String, Integer> {
 
   // called indirectly by get() or put() which are already supposed to be
   // called from within a synchronized block
+  @Override
   protected boolean removeEldestEntry(Map.Entry<String, Integer> eldest) {
     return (size() > cacheSize);
   }

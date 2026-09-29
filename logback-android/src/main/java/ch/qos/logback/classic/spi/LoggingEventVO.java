@@ -82,26 +82,32 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
     return ledo;
   }
 
+  @Override
   public String getThreadName() {
     return threadName;
   }
 
+  @Override
   public LoggerContextVO getLoggerContextVO() {
     return loggerContextVO;
   }
 
+  @Override
   public String getLoggerName() {
     return loggerName;
   }
 
+  @Override
   public Level getLevel() {
     return level;
   }
 
+  @Override
   public String getMessage() {
     return message;
   }
 
+  @Override
   public String getFormattedMessage() {
     if (formattedMessage != null) {
       return formattedMessage;
@@ -117,26 +123,32 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
     return formattedMessage;
   }
 
+  @Override
   public Object[] getArgumentArray() {
     return argumentArray;
   }
 
+  @Override
   public IThrowableProxy getThrowableProxy() {
     return throwableProxy;
   }
 
+  @Override
   public StackTraceElement[] getCallerData() {
     return callerDataArray;
   }
 
+  @Override
   public boolean hasCallerData() {
     return callerDataArray != null;
   }
 
+  @Override
   public List<Marker> getMarkers() {
     return markers;
   }
 
+  @Override
   public long getTimeStamp() {
     return timeStamp;
   }
@@ -149,13 +161,16 @@ public class LoggingEventVO implements ILoggingEvent, Serializable {
     return loggerContextVO;
   }
 
+  @Override
   public Map<String, String> getMDCPropertyMap() {
     return mdcPropertyMap;
   }
+  @Override
   public Map<String, String> getMdc() {
     return mdcPropertyMap;
   }
   
+  @Override
   public void prepareForDeferredProcessing() {
   }
 

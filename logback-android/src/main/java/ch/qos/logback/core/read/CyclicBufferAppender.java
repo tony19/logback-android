@@ -30,11 +30,13 @@ public class CyclicBufferAppender<E> extends AppenderBase<E> {
   CyclicBuffer<E> cb;
   int maxSize = 512;
 
+  @Override
   public void start() {
     cb = new CyclicBuffer<E>(maxSize);
     super.start();
   }
 
+  @Override
   public void stop() {
     cb = null;
     super.stop();

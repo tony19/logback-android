@@ -183,6 +183,7 @@ public class ReconfigureOnChangeFilter extends TurboFilter {
   }
 
   class ReconfiguringThread implements Runnable {
+    @Override
     public void run() {
       if (mainConfigurationURL == null) {
         addInfo("Due to missing top level configuration file, skipping reconfiguration");

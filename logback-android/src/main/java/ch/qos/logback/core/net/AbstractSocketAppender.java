@@ -113,6 +113,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void start() {
     if (isStarted()) return;
     int errorCount = 0;
@@ -155,6 +156,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     if (taskSubmitted) return;
     taskSubmitted = true;
     task = getContext().getScheduledExecutorService().submit(new Runnable() {
+      @Override
       public void run() {
         resolveHostAndDispatchEvents();
       }
@@ -200,7 +202,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     // this appender. Retry with the reconnection delay until resolved.
     try {
       while (!resolveRemoteHost()) {
-        long delayMs = (reconnectionDelay != null) ? reconnectionDelay.getMilliseconds() : 0;
+        long delayMs = getReconnectionDelayMillis();
         if (delayMs <= 0) {
           addError(peerId + "gave up resolving host (reconnectionDelay is zero)");
           return;
@@ -211,8 +213,12 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
       addInfo("shutting down before host resolution completed");
       return;
     }
-    connector = createConnector(address, port, 0, reconnectionDelay.getMilliseconds());
+    connector = createConnector(address, port, 0, getReconnectionDelayMillis());
     connectSocketAndDispatchEvents();
+  }
+
+  private long getReconnectionDelayMillis() {
+    return (reconnectionDelay != null) ? reconnectionDelay.getMilliseconds() : 0;
   }
 
   private boolean resolveRemoteHost() {
@@ -291,6 +297,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void connectionFailed(SocketConnector connector, Exception ex) {
     if (ex instanceof InterruptedException) {
       addInfo("connector interrupted");

@@ -36,6 +36,7 @@ public class ContextBasedDiscriminator extends AbstractDiscriminator<ILoggingEve
   /**
    * Return the name of the current context name as found in the logging event.
    */
+  @Override
   public String getDiscriminatingValue(ILoggingEvent event) {
     String contextName = event.getLoggerContextVO().getName();
 
@@ -46,6 +47,7 @@ public class ContextBasedDiscriminator extends AbstractDiscriminator<ILoggingEve
     }
   }
 
+  @Override
   public String getKey() {
     return KEY;
   }

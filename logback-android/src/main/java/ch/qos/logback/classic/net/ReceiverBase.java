@@ -32,6 +32,7 @@ public abstract class ReceiverBase extends ContextAwareBase
   /**
    * {@inheritDoc}
    */
+  @Override
   public final void start() {
     if (isStarted()) return;
     if (getContext() == null) {
@@ -46,6 +47,7 @@ public abstract class ReceiverBase extends ContextAwareBase
   /**
    * {@inheritDoc}
    */
+  @Override
   public final void stop() {
     if (!isStarted()) return;
     try {
@@ -60,6 +62,7 @@ public abstract class ReceiverBase extends ContextAwareBase
   /**
    * {@inheritDoc}
    */
+  @Override
   public final boolean isStarted() {
     return started;
   }
