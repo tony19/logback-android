@@ -17,6 +17,8 @@ package ch.qos.logback.core.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -297,5 +299,18 @@ public class OptionHelperTest  {
       String r = OptionHelper.substVars(input, context);
       assertEquals(input, r);
     }
+  }
+
+  @Test
+  public void getEnvReadsTheEnvironment() {
+    for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+      assertEquals(entry.getValue(), OptionHelper.getEnv(entry.getKey()));
+    }
+    assertNull(OptionHelper.getEnv("OPTION_HELPER_TEST_UNDEFINED_VARIABLE"));
+  }
+
+  @Test
+  public void getSystemPropertiesReturnsTheSystemProperties() {
+    assertSame(System.getProperties(), OptionHelper.getSystemProperties());
   }
 }
