@@ -21,18 +21,24 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import ch.qos.logback.classic.LoggerContext;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -133,6 +139,48 @@ public class TimeBasedArchiveRemoverTest {
     for (File f : Arrays.asList(expiredFiles).subList(0, MAX_HISTORY - NUM_FILES_TO_KEEP)) {
       verify(fileProvider, never()).deleteFile(f);
     }
+  }
+
+  @Test
+  public void removesEmptyParentOfARemovedEmptyDirInTheSamePass() throws IOException {
+    File emptyMonth = tmpDir.newFolder("nested_2017", "05");
+    File emptyYear = emptyMonth.getParentFile();
+    File nonEmptyMonth = tmpDir.newFolder("nested_2018", "03");
+    File unrelatedFile = new File(nonEmptyMonth, "keep.txt");
+    assertTrue(unrelatedFile.createNewFile());
+    File nonEmptyYear = nonEmptyMonth.getParentFile();
+    // list directory entries in descending name order, so the directories
+    // are visited (deepest first) as nested_2017/05, nested_2017,
+    // nested_2018/03, nested_2018: the latter two each have a single child
+    // that is not the directory found empty just before
+    doAnswer(invocation -> {
+      File[] files = (File[]) invocation.callRealMethod();
+      if (files != null) {
+        Arrays.sort(files, Collections.reverseOrder());
+      }
+      return files;
+    }).when(fileProvider).listFiles(any(File.class), isNull(FilenameFilter.class));
+    TimeBasedArchiveRemover gmtRemover = newGmtArchiveRemover(
+        "nested_%d{yyyy/MM, " + TIMEZONE_NAME + ", aux}/app_%d{" + DATE_FORMAT + ", " + TIMEZONE_NAME + "}.log");
+
+    gmtRemover.clean(EXPIRY);
+
+    verify(fileProvider).deleteFile(emptyMonth);
+    verify(fileProvider).deleteFile(emptyYear);
+    assertFalse(emptyMonth.exists());
+    assertFalse("a directory emptied by the removal of its only child must be removed too", emptyYear.exists());
+    verify(fileProvider, never()).deleteFile(nonEmptyMonth);
+    verify(fileProvider, never()).deleteFile(nonEmptyYear);
+    assertTrue(unrelatedFile.exists());
+  }
+
+  private TimeBasedArchiveRemover newGmtArchiveRemover(String relativePattern) {
+    LoggerContext context = new LoggerContext();
+    RollingCalendar rollingCalendar = new RollingCalendar(DATE_FORMAT, TimeZone.getTimeZone(TIMEZONE_NAME), Locale.US);
+    FileNamePattern filePattern = new FileNamePattern(tmpDir.getRoot().getAbsolutePath() + File.separator + relativePattern, context);
+    TimeBasedArchiveRemover archiveRemover = new TimeBasedArchiveRemover(filePattern, rollingCalendar, fileProvider);
+    archiveRemover.setContext(context);
+    return archiveRemover;
   }
 
   private void setupSizeCapTest() {

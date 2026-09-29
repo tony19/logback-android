@@ -195,7 +195,10 @@ public class TimeBasedArchiveRemover extends ContextAwareBase implements Archive
     ArrayDeque<String> emptyDirs = new ArrayDeque<String>();
     for (String dir : dirList) {
       int childSize = this.fileProvider.list(new File(dir), null).length;
-      if (childSize == 0 || (childSize == 1 && emptyDirs.size() > 0 && dir.equals(emptyDirs.peekLast()))) {
+      // a directory whose only child is the empty directory found just before
+      // it (so deleting that child empties it) is deleted too
+      if (childSize == 0 || (childSize == 1 && emptyDirs.size() > 0
+          && dir.equals(new File(emptyDirs.peekLast()).getParent()))) {
         emptyDirs.add(dir);
       }
     }
