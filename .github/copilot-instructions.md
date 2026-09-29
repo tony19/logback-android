@@ -17,8 +17,10 @@ sockets, syslog, email).
 - **Tests:** JUnit tests live under `logback-android/src/test/java`, except the
   tests of the Android-specific layer (`ch.qos.logback.{classic,core}.android`),
   which are written in Kotlin under `logback-android/src/test/kotlin`. Run with
-  `./gradlew test`. That layer is gated at 100% line and branch coverage
-  (`./gradlew verifyAndroidLayerCoverage`); keep it there when changing it.
+  `./gradlew test`. The whole library, Java and Kotlin, is gated at 100% line
+  and branch coverage (`./gradlew verifyCoverage`; `scripts/coverage-gaps.py`
+  lists what a report misses); a change must come with the tests that keep it
+  there.
 - **Upstream parity:** Much of the code mirrors upstream logback. Prefer changes
   that stay close to upstream behavior and naming so the port remains easy to
   sync.
