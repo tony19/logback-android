@@ -14,8 +14,11 @@ sockets, syslog, email).
   range without guarding them.
 - **Java level:** Match the source/target compatibility already set in the Gradle
   build. Do not introduce language features above that level.
-- **Tests:** JUnit tests live under `logback-android/src/test/java`. Run with
-  `./gradlew test`.
+- **Tests:** JUnit tests live under `logback-android/src/test/java`, except the
+  tests of the Android-specific layer (`ch.qos.logback.{classic,core}.android`),
+  which are written in Kotlin under `logback-android/src/test/kotlin`. Run with
+  `./gradlew test`. That layer is gated at 100% line and branch coverage
+  (`./gradlew verifyAndroidLayerCoverage`); keep it there when changing it.
 - **Upstream parity:** Much of the code mirrors upstream logback. Prefer changes
   that stay close to upstream behavior and naming so the port remains easy to
   sync.

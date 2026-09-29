@@ -92,6 +92,19 @@ jobs:
       - name: Unit tests (jdk8 variant)
         run: ./gradlew testJdk8DebugUnitTest
 
+      # The Android-specific layer (ch.qos.logback.{classic,core}.android) must
+      # stay at 100% line and branch coverage (rule in logback-android/build.gradle).
+      # Reuses the coverage the unit test runs above recorded.
+      - name: Coverage gate (Android-specific layer)
+        run: ./gradlew verifyAndroidLayerCoverage androidLayerCoverageReportJdk11Debug
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() && matrix.java == 21 }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: logback-android/build/reports/jacoco/androidLayerCoverageReportJdk11Debug/
+
       - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v7

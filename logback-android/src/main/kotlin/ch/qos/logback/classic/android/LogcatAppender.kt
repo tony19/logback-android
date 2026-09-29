@@ -46,7 +46,7 @@ public open class LogcatAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * [LayoutWrappingEncoder] with a layout is accepted (issue #376).
      */
     @set:DefaultClass(PatternLayoutEncoder::class)
-    public var encoder: LayoutWrappingEncoder<ILoggingEvent>? = null
+    public open var encoder: LayoutWrappingEncoder<ILoggingEvent>? = null
 
     /**
      * The layout-wrapping encoder for this appender's *logcat* tag
@@ -66,7 +66,7 @@ public open class LogcatAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * (in this case: `f.f.foo.foo.bar.Test`).
      */
     @set:DefaultClass(PatternLayoutEncoder::class)
-    public var tagEncoder: LayoutWrappingEncoder<ILoggingEvent>? = null
+    public open var tagEncoder: LayoutWrappingEncoder<ILoggingEvent>? = null
 
     /**
      * Whether to ask Android before logging a message with a specific
@@ -74,7 +74,7 @@ public open class LogcatAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      *
      * See [Log.isLoggable](https://developer.android.com/reference/android/util/Log#isLoggable(java.lang.String,%20int))
      */
-    public var checkLoggable: Boolean = false
+    public open var checkLoggable: Boolean = false
 
     /**
      * Checks that required parameters are set, and if everything is in order,
@@ -168,14 +168,16 @@ public open class LogcatAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
      * Gets the logcat tag string of a logging event
      *
      * @param event logging event to evaluate
-     * @return the tag string, truncated if max length exceeded
+     * @return the tag string, truncated if max length exceeded; or `null` if
+     * the event has no logger name (and there is no tag encoder)
      */
-    protected open fun getTag(event: ILoggingEvent): String {
+    protected open fun getTag(event: ILoggingEvent): String? {
         // format tag based on encoder layout; truncate if max length
         // exceeded (only necessary for isLoggable(), which throws
-        // IllegalArgumentException)
-        val tag = this.tagEncoder?.layout?.doLayout(event) ?: event.loggerName
-        return if (checkLoggable && tag.length > MAX_TAG_LENGTH) {
+        // IllegalArgumentException). The tag is null for an event without a
+        // logger name, which logcat accepts.
+        val tag: String? = this.tagEncoder?.layout?.doLayout(event) ?: event.loggerName
+        return if (checkLoggable && tag != null && tag.length > MAX_TAG_LENGTH) {
             "${tag.substring(0, MAX_TAG_LENGTH - 1)}*"
         } else {
             tag

@@ -15,6 +15,7 @@
  */
 package ch.qos.logback.core.android
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
@@ -43,7 +44,7 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      *
      * @param loggerContext logger context whose property map is updated
      */
-    public fun setupProperties(loggerContext: Context) {
+    public open fun setupProperties(loggerContext: Context) {
         // legacy properties
         loggerContext.putProperty(CoreConstants.DATA_DIR_KEY, filesDirectoryPath)
         mountedExternalStorageDirectoryPath?.let { extDir ->
@@ -51,10 +52,13 @@ public open class AndroidContextUtil @JvmOverloads constructor(
         }
         // Android-version-independent paths to the app-specific external
         // directories, writable without permissions on API 19+ (issue #181)
-        externalFilesDirectoryPath.takeIf { it.isNotEmpty() }?.let { extFilesDir ->
+        // (a subclass written in Java may report these paths as null)
+        val extFilesDir: String? = externalFilesDirectoryPath
+        if (!extFilesDir.isNullOrEmpty()) {
             loggerContext.putProperty(CoreConstants.EXT_FILES_DIR_KEY, extFilesDir)
         }
-        externalCacheDirectoryPath.takeIf { it.isNotEmpty() }?.let { extCacheDir ->
+        val extCacheDir: String? = externalCacheDirectoryPath
+        if (!extCacheDir.isNullOrEmpty()) {
             loggerContext.putProperty(CoreConstants.EXT_CACHE_DIR_KEY, extCacheDir)
         }
         loggerContext.putProperty(CoreConstants.PACKAGE_NAME_KEY, packageName)
@@ -66,7 +70,7 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      * The path to the external storage directory only if mounted;
      * `null` if not mounted.
      */
-    public val mountedExternalStorageDirectoryPath: String?
+    public open val mountedExternalStorageDirectoryPath: String?
         get() {
             val state = try {
                 Environment.getExternalStorageState()
@@ -92,7 +96,7 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      * replacement for the deprecated
      * [android.os.Environment.getExternalStorageDirectory].
      */
-    public val externalStorageDirectoryPath: String
+    public open val externalStorageDirectoryPath: String
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             externalFilesDirectoryPath
         } else {
@@ -104,7 +108,7 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      * The absolute path to the external files directory
      * ([android.content.Context.getExternalFilesDir]).
      */
-    public val externalFilesDirectoryPath: String
+    public open val externalFilesDirectoryPath: String
         get() = absPath(context?.getExternalFilesDir(null))
 
     /**
@@ -134,19 +138,19 @@ public open class AndroidContextUtil @JvmOverloads constructor(
     /**
      * The absolute path to the application's cache directory.
      */
-    public val cacheDirectoryPath: String
+    public open val cacheDirectoryPath: String
         get() = absPath(context?.cacheDir)
 
     /**
      * The absolute path to the application's external cache directory.
      */
-    public val externalCacheDirectoryPath: String
+    public open val externalCacheDirectoryPath: String
         get() = absPath(context?.externalCacheDir)
 
     /**
      * The application's package name.
      */
-    public val packageName: String
+    public open val packageName: String
         get() = context?.packageName ?: ""
 
     /**
@@ -157,7 +161,7 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      *
      * (example: "/data/data/com.example/files")
      */
-    public val filesDirectoryPath: String
+    public open val filesDirectoryPath: String
         get() = absPath(context?.filesDir)
 
     /**
@@ -166,10 +170,18 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      * from automatic backup to remote storage by
      * `android.app.backup.BackupAgent`.
      *
+     * This API is only available on SDK 21+. On older versions, this is an
+     * empty string.
+     *
      * (example: "/data/data/com.example/nobackup/files")
      */
-    public val noBackupFilesDirectoryPath: String
-        get() = absPath(context?.noBackupFilesDir)
+    public open val noBackupFilesDirectoryPath: String
+        @SuppressLint("ObsoleteSdkInt")
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            absPath(context?.noBackupFilesDir)
+        } else {
+            ""
+        }
 
     /**
      * The absolute path to the directory on the Android filesystem where
@@ -177,7 +189,7 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      *
      * (example: "/data/data/com.example/databases")
      */
-    public val databaseDirectoryPath: String
+    public open val databaseDirectoryPath: String
         get() = context?.getDatabasePath("x")?.parent ?: ""
 
     /**
@@ -186,13 +198,13 @@ public open class AndroidContextUtil @JvmOverloads constructor(
      * @param databaseName name of the target database
      * @return the absolute path to the database
      */
-    public fun getDatabasePath(databaseName: String): String =
+    public open fun getDatabasePath(databaseName: String): String =
         absPath(context?.getDatabasePath(databaseName))
 
     /**
      * The application's version code, as a string.
      */
-    public val versionCode: String
+    public open val versionCode: String
         get() {
             val pkgInfo = packageInfo ?: return ""
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -206,20 +218,22 @@ public open class AndroidContextUtil @JvmOverloads constructor(
     /**
      * The application's version name.
      */
-    public val versionName: String
+    public open val versionName: String
         get() = packageInfo?.versionName ?: ""
 
     private val packageInfo: PackageInfo?
-        get() = try {
-            val packageManager = context?.packageManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager?.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
-            } else {
-                @Suppress("DEPRECATION")
-                packageManager?.getPackageInfo(packageName, 0)
+        get() {
+            val packageManager = context?.packageManager ?: return null
+            return try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+                } else {
+                    @Suppress("DEPRECATION")
+                    packageManager.getPackageInfo(packageName, 0)
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                null
             }
-        } catch (e: PackageManager.NameNotFoundException) {
-            null
         }
 
     private fun absPath(file: File?): String = file?.absolutePath ?: ""

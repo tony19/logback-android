@@ -63,11 +63,13 @@ public class SystemPropertiesProxy private constructor(cl: ClassLoader?) {
      * @throws IllegalArgumentException if the key exceeds 32 characters
      */
     @Throws(IllegalArgumentException::class)
-    public fun get(key: String, def: String?): String? {
+    public fun get(key: String?, def: String?): String? {
         val method = getStringMethod ?: return null
 
         val ret = try {
-            method.invoke(null, key, def) as? String
+            // the receiver is ignored for the (static) SystemProperties methods;
+            // an IllegalArgumentException from invoke() itself is rethrown
+            method.invoke(systemProperties, key, def) as? String
         } catch (e: IllegalArgumentException) {
             throw e
         } catch (e: Exception) {
@@ -94,12 +96,13 @@ public class SystemPropertiesProxy private constructor(cl: ClassLoader?) {
      * is not able to be parsed as a boolean.
      * @throws IllegalArgumentException if the key exceeds 32 characters
      */
+    // Boolean? keeps the java.lang.Boolean return type of the Java API
     @Throws(IllegalArgumentException::class)
-    public fun getBoolean(key: String, def: Boolean): Boolean {
+    public fun getBoolean(key: String?, def: Boolean): Boolean? {
         val method = getBooleanMethod ?: return def
 
         return try {
-            method.invoke(null, key, def) as? Boolean ?: def
+            method.invoke(systemProperties, key, def) as Boolean?
         } catch (e: IllegalArgumentException) {
             throw e
         } catch (e: Exception) {
