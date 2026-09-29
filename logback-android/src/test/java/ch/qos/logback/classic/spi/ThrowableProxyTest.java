@@ -16,8 +16,11 @@
 package ch.qos.logback.classic.spi;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import static ch.qos.logback.classic.util.TestHelper.addSuppressed;
 
@@ -192,6 +195,43 @@ public class ThrowableProxyTest {
 
     verifyContains(ex1, "Suppressed: CIRCULAR REFERENCE:java.lang.Exception: Foo");
     verifyContains(ex2, "Suppressed: CIRCULAR REFERENCE:java.lang.Exception: Bar");
+  }
+
+  @Test
+  public void mockedThrowableWithNullSuppressedArrayYieldsNoSuppressedProxies() {
+    // Throwable.getSuppressed() never returns null for a real throwable, but a
+    // mocked one does (Mockito's default answer for an array is null)
+    Throwable t = mock(Exception.class);
+    doReturn("mocked").when(t).getMessage();
+    doReturn(null).when(t).getSuppressed();
+
+    ThrowableProxy tp = new ThrowableProxy(t);
+
+    assertEquals("mocked", tp.getMessage());
+    assertEquals(0, tp.getSuppressed().length);
+    assertEquals(0, tp.getStackTraceElementProxyArray().length);
+    assertNull(tp.getCause());
+  }
+
+  @Test
+  public void suppressedThrowablesAreProxiedInOrderWithTheirCommonFrames() {
+    Exception main = new Exception("main");
+    Exception foo = new Exception("Foo");
+    Exception bar = new Exception("Bar");
+    main.addSuppressed(foo);
+    main.addSuppressed(bar);
+
+    ThrowableProxy tp = new ThrowableProxy(main);
+
+    IThrowableProxy[] suppressed = tp.getSuppressed();
+    assertEquals(2, suppressed.length);
+    assertEquals("Foo", suppressed[0].getMessage());
+    assertEquals("Bar", suppressed[1].getMessage());
+    // the three throwables are created on different lines of this method, so
+    // they share every frame but the topmost one
+    int expectedCommonFrames = main.getStackTrace().length - 1;
+    assertEquals(expectedCommonFrames, suppressed[0].getCommonFrames());
+    assertEquals(expectedCommonFrames, suppressed[1].getCommonFrames());
   }
 
   void someMethod() throws Exception {
