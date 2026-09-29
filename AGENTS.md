@@ -16,3 +16,9 @@ Project facts and review focus areas are in
 - PR titles must follow [Conventional Commits](https://www.conventionalcommits.org/)
   (e.g. `fix: ...`, `ci: ...`, `docs: ...`); this is enforced by the Semantic
   Pull Request check.
+
+## Skills
+
+- Before writing code for a fix or feature, follow
+  [`.claude/skills/task-start/SKILL.md`](.claude/skills/task-start/SKILL.md): it
+  checks open issues, upstream logback, and both build flavors first.
