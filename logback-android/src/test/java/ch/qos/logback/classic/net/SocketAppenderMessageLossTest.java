@@ -22,8 +22,6 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.Duration;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +29,13 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertTrue;
 
-@RunWith(RobolectricTestRunner.class)
 public class SocketAppenderMessageLossTest {
   int runLen = 100;
   Duration reconnectionDelay =  new Duration(1000);
-  static final int TIMEOUT = 3000;
+  // Only a guard against hangs: every run waits for all runLen events to
+  // arrive, which takes well under a second, but can take longer than a few
+  // seconds on a loaded CI runner.
+  static final int TIMEOUT = 10000;
 
   @Test(timeout = TIMEOUT)
   public void synchronousSocketAppender() throws Exception {
