@@ -32,6 +32,7 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -246,12 +247,37 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     FileAppender<Object> fa = newFileAppender("prudent-lock", file, encoder);
     fa.setPrudent(true);
     fa.start();
+    // start from a non-interrupted thread
+    Thread.interrupted();
 
     fa.doAppend("hello");
+    // reads and clears the flag, so that it cannot leak into later tests
+    boolean interruptedAfterAppend = Thread.interrupted();
     fa.stop();
 
     assertEquals(Collections.singletonList(Boolean.TRUE), encoder.lockHeldDuringEncode);
     assertEquals("hello\n", readUtf8(file));
+    // the thread was not interrupted before the write, so it must not be after it
+    assertFalse(interruptedAfterAppend);
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void lazyPrudentAppenderLocksFileItOpensOnFirstAppend() throws Exception {
+    File file = new File(tmp.getRoot(), "lazy-prudent.log");
+    LockProbingEncoder encoder = new LockProbingEncoder(file);
+    FileAppender<Object> fa = newFileAppender("lazy-prudent", file, encoder);
+    fa.setPrudent(true);
+    fa.setLazy(true);
+    fa.start();
+    assertFalse(file.exists());
+
+    fa.doAppend("a");
+    fa.doAppend("b");
+    fa.stop();
+
+    assertEquals(Arrays.asList(Boolean.TRUE, Boolean.TRUE), encoder.lockHeldDuringEncode);
+    assertEquals("a\nb\n", readUtf8(file));
     new StatusChecker(context).assertIsErrorFree();
   }
 
@@ -514,9 +540,11 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     OutputStream opened = fa.getOutputStream();
     fa.doAppend("b");
 
-    // the file was not reopened for the second event
+    // the file was neither reopened nor checked again for collisions (which
+    // would now collide with this appender's own entry) for the second event
     assertSame(opened, fa.getOutputStream());
     assertEquals("a\nb\n", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
     fa.stop();
   }
 

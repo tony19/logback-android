@@ -194,14 +194,30 @@ public class OutputStreamAppenderTest {
   }
 
   @Test
-  public void appendOnNonStartedAppenderWritesNothing() {
-    OutputStreamAppender<Object> appender = newAppender(new Utf8LineEncoder());
+  public void appendOnNonStartedAppenderDoesNotReachSubAppend() {
+    final List<Object> subAppended = new ArrayList<Object>();
+    OutputStreamAppender<Object> appender = new OutputStreamAppender<Object>() {
+      @Override
+      protected void subAppend(Object event) {
+        subAppended.add(event);
+        super.subAppend(event);
+      }
+    };
+    appender.setContext(context);
+    appender.setEncoder(new Utf8LineEncoder());
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     appender.setOutputStream(baos);
 
     appender.append("ignored");
 
+    assertTrue(subAppended.isEmpty());
     assertEquals("", utf8(baos));
+
+    appender.start();
+    appender.append("written");
+
+    assertEquals(Arrays.<Object>asList("written"), subAppended);
+    assertEquals("written\n", utf8(baos));
   }
 
   @Test

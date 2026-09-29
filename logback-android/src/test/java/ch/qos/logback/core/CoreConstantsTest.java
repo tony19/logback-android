@@ -72,7 +72,9 @@ public class CoreConstantsTest {
 
   /**
    * Defines its own copy of {@link CoreConstants} from the class file of the
-   * parent's copy, and delegates every other class to the parent.
+   * parent's copy, and delegates every other class to the parent. The copy
+   * gets the original's protection domain (and so its code-source location),
+   * so that coverage agents record it even when they skip classes without one.
    */
   static class CoreConstantsReloadingClassLoader extends ClassLoader {
 
@@ -89,7 +91,7 @@ public class CoreConstantsTest {
         Class<?> c = findLoadedClass(name);
         if (c == null) {
           byte[] bytes = readClassFile(name);
-          c = defineClass(name, bytes, 0, bytes.length);
+          c = defineClass(name, bytes, 0, bytes.length, CoreConstants.class.getProtectionDomain());
         }
         if (resolve) {
           resolveClass(c);
