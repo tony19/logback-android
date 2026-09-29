@@ -19,9 +19,15 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -96,6 +102,107 @@ public class LogbackMDCAdapterTest {
 
     // verify that map0 is the same instance and that value was updated
     assertSame(map0, mdcAdapter.copyOnThreadLocal.get());
+  }
+
+  @Test
+  public void putWithNullKeyIsRejected() {
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        () -> mdcAdapter.put(null, "v"));
+    assertEquals("key cannot be null", e.getMessage());
+    assertNull(mdcAdapter.copyOnThreadLocal.get());
+  }
+
+  @Test
+  public void removeAfterWriteEditsTheMapInPlace() {
+    mdcAdapter.put("k0", "v0");
+    mdcAdapter.put("k1", "v1");
+    Map<String, String> map0 = mdcAdapter.copyOnThreadLocal.get();
+
+    mdcAdapter.remove("k0"); // last operation was a write: no copy needed
+
+    assertSame(map0, mdcAdapter.copyOnThreadLocal.get());
+    assertNull(map0.get("k0"));
+    assertEquals("v1", map0.get("k1"));
+  }
+
+  @Test
+  public void removeAfterGetPropertyMapLeavesTheReturnedMapIntact() {
+    mdcAdapter.put("k0", "v0");
+    Map<String, String> map0 = mdcAdapter.getPropertyMap();
+
+    mdcAdapter.remove("k0"); // map was handed out: it must be copied first
+
+    assertNotSame(map0, mdcAdapter.copyOnThreadLocal.get());
+    assertEquals("v0", map0.get("k0"));
+    assertNull(mdcAdapter.get("k0"));
+  }
+
+  @Test
+  public void getWithNullKeyReturnsNullEvenWithAMap() {
+    mdcAdapter.put("k0", "v0");
+    assertNull(mdcAdapter.get(null));
+  }
+
+  @Test
+  public void getKeysIsNullWithoutAMap() {
+    assertNull(mdcAdapter.getKeys());
+  }
+
+  @Test
+  public void getKeysReturnsTheKeysOfTheMap() {
+    mdcAdapter.put("k0", "v0");
+    mdcAdapter.put("k1", "v1");
+    assertEquals(new HashSet<String>(Arrays.asList("k0", "k1")), mdcAdapter.getKeys());
+  }
+
+  @Test
+  public void getCopyOfContextMapIsNullWithoutAMap() {
+    assertNull(mdcAdapter.getCopyOfContextMap());
+  }
+
+  @Test
+  public void getCopyOfContextMapIsADetachedCopy() {
+    mdcAdapter.put("k0", "v0");
+    Map<String, String> copy = mdcAdapter.getCopyOfContextMap();
+
+    assertNotSame(mdcAdapter.copyOnThreadLocal.get(), copy);
+    assertEquals(mdcAdapter.copyOnThreadLocal.get(), copy);
+    copy.put("k1", "v1");
+    assertNull(mdcAdapter.get("k1"));
+  }
+
+  @Test
+  public void pushByKeyPutsTheValue() {
+    mdcAdapter.pushByKey("k0", "v0");
+    assertEquals("v0", mdcAdapter.get("k0"));
+  }
+
+  @Test
+  public void popByKeyReturnsTheCurrentValue() {
+    assertNull(mdcAdapter.popByKey("k0"));
+    mdcAdapter.put("k0", "v0");
+    assertEquals("v0", mdcAdapter.popByKey("k0"));
+  }
+
+  @Test
+  public void getCopyOfDequeByKeyIsNullForAnAbsentKey() {
+    assertNull(mdcAdapter.getCopyOfDequeByKey("k0"));
+  }
+
+  @Test
+  public void getCopyOfDequeByKeyHoldsTheCurrentValue() {
+    mdcAdapter.put("k0", "v0");
+    Deque<String> deque = mdcAdapter.getCopyOfDequeByKey("k0");
+    assertEquals(Arrays.asList("v0"), Arrays.asList(deque.toArray(new String[0])));
+    assertTrue(deque instanceof ArrayDeque);
+  }
+
+  @Test
+  public void clearDequeByKeyNullsTheValue() {
+    mdcAdapter.put("k0", "v0");
+    mdcAdapter.clearDequeByKey("k0");
+    assertNull(mdcAdapter.get("k0"));
+    assertTrue(mdcAdapter.copyOnThreadLocal.get().containsKey("k0"));
   }
 
   // =================================================
