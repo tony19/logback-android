@@ -16,7 +16,9 @@
 package ch.qos.logback.classic.spi;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.doReturn;
@@ -26,6 +28,7 @@ import static ch.qos.logback.classic.util.TestHelper.addSuppressed;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import ch.qos.logback.classic.util.TestHelper;
@@ -232,6 +235,53 @@ public class ThrowableProxyTest {
     int expectedCommonFrames = main.getStackTrace().length - 1;
     assertEquals(expectedCommonFrames, suppressed[0].getCommonFrames());
     assertEquals(expectedCommonFrames, suppressed[1].getCommonFrames());
+  }
+
+  @Test
+  public void keepsTheProxiedThrowable() {
+    Exception e = new Exception("kept");
+    assertSame(e, new ThrowableProxy(e).getThrowable());
+  }
+
+  @Test
+  public void packagingDataCalculatorIsCreatedOnceAndReused() {
+    ThrowableProxy tp = new ThrowableProxy(new Exception("x"));
+
+    PackagingDataCalculator pdc = tp.getPackagingDataCalculator();
+
+    assertNotNull(pdc);
+    assertSame(pdc, tp.getPackagingDataCalculator());
+  }
+
+  @Test
+  public void packagingDataIsCalculatedOnlyOnce() {
+    ThrowableProxy tp = new ThrowableProxy(new Exception("x"));
+    tp.calculatePackagingData();
+    StackTraceElementProxy[] steps = tp.getStackTraceElementProxyArray();
+    ClassPackagingData first = steps[0].getClassPackagingData();
+    assertNotNull(first);
+
+    // a second calculation would fail: packaging data can be set only once per frame
+    tp.calculatePackagingData();
+
+    assertSame(first, steps[0].getClassPackagingData());
+  }
+
+  @Test
+  public void proxyWithoutThrowableHasNoPackagingDataCalculator() throws Exception {
+    // getPackagingDataCalculator() assumes a proxy without throwable was deserialized;
+    // ThrowableProxy is no longer Serializable, so clear the field reflectively
+    ThrowableProxy tp = new ThrowableProxy(new Exception("x"));
+    Field throwableField = ThrowableProxy.class.getDeclaredField("throwable");
+    throwableField.setAccessible(true);
+    throwableField.set(tp, null);
+
+    assertNull(tp.getPackagingDataCalculator());
+    tp.calculatePackagingData();
+
+    for (StackTraceElementProxy step : tp.getStackTraceElementProxyArray()) {
+      assertNull(step.getClassPackagingData());
+    }
   }
 
   void someMethod() throws Exception {
