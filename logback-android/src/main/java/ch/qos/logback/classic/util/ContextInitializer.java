@@ -54,16 +54,14 @@ public class ContextInitializer {
    * Finds a configuration file by system property
    * @return the file; or {@code null} if not found
    */
-  private URL findConfigFileFromSystemProperties(boolean updateStatus) {
+  private URL findConfigFileFromSystemProperties() {
     String logbackConfigFile = OptionHelper.getSystemProperty(CONFIG_FILE_PROPERTY);
     if (logbackConfigFile != null) {
       URL result = null;
       try {
         File file = new File(logbackConfigFile);
         if (file.exists() && file.isFile()) {
-          if (updateStatus) {
-            statusOnResourceSearch(logbackConfigFile, logbackConfigFile);
-          }
+          statusOnResourceSearch(logbackConfigFile, logbackConfigFile);
           result = file.toURI().toURL();
         } else {
           result = new URL(logbackConfigFile);
@@ -77,9 +75,7 @@ public class ContextInitializer {
           return result;
         }
       } finally {
-        if (updateStatus) {
-          statusOnResourceSearch(logbackConfigFile, result != null ? result.toString() : null);
-        }
+        statusOnResourceSearch(logbackConfigFile, result != null ? result.toString() : null);
       }
     }
     return null;
@@ -89,23 +85,21 @@ public class ContextInitializer {
    * Finds a configuration file in the application's assets directory
    * @return the URL of the file; or {@code null} if not found
    */
-  private URL findConfigFileURLFromAssets(boolean updateStatus) {
-    return getResource(AUTOCONFIG_FILE, this.classLoader, updateStatus);
+  private URL findConfigFileURLFromAssets() {
+    return getResource(AUTOCONFIG_FILE, this.classLoader);
   }
 
   /**
    * Uses the given classloader to search for a resource
    * @return the URL of the resource; or {@code null} if not found
    */
-  private URL getResource(String filename, ClassLoader myClassLoader, boolean updateStatus) {
+  private URL getResource(String filename, ClassLoader myClassLoader) {
     URL url = myClassLoader.getResource(filename);
-    if (updateStatus) {
-      String resourcePath = null;
-      if (url != null) {
-        resourcePath = filename;
-      }
-      statusOnResourceSearch(filename, resourcePath);
+    String resourcePath = null;
+    if (url != null) {
+      resourcePath = filename;
     }
+    statusOnResourceSearch(filename, resourcePath);
     return url;
   }
 
@@ -121,24 +115,21 @@ public class ContextInitializer {
   public void autoConfig() throws JoranException {
     StatusListenerConfigHelper.installIfAsked(loggerContext);
 
-    boolean verbose = true;
     boolean configured = false;
 
     JoranConfigurator configurator = new JoranConfigurator();
     configurator.setContext(loggerContext);
 
     // search system property
-    if (!configured) {
-      URL url = findConfigFileFromSystemProperties(verbose);
-      if (url != null) {
-        configurator.doConfigure(url);
-        configured = true;
-      }
+    URL url = findConfigFileFromSystemProperties();
+    if (url != null) {
+      configurator.doConfigure(url);
+      configured = true;
     }
 
     // search assets
     if (!configured) {
-      URL assetsConfigXml = findConfigFileURLFromAssets(verbose);
+      URL assetsConfigXml = findConfigFileURLFromAssets();
       if (assetsConfigXml != null) {
         configurator.doConfigure(assetsConfigXml);
         configured = true;
