@@ -628,7 +628,7 @@ private class AppGlobalsReplacingClassLoader(
 ) : ClassLoader(delegate) {
     private val utilClassName = AndroidContextUtil::class.java.name
 
-    override fun loadClass(name: String, resolve: Boolean): Class<*> = synchronized(getClassLoadingLock(name)) {
+    override fun loadClass(name: String, resolve: Boolean): Class<*> = synchronized(this) {
         findLoadedClass(name) ?: when {
             name == APP_GLOBALS -> define(name, appGlobals ?: throw ClassNotFoundException(name))
             name == utilClassName || name.startsWith("$utilClassName\$") -> define(name, bytesOf(name))
