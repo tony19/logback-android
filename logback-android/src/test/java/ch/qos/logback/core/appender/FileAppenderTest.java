@@ -725,8 +725,8 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     // prudent writeOut(), which locks the file without holding the appender's
     // lock, made the second thread's FileChannel.lock() throw
     // OverlappingFileLockException there, and its events were dropped.
-    final FileAppender<Object> fa = newFileAppender("prudent-concurrent", file,
-        new RendezvousEncoder(threadCount));
+    RendezvousEncoder encoder = new RendezvousEncoder(threadCount);
+    final FileAppender<Object> fa = newFileAppender("prudent-concurrent", file, encoder);
     fa.setPrudent(true);
     fa.start();
 
@@ -761,6 +761,8 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     fa.stop();
 
     assertEquals(Collections.<Throwable>emptyList(), failures);
+    // not encoded under the appender's lock, which serializes the writes
+    assertTrue("the first events were not encoded concurrently", encoder.metUp);
     List<String> lines = new ArrayList<String>(Arrays.asList(readUtf8(file).split("\n")));
     assertEquals("events in the file", expected.size(), lines.size());
     Collections.sort(expected);
@@ -1069,11 +1071,14 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
    * Holds each event in encode() until as many events as there are parties
    * are being encoded at the same time, so that the first events of that many
    * threads are written concurrently; later events are not held. The wait is
-   * bounded, and the events are encoded when it ends either way, so the
-   * outcome does not depend on how long it takes.
+   * bounded, and the events are encoded when it ends either way; whether the
+   * events did meet up is recorded instead. They cannot while one of them
+   * is encoded under a lock that the others wait for, i.e. unless events are
+   * encoded outside the appender's lock.
    */
   static class RendezvousEncoder extends Utf8LineEncoder {
     final CountDownLatch encoding;
+    volatile boolean metUp = true;
 
     RendezvousEncoder(int parties) {
       encoding = new CountDownLatch(parties);
@@ -1083,7 +1088,9 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     public byte[] encode(Object event) {
       encoding.countDown();
       try {
-        encoding.await(5, TimeUnit.SECONDS);
+        if (!encoding.await(30, TimeUnit.SECONDS)) {
+          metUp = false;
+        }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }

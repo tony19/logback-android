@@ -596,7 +596,8 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     final RollingFileAppender<Object> prudentRfa = new RollingFileAppender<Object>();
     prudentRfa.setContext(context);
     prudentRfa.setName("prudent-concurrent");
-    prudentRfa.setEncoder(new RendezvousEncoder(threadCount));
+    RendezvousEncoder encoder = new RendezvousEncoder(threadCount);
+    prudentRfa.setEncoder(encoder);
     prudentRfa.setPrudent(true);
     prudentRfa.setRollingPolicy(startedTimeBasedRollingPolicyAt(prudentRfa,
         tmpPath("concurrent-%d{yyyy-MM-dd, GMT}.log"), JAN_1_NOON_GMT));
@@ -634,6 +635,8 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     prudentRfa.stop();
 
     assertEquals(Collections.<Throwable>emptyList(), failures);
+    // not encoded under the appender's lock, which serializes the writes
+    assertTrue("the first events were not encoded concurrently", encoder.metUp);
     List<String> lines = new ArrayList<String>(Arrays.asList(
         read(tmpPath("concurrent-2024-01-01.log")).split(CoreConstants.LINE_SEPARATOR)));
     assertEquals("events in the file", expected.size(), lines.size());
@@ -687,11 +690,14 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
    * Holds each event in encode() until as many events as there are parties
    * are being encoded at the same time, so that the first events of that many
    * threads are written concurrently; later events are not held. The wait is
-   * bounded, and the events are encoded when it ends either way, so the
-   * outcome does not depend on how long it takes.
+   * bounded, and the events are encoded when it ends either way; whether the
+   * events did meet up is recorded instead. They cannot while one of them
+   * is encoded under a lock that the others wait for, i.e. unless events are
+   * encoded outside the appender's lock.
    */
   static class RendezvousEncoder extends EchoEncoder<Object> {
     final CountDownLatch encoding;
+    volatile boolean metUp = true;
 
     RendezvousEncoder(int parties) {
       encoding = new CountDownLatch(parties);
@@ -701,7 +707,9 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     public byte[] encode(Object event) {
       encoding.countDown();
       try {
-        encoding.await(5, TimeUnit.SECONDS);
+        if (!encoding.await(30, TimeUnit.SECONDS)) {
+          metUp = false;
+        }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
