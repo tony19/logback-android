@@ -23,10 +23,10 @@ import java.security.ProtectionDomain;
 /**
  * Defines its own copy of a class, and of the class's nested classes, from the
  * same class files that the original was defined from, so that the copy's
- * static initializer runs again (e.g. with other system properties, or within
- * another protection domain). Being defined from the same bytes, the copy's
- * code coverage is recorded as the original's. Every other class is loaded by
- * the parent class loader, so the copy shares them with the tests.
+ * static initializer runs again (e.g. with other system properties). Being
+ * defined from the same bytes, the copy's code coverage is recorded as the
+ * original's. Every other class is loaded by the parent class loader, so the
+ * copy shares them with the tests.
  *
  * <p>Used by the tests of the {@code ch.qos.logback.core.util} classes whose
  * static state can't otherwise be set up.</p>
@@ -36,10 +36,10 @@ final class FreshCopyClassLoader extends ClassLoader {
   private final String className;
   private final ProtectionDomain domain;
 
-  private FreshCopyClassLoader(Class<?> clazz, ProtectionDomain domain) {
+  private FreshCopyClassLoader(Class<?> clazz) {
     super(clazz.getClassLoader());
     this.className = clazz.getName();
-    this.domain = domain;
+    this.domain = clazz.getProtectionDomain();
   }
 
   /**
@@ -50,18 +50,7 @@ final class FreshCopyClassLoader extends ClassLoader {
    * @return the initialized copy
    */
   static Class<?> initializeFreshCopy(Class<?> clazz) throws ClassNotFoundException {
-    return initializeFreshCopy(clazz, clazz.getProtectionDomain());
-  }
-
-  /**
-   * Defines and initializes a copy of {@code clazz} within {@code domain}.
-   *
-   * @param clazz the class to copy
-   * @param domain the protection domain of the copy and its nested classes
-   * @return the initialized copy
-   */
-  static Class<?> initializeFreshCopy(Class<?> clazz, ProtectionDomain domain) throws ClassNotFoundException {
-    Class<?> copy = Class.forName(clazz.getName(), true, new FreshCopyClassLoader(clazz, domain));
+    Class<?> copy = Class.forName(clazz.getName(), true, new FreshCopyClassLoader(clazz));
     if (copy == clazz) {
       throw new IllegalStateException("not a copy: " + clazz);
     }
