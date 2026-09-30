@@ -76,13 +76,28 @@ public class SSLConfigurableSocket implements SSLConfigurable {
 
   @Override
   public void setHostnameVerification(boolean hostnameVerification) {
+    applyHostnameVerification(delegate, hostnameVerification);
+  }
+
+  /**
+   * Makes the socket verify that the server's certificate matches its hostname.
+   * <p>
+   * This returns the socket so that a caller can return the result: CodeQL's
+   * java/unsafe-cert-trust query only sees hostname verification when
+   * {@code setSSLParameters()} is called in the method the socket flows through.
+   *
+   * @param socket the socket to configure
+   * @param hostnameVerification whether to verify the server's hostname
+   * @return {@code socket}
+   */
+  static SSLSocket applyHostnameVerification(SSLSocket socket, boolean hostnameVerification) {
     // SSLParameters.setEndpointIdentificationAlgorithm() is API 24+; below
     // that, SSLParametersConfiguration warns that the hostname is not verified
-    if (!hostnameVerification || Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-      return;
+    if (hostnameVerification && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      SSLParameters sslParameters = socket.getSSLParameters();
+      sslParameters.setEndpointIdentificationAlgorithm("HTTPS");
+      socket.setSSLParameters(sslParameters);
     }
-    SSLParameters sslParameters = delegate.getSSLParameters();
-    sslParameters.setEndpointIdentificationAlgorithm("HTTPS");
-    delegate.setSSLParameters(sslParameters);
+    return socket;
   }
 }
