@@ -203,7 +203,8 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
     writeBytes(byteArray);
   }
 
-  private void writeBytes(byte[] byteArray) throws IOException {
+  // package-private for FileAppender's prudent path, which encodes the event itself
+  void writeBytes(byte[] byteArray) throws IOException {
     if (byteArray == null || byteArray.length == 0) {
       return;
     }
@@ -241,8 +242,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
       // are writing. It also prevents multiple threads from entering the same
       // converter. Converters assume that they are in a synchronized block.
       //lock.lock();
-      byte[] byteArray = this.encoder.encode(event);
-      writeBytes(byteArray);
+      writeOut(event);
 
     } catch (IOException ioe) {
       // as soon as an exception occurs, move to non-started state

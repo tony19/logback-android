@@ -250,6 +250,33 @@ public class OutputStreamAppenderTest {
   }
 
   @Test
+  public void appendedEventsAreWrittenThroughWriteOut() {
+    final List<Object> writtenOut = new ArrayList<Object>();
+    OutputStreamAppender<Object> appender = new OutputStreamAppender<Object>() {
+      @Override
+      protected void writeOut(Object event) throws IOException {
+        writtenOut.add(event);
+        super.writeOut(event);
+      }
+    };
+    appender.setContext(context);
+    appender.setEncoder(new Utf8LineEncoder());
+    FaultInjectingOutputStream out = new FaultInjectingOutputStream();
+    appender.setOutputStream(out);
+    appender.start();
+
+    appender.doAppend("a");
+    appender.doAppend("b");
+
+    // subclasses (e.g. FileAppender in prudent mode) write each event from
+    // writeOut(), which writes as it did before it was called from there
+    assertEquals(Arrays.<Object>asList("a", "b"), writtenOut);
+    assertEquals("a\nb\n", out.text());
+    assertEquals(2, out.flushCount);
+    statusChecker.assertIsErrorFree();
+  }
+
+  @Test
   public void subAppendOnNonStartedAppenderWritesNothing() {
     OutputStreamAppender<Object> appender = newAppender(new Utf8LineEncoder());
     ByteArrayOutputStream baos = new ByteArrayOutputStream();

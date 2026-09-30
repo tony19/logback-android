@@ -17,6 +17,7 @@ package ch.qos.logback.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.Map;
@@ -306,11 +307,52 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     this.syncOnFlush = syncOnFlush;
   }
 
-  private void safeWrite(E event) throws IOException {
-    ResilientFileOutputStream resilientFOS = (ResilientFileOutputStream) getOutputStream();
+  private void safeWriteOut(E event) throws IOException {
+    // Encoded before taking the lock, as the non-prudent path does in this
+    // 1.2-based port, so that the file lock that other processes wait for is
+    // held only while writing. (Upstream master now encodes under its lock.)
+    byte[] byteArray = this.encoder.encode(event);
+    if (byteArray == null || byteArray.length == 0) {
+      return;
+    }
+
+    // File locks are held on behalf of the entire JVM, so they do not
+    // serialize its threads: a second FileChannel.lock() while one is held
+    // throws OverlappingFileLockException. Holding the appender's lock from
+    // locking the file until releasing it does.
+    lock.lock();
+    try {
+      safeWriteBytes(byteArray);
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  private void safeWriteBytes(byte[] byteArray) throws IOException {
+    OutputStream outputStream = getOutputStream();
+    if (!(outputStream instanceof ResilientFileOutputStream)) {
+      // Unlike upstream, which casts: there is no file to lock while a lazy
+      // appender's stream is still a NOPOutputStream (for good after a file
+      // name collision), nor in a stream given to setOutputStream(). Write as
+      // the non-prudent path does.
+      writeBytes(byteArray);
+      return;
+    }
+    ResilientFileOutputStream resilientFOS = (ResilientFileOutputStream) outputStream;
     FileChannel fileChannel = resilientFOS.getChannel();
     if (fileChannel == null) {
       return;
+    }
+    if (!fileChannel.isOpen()) {
+      // Unlike upstream: the channel, and the file stream under it, were
+      // closed, e.g. by an interrupt while waiting in lock() below. Locking it
+      // would fail for every later event, yet the resilient stream reopens its
+      // file only from write(). An empty write lets it do so, once its backoff
+      // allows, and writes nothing otherwise. If it reopened the file, this
+      // event goes to the new channel; if not, lock() fails on the closed one,
+      // and the failure posted below leaves the stream presumed in error.
+      resilientFOS.write(byteArray, 0, 0);
+      fileChannel = resilientFOS.getChannel();
     }
 
     // Clear any current interrupt (see LOGBACK-875)
@@ -324,14 +366,12 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
       if (size != position) {
         fileChannel.position(size);
       }
-      super.writeOut(event);
+      writeBytes(byteArray);
     } catch (IOException e) {
       // Mainly to catch FileLockInterruptionExceptions (see LOGBACK-875)
       resilientFOS.postIOFailure(e);
     } finally {
-      if (fileLock != null && fileLock.isValid()) {
-        fileLock.release();
-      }
+      releaseFileLock(fileLock);
 
       // Re-interrupt if we started in an interrupted state (see LOGBACK-875)
       if (interrupted) {
@@ -340,10 +380,21 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     }
   }
 
+  private void releaseFileLock(FileLock fileLock) {
+    // closing the channel (see above) also invalidates the lock
+    if (fileLock != null && fileLock.isValid()) {
+      try {
+        fileLock.release();
+      } catch (IOException e) {
+        addError("failed to release lock", e);
+      }
+    }
+  }
+
   @Override
   protected void writeOut(E event) throws IOException {
     if (prudent) {
-      safeWrite(event);
+      safeWriteOut(event);
     } else {
       super.writeOut(event);
     }
