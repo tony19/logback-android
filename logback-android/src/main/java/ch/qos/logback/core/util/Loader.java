@@ -17,8 +17,6 @@ package ch.qos.logback.core.util;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.HashSet;
@@ -35,7 +33,6 @@ public class Loader {
 
   private static boolean ignoreTCL = false;
   public static final String IGNORE_TCL_PROPERTY_NAME = "logback.ignoreTCL";
-  private static boolean HAS_GET_CLASS_LOADER_PERMISSION = false;
 
   static {
     String ignoreTCLProp = OptionHelper.getSystemProperty(
@@ -44,22 +41,6 @@ public class Loader {
     if (ignoreTCLProp != null) {
       ignoreTCL = Boolean.valueOf(ignoreTCLProp);
     }
-
-    HAS_GET_CLASS_LOADER_PERMISSION =
-            AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
-              @Override
-              public Boolean run() {
-                try {
-                  AccessController.checkPermission(
-                          new RuntimePermission("getClassLoader"));
-                  return true;
-                } catch (SecurityException e) {
-                  // Using SecurityException instead of AccessControlException.
-                  // See bug LOGBACK-760.
-                  return false;
-                }
-              }
-            });
   }
 
   /**
@@ -151,22 +132,32 @@ public class Loader {
   }
 
   /**
-   * Returns the class loader of clazz in an access privileged section.
+   * Returns the class loader of {@code clazz}, exactly as
+   * {@link Class#getClassLoader()} does.
+   *
+   * <p>This method used to return {@code null} unless
+   * {@code java.security.AccessController} granted logback the
+   * {@code getClassLoader} {@link RuntimePermission}. Android has no
+   * {@code SecurityManager}, so there the permission was always granted and
+   * the result was always {@code clazz.getClassLoader()}. On the JVM it was
+   * granted only if a custom security policy granted it (the default policy
+   * does not), and never on JDK 24 and later (JEP 486), so there the result
+   * was {@code null} as a rule. It is now {@code clazz.getClassLoader()}
+   * everywhere, as on Android. Upstream logback removed the method, and
+   * logback-android no longer uses it.</p>
    *
    * @param clazz the class to evaluate
-   * @return the classloader of the object
+   * @return {@code clazz.getClassLoader()}: {@code null} for a primitive
+   * type, and on the JVM also for a class of the bootstrap class loader (on
+   * Android, that is the {@code BootClassLoader} instead)
+   * @deprecated Use {@link Class#getClassLoader()}, or
+   * {@link #getClassLoaderOfClass(Class)} to get the system class loader
+   * where {@code Class.getClassLoader()} returns {@code null}. This method is
+   * kept only for compatibility and will be removed in a future release.
    */
+  @Deprecated
   public static ClassLoader getClassLoaderAsPrivileged(final Class<?> clazz) {
-    if (!HAS_GET_CLASS_LOADER_PERMISSION)
-      return null;
-    else
-      return AccessController.doPrivileged(
-              new PrivilegedAction<ClassLoader>() {
-                @Override
-                public ClassLoader run() {
-                  return clazz.getClassLoader();
-                }
-              });
+    return clazz.getClassLoader();
   }
 
   /**

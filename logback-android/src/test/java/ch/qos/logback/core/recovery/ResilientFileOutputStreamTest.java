@@ -15,6 +15,8 @@
  */
 package ch.qos.logback.core.recovery;
 
+import static ch.qos.logback.core.recovery.ResilientOutputStreamBaseTest.FAR_FUTURE;
+import static ch.qos.logback.core.recovery.ResilientOutputStreamBaseTest.recoveryCoordinatorOf;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -39,8 +41,11 @@ import org.junit.rules.TemporaryFolder;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.status.Status;
+import ch.qos.logback.core.status.StatusChecker;
 
 public class ResilientFileOutputStreamTest {
+
+  static final int BUFFER_SIZE = 8192;
 
   @Rule
   public TemporaryFolder tmp = new TemporaryFolder();
@@ -52,7 +57,7 @@ public class ResilientFileOutputStreamTest {
   @Before
   public void setUp() throws IOException {
     file = tmp.newFile("resilient.log");
-    stream = new ResilientFileOutputStream(file, true, 8192);
+    stream = new ResilientFileOutputStream(file, true, BUFFER_SIZE);
     stream.setContext(context);
   }
 
@@ -113,5 +118,61 @@ public class ResilientFileOutputStreamTest {
 
     assertEquals(0, context.getStatusManager().getCount());
     assertArrayEquals(new byte[] {'o', 'k'}, Files.readAllBytes(file.toPath()));
+  }
+
+  /**
+   * Makes the stream fail on a write that leaves nothing buffered, as a
+   * prudent FileAppender's failure to lock a closed channel does: a write as
+   * large as the buffer goes straight to the (closed) file stream.
+   */
+  private static void failWithNothingBuffered(ResilientFileOutputStream stream) throws IOException {
+    stream.getChannel().close();
+    stream.write(new byte[BUFFER_SIZE], 0, BUFFER_SIZE);
+  }
+
+  @Test
+  public void failedRecoveryLeavesStreamInErrorAndBackingOff() throws Exception {
+    File dir = tmp.newFolder("gone");
+    File goneFile = new File(dir, "gone.log");
+    ResilientFileOutputStream goneStream = new ResilientFileOutputStream(goneFile, true, BUFFER_SIZE);
+    goneStream.setContext(context);
+    failWithNothingBuffered(goneStream);
+    // the file cannot be reopened
+    assertTrue(goneFile.delete());
+    assertTrue(dir.delete());
+    RecoveryCoordinator coordinator = recoveryCoordinatorOf(goneStream);
+    coordinator.setCurrentTime(FAR_FUTURE);
+
+    // tries to reopen the file, and fails
+    goneStream.write('a');
+    // still presumed in error, and backing off from that attempt
+    goneStream.write('b');
+
+    StatusChecker checker = new StatusChecker(context);
+    assertEquals(1, checker.matchCount("Attempting to recover from IO failure"));
+    checker.assertContainsMatch(Status.ERROR, "Failed to open file");
+    // closing the broken stream to reopen it must not count as recovering
+    // from the failure, which would restart the back-off and the status count
+    checker.assertNoMatch("Recovered from IO failure");
+    assertSame(coordinator, recoveryCoordinatorOf(goneStream));
+  }
+
+  @Test
+  public void recoveryIsReportedOnceWriteToReopenedFileSucceeds() throws Exception {
+    failWithNothingBuffered(stream);
+    recoveryCoordinatorOf(stream).setCurrentTime(FAR_FUTURE);
+
+    // reopens the file, and is itself dropped
+    stream.write('a');
+
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.INFO, "Attempting to recover from IO failure");
+    checker.assertNoMatch("Recovered from IO failure");
+
+    stream.write('b');
+    stream.flush();
+
+    checker.assertContainsMatch(Status.INFO, "Recovered from IO failure");
+    assertArrayEquals(new byte[] {'b'}, Files.readAllBytes(file.toPath()));
   }
 }

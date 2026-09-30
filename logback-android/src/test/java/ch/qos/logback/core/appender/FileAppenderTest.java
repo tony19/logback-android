@@ -18,18 +18,25 @@ package ch.qos.logback.core.appender;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.ClosedChannelException;
+import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,10 +46,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.encoder.EncoderBase;
+import ch.qos.logback.core.recovery.RecoveryCoordinator;
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
+import ch.qos.logback.core.testUtil.LockProbingOutputStream;
 import ch.qos.logback.core.status.StatusChecker;
 
 import org.junit.Rule;
@@ -247,17 +257,20 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     File file = new File(tmp.getRoot(), "prudent-lock.log");
     LockProbingEncoder encoder = new LockProbingEncoder(file);
     FileAppenderFriend<Object> fa = newFileAppender("prudent-lock", file, encoder);
+    fa.probeLocks = true;
     fa.setPrudent(true);
     fa.start();
     // start from a non-interrupted thread
     Thread.interrupted();
 
-    fa.writeOut("hello");
+    fa.doAppend("hello");
     // reads and clears the flag, so that it cannot leak into later tests
     boolean interruptedAfterAppend = Thread.interrupted();
     fa.stop();
 
-    assertEquals(Collections.singletonList(Boolean.TRUE), encoder.lockHeldDuringEncode);
+    // the event was encoded before the file was locked, and written while it was
+    assertEquals(Collections.singletonList(Boolean.FALSE), encoder.lockHeldDuringEncode);
+    assertEquals(Collections.singletonList(Boolean.TRUE), fa.probe.getLockHeldDuringWrite());
     assertEquals("hello\n", readUtf8(file));
     // the thread was not interrupted before the write, so it must not be after it
     assertFalse(interruptedAfterAppend);
@@ -267,8 +280,8 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
   @Test
   public void lazyPrudentAppenderLocksFileItOpensOnFirstAppend() throws Exception {
     File file = new File(tmp.getRoot(), "lazy-prudent.log");
-    LockProbingEncoder encoder = new LockProbingEncoder(file);
-    FileAppenderFriend<Object> fa = newFileAppender("lazy-prudent", file, encoder);
+    FileAppenderFriend<Object> fa = newFileAppender("lazy-prudent", file, new Utf8LineEncoder());
+    fa.probeLocks = true;
     fa.setPrudent(true);
     fa.setLazy(true);
     fa.start();
@@ -277,12 +290,12 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     // the first event opens the file
     fa.doAppend("a");
     assertTrue(fa.getOutputStream() instanceof ResilientFileOutputStream);
-    fa.writeOut("b");
+    fa.doAppend("b");
     fa.stop();
 
-    // the prudent write locked the file that was opened lazily
-    assertEquals(2, encoder.lockHeldDuringEncode.size());
-    assertEquals(Boolean.TRUE, encoder.lockHeldDuringEncode.get(1));
+    // the prudent write locked the file that was opened lazily, from the
+    // event that opened it on
+    assertEquals(Arrays.asList(Boolean.TRUE, Boolean.TRUE), fa.probe.getLockHeldDuringWrite());
     assertEquals("a\nb\n", readUtf8(file));
     new StatusChecker(context).assertIsErrorFree();
   }
@@ -292,13 +305,16 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     File file = new File(tmp.getRoot(), "non-prudent.log");
     LockProbingEncoder encoder = new LockProbingEncoder(file);
     FileAppenderFriend<Object> fa = newFileAppender("non-prudent", file, encoder);
+    fa.probeLocks = true;
     fa.start();
 
-    fa.writeOut("hello");
+    fa.doAppend("hello");
     fa.stop();
 
     assertEquals(Collections.singletonList(Boolean.FALSE), encoder.lockHeldDuringEncode);
+    assertEquals(Collections.singletonList(Boolean.FALSE), fa.probe.getLockHeldDuringWrite());
     assertEquals("hello\n", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
   }
 
   @Test
@@ -451,7 +467,7 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     appendUtf8(file, "other\n");
     fa.setPrudent(true);
 
-    fa.writeOut("b");
+    fa.doAppend("b");
     fa.stop();
 
     assertEquals("a\nother\nb\n", readUtf8(file));
@@ -462,13 +478,14 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
   public void prudentWriteRestoresInterruptFlag() throws IOException {
     File file = new File(tmp.getRoot(), "interrupted.log");
     FileAppenderFriend<Object> fa = newFileAppender("interrupted", file, new Utf8LineEncoder());
+    fa.probeLocks = true;
     fa.setPrudent(true);
     fa.start();
 
     boolean interruptedAfterAppend;
     Thread.currentThread().interrupt();
     try {
-      fa.writeOut("hello");
+      fa.doAppend("hello");
     } finally {
       // also clears the flag for later tests
       interruptedAfterAppend = Thread.interrupted();
@@ -476,7 +493,10 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     fa.stop();
 
     assertTrue(interruptedAfterAppend);
-    // the interrupt was cleared while locking, so the write went through
+    // the interrupt was cleared while locking (an interrupted thread's
+    // FileChannel.lock() closes the channel), so the file was locked and the
+    // write went through
+    assertEquals(Collections.singletonList(Boolean.TRUE), fa.probe.getLockHeldDuringWrite());
     assertEquals("hello\n", readUtf8(file));
     new StatusChecker(context).assertIsErrorFree();
   }
@@ -491,32 +511,148 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
 
     // returns normally: the failure is left to the resilient stream to
     // recover from instead of being thrown at the appender, which would stop it
-    fa.writeOut("lost");
+    fa.doAppend("lost");
 
     assertTrue(fa.isStarted());
     StatusChecker checker = new StatusChecker(context);
     checker.assertContainsMatch(Status.ERROR, "IO failure while writing to file");
     checker.asssertContainsException(ClosedChannelException.class);
+    checker.assertNoMatch("Appender \\[.*\\] failed to append");
     assertEquals("", readUtf8(file));
     fa.stop();
   }
 
   @Test
-  public void prudentWriteDoesNotReleaseLockInvalidatedDuringWrite() throws IOException {
-    File file = new File(tmp.getRoot(), "invalidated.log");
-    ChannelClosingEncoder encoder = new ChannelClosingEncoder();
-    FileAppenderFriend<Object> fa = newFileAppender("invalidated", file, encoder);
-    encoder.appender = fa;
+  public void prudentAppenderRecoversOnceItsClosedChannelCanBeReopened() throws Exception {
+    File file = new File(tmp.getRoot(), "recovered.log");
+    FileAppenderFriend<Object> fa = newFileAppender("recovered", file, new Utf8LineEncoder());
+    fa.probeLocks = true;
     fa.setPrudent(true);
     fa.start();
+    fa.doAppend("before");
+    // what an interrupt while waiting in FileChannel.lock() leaves behind: it
+    // closes the channel and the stream it belongs to (see LOGBACK-875)
+    ((ResilientFileOutputStream) fa.getOutputStream()).getChannel().close();
 
-    // returns normally: releasing the invalidated lock would have thrown
-    // ClosedChannelException out of writeOut(), which would stop the appender
-    fa.writeOut("lost");
+    fa.doAppend("lost");
+    waitUntilRecoveryIsDue(System.currentTimeMillis());
+    // this event makes the resilient stream reopen the file, and is written to it
+    fa.doAppend("recovered");
+    fa.doAppend("after");
+    fa.stop();
+
+    assertEquals("before\nrecovered\nafter\n", readUtf8(file));
+    // the reopened file is locked like the original one was
+    assertEquals(Arrays.asList(Boolean.TRUE, Boolean.TRUE, Boolean.TRUE), fa.probe.getLockHeldDuringWrite());
+    StatusChecker checker = new StatusChecker(context);
+    checker.asssertContainsException(ClosedChannelException.class);
+    checker.assertContainsMatch(Status.INFO, "Attempting to recover from IO failure on file");
+    checker.assertNoMatch("Failed to open");
+    // recovery is reported once an event was written to the reopened file,
+    // not when the broken stream is closed to reopen it
+    int attempting = indexOfFirstStatus("Attempting to recover from IO failure on file");
+    int recovered = indexOfFirstStatus("Recovered from IO failure on file");
+    assertTrue("recovery reported before it was attempted", attempting < recovered);
+  }
+
+  @Test
+  public void prudentAppenderKeepsBackingOffWhileItsFileCannotBeReopened() throws Exception {
+    File dir = tmp.newFolder("gone");
+    File file = new File(dir, "gone.log");
+    FileAppenderFriend<Object> fa = newFileAppender("gone", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+    fa.doAppend("before");
+    // the channel is closed, as in the test above, and the file cannot be
+    // reopened: its directory is gone (e.g. unmounted storage)
+    ((ResilientFileOutputStream) fa.getOutputStream()).getChannel().close();
+    assertTrue(file.delete());
+    assertTrue(dir.delete());
+
+    fa.doAppend("lost");
+    waitUntilRecoveryIsDue(System.currentTimeMillis());
+    // makes the resilient stream try to reopen the file, which fails
+    fa.doAppend("lost too");
 
     assertTrue(fa.isStarted());
-    new StatusChecker(context).assertContainsMatch(Status.ERROR, "IO failure while writing to file");
+    StatusChecker checker = new StatusChecker(context);
+    assertEquals(1, checker.matchCount("Attempting to recover from IO failure on file"));
+    checker.assertContainsMatch(Status.ERROR, "Failed to open file");
+    // the stream is still in error, and backs off further before the next
+    // attempt: reporting it recovered would restart its back-off and its
+    // status count, i.e. a reopen attempt and four statuses for every event
+    // logged 20 ms after the last one
+    checker.assertNoMatch("Recovered from IO failure");
+    checker.assertNoMatch("Appender \\[.*\\] failed to append");
     fa.stop();
+  }
+
+  @Test
+  public void prudentWriteDoesNotReleaseLockInvalidatedDuringWriteAndRecovers() throws Exception {
+    File file = new File(tmp.getRoot(), "invalidated.log");
+    FileAppenderFriend<Object> fa = newFileAppender("invalidated", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+    fa.setOutputStream(new ChannelClosingOutputStream(file, context));
+
+    // returns normally, without trying to release the lock that closing its
+    // channel invalidated: that would fail with ClosedChannelException
+    fa.doAppend("lost");
+    waitUntilRecoveryIsDue(System.currentTimeMillis());
+    fa.doAppend("recovered");
+    fa.stop();
+
+    assertEquals("recovered\n", readUtf8(file));
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR, "IO failure while writing to file");
+    checker.assertContainsMatch(Status.INFO, "Attempting to recover from IO failure on file");
+    checker.assertNoMatch("failed to release lock");
+    checker.assertNoMatch("Appender \\[.*\\] failed to append");
+  }
+
+  @Test
+  public void prudentWriteReportsLockReleaseFailureAndKeepsWriting() throws IOException {
+    File file = new File(tmp.getRoot(), "release-failure.log");
+    FileAppenderFriend<Object> fa = newFileAppender("release-failure", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+    fa.setOutputStream(new LockReleaseFailingOutputStream(file, context));
+
+    fa.doAppend("a");
+    fa.doAppend("b");
+
+    // the events were written before the lock was to be released, and the
+    // appender was not stopped over failing to release it
+    assertTrue(fa.isStarted());
+    assertEquals("a\nb\n", readUtf8(file));
+    StatusChecker checker = new StatusChecker(context);
+    assertEquals(2, checker.matchCount("failed to release lock"));
+    checker.asssertContainsException(IOException.class);
+    checker.assertNoMatch("IO failure in appender");
+    fa.stop();
+  }
+
+  @Test
+  public void prudentWriteDoesNotLockFileForEventEncodedToNothing() throws IOException {
+    File file = new File(tmp.getRoot(), "encoded-to-nothing.log");
+    Utf8LineEncoder encoder = new Utf8LineEncoder() {
+      @Override
+      public byte[] encode(Object event) {
+        return "null".equals(event) ? null : new byte[0];
+      }
+    };
+    FileAppenderFriend<Object> fa = newFileAppender("encoded-to-nothing", file, encoder);
+    fa.setPrudent(true);
+    fa.start();
+    // any lock taken through this stream's channel fails to be released
+    fa.setOutputStream(new LockReleaseFailingOutputStream(file, context));
+
+    fa.doAppend("null");
+    fa.doAppend("empty");
+    fa.stop();
+
+    assertEquals("", readUtf8(file));
+    new StatusChecker(context).assertIsErrorFree();
   }
 
   @Test
@@ -527,11 +663,56 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     fa.start();
     fa.setOutputStream(new ChannelLessResilientFileOutputStream(file));
 
-    fa.writeOut("dropped");
+    fa.doAppend("dropped");
     fa.stop();
 
     assertEquals("", readUtf8(file));
     new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void prudentAppenderWritesToStreamWithoutFileAsNonPrudentOneDoes() {
+    File file = new File(tmp.getRoot(), "not-a-file-stream.log");
+    FileAppenderFriend<Object> fa = newFileAppender("not-a-file-stream", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+    FlushCountingOutputStream out = new FlushCountingOutputStream();
+    fa.setOutputStream(out);
+
+    fa.doAppend("a");
+    fa.doAppend("b");
+    fa.stop();
+
+    // there is no file to lock: written and flushed as without prudent mode
+    assertEquals("a\nb\n", new String(out.toByteArray(), StandardCharsets.UTF_8));
+    assertEquals(2, out.flushCount);
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void lazyPrudentAppenderDiscardsEventsQuietlyAfterFileNameCollision() throws IOException {
+    File file = new File(tmp.getRoot(), "lazy-prudent-collision.log");
+    FileAppender<Object> first = newFileAppender("first", file, new Utf8LineEncoder());
+    first.start();
+    FileAppender<Object> lazy = newFileAppender("lazy", file, new Utf8LineEncoder());
+    lazy.setPrudent(true);
+    lazy.setLazy(true);
+    lazy.start();
+
+    lazy.doAppend("a");
+    lazy.doAppend("b");
+
+    // the stream the appender writes to stays the NOPOutputStream: its events
+    // are discarded, as without prudent mode, without failing to be appended
+    assertTrue(lazy.isStarted());
+    assertTrue(lazy.getOutputStream() instanceof NOPOutputStream);
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR,
+        "Collisions detected with FileAppender/RollingAppender instances defined earlier. Aborting.");
+    checker.assertNoMatch("Appender \\[.*\\] failed to append");
+    assertEquals("", readUtf8(file));
+    first.stop();
+    lazy.stop();
   }
 
   @Test
@@ -544,8 +725,8 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     // prudent writeOut(), which locks the file without holding the appender's
     // lock, made the second thread's FileChannel.lock() throw
     // OverlappingFileLockException there, and its events were dropped.
-    final FileAppender<Object> fa = newFileAppender("prudent-concurrent", file,
-        new RendezvousEncoder(threadCount));
+    RendezvousEncoder encoder = new RendezvousEncoder(threadCount);
+    final FileAppender<Object> fa = newFileAppender("prudent-concurrent", file, encoder);
     fa.setPrudent(true);
     fa.start();
 
@@ -580,6 +761,8 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     fa.stop();
 
     assertEquals(Collections.<Throwable>emptyList(), failures);
+    // not encoded under the appender's lock, which serializes the writes
+    assertTrue("the first events were not encoded concurrently", encoder.metUp);
     List<String> lines = new ArrayList<String>(Arrays.asList(readUtf8(file).split("\n")));
     assertEquals("events in the file", expected.size(), lines.size());
     Collections.sort(expected);
@@ -655,6 +838,17 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     return fa;
   }
 
+  private int indexOfFirstStatus(String messagePrefix) {
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    for (int i = 0; i < statuses.size(); i++) {
+      if (statuses.get(i).getMessage().startsWith(messagePrefix)) {
+        return i;
+      }
+    }
+    fail("no status starting with: " + messagePrefix);
+    return -1;
+  }
+
   static String readUtf8(File file) throws IOException {
     RandomAccessFile raf = new RandomAccessFile(file, "r");
     try {
@@ -696,20 +890,180 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
   }
 
   /**
-   * Closes the appender's file channel while encoding, i.e. after the prudent
-   * write locked the file, which invalidates that lock.
+   * Waits until a resilient stream that failed by {@code failedBy} may try to
+   * recover: its RecoveryCoordinator allows the first attempt once the clock
+   * is past the time of the failure plus
+   * {@link RecoveryCoordinator#BACKOFF_COEFFICIENT_MIN}. A slow runner only
+   * makes the wait longer; it cannot make the attempt come too soon.
    */
-  static class ChannelClosingEncoder extends Utf8LineEncoder {
-    FileAppender<Object> appender;
+  static void waitUntilRecoveryIsDue(long failedBy) throws InterruptedException {
+    while (System.currentTimeMillis() <= failedBy + RecoveryCoordinator.BACKOFF_COEFFICIENT_MIN) {
+      Thread.sleep(1);
+    }
+  }
+
+  /**
+   * Closes its file channel on its first write, i.e. while a prudent
+   * appender holds the lock it took through that channel, which invalidates
+   * the lock.
+   */
+  static class ChannelClosingOutputStream extends ResilientFileOutputStream {
+    private boolean channelClosed;
+
+    ChannelClosingOutputStream(File file, Context context) throws FileNotFoundException {
+      super(file, true, FileAppender.DEFAULT_BUFFER_SIZE);
+      setContext(context);
+    }
 
     @Override
-    public byte[] encode(Object event) {
-      try {
-        ((ResilientFileOutputStream) appender.getOutputStream()).getChannel().close();
-      } catch (IOException e) {
-        throw new IllegalStateException(e);
+    public void write(byte[] b, int off, int len) {
+      if (!channelClosed) {
+        channelClosed = true;
+        try {
+          getChannel().close();
+        } catch (IOException e) {
+          throw new IllegalStateException(e);
+        }
       }
-      return super.encode(event);
+      super.write(b, off, len);
+    }
+  }
+
+  /**
+   * Writes to its file, but its channel hands out file locks that fail to be
+   * released.
+   */
+  static class LockReleaseFailingOutputStream extends ResilientFileOutputStream {
+    LockReleaseFailingOutputStream(File file, Context context) throws FileNotFoundException {
+      super(file, true, FileAppender.DEFAULT_BUFFER_SIZE);
+      setContext(context);
+    }
+
+    @Override
+    public FileChannel getChannel() {
+      return new LockReleaseFailingChannel(super.getChannel());
+    }
+  }
+
+  /**
+   * Delegates what a prudent appender uses, apart from locking, to the given
+   * channel; its locks are not real, and fail to be released.
+   */
+  static class LockReleaseFailingChannel extends FileChannel {
+    private final FileChannel channel;
+
+    LockReleaseFailingChannel(FileChannel channel) {
+      this.channel = channel;
+    }
+
+    @Override
+    public FileLock lock(long position, long size, boolean shared) {
+      return new FileLock(this, position, size, shared) {
+        @Override
+        public boolean isValid() {
+          return true;
+        }
+
+        @Override
+        public void release() throws IOException {
+          throw new IOException("release failed");
+        }
+      };
+    }
+
+    @Override
+    public long position() throws IOException {
+      return channel.position();
+    }
+
+    @Override
+    public FileChannel position(long newPosition) throws IOException {
+      channel.position(newPosition);
+      return this;
+    }
+
+    @Override
+    public long size() throws IOException {
+      return channel.size();
+    }
+
+    @Override
+    protected void implCloseChannel() throws IOException {
+      channel.close();
+    }
+
+    // not used by the appender
+
+    @Override
+    public int read(ByteBuffer dst) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long read(ByteBuffer[] dsts, int offset, int length) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int write(ByteBuffer src) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long write(ByteBuffer[] srcs, int offset, int length) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FileChannel truncate(long size) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void force(boolean metaData) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long transferTo(long position, long count, WritableByteChannel target) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long transferFrom(ReadableByteChannel src, long position, long count) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int read(ByteBuffer dst, long position) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int write(ByteBuffer src, long position) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public MappedByteBuffer map(MapMode mode, long position, long size) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FileLock tryLock(long position, long size, boolean shared) {
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  /**
+   * Keeps what is written, and counts flushes.
+   */
+  static class FlushCountingOutputStream extends ByteArrayOutputStream {
+    int flushCount;
+
+    @Override
+    public void flush() {
+      flushCount++;
     }
   }
 
@@ -717,11 +1071,14 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
    * Holds each event in encode() until as many events as there are parties
    * are being encoded at the same time, so that the first events of that many
    * threads are written concurrently; later events are not held. The wait is
-   * bounded, and the events are encoded when it ends either way, so the
-   * outcome does not depend on how long it takes.
+   * bounded, and the events are encoded when it ends either way; whether the
+   * events did meet up is recorded instead. They cannot while one of them
+   * is encoded under a lock that the others wait for, i.e. unless events are
+   * encoded outside the appender's lock.
    */
   static class RendezvousEncoder extends Utf8LineEncoder {
     final CountDownLatch encoding;
+    volatile boolean metUp = true;
 
     RendezvousEncoder(int parties) {
       encoding = new CountDownLatch(parties);
@@ -731,7 +1088,9 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     public byte[] encode(Object event) {
       encoding.countDown();
       try {
-        encoding.await(5, TimeUnit.SECONDS);
+        if (!encoding.await(30, TimeUnit.SECONDS)) {
+          metUp = false;
+        }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
@@ -753,7 +1112,7 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
 
   /**
    * Records, for each encoded event, whether this JVM held a lock on the file
-   * while the event was being encoded (i.e. written).
+   * while the event was being encoded.
    */
   static class LockProbingEncoder extends Utf8LineEncoder {
     final File file;
@@ -789,17 +1148,25 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     }
   }
 
-  // helper class used to access protected fields
+  // helper class used to access protected members
   class FileAppenderFriend<E> extends FileAppender<E> {
+    // when set, the file is written through the probe, which it opens instead
+    boolean probeLocks;
+    LockProbingOutputStream probe;
+
     public void append(E obj) {
       this.subAppend(obj);
     }
 
-    // doAppend() does not go through writeOut() (subAppend() encodes and
-    // writes the bytes itself), so tests of prudent mode call it directly
     @Override
-    public void writeOut(E event) throws IOException {
-      super.writeOut(event);
+    protected boolean openFile(String filename) throws IOException {
+      boolean opened = super.openFile(filename);
+      if (probeLocks) {
+        probe = new LockProbingOutputStream(((ResilientFileOutputStream) getOutputStream()).getFile());
+        probe.setContext(getContext());
+        setOutputStream(probe);
+      }
+      return opened;
     }
   }
 }

@@ -18,6 +18,7 @@ package ch.qos.logback.core.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
@@ -27,9 +28,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.security.AllPermission;
-import java.security.Permissions;
-import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -172,7 +170,7 @@ public class LoaderTest {
   @Test
   public void ignoreTCLPropertyMakesLoadClassSkipTheContextClassLoader() throws Exception {
     System.setProperty(Loader.IGNORE_TCL_PROPERTY_NAME, "true");
-    Class<?> loader = initializeFreshLoader(domainWith(new Permissions()));
+    Class<?> loader = initializeFreshLoader();
     assertTrue(getStaticBoolean(loader, "ignoreTCL"));
 
     RecordingClassLoader tcl = new RecordingClassLoader();
@@ -186,7 +184,7 @@ public class LoaderTest {
   @Test
   public void ignoreTCLPropertyFalseKeepsLoadClassOnTheContextClassLoader() throws Exception {
     System.setProperty(Loader.IGNORE_TCL_PROPERTY_NAME, "false");
-    Class<?> loader = initializeFreshLoader(domainWith(new Permissions()));
+    Class<?> loader = initializeFreshLoader();
     assertFalse(getStaticBoolean(loader, "ignoreTCL"));
 
     RecordingClassLoader tcl = new RecordingClassLoader();
@@ -197,40 +195,42 @@ public class LoaderTest {
     assertEquals(Collections.singletonList(FileSize.class.getName()), tcl.requested);
   }
 
-  // Loader's permission check evaluates the protection domain of the copy.
-  // That needs a functional AccessController (JDK 23 and older, e.g. CI's
-  // JDK 17 and 21); from JDK 24 on, checkPermission always throws.
+  // The same as Class.getClassLoader(), on Android and on any JDK. (On the
+  // JVM it used to be null unless a security policy granted logback the
+  // "getClassLoader" permission, which the default policy doesn't, and which
+  // AccessController never grants from JDK 24 on.)
+  @SuppressWarnings("deprecation")
   @Test
-  public void classLoaderAsPrivilegedIsAvailableWithGetClassLoaderPermission() throws Exception {
-    Permissions all = new Permissions();
-    all.add(new AllPermission());
-    Class<?> loader = initializeFreshLoader(domainWith(all));
-    assertTrue(getStaticBoolean(loader, "HAS_GET_CLASS_LOADER_PERMISSION"));
+  public void classLoaderAsPrivilegedIsTheClassLoaderOfTheClass() throws Exception {
+    assertSame(LoaderTest.class.getClassLoader(), Loader.getClassLoaderAsPrivileged(LoaderTest.class));
 
-    Method getClassLoaderAsPrivileged = loader.getMethod("getClassLoaderAsPrivileged", Class.class);
-    assertSame(LoaderTest.class.getClassLoader(), getClassLoaderAsPrivileged.invoke(null, LoaderTest.class));
+    // a class defined by another class loader than the tests and Loader
+    Class<?> copy = initializeFreshLoader();
+    assertNotSame(Loader.class.getClassLoader(), copy.getClassLoader());
+    assertSame(copy.getClassLoader(), Loader.getClassLoaderAsPrivileged(copy));
   }
 
+  // As Class.getClassLoader() on the JVM, where the unit tests run; on
+  // Android, Class.getClassLoader() returns the BootClassLoader instead.
+  @SuppressWarnings("deprecation")
   @Test
-  public void classLoaderAsPrivilegedIsNullWithoutGetClassLoaderPermission() throws Exception {
-    Class<?> loader = initializeFreshLoader(domainWith(new Permissions()));
-    assertFalse(getStaticBoolean(loader, "HAS_GET_CLASS_LOADER_PERMISSION"));
-
-    Method getClassLoaderAsPrivileged = loader.getMethod("getClassLoaderAsPrivileged", Class.class);
-    assertNull(getClassLoaderAsPrivileged.invoke(null, LoaderTest.class));
+  public void classLoaderAsPrivilegedOfBootstrapClassIsNull() {
+    assertNull(Loader.getClassLoaderAsPrivileged(String.class));
   }
 
-  private static ProtectionDomain domainWith(Permissions permissions) {
-    return new ProtectionDomain(Loader.class.getProtectionDomain().getCodeSource(), permissions);
+  // As Class.getClassLoader(), on the JVM and on Android.
+  @SuppressWarnings("deprecation")
+  @Test
+  public void classLoaderAsPrivilegedOfPrimitiveTypeIsNull() {
+    assertNull(Loader.getClassLoaderAsPrivileged(int.class));
   }
 
   /**
    * Initializes another copy of {@link Loader}, defined from the same class
-   * file within the given protection domain, so that its static initializer
-   * runs again.
+   * file, so that its static initializer runs again.
    */
-  private static Class<?> initializeFreshLoader(ProtectionDomain domain) throws ClassNotFoundException {
-    return FreshCopyClassLoader.initializeFreshCopy(Loader.class, domain);
+  private static Class<?> initializeFreshLoader() throws ClassNotFoundException {
+    return FreshCopyClassLoader.initializeFreshCopy(Loader.class);
   }
 
   private static boolean getStaticBoolean(Class<?> clazz, String name) throws Exception {

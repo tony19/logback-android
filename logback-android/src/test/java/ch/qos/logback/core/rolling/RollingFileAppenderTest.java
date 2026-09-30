@@ -25,8 +25,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,9 +46,11 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.appender.AbstractAppenderTest;
 import ch.qos.logback.core.encoder.DummyEncoder;
 import ch.qos.logback.core.encoder.EchoEncoder;
+import ch.qos.logback.core.recovery.ResilientFileOutputStream;
 import ch.qos.logback.core.rolling.helper.FileNamePattern;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
+import ch.qos.logback.core.testUtil.LockProbingOutputStream;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
@@ -562,5 +569,151 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     assertTrue(String.valueOf(last.getThrowable()), last.getThrowable() instanceof FileNotFoundException);
     assertEquals(activeFile, rfa.currentlyActiveFile);
     rfa.stop();
+  }
+
+  // 2024-01-01T12:00:00Z
+  private static final long JAN_1_NOON_GMT = 1704110400000L;
+
+  private TimeBasedRollingPolicy<Object> startedTimeBasedRollingPolicyAt(RollingFileAppender<Object> appender,
+                                                                        String pattern, long currentTime) {
+    TimeBasedRollingPolicy<Object> policy = new TimeBasedRollingPolicy<Object>();
+    policy.setContext(context);
+    policy.setFileNamePattern(pattern);
+    policy.setParent(appender);
+    policy.timeBasedFileNamingAndTriggeringPolicy = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>();
+    policy.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(currentTime);
+    policy.start();
+    return policy;
+  }
+
+  @Test
+  public void prudentModeKeepsEveryEventLoggedConcurrently() throws Exception {
+    final int threadCount = 2;
+    final int eventsPerThread = 200;
+    // the threads' first events are encoded at the same time, i.e. each while
+    // the other thread's append is in progress: see
+    // FileAppenderTest.prudentAppenderKeepsEveryEventLoggedConcurrently
+    final RollingFileAppender<Object> prudentRfa = new RollingFileAppender<Object>();
+    prudentRfa.setContext(context);
+    prudentRfa.setName("prudent-concurrent");
+    RendezvousEncoder encoder = new RendezvousEncoder(threadCount);
+    prudentRfa.setEncoder(encoder);
+    prudentRfa.setPrudent(true);
+    prudentRfa.setRollingPolicy(startedTimeBasedRollingPolicyAt(prudentRfa,
+        tmpPath("concurrent-%d{yyyy-MM-dd, GMT}.log"), JAN_1_NOON_GMT));
+    prudentRfa.start();
+    assertTrue(prudentRfa.isStarted());
+
+    final CountDownLatch startGate = new CountDownLatch(1);
+    final List<Throwable> failures = Collections.synchronizedList(new ArrayList<Throwable>());
+    List<Thread> threads = new ArrayList<Thread>();
+    List<String> expected = new ArrayList<String>();
+    for (int t = 0; t < threadCount; t++) {
+      final String prefix = "thread" + t + "-event";
+      for (int i = 0; i < eventsPerThread; i++) {
+        expected.add(prefix + i);
+      }
+      Thread thread = new Thread(() -> {
+        try {
+          startGate.await();
+          for (int i = 0; i < eventsPerThread; i++) {
+            prudentRfa.doAppend(prefix + i);
+          }
+        } catch (Throwable e) {
+          failures.add(e);
+        }
+      }, "prudent-rolling-writer-" + t);
+      thread.start();
+      threads.add(thread);
+    }
+
+    startGate.countDown();
+    for (Thread thread : threads) {
+      thread.join(TimeUnit.SECONDS.toMillis(30));
+      assertFalse(thread.getName() + " did not finish", thread.isAlive());
+    }
+    prudentRfa.stop();
+
+    assertEquals(Collections.<Throwable>emptyList(), failures);
+    // not encoded under the appender's lock, which serializes the writes
+    assertTrue("the first events were not encoded concurrently", encoder.metUp);
+    List<String> lines = new ArrayList<String>(Arrays.asList(
+        read(tmpPath("concurrent-2024-01-01.log")).split(CoreConstants.LINE_SEPARATOR)));
+    assertEquals("events in the file", expected.size(), lines.size());
+    Collections.sort(expected);
+    Collections.sort(lines);
+    assertEquals(expected, lines);
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  @Test
+  public void prudentModeLocksTheFileItRollsOverTo() throws IOException {
+    final List<LockProbingOutputStream> opened = new ArrayList<LockProbingOutputStream>();
+    RollingFileAppender<Object> prudentRfa = new RollingFileAppender<Object>() {
+      // writes each file it opens through a LockProbingOutputStream
+      @Override
+      protected boolean openFile(String filename) throws IOException {
+        boolean result = super.openFile(filename);
+        LockProbingOutputStream probe =
+            new LockProbingOutputStream(((ResilientFileOutputStream) getOutputStream()).getFile());
+        probe.setContext(getContext());
+        opened.add(probe);
+        setOutputStream(probe);
+        return result;
+      }
+    };
+    prudentRfa.setContext(context);
+    prudentRfa.setName("prudent-rolling");
+    prudentRfa.setEncoder(new EchoEncoder<Object>());
+    prudentRfa.setPrudent(true);
+    TimeBasedRollingPolicy<Object> policy = startedTimeBasedRollingPolicyAt(prudentRfa,
+        tmpPath("prudent-%d{yyyy-MM-dd, GMT}.log"), JAN_1_NOON_GMT);
+    prudentRfa.setRollingPolicy(policy);
+    prudentRfa.start();
+
+    prudentRfa.doAppend("day 1");
+    policy.timeBasedFileNamingAndTriggeringPolicy.setCurrentTime(JAN_1_NOON_GMT + TimeUnit.DAYS.toMillis(1));
+    prudentRfa.doAppend("day 2");
+    prudentRfa.stop();
+
+    assertEquals("day 1" + CoreConstants.LINE_SEPARATOR, read(tmpPath("prudent-2024-01-01.log")));
+    assertEquals("day 2" + CoreConstants.LINE_SEPARATOR, read(tmpPath("prudent-2024-01-02.log")));
+    // the file opened at start and the one opened by the rollover were both
+    // written under their lock
+    assertEquals(2, opened.size());
+    assertEquals(Collections.singletonList(Boolean.TRUE), opened.get(0).getLockHeldDuringWrite());
+    assertEquals(Collections.singletonList(Boolean.TRUE), opened.get(1).getLockHeldDuringWrite());
+    new StatusChecker(context).assertIsErrorFree();
+  }
+
+  /**
+   * Holds each event in encode() until as many events as there are parties
+   * are being encoded at the same time, so that the first events of that many
+   * threads are written concurrently; later events are not held. The wait is
+   * bounded, and the events are encoded when it ends either way; whether the
+   * events did meet up is recorded instead. They cannot while one of them
+   * is encoded under a lock that the others wait for, i.e. unless events are
+   * encoded outside the appender's lock.
+   */
+  static class RendezvousEncoder extends EchoEncoder<Object> {
+    final CountDownLatch encoding;
+    volatile boolean metUp = true;
+
+    RendezvousEncoder(int parties) {
+      encoding = new CountDownLatch(parties);
+    }
+
+    @Override
+    public byte[] encode(Object event) {
+      encoding.countDown();
+      try {
+        if (!encoding.await(30, TimeUnit.SECONDS)) {
+          metUp = false;
+        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      return super.encode(event);
+    }
   }
 }
