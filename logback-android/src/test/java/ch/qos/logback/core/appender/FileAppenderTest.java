@@ -18,6 +18,7 @@ package ch.qos.logback.core.appender;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
@@ -547,6 +548,43 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     checker.asssertContainsException(ClosedChannelException.class);
     checker.assertContainsMatch(Status.INFO, "Attempting to recover from IO failure on file");
     checker.assertNoMatch("Failed to open");
+    // recovery is reported once an event was written to the reopened file,
+    // not when the broken stream is closed to reopen it
+    int attempting = indexOfFirstStatus("Attempting to recover from IO failure on file");
+    int recovered = indexOfFirstStatus("Recovered from IO failure on file");
+    assertTrue("recovery reported before it was attempted", attempting < recovered);
+  }
+
+  @Test
+  public void prudentAppenderKeepsBackingOffWhileItsFileCannotBeReopened() throws Exception {
+    File dir = tmp.newFolder("gone");
+    File file = new File(dir, "gone.log");
+    FileAppenderFriend<Object> fa = newFileAppender("gone", file, new Utf8LineEncoder());
+    fa.setPrudent(true);
+    fa.start();
+    fa.doAppend("before");
+    // the channel is closed, as in the test above, and the file cannot be
+    // reopened: its directory is gone (e.g. unmounted storage)
+    ((ResilientFileOutputStream) fa.getOutputStream()).getChannel().close();
+    assertTrue(file.delete());
+    assertTrue(dir.delete());
+
+    fa.doAppend("lost");
+    waitUntilRecoveryIsDue(System.currentTimeMillis());
+    // makes the resilient stream try to reopen the file, which fails
+    fa.doAppend("lost too");
+
+    assertTrue(fa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    assertEquals(1, checker.matchCount("Attempting to recover from IO failure on file"));
+    checker.assertContainsMatch(Status.ERROR, "Failed to open file");
+    // the stream is still in error, and backs off further before the next
+    // attempt: reporting it recovered would restart its back-off and its
+    // status count, i.e. a reopen attempt and four statuses for every event
+    // logged 20 ms after the last one
+    checker.assertNoMatch("Recovered from IO failure");
+    checker.assertNoMatch("Appender \\[.*\\] failed to append");
+    fa.stop();
   }
 
   @Test
@@ -796,6 +834,17 @@ public class FileAppenderTest extends AbstractAppenderTest<Object> {
     fa.setEncoder(encoder);
     fa.setFile(file.getAbsolutePath());
     return fa;
+  }
+
+  private int indexOfFirstStatus(String messagePrefix) {
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    for (int i = 0; i < statuses.size(); i++) {
+      if (statuses.get(i).getMessage().startsWith(messagePrefix)) {
+        return i;
+      }
+    }
+    fail("no status starting with: " + messagePrefix);
+    return -1;
   }
 
   static String readUtf8(File file) throws IOException {

@@ -111,6 +111,10 @@ abstract public class ResilientOutputStreamBase extends OutputStream {
 
   @Override
   public void close() throws IOException {
+    closeStream();
+  }
+
+  private void closeStream() throws IOException {
     if (os != null) {
       os.close();
     }
@@ -118,7 +122,13 @@ abstract public class ResilientOutputStreamBase extends OutputStream {
 
   void attemptRecovery() {
     try {
-      close();
+      // Closes the broken stream itself, as upstream's close() does. This
+      // port's ResilientFileOutputStream.close() also runs flush(), which
+      // succeeds when nothing is buffered (e.g. after a prudent FileAppender
+      // failed to lock a closed channel) and so would report recovery,
+      // resetting the back-off and the status count, before the stream is
+      // even reopened.
+      closeStream();
     } catch (IOException e) {
     }
 

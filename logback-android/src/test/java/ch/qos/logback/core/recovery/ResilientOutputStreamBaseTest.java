@@ -108,7 +108,7 @@ public class ResilientOutputStreamBaseTest {
     return stream;
   }
 
-  private static RecoveryCoordinator recoveryCoordinatorOf(ResilientOutputStreamBase stream) throws Exception {
+  static RecoveryCoordinator recoveryCoordinatorOf(ResilientOutputStreamBase stream) throws Exception {
     Field field = ResilientOutputStreamBase.class.getDeclaredField("recoveryCoordinator");
     field.setAccessible(true);
     return (RecoveryCoordinator) field.get(stream);
