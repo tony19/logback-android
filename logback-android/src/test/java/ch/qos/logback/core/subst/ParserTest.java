@@ -16,6 +16,8 @@
 package ch.qos.logback.core.subst;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
 
@@ -188,6 +190,34 @@ public class ParserTest {
     // be able to handle this.
     Parser parser = new Parser(new ArrayList<Token>());
     parser.parse();
+  }
+
+  @Test
+  public void nullTokenListParsesToNull() throws ScanException {
+    Parser parser = new Parser(null);
+    assertNull(parser.parse());
+  }
+
+  @Test
+  public void emptyTokenListParsesToNull() throws ScanException {
+    Parser parser = new Parser(new ArrayList<Token>());
+    assertNull(parser.parse());
+  }
+
+  @Test
+  public void secondDefaultSeparatorInVariableIsRejected() throws ScanException {
+    Tokenizer tokenizer = new Tokenizer("${a:-b:-c}");
+    Parser parser = new Parser(tokenizer.tokenize());
+    ScanException e = assertThrows(ScanException.class, parser::parse);
+    assertEquals("Expecting }", e.getMessage());
+  }
+
+  @Test
+  public void unclosedVariableIsRejected() throws ScanException {
+    Tokenizer tokenizer = new Tokenizer("${a");
+    Parser parser = new Parser(tokenizer.tokenize());
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class, parser::parse);
+    assertEquals("All tokens consumed but was expecting \"}\"", e.getMessage());
   }
 
   private void dump(Node node) {

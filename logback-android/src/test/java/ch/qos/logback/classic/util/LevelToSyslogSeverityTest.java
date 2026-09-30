@@ -16,6 +16,8 @@
 package ch.qos.logback.classic.util;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 
@@ -44,6 +46,20 @@ public class LevelToSyslogSeverityTest {
     assertEquals(SyslogConstants.ERROR_SEVERITY, LevelToSyslogSeverity
         .convert(createEventOfLevel(Level.ERROR)));
 
+  }
+
+  @Test
+  public void levelsWithoutPrintingMethodAreRejected() {
+    for (final Level level : new Level[] { Level.OFF, Level.ALL }) {
+      IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+          () -> LevelToSyslogSeverity.convert(createEventOfLevel(level)));
+      assertEquals("Level " + level + " is not a valid level for a printing method", e.getMessage());
+    }
+  }
+
+  @Test
+  public void utilityClassKeepsItsPublicConstructor() {
+    assertNotNull(new LevelToSyslogSeverity());
   }
 
   ILoggingEvent createEventOfLevel(Level level) {

@@ -119,6 +119,26 @@ public class FileSorterTest {
     assertThat(sort("/var/logs/my-app/%d{yyyy-MM,aux}/%d{yyyy-MM-dd}/%i.log", FILENAMES), contains(EXPECTED_RESULT));
   }
 
+  @Test
+  public void sortsDescendingByNameWhenDateCannotBeParsed() {
+    final String PATTERN = "/var/logs/my-app/%d{yyyy-MM-dd}.log";
+    // one name without a date: comparing it with a dated name falls back to
+    // the raw names, in whichever order the two are compared
+    final String[] EXPECTED_RESULT = new String[] {
+      "/var/logs/my-app/undated.log",
+      "/var/logs/my-app/2019-01-01.log",
+    };
+
+    assertThat(sort(PATTERN, new String[] {
+      "/var/logs/my-app/2019-01-01.log",
+      "/var/logs/my-app/undated.log",
+    }), contains(EXPECTED_RESULT));
+    assertThat(sort(PATTERN, new String[] {
+      "/var/logs/my-app/undated.log",
+      "/var/logs/my-app/2019-01-01.log",
+    }), contains(EXPECTED_RESULT));
+  }
+
   private List<String> sort(String pattern, String[] filenames) {
     FileNamePattern fileNamePattern = new FileNamePattern(pattern, new LoggerContext());
     FileSorter sorter = new FileSorter(new DateParser(fileNamePattern), new IntParser(fileNamePattern));

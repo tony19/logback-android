@@ -17,6 +17,10 @@ package ch.qos.logback.classic.pattern;
 
 import static junit.framework.Assert.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
 import org.junit.Test;
 
 import ch.qos.logback.classic.pattern.TargetLengthBasedClassNameAbbreviator;
@@ -147,5 +151,31 @@ public class TargetLengthBasedClassNameAbbreviatorTest  {
       String name = "com.logback.wombat.alligator.tomato.Foobar";
       assertEquals("c.l.w.alligator.tomato.Foobar", abbreviator.abbreviate(name));
     }
+  }
+
+  @Test
+  public void nullClassNameIsRejected() {
+    TargetLengthBasedClassNameAbbreviator abbreviator = new TargetLengthBasedClassNameAbbreviator(10);
+    try {
+      abbreviator.abbreviate(null);
+      fail("expected IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      assertEquals("Class name may not be null", e.getMessage());
+    }
+  }
+
+  @Test
+  public void printArrayWritesCommaSeparatedValuesToStandardOut() throws UnsupportedEncodingException {
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    PrintStream original = System.out;
+    System.setOut(new PrintStream(bytes, true, "UTF-8"));
+    try {
+      TargetLengthBasedClassNameAbbreviator.printArray("dots: ", new int[] {3, 11, 15});
+      TargetLengthBasedClassNameAbbreviator.printArray("none: ", new int[0]);
+    } finally {
+      System.setOut(original);
+    }
+    String ls = System.getProperty("line.separator");
+    assertEquals("dots: 3, 11, 15" + ls + "none: " + ls, bytes.toString("UTF-8"));
   }
 }

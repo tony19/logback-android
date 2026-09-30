@@ -16,6 +16,7 @@
 package ch.qos.logback.classic.net.server;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import javax.net.ServerSocketFactory;
@@ -24,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.core.net.mock.MockContext;
+import ch.qos.logback.core.net.ssl.SSLConfiguration;
 
 /**
  * Unit tests for {@link SSLServerSocketReceiver}.
@@ -54,6 +56,21 @@ public class SSLServerSocketReceiverTest {
     assertNotNull(socketFactory);
     assertTrue(ssl.isContextCreated());
     assertTrue(parameters.isContextInjected());
+  }
+
+  @Test
+  public void serverSocketFactoryIsCreatedOnlyOnce() throws Exception {
+    ServerSocketFactory first = receiver.getServerSocketFactory();
+    assertSame(first, receiver.getServerSocketFactory());
+  }
+
+  @Test
+  public void sslConfigurationDefaultsToANewConfiguration() throws Exception {
+    SSLServerSocketReceiver unconfigured = new SSLServerSocketReceiver();
+    SSLConfiguration ssl = unconfigured.getSsl();
+    assertNotNull(ssl);
+    assertSame(ssl, unconfigured.getSsl());
+    assertSame(this.ssl, receiver.getSsl());
   }
 
 }

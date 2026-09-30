@@ -17,6 +17,7 @@ package ch.qos.logback.classic;
 
 import ch.qos.logback.classic.net.testObjectBuilders.LoggingEventBuilderInContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.read.ListAppender;
 import ch.qos.logback.core.testUtil.RandomUtil;
@@ -85,5 +86,45 @@ public class AsyncAppenderTest {
     assertTrue(e.hasCallerData());
     StackTraceElement ste = e.getCallerData()[0];
     assertEquals(thisClassName, ste.getClassName());
+  }
+
+  private ILoggingEvent eventAt(Level level) {
+    return new LoggingEvent(thisClassName, context.getLogger(thisClassName), level, level.toString(), null, null);
+  }
+
+  @Test
+  public void eventsOfLevelInfoOrLowerAreDiscardable() {
+    assertTrue(asyncAppender.isDiscardable(eventAt(Level.TRACE)));
+    assertTrue(asyncAppender.isDiscardable(eventAt(Level.DEBUG)));
+    assertTrue(asyncAppender.isDiscardable(eventAt(Level.INFO)));
+    assertFalse(asyncAppender.isDiscardable(eventAt(Level.WARN)));
+    assertFalse(asyncAppender.isDiscardable(eventAt(Level.ERROR)));
+  }
+
+  @Test
+  public void discardableEventsAreDroppedWhenQueueIsBelowDiscardingThreshold() {
+    asyncAppender.addAppender(listAppender);
+    asyncAppender.setQueueSize(10);
+    // remaining capacity (at most 10) is always below this threshold
+    asyncAppender.setDiscardingThreshold(11);
+    // stop() returns as soon as the worker has flushed; a generous bound keeps a slow machine from losing events
+    asyncAppender.setMaxFlushTime(60000);
+    asyncAppender.start();
+
+    for (Level level : new Level[] {Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR}) {
+      asyncAppender.doAppend(eventAt(level));
+    }
+    asyncAppender.stop();
+
+    assertEquals(2, listAppender.list.size());
+    assertEquals(Level.WARN, listAppender.list.get(0).getLevel());
+    assertEquals(Level.ERROR, listAppender.list.get(1).getLevel());
+  }
+
+  @Test
+  public void includeCallerDataIsOffByDefaultAndSettable() {
+    assertFalse(asyncAppender.isIncludeCallerData());
+    asyncAppender.setIncludeCallerData(true);
+    assertTrue(asyncAppender.isIncludeCallerData());
   }
 }

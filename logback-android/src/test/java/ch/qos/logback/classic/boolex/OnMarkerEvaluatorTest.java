@@ -20,8 +20,10 @@ import static junit.framework.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import ch.qos.logback.classic.Level;
@@ -64,8 +66,43 @@ public class OnMarkerEvaluatorTest {
     evaluator.start();
     assertFalse(evaluator.evaluate(event));
   }
-  
-  
+
+  @Test
+  public void emptyMarkerListInEvent() throws EvaluationException {
+    evaluator.addMarker("M");
+    evaluator.start();
+    event.setMarkers(Collections.<Marker>emptyList());
+    assertFalse(evaluator.evaluate(event));
+  }
+
+  @Test
+  public void eventMarkersMatchingNoConfiguredMarker() throws EvaluationException {
+    evaluator.addMarker("A");
+    evaluator.addMarker("B");
+    evaluator.start();
+    event.setMarkers(Arrays.asList(MarkerFactory.getDetachedMarker("X"), MarkerFactory.getDetachedMarker("Y")));
+    assertFalse(evaluator.evaluate(event));
+  }
+
+  @Test
+  public void anyEventMarkerMatchingAnyConfiguredMarker() throws EvaluationException {
+    evaluator.addMarker("A");
+    evaluator.addMarker("B");
+    evaluator.start();
+    event.setMarkers(Arrays.asList(MarkerFactory.getDetachedMarker("X"), MarkerFactory.getDetachedMarker("B")));
+    assertTrue(evaluator.evaluate(event));
+  }
+
+  @Test
+  public void eventMarkerReferencingConfiguredMarker() throws EvaluationException {
+    evaluator.addMarker("M");
+    evaluator.start();
+    Marker parent = MarkerFactory.getDetachedMarker("P");
+    parent.add(MarkerFactory.getDetachedMarker("M"));
+    event.setMarkers(Collections.singletonList(parent));
+    assertTrue(evaluator.evaluate(event));
+  }
+
   LoggingEvent makeEvent() {
     return new LoggingEvent("x", lc.getLogger("x"), Level.DEBUG, "msg", null, null);
   }

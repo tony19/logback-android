@@ -99,6 +99,14 @@ public class EnvUtilTest {
     }
 
     @Test
+    public void unparsableVersionIsNotJDK5OrHigher() {
+        System.setProperty("java.version", "unknown");
+
+        assertFalse(EnvUtil.isJDK5());
+        assertFalse(EnvUtil.isJDK7OrHigher());
+    }
+
+    @Test
     public void testJava10() {
         System.setProperty("java.version", "10.xx");
 

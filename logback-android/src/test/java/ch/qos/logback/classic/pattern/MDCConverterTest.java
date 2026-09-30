@@ -17,12 +17,16 @@ package ch.qos.logback.classic.pattern;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import ch.qos.logback.core.testUtil.RandomUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.MDC;
+
+import java.util.Collections;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -71,6 +75,36 @@ public class MDCConverterTest {
     String result = converter.convert(le);
     boolean isConform = result.matches("testKey2?=testValue2?, testKey2?=testValue2?");
     assertTrue(result + " is not conform", isConform);
+  }
+
+  @Test
+  public void testConvertWithKeyAndDefaultValue() {
+    converter.stop();
+    converter.setOptionList(Collections.singletonList("absentKey:-fallback"));
+    converter.start();
+    MDC.put("otherKey", "otherValue");
+
+    assertEquals("fallback", converter.convert(createLoggingEvent()));
+  }
+
+  @Test
+  public void testConvertWithoutMDCMapYieldsDefaultValue() {
+    converter.stop();
+    converter.setOptionList(Collections.singletonList("someKey:-fallback"));
+    converter.start();
+
+    assertEquals("fallback", converter.convert(eventWithoutMDCMap()));
+  }
+
+  @Test
+  public void testConvertWithoutMDCMapYieldsEmptyStringByDefault() {
+    assertEquals("", converter.convert(eventWithoutMDCMap()));
+  }
+
+  private ILoggingEvent eventWithoutMDCMap() {
+    ILoggingEvent event = mock(ILoggingEvent.class);
+    when(event.getMDCPropertyMap()).thenReturn(null);
+    return event;
   }
 
   private ILoggingEvent createLoggingEvent() {

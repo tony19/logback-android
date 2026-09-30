@@ -17,6 +17,8 @@ package ch.qos.logback.classic.turbo;
 
 import static junit.framework.Assert.*;
 
+import java.lang.reflect.Field;
+
 import org.junit.Test;
 
 import ch.qos.logback.core.spi.FilterReply;
@@ -86,6 +88,44 @@ public class DuplicateMessageFilterTest {
         null));
     assertEquals(FilterReply.NEUTRAL, dmf.decide(null, null, null, null, null,
         null));
+  }
+
+  @Test
+  public void allowedRepetitionsAndCacheSizeHaveDefaultsAndCanBeSet() {
+    DuplicateMessageFilter dmf = new DuplicateMessageFilter();
+    assertEquals(5, dmf.getAllowedRepetitions());
+    assertEquals(DuplicateMessageFilter.DEFAULT_ALLOWED_REPETITIONS, dmf.getAllowedRepetitions());
+    assertEquals(100, dmf.getCacheSize());
+    assertEquals(DuplicateMessageFilter.DEFAULT_CACHE_SIZE, dmf.getCacheSize());
+
+    dmf.setAllowedRepetitions(3);
+    dmf.setCacheSize(7);
+
+    assertEquals(3, dmf.getAllowedRepetitions());
+    assertEquals(7, dmf.getCacheSize());
+  }
+
+  @Test
+  public void stopClearsAndDropsTheMessageCache() throws Exception {
+    DuplicateMessageFilter dmf = new DuplicateMessageFilter();
+    dmf.setAllowedRepetitions(0);
+    dmf.start();
+    assertEquals(FilterReply.NEUTRAL, dmf.decide(null, null, null, "x", null, null));
+    assertEquals(FilterReply.DENY, dmf.decide(null, null, null, "x", null, null));
+    Field msgCacheField = DuplicateMessageFilter.class.getDeclaredField("msgCache");
+    msgCacheField.setAccessible(true);
+    LRUMessageCache msgCache = (LRUMessageCache) msgCacheField.get(dmf);
+    assertFalse(msgCache.isEmpty());
+
+    dmf.stop();
+
+    assertFalse(dmf.isStarted());
+    assertTrue(msgCache.isEmpty());
+    assertNull(msgCacheField.get(dmf));
+
+    // a restarted filter has forgotten the messages seen before
+    dmf.start();
+    assertEquals(FilterReply.NEUTRAL, dmf.decide(null, null, null, "x", null, null));
   }
 
 }

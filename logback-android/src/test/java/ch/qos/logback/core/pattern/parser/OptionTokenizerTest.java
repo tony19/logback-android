@@ -15,13 +15,115 @@
  */
 package ch.qos.logback.core.pattern.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
 
+import ch.qos.logback.core.spi.ScanException;
+
 public class OptionTokenizerTest {
+
+  static final String UNEXPECTED_END = "Unexpected end of pattern string in OptionTokenizer";
 
   @Test
    public void testEmpty() {
 
+  }
+
+  @Test
+  public void escapeConsumingLastCharOfQuotedOptionIsReportedAsScanException() {
+    // the backslash escapes the closing quote, which is the last char of the pattern
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("%x{'a\\'").tokenize());
+    assertEquals(UNEXPECTED_END, e.getMessage());
+  }
+
+  @Test
+  public void unterminatedQuotedOptionEndingWithCurlyBraceIsRejected() {
+    // the '}' is inside the still-open quote, so it does not close the option list
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("%x{'abc}").tokenize());
+    assertEquals(UNEXPECTED_END, e.getMessage());
+  }
+
+  @Test
+  public void optionWithoutClosingCurlyBraceIsRejected() {
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("%x{abc").tokenize());
+    assertEquals(UNEXPECTED_END, e.getMessage());
+  }
+
+  @Test
+  public void quotedOptionWithoutClosingCurlyBraceIsRejected() {
+    ScanException e = assertThrows(ScanException.class,
+        () -> new TokenStream("%x{'abc'").tokenize());
+    assertEquals(UNEXPECTED_END, e.getMessage());
+  }
+
+  @Test
+  public void escapedQuoteDoesNotCloseQuotedOptionAndIsKeptAsIs() throws ScanException {
+    List<Token> tokens = new TokenStream("%x{'a\\'b'}").tokenize();
+
+    assertEquals(3, tokens.size());
+    Token option = tokens.get(2);
+    assertEquals(Token.OPTION, option.getType());
+    assertEquals(Collections.singletonList("a\\'b"), option.getOptionsList());
+  }
+
+  @Test
+  public void unquotedOptionsAreTrimmedButQuotedOptionsAreKeptVerbatim() throws ScanException {
+    List<Token> tokens = new TokenStream("%x{ a b , ' c ' , d } z").tokenize();
+
+    assertEquals(4, tokens.size());
+    Token option = tokens.get(2);
+    assertEquals(Token.OPTION, option.getType());
+    assertEquals(Arrays.asList("a b", " c ", "d"), option.getOptionsList());
+    assertEquals(new Token(Token.LITERAL, " z"), tokens.get(3));
+  }
+
+  @Test
+  public void lastUnquotedOptionIsTrimmedWhenItsCurlyBraceEndsThePattern() throws ScanException {
+    List<Token> tokens = new TokenStream("%x{ a , b }").tokenize();
+
+    assertEquals(3, tokens.size());
+    Token option = tokens.get(2);
+    assertEquals(Token.OPTION, option.getType());
+    assertEquals(Arrays.asList("a", "b"), option.getOptionsList());
+  }
+
+  @Test
+  public void escapeAtEndOfPatternIsNoOp() {
+    TokenStream ts = new TokenStream("x");
+    ts.pointer = 1;
+    OptionTokenizer ot = new OptionTokenizer(ts);
+    StringBuffer buf = new StringBuffer("a");
+
+    ot.escape("'", buf);
+
+    assertEquals("a", buf.toString());
+    assertEquals(1, ts.pointer);
+  }
+
+  @Test
+  public void unknownStateConsumesRestOfPatternWithoutEmittingOption() {
+    TokenStream ts = new TokenStream("ab}");
+    ts.pointer = 1;
+    OptionTokenizer ot = new OptionTokenizer(ts);
+    ot.state = 42;
+    List<Token> tokens = new ArrayList<Token>();
+
+    ScanException e = assertThrows(ScanException.class, () -> ot.tokenize('a', tokens));
+
+    assertEquals(UNEXPECTED_END, e.getMessage());
+    assertTrue(tokens.isEmpty());
+    assertEquals(3, ts.pointer);
   }
 
 //

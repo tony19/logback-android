@@ -17,8 +17,6 @@ package ch.qos.logback.classic.spi;
 
 import ch.qos.logback.core.CoreConstants;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
@@ -37,18 +35,6 @@ public class ThrowableProxy implements IThrowableProxy {
 
   private transient PackagingDataCalculator packagingDataCalculator;
   private boolean calculatedPackageData = false;
-
-  private static final Method GET_SUPPRESSED_METHOD;
-
-  static {
-    Method method = null;
-    try {
-      method = Throwable.class.getMethod("getSuppressed");
-    } catch (NoSuchMethodException e) {
-      // ignore, will get thrown in Java < 7
-    }
-    GET_SUPPRESSED_METHOD = method;
-  }
 
   private static final ThrowableProxy[] NO_SUPPRESSED = new ThrowableProxy[0];
   private static final StackTraceElementProxy[] NO_STACK_TRACE = new StackTraceElementProxy[0];
@@ -78,26 +64,16 @@ public class ThrowableProxy implements IThrowableProxy {
                 stackTraceElementProxyArray);
       }
 
-      if (GET_SUPPRESSED_METHOD != null) {
-        // this will only execute on Java >= 7
-        try {
-          Object obj = GET_SUPPRESSED_METHOD.invoke(throwable);
-          if (obj instanceof Throwable[]) {
-            Throwable[] throwableSuppressed = (Throwable[]) obj;
-            if (throwableSuppressed.length > 0) {
-              suppressed = new ThrowableProxy[throwableSuppressed.length];
-              for (int i = 0; i < throwableSuppressed.length; i++) {
-                this.suppressed[i] = new ThrowableProxy(throwableSuppressed[i], visited);
-                this.suppressed[i].commonFrames = ThrowableProxyUtil
-                        .findNumberOfCommonFrames(throwableSuppressed[i].getStackTrace(),
-                                stackTraceElementProxyArray);
-              }
-            }
-          }
-        } catch (IllegalAccessException e) {
-          // ignore
-        } catch (InvocationTargetException e) {
-          // ignore
+      Throwable[] throwableSuppressed = throwable.getSuppressed();
+      // while JDK's implementation of getSuppressed() will always return a non-null array,
+      // this might not be the case in mocked throwables or in other implementations
+      if (throwableSuppressed != null && throwableSuppressed.length > 0) {
+        suppressed = new ThrowableProxy[throwableSuppressed.length];
+        for (int i = 0; i < throwableSuppressed.length; i++) {
+          this.suppressed[i] = new ThrowableProxy(throwableSuppressed[i], visited);
+          this.suppressed[i].commonFrames = ThrowableProxyUtil
+                  .findNumberOfCommonFrames(throwableSuppressed[i].getStackTrace(),
+                          stackTraceElementProxyArray);
         }
       }
     }

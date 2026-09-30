@@ -92,4 +92,93 @@ public class StatusBaseTest extends TestCase {
     }
   }
 
+  public void testRemoveFromStatusWithoutChildrenReturnsFalse() {
+    InfoStatus status = new InfoStatus("testing", this);
+
+    assertFalse(status.remove(new ErrorStatus("error", this)));
+    assertFalse(status.hasChildren());
+  }
+
+  public void testToStringWithoutOriginOmitsOriginPart() {
+    InfoStatus status = new InfoStatus("testing", null);
+
+    assertEquals("INFO testing", status.toString());
+  }
+
+  public void testToStringWithUnknownLevelOmitsLevelName() {
+    InfoStatus status = new InfoStatus("testing", "origin");
+    status.level = 42;
+
+    assertEquals(" in origin - testing", status.toString());
+  }
+
+  public void testHashCodeCombinesLevelAndMessage() {
+    assertEquals(31 * (31 + Status.INFO) + "testing".hashCode(),
+        new InfoStatus("testing", this).hashCode());
+    assertEquals(31 * (31 + Status.WARN) + "testing".hashCode(),
+        new WarnStatus("testing", this).hashCode());
+  }
+
+  public void testHashCodeOfNullMessageDependsOnLevelOnly() {
+    assertEquals(31 * (31 + Status.ERROR), new ErrorStatus(null, this).hashCode());
+  }
+
+  public void testHashCodeIgnoresOriginAndThrowable() {
+    InfoStatus a = new InfoStatus("testing", "a");
+    InfoStatus b = new InfoStatus("testing", "b", new Exception());
+
+    assertEquals(a.hashCode(), b.hashCode());
+  }
+
+  public void testEqualsIsReflexive() {
+    InfoStatus status = new InfoStatus("testing", this);
+
+    assertTrue(status.equals(status));
+  }
+
+  public void testNotEqualToNull() {
+    assertFalse(new InfoStatus("testing", this).equals(null));
+  }
+
+  public void testNotEqualToStatusOfAnotherClassWithSameLevelAndMessage() {
+    InfoStatus status = new InfoStatus("testing", this);
+    InfoStatus subclassStatus = new InfoStatus("testing", this) {
+    };
+
+    assertEquals(status.getLevel(), subclassStatus.getLevel());
+    assertFalse(status.equals(subclassStatus));
+  }
+
+  public void testNotEqualWhenLevelsDiffer() {
+    InfoStatus status = new InfoStatus("testing", this);
+    InfoStatus other = new InfoStatus("testing", this);
+    other.level = Status.WARN;
+
+    assertFalse(status.equals(other));
+  }
+
+  public void testEqualWhenLevelAndMessageMatchRegardlessOfOriginAndThrowable() {
+    InfoStatus a = new InfoStatus("testing", "a");
+    InfoStatus b = new InfoStatus("testing", "b", new Exception());
+
+    assertTrue(a.equals(b));
+    assertTrue(b.equals(a));
+  }
+
+  public void testNotEqualWhenMessagesDiffer() {
+    assertFalse(new InfoStatus("testing", this).equals(new InfoStatus("other", this)));
+  }
+
+  public void testEqualWhenBothMessagesAreNull() {
+    assertTrue(new InfoStatus(null, this).equals(new InfoStatus(null, this)));
+  }
+
+  public void testNotEqualWhenOnlyOneMessageIsNull() {
+    InfoStatus withNull = new InfoStatus(null, this);
+    InfoStatus withMessage = new InfoStatus("testing", this);
+
+    assertFalse(withNull.equals(withMessage));
+    assertFalse(withMessage.equals(withNull));
+  }
+
 }

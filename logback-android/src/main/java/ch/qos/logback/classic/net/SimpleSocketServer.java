@@ -78,7 +78,11 @@ public class SimpleSocketServer extends Thread {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
     configureLC(lc, configFile);
 
-    SimpleSocketServer sss = new SimpleSocketServer(lc, port);
+    // Unlike upstream logback 1.2, which ignores serverClass and always
+    // starts a plain SimpleSocketServer (so SimpleSSLSocketServer.main
+    // started a server without SSL), create the requested class.
+    SimpleSocketServer sss = serverClass.getConstructor(LoggerContext.class, int.class)
+        .newInstance(lc, port);
     sss.start();
   }
 

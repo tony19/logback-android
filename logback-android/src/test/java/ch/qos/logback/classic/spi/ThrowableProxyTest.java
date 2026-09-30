@@ -16,13 +16,19 @@
 package ch.qos.logback.classic.spi;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import static ch.qos.logback.classic.util.TestHelper.addSuppressed;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import ch.qos.logback.classic.util.TestHelper;
@@ -192,6 +198,90 @@ public class ThrowableProxyTest {
 
     verifyContains(ex1, "Suppressed: CIRCULAR REFERENCE:java.lang.Exception: Foo");
     verifyContains(ex2, "Suppressed: CIRCULAR REFERENCE:java.lang.Exception: Bar");
+  }
+
+  @Test
+  public void mockedThrowableWithNullSuppressedArrayYieldsNoSuppressedProxies() {
+    // Throwable.getSuppressed() never returns null for a real throwable, but a
+    // mocked one does (Mockito's default answer for an array is null)
+    Throwable t = mock(Exception.class);
+    doReturn("mocked").when(t).getMessage();
+    doReturn(null).when(t).getSuppressed();
+
+    ThrowableProxy tp = new ThrowableProxy(t);
+
+    assertEquals("mocked", tp.getMessage());
+    assertEquals(0, tp.getSuppressed().length);
+    assertEquals(0, tp.getStackTraceElementProxyArray().length);
+    assertNull(tp.getCause());
+  }
+
+  @Test
+  public void suppressedThrowablesAreProxiedInOrderWithTheirCommonFrames() {
+    Exception main = new Exception("main");
+    Exception foo = new Exception("Foo");
+    Exception bar = new Exception("Bar");
+    main.addSuppressed(foo);
+    main.addSuppressed(bar);
+
+    ThrowableProxy tp = new ThrowableProxy(main);
+
+    IThrowableProxy[] suppressed = tp.getSuppressed();
+    assertEquals(2, suppressed.length);
+    assertEquals("Foo", suppressed[0].getMessage());
+    assertEquals("Bar", suppressed[1].getMessage());
+    // the three throwables are created on different lines of this method, so
+    // they share every frame but the topmost one
+    int expectedCommonFrames = main.getStackTrace().length - 1;
+    assertEquals(expectedCommonFrames, suppressed[0].getCommonFrames());
+    assertEquals(expectedCommonFrames, suppressed[1].getCommonFrames());
+  }
+
+  @Test
+  public void keepsTheProxiedThrowable() {
+    Exception e = new Exception("kept");
+    assertSame(e, new ThrowableProxy(e).getThrowable());
+  }
+
+  @Test
+  public void packagingDataCalculatorIsCreatedOnceAndReused() {
+    ThrowableProxy tp = new ThrowableProxy(new Exception("x"));
+
+    PackagingDataCalculator pdc = tp.getPackagingDataCalculator();
+
+    assertNotNull(pdc);
+    assertSame(pdc, tp.getPackagingDataCalculator());
+  }
+
+  @Test
+  public void packagingDataIsCalculatedOnlyOnce() {
+    ThrowableProxy tp = new ThrowableProxy(new Exception("x"));
+    tp.calculatePackagingData();
+    StackTraceElementProxy[] steps = tp.getStackTraceElementProxyArray();
+    ClassPackagingData first = steps[0].getClassPackagingData();
+    assertNotNull(first);
+
+    // a second calculation would fail: packaging data can be set only once per frame
+    tp.calculatePackagingData();
+
+    assertSame(first, steps[0].getClassPackagingData());
+  }
+
+  @Test
+  public void proxyWithoutThrowableHasNoPackagingDataCalculator() throws Exception {
+    // getPackagingDataCalculator() assumes a proxy without throwable was deserialized;
+    // ThrowableProxy is no longer Serializable, so clear the field reflectively
+    ThrowableProxy tp = new ThrowableProxy(new Exception("x"));
+    Field throwableField = ThrowableProxy.class.getDeclaredField("throwable");
+    throwableField.setAccessible(true);
+    throwableField.set(tp, null);
+
+    assertNull(tp.getPackagingDataCalculator());
+    tp.calculatePackagingData();
+
+    for (StackTraceElementProxy step : tp.getStackTraceElementProxyArray()) {
+      assertNull(step.getClassPackagingData());
+    }
   }
 
   void someMethod() throws Exception {

@@ -72,7 +72,8 @@ public class FormatInfo {
       minPart = str;
     }
 
-    if (minPart != null && minPart.length() > 0) {
+    // minPart is never null here: both branches above assign it
+    if (minPart.length() > 0) {
       int min = Integer.parseInt(minPart);
       if (min >= 0) {
         fi.min = min;
@@ -82,7 +83,8 @@ public class FormatInfo {
       }
     }
 
-    if (maxPart != null && maxPart.length() > 0) {
+    // a non-null maxPart is never empty: a trailing '.' is rejected above
+    if (maxPart != null) {
       int max = Integer.parseInt(maxPart);
       if (max >= 0) {
         fi.max = max;

@@ -21,10 +21,16 @@ import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -34,6 +40,9 @@ public class TimeBasedFileNamingAndTriggeringPolicyBaseTest {
 
   static long MILLIS_IN_MINUTE = 60*1000;
   static long MILLIS_IN_HOUR = 60*MILLIS_IN_MINUTE;
+
+  @Rule
+  public TemporaryFolder tmp = new TemporaryFolder();
 
   Context context = new ContextBase();
   RollingFileAppender<Object> rfa = new RollingFileAppender<Object>();
@@ -114,5 +123,72 @@ public class TimeBasedFileNamingAndTriggeringPolicyBaseTest {
     assertFalse(tbrp.isStarted());
     StatusChecker statusChecker = new StatusChecker(context);
     statusChecker.assertContainsMatch(Status.ERROR, "Filename pattern .{37} contains an integer token converter");
+  }
+
+  @Test
+  public void fileNamePatternWithoutDateTokenIsRejected() {
+    tbrp.setFileNamePattern("foo.log");
+
+    IllegalStateException e = assertThrows(IllegalStateException.class, tbrp::start);
+
+    assertEquals("FileNamePattern [foo.log] does not contain a valid DateToken", e.getMessage());
+    assertFalse(timeBasedFNATP.isStarted());
+  }
+
+  @Test
+  public void stopMarksPolicyAsNotStarted() {
+    tbrp.setFileNamePattern("foo-%d{yyyy-MM-dd}.log");
+    tbrp.start();
+    assertTrue(timeBasedFNATP.isStarted());
+
+    timeBasedFNATP.stop();
+
+    assertFalse(timeBasedFNATP.isStarted());
+  }
+
+  @Test
+  public void readableActiveFileDeterminesInitialPeriod() throws IOException {
+    // Friday January 7th 12:00:00 UTC 2000
+    File activeFile = tmp.newFile("active.log");
+    assertTrue(activeFile.setLastModified(947246400000L));
+    rfa.setFile(activeFile.getAbsolutePath());
+    tbrp.setFileNamePattern("foo-%d{yyyy-MM-dd, UTC}.log");
+    timeBasedFNATP.setCurrentTime(1324400341553L);
+
+    tbrp.start();
+
+    assertEquals("foo-2000-01-07.log", timeBasedFNATP.getCurrentPeriodsFileNameWithoutCompressionSuffix());
+  }
+
+  @Test
+  public void unreadableActiveFileDoesNotDetermineInitialPeriod() throws IOException {
+    // Friday January 7th 12:00:00 UTC 2000
+    File activeFile = tmp.newFile("active.log");
+    assertTrue(activeFile.setLastModified(947246400000L));
+    // file permissions can't make a file unreadable for a privileged user, or
+    // at all on some platforms, so hand the policy a file that reports it
+    // can't be read
+    DefaultTimeBasedFileNamingAndTriggeringPolicy<Object> fnatp = new DefaultTimeBasedFileNamingAndTriggeringPolicy<Object>() {
+      @Override
+      File newActiveFile(String fileName) {
+        return new File(fileName) {
+          @Override
+          public boolean canRead() {
+            return false;
+          }
+        };
+      }
+    };
+    fnatp.setContext(context);
+    tbrp.setTimeBasedFileNamingAndTriggeringPolicy(fnatp);
+    fnatp.setTimeBasedRollingPolicy(tbrp);
+    rfa.setFile(activeFile.getAbsolutePath());
+    tbrp.setFileNamePattern("foo-%d{yyyy-MM-dd, UTC}.log");
+    // Tuesday December 20th 16:59:01 UTC 2011
+    fnatp.setCurrentTime(1324400341553L);
+
+    tbrp.start();
+
+    assertEquals("foo-2011-12-20.log", fnatp.getCurrentPeriodsFileNameWithoutCompressionSuffix());
   }
 }

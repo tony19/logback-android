@@ -161,4 +161,44 @@ public class ConsoleAppenderTest extends AbstractAppenderTest<Object> {
 
   }
 
+  @Test
+  public void targetDefaultsToSystemOut() {
+    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    assertEquals("System.out", ca.getTarget());
+  }
+
+  @Test
+  public void systemErrTargetWritesToSystemErr() {
+    PrintStream originalErr = System.err;
+    XTeeOutputStream errTee = new XTeeOutputStream(null);
+    System.setErr(new PrintStream(errTee));
+    try {
+      ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+      ca.setContext(context);
+      // surrounding spaces are ignored
+      ca.setTarget(" System.err ");
+      assertEquals("System.err", ca.getTarget());
+      ca.setEncoder(new DummyEncoder<Object>());
+      ca.start();
+      ca.doAppend(new Object());
+
+      assertEquals(DummyLayout.DUMMY, errTee.toString());
+      assertEquals("", tee.toString());
+      new StatusChecker(context).assertIsWarningOrErrorFree();
+    } finally {
+      System.setErr(originalErr);
+    }
+  }
+
+  @Test
+  public void invalidTargetKeepsPreviouslySetTarget() {
+    ConsoleAppender<Object> ca = (ConsoleAppender<Object>) getAppender();
+    ca.setContext(context);
+    ca.setTarget("System.err");
+
+    ca.setTarget("foo");
+
+    assertEquals("System.err", ca.getTarget());
+    new StatusChecker(context).assertContainsMatch(Status.WARN, "\\[foo\\] should be one of");
+  }
 }

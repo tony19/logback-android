@@ -124,11 +124,9 @@ public class OptionHelper {
    * @return value corresponding to key from the OS environment
    */
   public static String getEnv(String key) {
-    try {
-      return System.getenv(key);
-    } catch (SecurityException e) {
-      return null;
-    }
+    // System.getenv only throws SecurityException when a SecurityManager
+    // denies access, and Android never has one
+    return System.getenv(key);
   }
 
   /**
@@ -179,17 +177,14 @@ public class OptionHelper {
   }
 
   /**
-   * Very similar to {@link System#getProperties()} except that the
-   * {@link SecurityException} is absorbed.
+   * Same as {@link System#getProperties()}.
    *
    * @return the system properties
    */
   public static Properties getSystemProperties() {
-    try {
-      return System.getProperties();
-    } catch (SecurityException e) {
-      return new Properties();
-    }
+    // System.getProperties only throws SecurityException when a
+    // SecurityManager denies access, and Android never has one
+    return System.getProperties();
   }
 
   /**

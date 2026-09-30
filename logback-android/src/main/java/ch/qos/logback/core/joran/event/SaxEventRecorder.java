@@ -69,22 +69,23 @@ public class SaxEventRecorder extends DefaultHandler implements ContextAware {
       parser.parse(inputSource);
       return saxEventList;
     } catch (EOFException eof) {
-      handleError(eof.getLocalizedMessage(),
+      throw handleError(eof.getLocalizedMessage(),
           new SAXParseException(eof.getLocalizedMessage(), locator, eof));
     } catch (IOException ie) {
-      handleError("I/O error occurred while parsing xml file", ie);
+      throw handleError("I/O error occurred while parsing xml file", ie);
     } catch(SAXException se) {
       // Exception added into StatusManager via Sax error handling. No need to add it again
       throw new JoranException("Problem parsing XML document. See previously reported errors.", se);
     } catch (Exception ex) {
-      handleError("Unexpected exception while parsing XML document.", ex);
+      throw handleError("Unexpected exception while parsing XML document.", ex);
     }
-    throw new IllegalStateException("This point can never be reached");
   }
 
-  private void handleError(String errMsg, Throwable t) throws JoranException {
+  // returns (rather than throws) the exception so that every catch block above
+  // visibly ends in a throw and no unreachable statement is needed after them
+  private JoranException handleError(String errMsg, Throwable t) {
     addError(errMsg, t);
-    throw new JoranException(errMsg, t);
+    return new JoranException(errMsg, t);
   }
 
   private Driver buildPullParser() throws JoranException {

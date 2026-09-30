@@ -15,6 +15,8 @@
  */
 package ch.qos.logback.core.net.ssl;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -142,6 +144,34 @@ public class SSLParametersConfigurationTest {
     configurable.setWantClientAuth(true);
     configuration.configure(configurable);
     assertTrue(configurable.isWantClientAuth());
+  }
+
+  @Test
+  public void hostnameVerificationIsFalseUntilConfigured() {
+    assertFalse(configuration.getHostnameVerification());
+
+    configuration.setHostnameVerification(true);
+    assertTrue(configuration.getHostnameVerification());
+
+    configuration.setHostnameVerification(false);
+    assertFalse(configuration.getHostnameVerification());
+  }
+
+  @Test
+  public void enabledProtocolsAndCipherSuitesAreDeterminedOnlyOnce() {
+    configurable.setDefaultProtocols(new String[] { "A" });
+    configurable.setDefaultCipherSuites(new String[] { "X" });
+    configuration.configure(configurable);
+
+    // the same engine is assumed for every socket, so the defaults of a
+    // later socket don't matter
+    MockSSLConfigurable other = new MockSSLConfigurable();
+    other.setDefaultProtocols(new String[] { "B" });
+    other.setDefaultCipherSuites(new String[] { "Y" });
+    configuration.configure(other);
+
+    assertArrayEquals(new String[] { "A" }, other.getEnabledProtocols());
+    assertArrayEquals(new String[] { "X" }, other.getEnabledCipherSuites());
   }
 
 }

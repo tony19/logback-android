@@ -17,16 +17,21 @@ package ch.qos.logback.core;
 
 import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.read.ListAppender;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.testUtil.DelayingListAppender;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.NPEAppender;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -318,5 +323,237 @@ public class AsyncAppenderBaseTest {
 
     // a second invocation of start will cause a IllegalThreadStateException thrown by the asyncAppenderBase.worker thread
     asyncAppenderBase.start();
+  }
+
+  @Test
+  public void startWithoutAttachedAppenderReportsErrorAndDoesNotStart() {
+    asyncAppenderBase.start();
+
+    assertFalse(asyncAppenderBase.isStarted());
+    assertEquals(Thread.State.NEW, asyncAppenderBase.worker.getState());
+    statusChecker.assertContainsMatch(Status.ERROR, "No attached appenders found.");
+  }
+
+  @Test
+  public void stopOfNonStartedAppenderDoesNothing() {
+    asyncAppenderBase.addAppender(listAppender);
+    int statusCountBeforeStop = context.getStatusManager().getCount();
+
+    asyncAppenderBase.stop();
+
+    assertFalse(asyncAppenderBase.isStarted());
+    assertEquals(statusCountBeforeStop, context.getStatusManager().getCount());
+    // the attached appender is only stopped by a worker that actually ran
+    assertTrue(listAppender.isStarted());
+  }
+
+  @Test
+  public void discardingThresholdDefaultsToOneFifthOfQueueSizeOnStart() {
+    assertEquals(AsyncAppenderBase.UNDEFINED, asyncAppenderBase.getDiscardingThreshold());
+    asyncAppenderBase.addAppender(listAppender);
+    asyncAppenderBase.setQueueSize(10);
+
+    asyncAppenderBase.start();
+
+    assertEquals(2, asyncAppenderBase.getDiscardingThreshold());
+    statusChecker.assertContainsMatch("Setting discardingThreshold to 2");
+    asyncAppenderBase.stop();
+  }
+
+  @Test
+  public void explicitDiscardingThresholdIsKeptOnStart() {
+    asyncAppenderBase.addAppender(listAppender);
+    asyncAppenderBase.setQueueSize(10);
+    asyncAppenderBase.setDiscardingThreshold(7);
+
+    asyncAppenderBase.start();
+
+    assertEquals(7, asyncAppenderBase.getDiscardingThreshold());
+    statusChecker.assertContainsMatch("Setting discardingThreshold to 7");
+    asyncAppenderBase.stop();
+  }
+
+  @Test
+  public void maxFlushTimeDefaultsToOneSecondAndIsSettable() {
+    assertEquals(AsyncAppenderBase.DEFAULT_MAX_FLUSH_TIME, asyncAppenderBase.getMaxFlushTime());
+    asyncAppenderBase.setMaxFlushTime(123);
+    assertEquals(123, asyncAppenderBase.getMaxFlushTime());
+  }
+
+  @Test
+  public void neverBlockDefaultsToFalseAndIsSettable() {
+    assertFalse(asyncAppenderBase.isNeverBlock());
+    asyncAppenderBase.setNeverBlock(true);
+    assertTrue(asyncAppenderBase.isNeverBlock());
+  }
+
+  @Test
+  public void onlyTheFirstAppenderIsAttached() {
+    ListAppender<Integer> second = new ListAppender<Integer>();
+    second.setName("second");
+
+    asyncAppenderBase.addAppender(listAppender);
+    asyncAppenderBase.addAppender(second);
+
+    statusChecker.assertContainsMatch(Status.INFO, "Attaching appender named \\[list\\] to AsyncAppender.");
+    statusChecker.assertContainsMatch(Status.WARN, "One and only one appender may be attached to AsyncAppender.");
+    statusChecker.assertContainsMatch(Status.WARN, "Ignoring additional appender named \\[second\\]");
+    assertTrue(asyncAppenderBase.isAttached(listAppender));
+    assertFalse(asyncAppenderBase.isAttached(second));
+    assertSame(listAppender, asyncAppenderBase.getAppender("list"));
+    assertNull(asyncAppenderBase.getAppender("second"));
+    Iterator<Appender<Integer>> it = asyncAppenderBase.iteratorForAppenders();
+    assertSame(listAppender, it.next());
+    assertFalse(it.hasNext());
+  }
+
+  @Test
+  public void detachAppenderByReferenceRemovesItWithoutStoppingIt() {
+    asyncAppenderBase.addAppender(listAppender);
+
+    assertTrue(asyncAppenderBase.detachAppender(listAppender));
+
+    assertFalse(asyncAppenderBase.isAttached(listAppender));
+    assertFalse(asyncAppenderBase.iteratorForAppenders().hasNext());
+    assertTrue(listAppender.isStarted());
+    assertFalse(asyncAppenderBase.detachAppender(listAppender));
+  }
+
+  @Test
+  public void detachAppenderByNameRemovesItWithoutStoppingIt() {
+    asyncAppenderBase.addAppender(listAppender);
+
+    assertTrue(asyncAppenderBase.detachAppender("list"));
+
+    assertNull(asyncAppenderBase.getAppender("list"));
+    assertTrue(listAppender.isStarted());
+    assertFalse(asyncAppenderBase.detachAppender("list"));
+  }
+
+  @Test
+  public void detachAndStopAllAppendersStopsTheAttachedAppender() {
+    asyncAppenderBase.addAppender(listAppender);
+
+    asyncAppenderBase.detachAndStopAllAppenders();
+
+    assertFalse(listAppender.isStarted());
+    assertFalse(asyncAppenderBase.iteratorForAppenders().hasNext());
+  }
+
+  @Test(timeout = 5000)
+  public void interruptedWorkerFlushesQueueAndExitsWhileAppenderIsStarted() throws InterruptedException {
+    BlockingListAppender la = new BlockingListAppender(0);
+    la.interruptWorkerOnRelease = true;
+    la.setContext(context);
+    la.setName("blocking");
+    la.start();
+    asyncAppenderBase.addAppender(la);
+    asyncAppenderBase.setQueueSize(10);
+    asyncAppenderBase.start();
+    assertEquals(10, asyncAppenderBase.getRemainingCapacity());
+
+    asyncAppenderBase.doAppend(0);
+    la.entered.await();
+    // the worker is now blocked inside append(0): these stay in the queue
+    asyncAppenderBase.doAppend(1);
+    asyncAppenderBase.doAppend(2);
+    assertEquals(8, asyncAppenderBase.getRemainingCapacity());
+
+    // on release, the worker interrupts itself, so its next take() throws
+    // InterruptedException although the async appender is still started
+    la.release.countDown();
+    asyncAppenderBase.worker.join();
+
+    assertTrue(asyncAppenderBase.isStarted());
+    assertEquals(Arrays.asList(0, 1, 2), la.list);
+    assertEquals(0, asyncAppenderBase.getNumberOfElementsInQueue());
+    assertFalse("worker should stop the attached appender on exit", la.isStarted());
+    assertFalse(asyncAppenderBase.worker.isInterrupted());
+    statusChecker.assertContainsMatch("Worker thread will flush remaining events before exiting.");
+
+    asyncAppenderBase.stop();
+    assertFalse(asyncAppenderBase.isStarted());
+    statusChecker.assertContainsMatch("Queue flush finished successfully within timeout.");
+    statusChecker.assertIsErrorFree();
+  }
+
+  @Test(timeout = 5000)
+  public void stopReportsErrorWhenInterruptedWhileWaitingForWorker() throws InterruptedException {
+    final BlockingListAppender la = new BlockingListAppender(0);
+    la.setContext(context);
+    la.setName("blocking");
+    la.start();
+    asyncAppenderBase.addAppender(la);
+    // 0 = wait for the worker without a time limit
+    asyncAppenderBase.setMaxFlushTime(0);
+    asyncAppenderBase.start();
+
+    asyncAppenderBase.doAppend(0);
+    la.entered.await();
+    asyncAppenderBase.doAppend(1);
+    asyncAppenderBase.doAppend(2);
+
+    Thread stopper = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        asyncAppenderBase.stop();
+      }
+    }, "AsyncAppenderBaseTest-stopper");
+    stopper.start();
+    // The worker ignores interrupts until released, so stop() can only return
+    // by being interrupted while it waits for the worker to finish.
+    while (stopper.isAlive()) {
+      stopper.interrupt();
+      stopper.join(10);
+    }
+
+    assertFalse(asyncAppenderBase.isStarted());
+    statusChecker.assertContainsMatch(Status.ERROR,
+        "Failed to join worker thread. 2 queued events may be discarded.");
+    statusChecker.asssertContainsException(InterruptedException.class);
+    statusChecker.assertNoMatch("Queue flush finished successfully");
+
+    // let the worker finish so that it doesn't outlive this test
+    la.release.countDown();
+    asyncAppenderBase.worker.join();
+    assertEquals(Arrays.asList(0, 1, 2), la.list);
+  }
+
+  /**
+   * A ListAppender that blocks the calling (worker) thread inside the append
+   * of {@link #blockingEvent} until {@link #release} opens, ignoring interrupts
+   * meanwhile. It restores a swallowed interrupt on release, and interrupts its
+   * thread on release anyway if {@link #interruptWorkerOnRelease} is set.
+   */
+  static class BlockingListAppender extends ListAppender<Integer> {
+    final CountDownLatch entered = new CountDownLatch(1);
+    final CountDownLatch release = new CountDownLatch(1);
+    final int blockingEvent;
+    volatile boolean interruptWorkerOnRelease;
+
+    BlockingListAppender(int blockingEvent) {
+      this.blockingEvent = blockingEvent;
+    }
+
+    @Override
+    protected void append(Integer e) {
+      super.append(e);
+      if (e != blockingEvent) {
+        return;
+      }
+      entered.countDown();
+      boolean interrupted = false;
+      while (true) {
+        try {
+          release.await();
+          break;
+        } catch (InterruptedException ie) {
+          interrupted = true;
+        }
+      }
+      if (interrupted || interruptWorkerOnRelease) {
+        Thread.currentThread().interrupt();
+      }
+    }
   }
 }

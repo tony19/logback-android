@@ -15,33 +15,49 @@
  */
 package ch.qos.logback.classic.net;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.net.InetAddress;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.net.ssl.SSLConfiguration;
+import ch.qos.logback.core.spi.ContextAware;
+import ch.qos.logback.core.status.Status;
 
 /**
  * Unit tests for {@link SSLSocketReceiver}.
  *
  * @author Carl Harris
  */
-@RunWith(RobolectricTestRunner.class)
 public class SSLSocketReceiverTest {
+
+  private final LoggerContext lc = new LoggerContext();
 
   private SSLSocketReceiver remote =
       new SSLSocketReceiver();
 
   @Before
   public void setUp() throws Exception {
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
     remote.setContext(lc);
+  }
+
+  @After
+  public void tearDown() {
+    remote.stop();
+    lc.stop();
   }
 
   @Test
@@ -51,5 +67,32 @@ public class SSLSocketReceiverTest {
     remote.setPort(6000);
     remote.start();
     assertNotNull(remote.getSocketFactory());
+  }
+
+  @Test
+  public void startFailsWhenTheSslContextCannotBeCreated() throws Exception {
+    NoSuchAlgorithmException failure = new NoSuchAlgorithmException("no TLS here");
+    SSLConfiguration ssl = mock(SSLConfiguration.class);
+    when(ssl.createContext(any(ContextAware.class))).thenThrow(failure);
+    remote.setSsl(ssl);
+    remote.setRemoteHost("127.0.0.1");
+    remote.setPort(6000);
+
+    remote.start();
+
+    assertFalse(remote.isStarted());
+    assertNull(remote.getSocketFactory());
+    List<Status> statuses = lc.getStatusManager().getCopyOfStatusList();
+    Status last = statuses.get(statuses.size() - 1);
+    assertEquals(Status.ERROR, last.getLevel());
+    assertEquals("no TLS here", last.getMessage());
+    assertSame(failure, last.getThrowable());
+  }
+
+  @Test
+  public void sslConfigurationCanBeReplaced() {
+    SSLConfiguration ssl = new SSLConfiguration();
+    remote.setSsl(ssl);
+    assertSame(ssl, remote.getSsl());
   }
 }

@@ -17,6 +17,8 @@ package ch.qos.logback.core.net;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.Executors;
@@ -25,14 +27,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import ch.qos.logback.core.net.mock.MockContext;
+import ch.qos.logback.core.net.server.MockScheduledExecutorService;
 import ch.qos.logback.core.spi.PreSerializationTransformer;
 import ch.qos.logback.core.testUtil.NetworkTestUtil;
 import ch.qos.logback.core.util.Duration;
 import ch.qos.logback.core.util.ExecutorServiceUtil;
 
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +51,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -51,6 +60,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -72,6 +82,12 @@ public class AbstractSocketAppenderTest {
    */
   private static final int TIMEOUT = 5000;
 
+  /**
+   * A malformed IPv6 literal: {@link InetAddress#getByName(String)} rejects it
+   * with an {@link java.net.UnknownHostException} without any network lookup.
+   */
+  private static final String UNRESOLVABLE_HOST = "[not-an-ipv6-literal";
+
   private ScheduledExecutorService executorService;
   private MockContext mockContext;
   private PreSerializationTransformer<String> preSerializationTransformer;
@@ -82,6 +98,7 @@ public class AbstractSocketAppenderTest {
   private LinkedBlockingDeque<String> deque;
   private QueueFactory queueFactory;
   private InstrumentedSocketAppender appender;
+  private InstrumentedSocketAppender inlineAppender;
 
   @Before
   public void setupValidAppenderWithMockDependencies() throws Exception {
@@ -113,6 +130,9 @@ public class AbstractSocketAppenderTest {
   public void tearDown() throws Exception {
     appender.stop();
     assertFalse(appender.isStarted());
+    if (inlineAppender != null) {
+      inlineAppender.stop();
+    }
 
     executorService.shutdownNow();
     assertTrue(executorService.awaitTermination(TIMEOUT, TimeUnit.MILLISECONDS));
@@ -529,6 +549,298 @@ public class AbstractSocketAppenderTest {
     InOrder inOrder = inOrder(socket);
     inOrder.verify(socket).setSoTimeout(42);
     inOrder.verify(socket).setSoTimeout(0);
+  }
+
+  @Test
+  public void ignoresStartWhenAlreadyStarted() throws Exception {
+
+    // given
+    appender.setLazy(true);
+    appender.start();
+
+    // when
+    appender.start();
+
+    // then
+    assertTrue(appender.isStarted());
+    verify(queueFactory, times(1)).<String>newLinkedBlockingDeque(anyInt());
+  }
+
+  @Test
+  public void stopsLazyAppenderThatNeverSubmittedItsDispatchTask() throws Exception {
+
+    // given
+    appender.setLazy(true);
+    appender.start();
+
+    // when
+    appender.stop();
+
+    // then
+    assertFalse(appender.isStarted());
+    verify(appender, never()).newConnector(any(InetAddress.class), anyInt(), anyLong(), anyLong());
+  }
+
+  @Test
+  public void ignoresNullEvents() throws Exception {
+
+    // given
+    appender.setLazy(true);
+    appender.start();
+
+    // when
+    appender.append(null);
+
+    // then: nothing is queued, and a lazy appender still does not connect
+    verifyNoInteractions(deque);
+    verify(appender, never()).newConnector(any(InetAddress.class), anyInt(), anyLong(), anyLong());
+  }
+
+  @Test
+  public void givesUpResolvingRemoteHostWhenReconnectionDelayIsZero() throws Exception {
+
+    // given
+    InstrumentedSocketAppender syncAppender = newAppenderDispatchingOnCallingThread();
+    syncAppender.setRemoteHost(UNRESOLVABLE_HOST);
+    syncAppender.setReconnectionDelay(new Duration(0));
+
+    // when
+    syncAppender.start();
+
+    // then
+    assertTrue(syncAppender.isStarted());
+    String peerId = "remote peer " + UNRESOLVABLE_HOST + ":" + AbstractSocketAppender.DEFAULT_PORT + ": ";
+    verify(syncAppender).addWarn(peerId + "unknown host: " + UNRESOLVABLE_HOST + " (will retry)");
+    verify(syncAppender).addError(peerId + "gave up resolving host (reconnectionDelay is zero)");
+    verify(syncAppender, never()).newConnector(any(InetAddress.class), anyInt(), anyLong(), anyLong());
+  }
+
+  @Test
+  public void givesUpResolvingRemoteHostWhenReconnectionDelayIsUnset() throws Exception {
+
+    // given
+    InstrumentedSocketAppender syncAppender = newAppenderDispatchingOnCallingThread();
+    syncAppender.setRemoteHost(UNRESOLVABLE_HOST);
+    syncAppender.setReconnectionDelay(null);
+
+    // when
+    syncAppender.start();
+
+    // then
+    verify(syncAppender).addError(contains("gave up resolving host (reconnectionDelay is zero)"));
+    verify(syncAppender, never()).newConnector(any(InetAddress.class), anyInt(), anyLong(), anyLong());
+  }
+
+  @Test
+  public void retriesHostResolutionAfterReconnectionDelay() throws Exception {
+
+    // given: the host becomes resolvable after the first failed attempt
+    // (e.g. a device that was offline at startup comes online)
+    final InstrumentedSocketAppender syncAppender = newAppenderDispatchingOnCallingThread();
+    syncAppender.setRemoteHost(UNRESOLVABLE_HOST);
+    syncAppender.setReconnectionDelay(new Duration(1));
+    doAnswer(invocation -> {
+      syncAppender.setRemoteHost("127.0.0.1");
+      return invocation.callRealMethod();
+    }).when(syncAppender).addWarn(contains("unknown host"));
+
+    // when
+    syncAppender.start();
+
+    // then
+    verify(syncAppender, times(1)).addWarn(contains("unknown host"));
+    verify(syncAppender, never()).addError(anyString());
+    verify(syncAppender).newConnector(InetAddress.getByAddress(new byte[] {127, 0, 0, 1}),
+        AbstractSocketAppender.DEFAULT_PORT, 0, 1);
+  }
+
+  @Test
+  public void createsConnectorWithoutRetryDelayWhenReconnectionDelayIsUnset() throws Exception {
+
+    // given
+    InstrumentedSocketAppender syncAppender = newAppenderDispatchingOnCallingThread();
+    syncAppender.setRemoteHost("127.0.0.1");
+    syncAppender.setPort(21);
+    syncAppender.setReconnectionDelay(null);
+
+    // when
+    syncAppender.start();
+
+    // then
+    verify(syncAppender).newConnector(InetAddress.getByAddress(new byte[] {127, 0, 0, 1}), 21, 0, 0);
+  }
+
+  @Test
+  public void waitsBeforeReconnectingAfterSslHandshakeFailure() throws Exception {
+
+    // given: the handshake of the only connection fails; the pending interrupt
+    // then ends the wait before reconnecting (instead of sleeping 30 seconds)
+    InstrumentedSocketAppender syncAppender = newAppenderDispatchingOnCallingThread();
+    syncAppender.setRemoteHost("127.0.0.1");
+    mockOneSuccessfulSocketConnection();
+    doAnswer(invocation -> {
+      Thread.currentThread().interrupt();
+      throw new SSLHandshakeException("handshake failed");
+    }).when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
+
+    // when
+    boolean interruptPending;
+    try {
+      syncAppender.start();
+    } finally {
+      interruptPending = Thread.interrupted();
+    }
+
+    // then: the wait consumed the interrupt and shut the dispatcher down,
+    // without handling the handshake failure as a plain connection failure
+    assertFalse(interruptPending);
+    verify(socketConnector, times(1)).call();
+    verify(socket).close();
+    verify(syncAppender, never()).addInfo(contains("connection failed"));
+    InOrder inOrder = inOrder(syncAppender);
+    inOrder.verify(syncAppender).addInfo("remote peer 127.0.0.1:" + AbstractSocketAppender.DEFAULT_PORT + ": connection closed");
+    inOrder.verify(syncAppender).addInfo("shutting down");
+  }
+
+  @Test
+  public void reconnectsAfterWaitingFollowingSslHandshakeFailure() throws Exception {
+
+    // given
+    InstrumentedSocketAppender syncAppender = newAppenderDispatchingOnCallingThread();
+    syncAppender.setRemoteHost("127.0.0.1");
+    syncAppender.setHandshakeFailureDelay(1);
+    mockOneSuccessfulSocketConnection();
+    doThrow(new SSLHandshakeException("handshake failed"))
+        .when(objectWriterFactory).newAutoFlushingObjectWriter(any(OutputStream.class));
+
+    // when
+    syncAppender.start();
+
+    // then: after the wait it asks the connector for a new connection
+    verify(socketConnector, times(2)).call();
+    verify(socket).close();
+    verify(syncAppender, never()).addInfo(contains("connection failed"));
+    verify(syncAppender).addInfo("remote peer 127.0.0.1:" + AbstractSocketAppender.DEFAULT_PORT + ": connection closed");
+  }
+
+  @Test
+  public void waitsTheDefaultReconnectionDelayAfterSslHandshakeFailure() throws Exception {
+
+    // the wait is pinned by the two tests above; its length can be changed
+    // only by unit tests, so check the default directly
+    Field handshakeFailureDelay = AbstractSocketAppender.class.getDeclaredField("handshakeFailureDelay");
+    handshakeFailureDelay.setAccessible(true);
+
+    assertEquals(AbstractSocketAppender.DEFAULT_RECONNECTION_DELAY, handshakeFailureDelay.getInt(appender));
+  }
+
+  @Test
+  public void stopInterruptsTheDispatcherWaitingForEvents() throws Exception {
+
+    // given
+    mockOneSuccessfulSocketConnection();
+    appender.start();
+    awaitStartOfEventDispatching();
+
+    // when
+    appender.stop();
+
+    // then: the dispatch task, blocked on the empty deque, is cancelled
+    verify(appender, timeout(TIMEOUT)).addInfo("shutting down");
+    verify(socketConnector, times(1)).call();
+  }
+
+  @Test
+  public void reportsInterruptedConnector() throws Exception {
+
+    // given
+    appender.setLazy(true);
+    appender.start();
+
+    // when
+    appender.connectionFailed(socketConnector, new InterruptedException());
+
+    // then
+    verify(appender).addInfo("connector interrupted");
+  }
+
+  @Test
+  public void reportsRefusedConnection() throws Exception {
+
+    // given
+    appender.setLazy(true);
+    appender.start();
+
+    // when
+    appender.connectionFailed(socketConnector, new ConnectException("Connection refused"));
+
+    // then
+    verify(appender).addInfo("remote peer localhost:" + AbstractSocketAppender.DEFAULT_PORT + ": connection refused");
+  }
+
+  @Test
+  public void reportsOtherConnectionFailuresWithTheException() throws Exception {
+
+    // given
+    appender.setLazy(true);
+    appender.start();
+    IOException failure = new IOException("network is unreachable");
+
+    // when
+    appender.connectionFailed(socketConnector, failure);
+
+    // then
+    verify(appender).addInfo("remote peer localhost:" + AbstractSocketAppender.DEFAULT_PORT + ": " + failure);
+  }
+
+  @Test
+  public void hasDefaultProperties() throws Exception {
+
+    // when
+    InstrumentedSocketAppender syncAppender = newAppenderDispatchingOnCallingThread();
+
+    // then
+    assertFalse(syncAppender.getLazy());
+    assertNull(syncAppender.getRemoteHost());
+    assertEquals(AbstractSocketAppender.DEFAULT_PORT, syncAppender.getPort());
+    assertEquals(AbstractSocketAppender.DEFAULT_RECONNECTION_DELAY, syncAppender.getReconnectionDelay().getMilliseconds());
+    assertEquals(AbstractSocketAppender.DEFAULT_QUEUE_SIZE, syncAppender.getQueueSize());
+    assertEquals(100, syncAppender.getEventDelayLimit().getMilliseconds());
+  }
+
+  @Test
+  public void returnsConfiguredProperties() throws Exception {
+
+    // given
+    Duration reconnectionDelay = new Duration(42);
+    Duration eventDelayLimit = new Duration(7);
+
+    // when
+    appender.setLazy(true);
+    appender.setRemoteHost("some.host");
+    appender.setPort(1234);
+    appender.setReconnectionDelay(reconnectionDelay);
+    appender.setQueueSize(5);
+    appender.setEventDelayLimit(eventDelayLimit);
+
+    // then
+    assertTrue(appender.getLazy());
+    assertEquals("some.host", appender.getRemoteHost());
+    assertEquals(1234, appender.getPort());
+    assertSame(reconnectionDelay, appender.getReconnectionDelay());
+    assertEquals(5, appender.getQueueSize());
+    assertSame(eventDelayLimit, appender.getEventDelayLimit());
+  }
+
+  /**
+   * Creates an appender whose context runs the dispatch task synchronously on
+   * the thread that submits it, so that {@code start()} returns only once the
+   * task has finished (the mock connector yields no socket unless stubbed).
+   */
+  private InstrumentedSocketAppender newAppenderDispatchingOnCallingThread() {
+    inlineAppender = spy(new InstrumentedSocketAppender(preSerializationTransformer, queueFactory, objectWriterFactory, socketConnector));
+    inlineAppender.setContext(new MockContext(new MockScheduledExecutorService()));
+    return inlineAppender;
   }
 
   private void awaitAtLeastOneEventToBeDispatched() throws IOException {

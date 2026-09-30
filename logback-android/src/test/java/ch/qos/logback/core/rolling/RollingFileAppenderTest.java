@@ -19,16 +19,29 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertSame;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.appender.AbstractAppenderTest;
 import ch.qos.logback.core.encoder.DummyEncoder;
+import ch.qos.logback.core.encoder.EchoEncoder;
+import ch.qos.logback.core.rolling.helper.FileNamePattern;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
 import ch.qos.logback.core.testUtil.RandomUtil;
@@ -36,6 +49,9 @@ import ch.qos.logback.core.util.CoreTestConstants;
 import ch.qos.logback.core.util.StatusPrinter;
 
 public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
+
+  @Rule
+  public TemporaryFolder tmp = new TemporaryFolder();
 
   RollingFileAppender<Object> rfa = new RollingFileAppender<Object>();
   Context context = new ContextBase();
@@ -268,5 +284,283 @@ public class RollingFileAppenderTest extends AbstractAppenderTest<Object> {
     assertFalse(appender1.isStarted());
     StatusChecker checker = new StatusChecker(context);
     checker.assertContainsMatch(Status.ERROR, "'FileNamePattern' option has the same value");
+  }
+
+  /** A rolling policy (not a triggering policy) whose rollover runs a test-supplied action. */
+  static class ScriptedRollingPolicy extends RollingPolicyBase {
+    interface Action {
+      void run() throws RolloverFailure;
+    }
+
+    Action onRollover;
+
+    @Override
+    public void rollover() throws RolloverFailure {
+      onRollover.run();
+    }
+
+    @Override
+    public String getActiveFileName() {
+      return getParentsRawFileProperty();
+    }
+  }
+
+  /** A rolling policy that is its own triggering policy and uses no file name pattern. */
+  static class PatternlessRollingPolicy extends RollingPolicyBase implements TriggeringPolicy<Object> {
+    @Override
+    public void rollover() {
+    }
+
+    @Override
+    public String getActiveFileName() {
+      return getParentsRawFileProperty();
+    }
+
+    @Override
+    public boolean isTriggeringEvent(File activeFile, Object event) {
+      return false;
+    }
+  }
+
+  private String tmpPath(String name) {
+    return new File(tmp.getRoot(), name).getAbsolutePath();
+  }
+
+  private static String read(String fileName) throws IOException {
+    return new String(Files.readAllBytes(new File(fileName).toPath()), "UTF-8");
+  }
+
+  private SizeBasedTriggeringPolicy<Object> startedSizeBasedTriggeringPolicy() {
+    SizeBasedTriggeringPolicy<Object> policy = new SizeBasedTriggeringPolicy<Object>();
+    policy.setContext(context);
+    policy.start();
+    return policy;
+  }
+
+  private ScriptedRollingPolicy startAppenderWithScriptedPolicy(String fileName) {
+    rfa.setContext(context);
+    rfa.setEncoder(new EchoEncoder<Object>());
+    rfa.setFile(fileName);
+    ScriptedRollingPolicy policy = new ScriptedRollingPolicy();
+    policy.setContext(context);
+    policy.setParent(rfa);
+    policy.start();
+    rfa.setRollingPolicy(policy);
+    rfa.setTriggeringPolicy(startedSizeBasedTriggeringPolicy());
+    rfa.start();
+    assertTrue(rfa.isStarted());
+    return policy;
+  }
+
+  private TimeBasedRollingPolicy<Object> startedTimeBasedRollingPolicy(RollingFileAppender<Object> appender, String pattern) {
+    TimeBasedRollingPolicy<Object> policy = new TimeBasedRollingPolicy<Object>();
+    policy.setContext(context);
+    policy.setFileNamePattern(pattern);
+    policy.setParent(appender);
+    policy.start();
+    return policy;
+  }
+
+  @Test
+  public void startWithoutTriggeringPolicyIsRefused() {
+    rfa.setContext(context);
+    rfa.setFile(tmpPath("no-tp.log"));
+
+    rfa.start();
+
+    assertFalse(rfa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.WARN, "No TriggeringPolicy was set for the RollingFileAppender named test");
+    checker.assertContainsMatch(Status.WARN, "For more information, please visit .*#rfa_no_tp");
+    assertFalse(new File(tmpPath("no-tp.log")).exists());
+  }
+
+  @Test
+  public void startWithoutRollingPolicyIsRefused() {
+    rfa.setContext(context);
+    rfa.setFile(tmpPath("no-rp.log"));
+    rfa.setTriggeringPolicy(startedSizeBasedTriggeringPolicy());
+
+    rfa.start();
+
+    assertFalse(rfa.isStarted());
+    StatusChecker checker = new StatusChecker(context);
+    checker.assertContainsMatch(Status.ERROR, "No RollingPolicy was set for the RollingFileAppender named test");
+    checker.assertContainsMatch(Status.ERROR, "For more information, please visit .*#rfa_no_rp");
+    assertFalse(new File(tmpPath("no-rp.log")).exists());
+  }
+
+  @Test
+  public void stopWithoutRollingPolicyStillStopsTriggeringPolicy() {
+    rfa.setContext(context);
+    SizeBasedTriggeringPolicy<Object> triggeringPolicy = startedSizeBasedTriggeringPolicy();
+    rfa.setTriggeringPolicy(triggeringPolicy);
+
+    rfa.stop();
+
+    assertNull(rfa.getRollingPolicy());
+    assertFalse(triggeringPolicy.isStarted());
+  }
+
+  @Test
+  public void stopWithoutTriggeringPolicyStillStopsRollingPolicy() {
+    rfa.setContext(context);
+    rfa.setFile(tmpPath("fw.log"));
+    FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
+    rollingPolicy.setContext(context);
+    rollingPolicy.setFileNamePattern(tmpPath("fw.%i.log"));
+    rollingPolicy.setParent(rfa);
+    rollingPolicy.start();
+    rfa.setRollingPolicy(rollingPolicy);
+
+    rfa.stop();
+
+    assertNull(rfa.getTriggeringPolicy());
+    assertFalse(rollingPolicy.isStarted());
+  }
+
+  @Test
+  public void setTriggeringPolicyThatIsAlsoRollingPolicySetsBoth() {
+    rfa.setTriggeringPolicy(tbrp);
+
+    assertSame(tbrp, rfa.getTriggeringPolicy());
+    assertSame(tbrp, rfa.getRollingPolicy());
+  }
+
+  @Test
+  public void setRollingPolicyThatIsNotTriggeringPolicyLeavesTriggeringPolicyUnset() {
+    FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
+
+    rfa.setRollingPolicy(rollingPolicy);
+
+    assertSame(rollingPolicy, rfa.getRollingPolicy());
+    assertNull(rfa.getTriggeringPolicy());
+  }
+
+  @Test
+  public void testFilePropertyAfterNonTriggeringRollingPolicy() {
+    rfa.setContext(context);
+    rfa.setRollingPolicy(new FixedWindowRollingPolicy());
+    rfa.setFile("x");
+    StatusChecker statusChecker = new StatusChecker(context.getStatusManager());
+    statusChecker.assertContainsMatch(Status.ERROR,
+            "File property must be set before any triggeringPolicy ");
+  }
+
+  @Test
+  public void appendersWithDistinctFileNamePatternsDoNotCollide() {
+    RollingFileAppender<Object> appender0 = new RollingFileAppender<Object>();
+    appender0.setName("FA0");
+    appender0.setContext(context);
+    appender0.setEncoder(new DummyEncoder<Object>());
+    appender0.setRollingPolicy(startedTimeBasedRollingPolicy(appender0, tmpPath("a-%d.log")));
+    appender0.start();
+
+    rfa.setContext(context);
+    rfa.setRollingPolicy(startedTimeBasedRollingPolicy(rfa, tmpPath("b-%d.log")));
+    rfa.start();
+
+    assertTrue(appender0.isStarted());
+    assertTrue(rfa.isStarted());
+    new StatusChecker(context).assertNoMatch("'FileNamePattern' option has the same value");
+    appender0.stop();
+    rfa.stop();
+  }
+
+  @Test
+  public void startsWithoutCollisionCheckWhenContextHasNoFileNamePatternMap() {
+    context.putObject(CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP, null);
+    rfa.setContext(context);
+    rfa.setRollingPolicy(startedTimeBasedRollingPolicy(rfa, tmpPath("c-%d.log")));
+
+    rfa.start();
+    assertTrue(rfa.isStarted());
+
+    rfa.stop();
+    assertFalse(rfa.isStarted());
+  }
+
+  @Test
+  public void stoppingUnnamedAppenderKeepsOtherAppendersInCollisionMap() {
+    @SuppressWarnings("unchecked")
+    Map<String, FileNamePattern> map =
+        (Map<String, FileNamePattern>) context.getObject(CoreConstants.RFA_FILENAME_PATTERN_COLLISION_MAP);
+    FileNamePattern otherPattern = new FileNamePattern(tmpPath("other-%d.log"), context);
+    map.put("other", otherPattern);
+    rfa.setName(null);
+    rfa.setContext(context);
+    rfa.setRollingPolicy(startedTimeBasedRollingPolicy(rfa, tmpPath("d-%d.log")));
+    rfa.start();
+    assertTrue(rfa.isStarted());
+
+    rfa.stop();
+
+    assertEquals(1, map.size());
+    assertSame(otherPattern, map.get("other"));
+  }
+
+  @Test
+  public void rollingPolicyWithoutFileNamePatternSkipsPatternChecks() throws IOException {
+    rfa.setContext(context);
+    rfa.setEncoder(new EchoEncoder<Object>());
+    rfa.setFile(tmpPath("patternless.log"));
+    PatternlessRollingPolicy policy = new PatternlessRollingPolicy();
+    policy.setContext(context);
+    policy.setParent(rfa);
+    policy.start();
+    rfa.setRollingPolicy(policy);
+
+    rfa.start();
+    rfa.doAppend("hello");
+    rfa.stop();
+
+    assertSame(policy, rfa.getTriggeringPolicy());
+    assertEquals("hello" + CoreConstants.LINE_SEPARATOR, read(tmpPath("patternless.log")));
+  }
+
+  @Test
+  public void failedRolloverKeepsAppendingToActiveFile() throws IOException {
+    String fileName = tmpPath("deferred.log");
+    ScriptedRollingPolicy policy = startAppenderWithScriptedPolicy(fileName);
+    policy.onRollover = new ScriptedRollingPolicy.Action() {
+      @Override
+      public void run() throws RolloverFailure {
+        throw new RolloverFailure("cannot rename");
+      }
+    };
+    rfa.doAppend("before");
+    rfa.setAppend(false);
+
+    rfa.rollover();
+    rfa.doAppend("after");
+    rfa.stop();
+
+    assertTrue(rfa.isAppend());
+    new StatusChecker(context).assertContainsMatch(Status.WARN, "RolloverFailure occurred. Deferring roll-over.");
+    assertEquals("before" + CoreConstants.LINE_SEPARATOR + "after" + CoreConstants.LINE_SEPARATOR, read(fileName));
+  }
+
+  @Test
+  public void failureToReopenActiveFileAfterRolloverIsReported() {
+    final File activeFile = new File(tmpPath("reopen.log"));
+    ScriptedRollingPolicy policy = startAppenderWithScriptedPolicy(activeFile.getAbsolutePath());
+    policy.onRollover = new ScriptedRollingPolicy.Action() {
+      @Override
+      public void run() {
+        // leave something that cannot be opened for writing where the active file was
+        assertTrue(activeFile.delete());
+        assertTrue(activeFile.mkdir());
+      }
+    };
+
+    rfa.rollover();
+
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    Status last = statuses.get(statuses.size() - 1);
+    assertEquals(Status.ERROR, last.getLevel());
+    assertEquals("setFile(" + activeFile.getAbsolutePath() + ", false) call failed.", last.getMessage());
+    assertTrue(String.valueOf(last.getThrowable()), last.getThrowable() instanceof FileNotFoundException);
+    assertEquals(activeFile, rfa.currentlyActiveFile);
+    rfa.stop();
   }
 }

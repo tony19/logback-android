@@ -15,7 +15,9 @@
  */
 package ch.qos.logback.classic.layout;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
 
 import org.junit.Before;
@@ -49,5 +51,33 @@ public class TTLLLayoutTest {
         String result = layout.doLayout(event);
         String firstLine = result.split(CoreConstants.LINE_SEPARATOR)[0];
         assertThat(firstLine, matchesPattern(TTLL_PREFIX_PATTERN + " - null"));
+    }
+
+    @Test
+    public void unstartedLayoutProducesEmptyString() {
+        TTLLLayout unstarted = new TTLLLayout();
+        unstarted.setContext(context);
+        LoggingEvent event = new LoggingEvent("", logger, Level.INFO, "hello", null, null);
+        assertEquals("", unstarted.doLayout(event));
+    }
+
+    @Test
+    public void eventWithoutThrowableIsASingleLine() {
+        LoggingEvent event = new LoggingEvent("", logger, Level.WARN, "hello", null, null);
+        event.setThreadName("main");
+        String result = layout.doLayout(event);
+        assertTrue(result.endsWith("] WARN " + TTLLLayoutTest.class.getName() + " - hello" + CoreConstants.LINE_SEPARATOR));
+        assertEquals(1, result.split(CoreConstants.LINE_SEPARATOR).length);
+    }
+
+    @Test
+    public void throwableStackTraceFollowsTheMessageLine() {
+        LoggingEvent event = new LoggingEvent("", logger, Level.ERROR, "failed", new IllegalStateException("boom"), null);
+        event.setThreadName("main");
+        String result = layout.doLayout(event);
+        String[] lines = result.split(CoreConstants.LINE_SEPARATOR);
+        assertThat(lines[0], matchesPattern(TTLL_PREFIX_PATTERN + " - failed"));
+        assertEquals("java.lang.IllegalStateException: boom", lines[1]);
+        assertTrue(lines[2], lines[2].startsWith(CoreConstants.TAB + "at " + TTLLLayoutTest.class.getName()));
     }
 }

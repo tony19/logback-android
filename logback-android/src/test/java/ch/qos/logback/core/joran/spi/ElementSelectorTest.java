@@ -16,6 +16,11 @@
 package ch.qos.logback.core.joran.spi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -178,4 +183,63 @@ public class ElementSelectorTest {
     }
   }
 
+  @Test
+  public void noArgAndListConstructors() {
+    assertEquals(0, new ElementSelector().size());
+
+    ElementSelector fromList = new ElementSelector(Arrays.asList("a", "b"));
+    assertEquals(new ElementSelector("a/b"), fromList);
+  }
+
+  @Test
+  public void tailMatchLengthIsZeroForNullOrEmptyPaths() {
+    ElementSelector selector = new ElementSelector("*/a");
+    assertEquals(0, selector.getTailMatchLength(null));
+    assertEquals(0, selector.getTailMatchLength(new ElementPath()));
+    assertEquals(0, new ElementSelector().getTailMatchLength(new ElementPath("a")));
+  }
+
+  @Test
+  public void prefixMatchLengthIsZeroForNullOrEmptyPaths() {
+    ElementSelector selector = new ElementSelector("a/*");
+    assertEquals(0, selector.getPrefixMatchLength(null));
+    assertEquals(0, selector.getPrefixMatchLength(new ElementPath()));
+    assertEquals(0, new ElementSelector().getPrefixMatchLength(new ElementPath("a")));
+  }
+
+  @Test
+  public void isContainedInMatchesAContiguousRunOfParts() {
+    ElementSelector selector = new ElementSelector("b/c");
+    assertTrue(selector.isContainedIn(new ElementPath("a/b/c/d")));
+    assertTrue(selector.isContainedIn(new ElementPath("b/c")));
+    assertFalse(selector.isContainedIn(new ElementPath("a/b/x/c")));
+    assertFalse(selector.isContainedIn(new ElementPath("a/bb/c")));
+    assertFalse(selector.isContainedIn(null));
+  }
+
+  @Test
+  public void equalityIsCaseInsensitiveWithConsistentHashCode() {
+    ElementSelector lower = new ElementSelector("a/b");
+    ElementSelector mixed = new ElementSelector("A/b");
+
+    assertEquals(lower, mixed);
+    assertEquals(lower.hashCode(), mixed.hashCode());
+    assertNotEquals(lower, new ElementSelector("a/c"));
+    assertNotEquals(lower, new ElementSelector("a/b/c"));
+  }
+
+  @Test
+  public void isNeverEqualToNullOrAPlainElementPath() {
+    ElementSelector selector = new ElementSelector("a/b");
+    assertFalse(selector.equals(null));
+    assertFalse(selector.equals(new ElementPath("a/b")));
+  }
+
+  @Test
+  public void fullPathMatchIsCaseInsensitiveAndRequiresSameLength() {
+    ElementSelector selector = new ElementSelector("a/b");
+    assertTrue(selector.fullPathMatch(new ElementPath("A/B")));
+    assertFalse(selector.fullPathMatch(new ElementPath("a/c")));
+    assertFalse(selector.fullPathMatch(new ElementPath("a")));
+  }
 }

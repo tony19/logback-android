@@ -160,6 +160,9 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
         compressor.compress(getActiveFileName(), fileNamePattern.convertInt(minIndex), null);
         break;
       case ZIP:
+      // javac gives every enum switch an implicit default; sharing ZIP's body
+      // keeps it from being a dead branch that no CompressionMode can reach
+      default:
         compressor.compress(getActiveFileName(), fileNamePattern.convertInt(minIndex), zipEntryFileNamePattern.convert(new Date()));
         break;
       }

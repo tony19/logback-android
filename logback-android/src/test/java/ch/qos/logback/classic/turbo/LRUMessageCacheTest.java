@@ -15,6 +15,8 @@
  */
 package ch.qos.logback.classic.turbo;
 
+import static org.junit.Assert.assertThrows;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -38,6 +40,33 @@ public class LRUMessageCacheTest {
     Assert.assertEquals(0, cache.getMessageCountAndThenIncrement("1"));
     // So it is expected a returned value of 0 instead of 2.
     Assert.assertEquals(0, cache.getMessageCountAndThenIncrement("2"));
+  }
+
+  @Test
+  public void cacheSizeSmallerThanOneIsRejected() {
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new LRUMessageCache(0));
+    Assert.assertEquals("Cache size cannot be smaller than 1", e.getMessage());
+  }
+
+  @Test
+  public void cacheSizeOfOneIsAccepted() {
+    final LRUMessageCache cache = new LRUMessageCache(1);
+    Assert.assertEquals(1, cache.cacheSize);
+    Assert.assertEquals(0, cache.getMessageCountAndThenIncrement("0"));
+    Assert.assertEquals(1, cache.getMessageCountAndThenIncrement("0"));
+  }
+
+  @Test
+  public void clearForgetsAllCounts() {
+    final LRUMessageCache cache = new LRUMessageCache(10);
+    Assert.assertEquals(0, cache.getMessageCountAndThenIncrement("a"));
+    Assert.assertEquals(1, cache.getMessageCountAndThenIncrement("a"));
+    Assert.assertEquals(0, cache.getMessageCountAndThenIncrement("b"));
+
+    cache.clear();
+
+    Assert.assertTrue(cache.isEmpty());
+    Assert.assertEquals(0, cache.getMessageCountAndThenIncrement("a"));
   }
 
 }

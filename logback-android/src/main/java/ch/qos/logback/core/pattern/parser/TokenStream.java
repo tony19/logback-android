@@ -96,10 +96,9 @@ class TokenStream {
           handleKeywordState(c, tokenList, buf);
           break;
         case RIGHT_PARENTHESIS_STATE:
+        default: // every state has a case; default shares the last one's
           handleRightParenthesisState(c, tokenList, buf);
           break;
-
-        default:
       }
     }
 
@@ -117,6 +116,7 @@ class TokenStream {
 
       case FORMAT_MODIFIER_STATE:
       case OPTION_STATE:
+      default: // every state has a case; default shares the last one's
         throw new ScanException("Unexpected end of pattern string");
     }
 

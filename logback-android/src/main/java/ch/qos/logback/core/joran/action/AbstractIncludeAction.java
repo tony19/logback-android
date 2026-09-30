@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 
@@ -69,7 +68,7 @@ public abstract class AbstractIncludeAction extends Action {
       if (url != null) {
         processInclude(ec, url);
       }
-    } catch (JoranException e) {
+    } catch (JoranException | MalformedURLException e) {
       optionalWarning("Error while parsing " + attributeInUse, e);
     }
 
@@ -140,21 +139,15 @@ public abstract class AbstractIncludeAction extends Action {
       return url;
   }
 
-  private URL filePathAsURL(String path) {
+  private URL filePathAsURL(String path) throws MalformedURLException {
     File file = new File(path);
     if (!file.exists() || !file.isFile()) {
       optionalWarning("File does not exist [" + path + "]", new FileNotFoundException(path));
       return null;
     }
 
-    URI uri = file.toURI();
-    try {
-      return uri.toURL();
-    } catch (MalformedURLException e) {
-      // impossible to get here
-      e.printStackTrace();
-      return null;
-    }
+    // cannot throw: a file's URI always has the "file" scheme, whose URL handler exists
+    return file.toURI().toURL();
   }
 
   protected String getAttributeInUse() {
@@ -165,7 +158,7 @@ public abstract class AbstractIncludeAction extends Action {
     return this.optional;
   }
 
-  private URL getInputURL(InterpretationContext ec, Attributes attributes) {
+  private URL getInputURL(InterpretationContext ec, Attributes attributes) throws MalformedURLException {
     String fileAttribute = attributes.getValue(FILE_ATTR);
     String urlAttribute = attributes.getValue(URL_ATTR);
     String resourceAttribute = attributes.getValue(RESOURCE_ATTR);

@@ -16,12 +16,21 @@
 package ch.qos.logback.core.joran.spi;
 
 import org.junit.Test;
+import org.mockito.MockedStatic;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertSame;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
 
 /**
  * @author Ceki G&uuml;c&uuml;
@@ -36,5 +45,28 @@ public class ConfigurationWatchListTest {
     ConfigurationWatchList cwl = new ConfigurationWatchList();
     File back = cwl.convertToFile(url);
     assertEquals(file.getName(), back.getName());
+  }
+
+  @Test
+  public void nullMainUrlIsAcceptedAndWatchesNothing() {
+    ConfigurationWatchList cwl = new ConfigurationWatchList();
+    cwl.setMainURL(null);
+
+    assertNull(cwl.getMainURL());
+    assertTrue(cwl.getCopyOfFileWatchList().isEmpty());
+  }
+
+  @Test
+  public void undecodableFileUrlIsReportedAsIllegalState() throws MalformedURLException {
+    URL url = new File("a b.xml").toURI().toURL();
+    ConfigurationWatchList cwl = new ConfigurationWatchList();
+    UnsupportedEncodingException failure = new UnsupportedEncodingException("UTF-8");
+
+    try (MockedStatic<URLDecoder> decoder = mockStatic(URLDecoder.class)) {
+      decoder.when(() -> URLDecoder.decode(anyString(), anyString())).thenThrow(failure);
+
+      IllegalStateException e = assertThrows(IllegalStateException.class, () -> cwl.convertToFile(url));
+      assertSame(failure, e.getCause());
+    }
   }
 }

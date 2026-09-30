@@ -21,18 +21,27 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.status.Status;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -133,6 +142,161 @@ public class TimeBasedArchiveRemoverTest {
     for (File f : Arrays.asList(expiredFiles).subList(0, MAX_HISTORY - NUM_FILES_TO_KEEP)) {
       verify(fileProvider, never()).deleteFile(f);
     }
+  }
+
+  @Test
+  public void warnsWhenAnExpiredFileCannotBeDeleted() {
+    doReturn(false).when(fileProvider).deleteFile(any(File.class));
+
+    remover.clean(EXPIRY);
+
+    for (File f : expiredFiles) {
+      verify(fileProvider).deleteFile(f);
+      assertTrue("missing warning for " + f, hasStatus(remover.getContext(), Status.WARN, "cannot delete " + f));
+    }
+    for (File f : recentFiles) {
+      assertFalse(hasStatus(remover.getContext(), Status.WARN, "cannot delete " + f));
+    }
+  }
+
+  @Test
+  public void totalSizeCapCountsOnlyTheFilesActuallyDeleted() {
+    final long FILE_SIZE = 1024L;
+    doReturn(FILE_SIZE).when(fileProvider).length(any(File.class));
+    doReturn(true).when(fileProvider).deleteFile(any(File.class));
+    // expiredFiles[0] is app_20191103.log, expiredFiles[1] is app_20191102.log
+    File undeletable = expiredFiles[0];
+    doReturn(false).when(fileProvider).deleteFile(undeletable);
+    remover.setMaxHistory(MAX_HISTORY);
+    remover.setTotalSizeCap(2 * FILE_SIZE);
+
+    remover.clean(EXPIRY);
+
+    // newest first: 1105 and 1104 fit in the cap; 1103 and 1102 exceed it
+    verify(fileProvider).deleteFile(undeletable);
+    verify(fileProvider).deleteFile(expiredFiles[1]);
+    for (File f : recentFiles) {
+      verify(fileProvider, never()).deleteFile(f);
+    }
+    Context context = remover.getContext();
+    assertTrue(hasStatus(context, Status.WARN, "cannot delete " + undeletable));
+    // the file that could not be deleted neither counts as removed nor
+    // pushes the remaining files further over the cap
+    assertTrue(hasStatus(context, Status.INFO, "Removed  1 KB of files"));
+  }
+
+  @Test
+  public void nonPositiveTotalSizeCapDisablesSizeCapping() {
+    doReturn(1024L).when(fileProvider).length(any(File.class));
+    remover.setMaxHistory(MAX_HISTORY);
+    remover.setTotalSizeCap(-1);
+
+    remover.clean(EXPIRY);
+
+    verify(fileProvider, never()).length(any(File.class));
+    for (File f : recentFiles) {
+      verify(fileProvider, never()).deleteFile(f);
+    }
+    for (File f : Arrays.asList(expiredFiles).subList(0, 2)) {
+      verify(fileProvider, never()).deleteFile(f);
+    }
+    for (Status s : remover.getContext().getStatusManager().getCopyOfStatusList()) {
+      assertFalse(s.getMessage(), s.getMessage().startsWith("Removed "));
+    }
+  }
+
+  @Test
+  public void keepsEmptyDirectoryOfARetainedPeriod() throws IOException {
+    File currentPeriodDir = tmpDir.newFolder("cur_2019", "11");
+    File expiredPeriodDir = tmpDir.newFolder("cur_2018", "05");
+    TimeBasedArchiveRemover gmtRemover = newGmtArchiveRemover(
+        "cur_%d{yyyy/MM, " + TIMEZONE_NAME + ", aux}/app_%d{" + DATE_FORMAT + ", " + TIMEZONE_NAME + "}.log");
+
+    gmtRemover.clean(EXPIRY);
+
+    // the current period's directory is empty (e.g. its active file is being
+    // re-created) but must not be removed; an old empty one must be
+    verify(fileProvider, never()).deleteFile(currentPeriodDir);
+    verify(fileProvider, never()).deleteFile(currentPeriodDir.getParentFile());
+    assertTrue(currentPeriodDir.isDirectory());
+    verify(fileProvider).deleteFile(expiredPeriodDir);
+    assertFalse(expiredPeriodDir.exists());
+  }
+
+  @Test
+  public void removesEmptyParentOfARemovedEmptyDirInTheSamePass() throws IOException {
+    File emptyMonth = tmpDir.newFolder("nested_2017", "05");
+    File emptyYear = emptyMonth.getParentFile();
+    File nonEmptyMonth = tmpDir.newFolder("nested_2018", "03");
+    File unrelatedFile = new File(nonEmptyMonth, "keep.txt");
+    assertTrue(unrelatedFile.createNewFile());
+    File nonEmptyYear = nonEmptyMonth.getParentFile();
+    // list directory entries in descending name order, so the directories
+    // are visited (deepest first) as nested_2017/05, nested_2017,
+    // nested_2018/03, nested_2018: the latter two each have a single child
+    // that is not the directory found empty just before
+    doAnswer(invocation -> {
+      File[] files = (File[]) invocation.callRealMethod();
+      if (files != null) {
+        Arrays.sort(files, Collections.reverseOrder());
+      }
+      return files;
+    }).when(fileProvider).listFiles(any(File.class), isNull(FilenameFilter.class));
+    TimeBasedArchiveRemover gmtRemover = newGmtArchiveRemover(
+        "nested_%d{yyyy/MM, " + TIMEZONE_NAME + ", aux}/app_%d{" + DATE_FORMAT + ", " + TIMEZONE_NAME + "}.log");
+
+    gmtRemover.clean(EXPIRY);
+
+    verify(fileProvider).deleteFile(emptyMonth);
+    verify(fileProvider).deleteFile(emptyYear);
+    assertFalse(emptyMonth.exists());
+    assertFalse("a directory emptied by the removal of its only child must be removed too", emptyYear.exists());
+    verify(fileProvider, never()).deleteFile(nonEmptyMonth);
+    verify(fileProvider, never()).deleteFile(nonEmptyYear);
+    assertTrue(unrelatedFile.exists());
+  }
+
+  @Test
+  public void keepsParentOfARemovedEmptyDirWhenItHoldsOtherEntries() throws IOException {
+    File emptyMonth = tmpDir.newFolder("shared_2017", "05");
+    File year = emptyMonth.getParentFile();
+    File unrelatedFile = new File(year, "notes.txt");
+    assertTrue(unrelatedFile.createNewFile());
+    TimeBasedArchiveRemover gmtRemover = newGmtArchiveRemover(
+        "shared_%d{yyyy/MM, " + TIMEZONE_NAME + ", aux}/app_%d{" + DATE_FORMAT + ", " + TIMEZONE_NAME + "}.log");
+
+    gmtRemover.clean(EXPIRY);
+
+    verify(fileProvider).deleteFile(emptyMonth);
+    assertFalse(emptyMonth.exists());
+    // the year directory still holds another entry once its empty month is
+    // gone, so its removal is not even attempted
+    verify(fileProvider, never()).deleteFile(year);
+    assertTrue(unrelatedFile.exists());
+    assertFalse(hasStatus(gmtRemover.getContext(), Status.WARN, "cannot delete " + year));
+  }
+
+  @Test
+  public void toStringNamesTheRemover() {
+    assertEquals("c.q.l.core.rolling.helper.TimeBasedArchiveRemover", remover.toString());
+  }
+
+  private TimeBasedArchiveRemover newGmtArchiveRemover(String relativePattern) {
+    LoggerContext context = new LoggerContext();
+    RollingCalendar rollingCalendar = new RollingCalendar(DATE_FORMAT, TimeZone.getTimeZone(TIMEZONE_NAME), Locale.US);
+    FileNamePattern filePattern = new FileNamePattern(tmpDir.getRoot().getAbsolutePath() + File.separator + relativePattern, context);
+    TimeBasedArchiveRemover archiveRemover = new TimeBasedArchiveRemover(filePattern, rollingCalendar, fileProvider);
+    archiveRemover.setContext(context);
+    return archiveRemover;
+  }
+
+  private static boolean hasStatus(Context context, int level, String message) {
+    for (Status s : context.getStatusManager().getCopyOfStatusList()) {
+      if (s.getLevel() == level && message.equals(s.getMessage())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void setupSizeCapTest() {

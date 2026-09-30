@@ -68,6 +68,7 @@ public class NestedComplexPropertyIA extends ImplicitAction {
     case NOT_FOUND:
     case AS_BASIC_PROPERTY:
     case AS_BASIC_PROPERTY_COLLECTION:
+    default: // every AggregationType has a case; default shares this one's
       return false;
 
       // we only push action data if NestComponentIA is applicable
@@ -78,10 +79,6 @@ public class NestedComplexPropertyIA extends ImplicitAction {
       actionDataStack.push(ad);
 
       return true;
-    default:
-      addError("PropertySetter.computeAggregationType returned "
-          + aggregationType);
-      return false;
     }
   }
 

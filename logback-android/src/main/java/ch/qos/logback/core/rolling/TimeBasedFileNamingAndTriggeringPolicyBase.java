@@ -78,7 +78,7 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
 
     setDateInCurrentPeriod(new Date(getCurrentTime()));
     if (tbrp.getParentsRawFileProperty() != null) {
-      File currentFile = new File(tbrp.getParentsRawFileProperty());
+      File currentFile = newActiveFile(tbrp.getParentsRawFileProperty());
       if (currentFile.exists() && currentFile.canRead()) {
         setDateInCurrentPeriod(new Date(currentFile.lastModified()));
       }
@@ -91,6 +91,16 @@ abstract public class TimeBasedFileNamingAndTriggeringPolicyBase<E> extends
             + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z", Locale.US)
                     .format(dateInCurrentPeriod));
     computeNextCheck();
+  }
+
+  /**
+   * The file the parent appender writes to, whose modification time sets the
+   * initial period when it can be read. Package-private so that a unit test
+   * can supply an unreadable file: file permissions can't make a file
+   * unreadable for a privileged user, or at all on some platforms.
+   */
+  File newActiveFile(String fileName) {
+    return new File(fileName);
   }
 
   @Override

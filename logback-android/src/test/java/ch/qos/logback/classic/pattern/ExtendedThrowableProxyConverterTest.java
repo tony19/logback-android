@@ -18,6 +18,8 @@ package ch.qos.logback.classic.pattern;
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -88,6 +90,13 @@ public class ExtendedThrowableProxyConverterTest {
   public void nested() {
     Throwable t = makeNestedException(1);
     verify(t);
+  }
+
+  @Test
+  public void prepareLoggingEventLeavesEventUntouched() {
+    ILoggingEvent event = mock(ILoggingEvent.class);
+    etpc.prepareLoggingEvent(event);
+    verifyNoInteractions(event);
   }
 
   void verify(Throwable t) {

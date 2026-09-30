@@ -150,7 +150,7 @@ public class ReconfigureOnChangeTask extends ContextAwareBase implements Runnabl
         ConfigurationWatchList oldCWL = ConfigurationWatchListUtil.getConfigurationWatchList(lc);
         ConfigurationWatchList newCWL = oldCWL.buildClone();
 
-        if (failsafeEvents == null || failsafeEvents.isEmpty()) {
+        if (failsafeEvents.isEmpty()) {
             addWarn("No previous configuration to fall back on.");
         } else {
             addWarn(FALLING_BACK_TO_SAFE_CONFIGURATION);

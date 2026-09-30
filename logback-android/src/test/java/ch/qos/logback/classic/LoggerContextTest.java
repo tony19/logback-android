@@ -18,16 +18,29 @@ package ch.qos.logback.classic;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.slf4j.Marker;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggerContextListener;
+import ch.qos.logback.classic.spi.LoggerContextVO;
+import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.classic.turbo.NOPTurboFilter;
+import ch.qos.logback.classic.turbo.TurboFilter;
+import ch.qos.logback.core.read.ListAppender;
+import ch.qos.logback.core.spi.FilterReply;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.rolling.helper.FileNamePattern;
 import ch.qos.logback.core.status.StatusManager;
@@ -282,4 +295,158 @@ public class LoggerContextTest {
 
   }
 
+  @Test
+  public void putPropertiesAddsEveryPropertyAndRefreshesRemoteView() {
+    LoggerContextVO before = lc.getLoggerContextRemoteView();
+    Properties props = new Properties();
+    props.setProperty("k1", "v1");
+    props.setProperty("k2", "v2");
+
+    lc.putProperties(props);
+
+    assertEquals("v1", lc.getProperty("k1"));
+    assertEquals("v2", lc.getProperty("k2"));
+    LoggerContextVO after = lc.getLoggerContextRemoteView();
+    assertNotSame(before, after);
+    assertEquals("v1", after.getPropertyMap().get("k1"));
+    assertEquals("v2", after.getPropertyMap().get("k2"));
+    assertNull(before.getPropertyMap().get("k1"));
+  }
+
+  @Test
+  public void oneArgumentLogCallIsDecidedByTurboFiltersWithThatArgument() {
+    RecordingTurboFilter tf = addRecordingTurboFilter(FilterReply.ACCEPT);
+    ListAppender<ILoggingEvent> la = attachListAppender();
+    Logger logger = lc.getLogger("one");
+    logger.setLevel(Level.ERROR);
+
+    logger.debug("a {}", "p1");
+
+    assertEquals("a {}", tf.format);
+    assertEquals(Level.DEBUG, tf.level);
+    assertArrayEquals(new Object[] {"p1"}, tf.params);
+    // ACCEPT overrides the logger level
+    assertEquals(1, la.list.size());
+    assertEquals("a p1", la.list.get(0).getFormattedMessage());
+
+    tf.reply = FilterReply.DENY;
+    logger.error("b {}", "p2");
+    assertArrayEquals(new Object[] {"p2"}, tf.params);
+    assertEquals(1, la.list.size());
+  }
+
+  @Test
+  public void twoArgumentLogCallIsDecidedByTurboFiltersWithBothArguments() {
+    RecordingTurboFilter tf = addRecordingTurboFilter(FilterReply.ACCEPT);
+    ListAppender<ILoggingEvent> la = attachListAppender();
+    Logger logger = lc.getLogger("two");
+    logger.setLevel(Level.ERROR);
+
+    logger.info("a {} {}", "p1", "p2");
+
+    assertEquals("a {} {}", tf.format);
+    assertEquals(Level.INFO, tf.level);
+    assertArrayEquals(new Object[] {"p1", "p2"}, tf.params);
+    assertEquals(1, la.list.size());
+    assertEquals("a p1 p2", la.list.get(0).getFormattedMessage());
+
+    tf.reply = FilterReply.DENY;
+    logger.error("b {} {}", "p3", "p4");
+    assertArrayEquals(new Object[] {"p3", "p4"}, tf.params);
+    assertEquals(1, la.list.size());
+  }
+
+  @Test
+  public void removedListenerIsNoLongerNotified() {
+    RecordingListener kept = new RecordingListener();
+    RecordingListener removed = new RecordingListener();
+    lc.addListener(kept);
+    lc.addListener(removed);
+    assertEquals(2, lc.getCopyOfListenerList().size());
+
+    lc.removeListener(removed);
+    lc.start();
+
+    List<LoggerContextListener> listeners = lc.getCopyOfListenerList();
+    assertEquals(1, listeners.size());
+    assertTrue(listeners.contains(kept));
+    assertEquals(1, kept.startCount);
+    assertEquals(0, removed.startCount);
+  }
+
+  @Test
+  public void copyOfListenerListIsDetachedFromTheContext() {
+    RecordingListener listener = new RecordingListener();
+    lc.addListener(listener);
+
+    List<LoggerContextListener> copy = lc.getCopyOfListenerList();
+    copy.clear();
+
+    assertEquals(1, lc.getCopyOfListenerList().size());
+    lc.start();
+    assertEquals(1, listener.startCount);
+  }
+
+  @Test
+  public void maxCallerDataDepthLimitsExtractedCallerData() {
+    assertEquals(ClassicConstants.DEFAULT_MAX_CALLEDER_DATA_DEPTH, lc.getMaxCallerDataDepth());
+    lc.setMaxCallerDataDepth(3);
+    assertEquals(3, lc.getMaxCallerDataDepth());
+
+    LoggingEvent event = new LoggingEvent(LoggerContextTest.class.getName(), lc.getLogger("x"), Level.INFO, "m", null, null);
+    // the caller is the frame right below this test class, and the stack below it is deeper than 3
+    assertEquals(3, event.getCallerData().length);
+  }
+
+  private RecordingTurboFilter addRecordingTurboFilter(FilterReply reply) {
+    RecordingTurboFilter tf = new RecordingTurboFilter();
+    tf.reply = reply;
+    tf.start();
+    lc.addTurboFilter(tf);
+    return tf;
+  }
+
+  private ListAppender<ILoggingEvent> attachListAppender() {
+    ListAppender<ILoggingEvent> la = new ListAppender<ILoggingEvent>();
+    la.setContext(lc);
+    la.start();
+    lc.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(la);
+    return la;
+  }
+
+  static class RecordingTurboFilter extends TurboFilter {
+    FilterReply reply;
+    String format;
+    Level level;
+    Object[] params;
+
+    @Override
+    public FilterReply decide(List<Marker> markers, Logger logger, Level level, String format, Object[] params, Throwable t) {
+      this.level = level;
+      this.format = format;
+      this.params = params;
+      return reply;
+    }
+  }
+
+  static class RecordingListener implements LoggerContextListener {
+    int startCount;
+
+    public boolean isResetResistant() {
+      return false;
+    }
+
+    public void onStart(LoggerContext context) {
+      startCount++;
+    }
+
+    public void onReset(LoggerContext context) {
+    }
+
+    public void onStop(LoggerContext context) {
+    }
+
+    public void onLevelChange(Logger logger, Level level) {
+    }
+  }
 }

@@ -92,18 +92,32 @@ jobs:
       - name: Unit tests (jdk8 variant)
         run: ./gradlew testJdk8DebugUnitTest
 
-      # The Android-specific layer (ch.qos.logback.{classic,core}.android) must
-      # stay at 100% line and branch coverage (rule in logback-android/build.gradle).
-      # Reuses the coverage the unit test runs above recorded.
-      - name: Coverage gate (Android-specific layer)
-        run: ./gradlew verifyAndroidLayerCoverage androidLayerCoverageReportJdk11Debug
+      # Every class in the library, Java and Kotlin, must stay at 100% line and
+      # branch coverage (rule in logback-android/build.gradle). Reuses the
+      # coverage the unit test runs above recorded. The reports are written
+      # first so that the next step can list what a failing gate is missing.
+      - name: Coverage reports
+        run: ./gradlew coverageReportJdk11Debug coverageReportJdk8Debug
+
+      - name: Coverage gaps
+        run: |
+          for variant in Jdk11Debug Jdk8Debug; do
+            report="logback-android/build/reports/jacoco/coverageReport$variant/coverageReport$variant.xml"
+            echo "::group::Uncovered lines and branches ($variant)"
+            python3 scripts/coverage-gaps.py "$report"
+            echo "::endgroup::"
+            { echo "### Uncovered lines and branches ($variant)"; echo '```'; python3 scripts/coverage-gaps.py "$report"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: Coverage gate
+        run: ./gradlew verifyCoverage
 
       - name: Upload coverage report
         if: ${{ !cancelled() && matrix.java == 21 }}
         uses: actions/upload-artifact@v7
         with:
           name: coverage-report
-          path: logback-android/build/reports/jacoco/androidLayerCoverageReportJdk11Debug/
+          path: logback-android/build/reports/jacoco/coverageReportJdk11Debug/
 
       - name: Upload test reports
         if: failure()

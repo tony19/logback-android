@@ -16,6 +16,8 @@
 package ch.qos.logback.core.pattern.parser;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -29,7 +31,10 @@ import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.pattern.Converter;
 import ch.qos.logback.core.pattern.Converter123;
 import ch.qos.logback.core.pattern.ConverterHello;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusChecker;
+import ch.qos.logback.core.util.DynamicClassLoadingException;
+import ch.qos.logback.core.util.IncompatibleClassException;
 import ch.qos.logback.core.util.StatusPrinter;
 
 public class CompilerTest {
@@ -255,6 +260,81 @@ public class CompilerTest {
       String result = write(head, new Object());
       assertEquals("xyz Helloworld", result);
     }
+  }
+
+  /** Returns the only status whose message is exactly {@code message}. */
+  Status statusWithMessage(String message) {
+    Status found = null;
+    for (Status s : context.getStatusManager().getCopyOfStatusList()) {
+      if (message.equals(s.getMessage())) {
+        assertNull("more than one status with message " + message, found);
+        found = s;
+      }
+    }
+    assertNotNull("no status with message " + message, found);
+    return found;
+  }
+
+  @Test
+  public void compositeKeywordWithoutRegisteredConverterBecomesParserError() throws Exception {
+    Parser<Object> p = new Parser<Object>("a %foo(x) b");
+    p.setContext(context);
+    Node t = p.parse();
+    Converter<Object> head = p.compile(t, converterMap);
+
+    assertEquals("a %PARSER_ERROR[foo] b", write(head, new Object()));
+    Status missing = statusWithMessage(
+            "There is no conversion class registered for composite conversion word [foo]");
+    assertEquals(Status.ERROR, missing.getLevel());
+    Status failed = statusWithMessage("Failed to create converter for [%foo] keyword");
+    assertEquals(Status.ERROR, failed.getLevel());
+  }
+
+  @Test
+  public void compositeKeywordMappedToNonCompositeConverterBecomesParserError() throws Exception {
+    Parser<Object> p = new Parser<Object>("%hello(x)");
+    p.setContext(context);
+    Node t = p.parse();
+    Converter<Object> head = p.compile(t, converterMap);
+
+    assertEquals("%PARSER_ERROR[hello]", write(head, new Object()));
+    Status instantiation = statusWithMessage("Failed to instantiate converter class ["
+            + ConverterHello.class.getName() + "] as a composite converter for keyword [hello]");
+    assertEquals(Status.ERROR, instantiation.getLevel());
+    assertTrue(instantiation.getThrowable() instanceof IncompatibleClassException);
+    Status failed = statusWithMessage("Failed to create converter for [%hello] keyword");
+    assertEquals(Status.ERROR, failed.getLevel());
+  }
+
+  @Test
+  public void keywordMappedToMissingClassBecomesParserError() throws Exception {
+    converterMap.put("missing", "no.such.Converter");
+    Parser<Object> p = new Parser<Object>("a %missing b");
+    p.setContext(context);
+    Node t = p.parse();
+    Converter<Object> head = p.compile(t, converterMap);
+
+    assertEquals("a %PARSER_ERROR[missing] b", write(head, new Object()));
+    Status instantiation = statusWithMessage(
+            "Failed to instantiate converter class [no.such.Converter] for keyword [missing]");
+    assertEquals(Status.ERROR, instantiation.getLevel());
+    assertTrue(instantiation.getThrowable() instanceof DynamicClassLoadingException);
+    Status invalid = statusWithMessage("[missing] is not a valid conversion word");
+    assertEquals(Status.ERROR, invalid.getLevel());
+  }
+
+  @Test
+  public void nodesOfUnknownTypeAreSkipped() {
+    Node top = new Node(99, "ignored");
+    top.setNext(new Node(Node.LITERAL, "a"));
+    Compiler<Object> compiler = new Compiler<Object>(top, converterMap);
+    compiler.setContext(context);
+
+    Converter<Object> head = compiler.compile();
+
+    assertEquals("a", write(head, new Object()));
+    assertNull(head.getNext());
+    assertTrue(context.getStatusManager().getCopyOfStatusList().isEmpty());
   }
 
 }

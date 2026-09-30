@@ -20,9 +20,15 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InvalidClassException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -120,6 +126,212 @@ public class HardenedObjectInputStreamTest {
             s2 = t2;
         }
         return root;
+    }
+
+    @Test
+    public void acceptsJavaLangAndJavaUtilClassesWithoutWhitelist() throws Exception {
+        List<Object> list = new ArrayList<Object>();
+        list.add("text");
+        list.add(Integer.valueOf(42));
+
+        inputStream = new HardenedObjectInputStream(new ByteArrayInputStream(serialize(list)), (String[]) null);
+        try {
+            assertEquals(list, inputStream.readObject());
+        } finally {
+            inputStream.close();
+        }
+    }
+
+    @Test
+    public void rejectsClassesThatAreNotWhitelisted() throws Exception {
+        inputStream = new HardenedObjectInputStream(new ByteArrayInputStream(serialize(new Innocent())), (String[]) null);
+        try {
+            InvalidClassException e = assertThrows(InvalidClassException.class, () -> inputStream.readObject());
+            assertEquals("Unauthorized deserialization attempt; " + Innocent.class.getName(), e.getMessage());
+        } finally {
+            inputStream.close();
+        }
+    }
+
+    @Test
+    public void acceptsClassesOnWhitelistGivenAsList() throws Exception {
+        Innocent innocent = new Innocent();
+        innocent.setaString("listed");
+        List<String> listedClasses = Arrays.asList("some.other.Clazz", Innocent.class.getName());
+
+        inputStream = new HardenedObjectInputStream(new ByteArrayInputStream(serialize(innocent)), listedClasses);
+        try {
+            assertEquals(innocent, inputStream.readObject());
+        } finally {
+            inputStream.close();
+        }
+    }
+
+    @Test
+    public void acceptsClassesAddedToTheWhitelist() throws Exception {
+        Innocent innocent = new Innocent();
+        innocent.setaString("added");
+
+        inputStream = new HardenedObjectInputStream(new ByteArrayInputStream(serialize(innocent)), new String[0]);
+        inputStream.addToWhitelist(Arrays.asList(Innocent.class.getName()));
+        try {
+            assertEquals(innocent, inputStream.readObject());
+        } finally {
+            inputStream.close();
+        }
+    }
+
+    @Test
+    public void acceptsArraysUpToTheLimit() throws Exception {
+        inputStream = new HardenedObjectInputStream(new ByteArrayInputStream(serialize(new int[10000])), new String[] {"[I"});
+        try {
+            assertEquals(10000, ((int[]) inputStream.readObject()).length);
+        } finally {
+            inputStream.close();
+        }
+    }
+
+    @Test
+    public void rejectsArraysLongerThanTheLimit() throws Exception {
+        // the array limit relies on java.io.ObjectInputFilter (Java 9+)
+        Assume.assumeTrue(hasObjectInputFilter());
+
+        inputStream = new HardenedObjectInputStream(new ByteArrayInputStream(serialize(new int[10001])), new String[] {"[I"});
+        try {
+            InvalidClassException e = assertThrows(InvalidClassException.class, () -> inputStream.readObject());
+            assertTrue(e.getMessage(), e.getMessage().contains("REJECTED"));
+        } finally {
+            inputStream.close();
+        }
+    }
+
+    @Test
+    public void reliesOnWhitelistAloneWhereObjectInputFilterIsMissing() throws Exception {
+        // as on Java 8 and Android, which have no java.io.ObjectInputFilter
+        Class<?> isolatedClass = new ObjectInputFilterHidingClassLoader()
+                .loadClass(HardenedObjectInputStream.class.getName());
+        assertNotSame(HardenedObjectInputStream.class, isolatedClass);
+
+        // no array limit...
+        ObjectInputStream in = newIsolatedInputStream(isolatedClass, serialize(new int[10001]), "[I");
+        try {
+            assertEquals(10001, ((int[]) in.readObject()).length);
+        } finally {
+            in.close();
+        }
+
+        // ...but the whitelist still applies
+        final ObjectInputStream rejecting = newIsolatedInputStream(isolatedClass, serialize(new Innocent()), "[I");
+        try {
+            assertThrows(InvalidClassException.class, () -> rejecting.readObject());
+        } finally {
+            rejecting.close();
+        }
+    }
+
+    @Test
+    public void failsWhenTheObjectFilterCannotBeInstalled() throws Exception {
+        Assume.assumeTrue(hasObjectInputFilter());
+        final byte[] bytes = serialize("anything");
+
+        RuntimeException e = assertThrows(RuntimeException.class,
+                () -> new FilterPresettingInputStream(new ByteArrayInputStream(bytes)));
+
+        assertEquals("Failed to initialize object filter", e.getMessage());
+        assertTrue(e.getCause() instanceof InvocationTargetException);
+        // ObjectInputStream allows setting a stream's filter only once
+        assertTrue(e.getCause().getCause() instanceof IllegalStateException);
+    }
+
+    private static byte[] serialize(Object o) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream objectOut = new ObjectOutputStream(out);
+        objectOut.writeObject(o);
+        objectOut.close();
+        return out.toByteArray();
+    }
+
+    private static ObjectInputStream newIsolatedInputStream(Class<?> isolatedClass, byte[] bytes, String... allowedClasses)
+            throws Exception {
+        return (ObjectInputStream) isolatedClass.getConstructor(InputStream.class, String[].class)
+                .newInstance(new ByteArrayInputStream(bytes), allowedClasses);
+    }
+
+    /**
+     * Defines its own copy of {@link HardenedObjectInputStream}, for which
+     * {@code java.io.ObjectInputFilter} cannot be found.
+     */
+    private static class ObjectInputFilterHidingClassLoader extends ClassLoader {
+
+        ObjectInputFilterHidingClassLoader() {
+            super(HardenedObjectInputStreamTest.class.getClassLoader());
+        }
+
+        @Override
+        protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            if (name.equals("java.io.ObjectInputFilter")) {
+                throw new ClassNotFoundException(name);
+            }
+            if (!name.equals(HardenedObjectInputStream.class.getName())) {
+                return super.loadClass(name, resolve);
+            }
+            Class<?> c = findLoadedClass(name);
+            if (c == null) {
+                byte[] bytes = readClassFile(HardenedObjectInputStream.class);
+                // same code source as the original class, so that coverage tools record it
+                c = defineClass(name, bytes, 0, bytes.length, HardenedObjectInputStream.class.getProtectionDomain());
+            }
+            return c;
+        }
+
+        private static byte[] readClassFile(Class<?> c) throws ClassNotFoundException {
+            InputStream in = c.getResourceAsStream(c.getSimpleName() + ".class");
+            if (in == null) {
+                throw new ClassNotFoundException(c.getName());
+            }
+            try {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096];
+                int n;
+                while ((n = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, n);
+                }
+                return out.toByteArray();
+            } catch (IOException e) {
+                throw new ClassNotFoundException(c.getName(), e);
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets an object filter of its own while the stream header is read, i.e.
+     * before {@link HardenedObjectInputStream} installs its filter.
+     */
+    private static class FilterPresettingInputStream extends HardenedObjectInputStream {
+
+        FilterPresettingInputStream(InputStream in) throws IOException {
+            super(in, new String[0]);
+        }
+
+        @Override
+        protected void readStreamHeader() throws IOException {
+            super.readStreamHeader();
+            try {
+                // java.io.ObjectInputFilter (Java 9+) is not part of the Android API
+                Class<?> filterClass = Class.forName("java.io.ObjectInputFilter");
+                Object filter = Class.forName("java.io.ObjectInputFilter$Config")
+                        .getMethod("createFilter", String.class).invoke(null, "maxdepth=1");
+                ObjectInputStream.class.getMethod("setObjectInputFilter", filterClass).invoke(this, filter);
+            } catch (ReflectiveOperationException e) {
+                throw new IOException(e);
+            }
+        }
     }
 
 }

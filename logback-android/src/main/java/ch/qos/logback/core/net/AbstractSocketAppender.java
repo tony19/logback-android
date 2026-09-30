@@ -83,6 +83,7 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
   private Duration reconnectionDelay = new Duration(DEFAULT_RECONNECTION_DELAY);
   private int queueSize = DEFAULT_QUEUE_SIZE;
   private int acceptConnectionTimeout = DEFAULT_ACCEPT_CONNECTION_DELAY;
+  private int handshakeFailureDelay = DEFAULT_RECONNECTION_DELAY;
   private Duration eventDelayLimit = new Duration(DEFAULT_EVENT_DELAY_TIMEOUT);
   
   private boolean lazyInit = false;
@@ -237,10 +238,14 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
         try {
           ObjectWriter objectWriter = createObjectWriterForSocket();
           addInfo(peerId + "connection established");
-          dispatchEvents(objectWriter);
+          // ends only by an IOException (connection lost) or an
+          // InterruptedException (appender stopped)
+          while (true) {
+            dispatchEvent(objectWriter);
+          }
         } catch (javax.net.ssl.SSLHandshakeException she) {
           // FIXME
-          Thread.sleep(DEFAULT_RECONNECTION_DELAY);
+          Thread.sleep(handshakeFailureDelay);
         } catch (IOException ex) {
           addInfo(peerId + "connection failed: " + ex);
         } finally {
@@ -273,17 +278,15 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
     return connector;
   }
 
-  private void dispatchEvents(ObjectWriter objectWriter) throws InterruptedException, IOException {
-    while (true) {
-      E event = deque.takeFirst();
-      postProcessEvent(event);
-      Serializable serializableEvent = getPST().transform(event);
-      try {
-        objectWriter.write(serializableEvent);
-      } catch (IOException e) {
-        tryReAddingEventToFrontOfQueue(event);
-        throw e;
-      }
+  private void dispatchEvent(ObjectWriter objectWriter) throws InterruptedException, IOException {
+    E event = deque.takeFirst();
+    postProcessEvent(event);
+    Serializable serializableEvent = getPST().transform(event);
+    try {
+      objectWriter.write(serializableEvent);
+    } catch (IOException e) {
+      tryReAddingEventToFrontOfQueue(event);
+      throw e;
     }
   }
 
@@ -478,6 +481,19 @@ public abstract class AbstractSocketAppender<E> extends AppenderBase<E>
    */
   void setAcceptConnectionTimeout(int acceptConnectionTimeout) {
     this.acceptConnectionTimeout = acceptConnectionTimeout;
+  }
+
+  /**
+   * Sets how long to wait before reconnecting after the SSL handshake with
+   * the remote peer failed (default {@link #DEFAULT_RECONNECTION_DELAY}).
+   * <p>
+   * This property is configurable only to support instrumentation for unit
+   * testing.
+   *
+   * @param handshakeFailureDelay delay in milliseconds
+   */
+  void setHandshakeFailureDelay(int handshakeFailureDelay) {
+    this.handshakeFailureDelay = handshakeFailureDelay;
   }
 
 }

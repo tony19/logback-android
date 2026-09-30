@@ -75,6 +75,25 @@ public class CyclicBufferTrackerTest {
     assertEquals(0, cb.length());
   }
 
+  @Test
+  public void buffersHaveTheDefaultSizeUnlessConfigured() {
+    assertEquals(CyclicBufferTracker.DEFAULT_BUFFER_SIZE, tracker.getBufferSize());
+    assertEquals(CyclicBufferTracker.DEFAULT_BUFFER_SIZE, tracker.getOrCreate(key, 3000).getMaxSize());
+  }
+
+  @Test
+  public void configuredBufferSizeAppliesToBuffersCreatedAfterwards() {
+    tracker.setBufferSize(3);
+
+    assertEquals(3, tracker.getBufferSize());
+    CyclicBuffer<Object> cb = tracker.getOrCreate(key, 3000);
+    assertEquals(3, cb.getMaxSize());
+    for (int i = 0; i < 5; i++) {
+      cb.add(i);
+    }
+    assertEquals(3, cb.length());
+  }
+
 
 
 

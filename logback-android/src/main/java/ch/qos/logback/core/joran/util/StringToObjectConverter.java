@@ -105,9 +105,7 @@ public class StringToObjectConverter {
   public static Method getValueOfMethod(Class<?> type) {
     try {
       return type.getMethod(CoreConstants.VALUE_OF, STRING_CLASS_PARAMETER);
-    } catch (NoSuchMethodException e) {
-      return null;
-    } catch (SecurityException e) {
+    } catch (NoSuchMethodException | SecurityException e) {
       return null;
     }
   }

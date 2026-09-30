@@ -26,8 +26,11 @@ import org.junit.Test;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
+import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.helpers.NOPAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.read.ListAppender;
+import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -149,7 +152,72 @@ public class AppenderTrackerTest {
     }
   }
 
+  @Test
+  public void stoppedAppenderIsRemovedBeforeItTimesOut() {
+    Appender<Object> stopped = appenderTracker.getOrCreate(key + "-stopped", now);
+    Appender<Object> running = appenderTracker.getOrCreate(key + "-running", now);
+    stopped.stop();
+
+    // well before DEFAULT_TIMEOUT
+    appenderTracker.removeStaleComponents(now);
+
+    assertNull(appenderTracker.find(key + "-stopped"));
+    assertSame(running, appenderTracker.find(key + "-running"));
+    assertTrue(running.isStarted());
+  }
+
+  @Test
+  public void failureToBuildAnAppenderIsReportedAndYieldsAStartedNOPAppender() {
+    AppenderTracker<Object> tracker = new AppenderTracker<Object>(context, new FailingAppenderFactory());
+
+    Appender<Object> appender = tracker.getOrCreate(key, now);
+
+    assertTrue(appender instanceof NOPAppender);
+    assertTrue(appender.isStarted());
+    assertSame(context, appender.getContext());
+    assertSame(appender, tracker.find(key));
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(2, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("Error while building appender with discriminating value [" + key + "]",
+        statuses.get(0).getMessage());
+    assertSame(tracker, statuses.get(0).getOrigin());
+    assertEquals(Status.ERROR, statuses.get(1).getLevel());
+    assertEquals("Building NOPAppender for discriminating value [" + key + "]",
+        statuses.get(1).getMessage());
+  }
+
+  @Test
+  public void nopAppenderErrorsAreReportedAtMostMaxErrorCountTimes() {
+    AppenderTracker<Object> tracker = new AppenderTracker<Object>(context, new NullAppenderFactory());
+
+    int attempts = CoreConstants.MAX_ERROR_COUNT + 3;
+    for (int i = 0; i < attempts; i++) {
+      assertTrue(tracker.getOrCreate(key + "-" + i, now) instanceof NOPAppender);
+    }
+
+    assertEquals(attempts, tracker.getComponentCount());
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(CoreConstants.MAX_ERROR_COUNT, statuses.size());
+    for (int i = 0; i < CoreConstants.MAX_ERROR_COUNT; i++) {
+      assertEquals("Building NOPAppender for discriminating value [" + key + "-" + i + "]",
+          statuses.get(i).getMessage());
+    }
+  }
+
   // ======================================================================
+  static class FailingAppenderFactory implements AppenderFactory<Object> {
+    public Appender<Object> buildAppender(Context context, String discriminatingValue) throws JoranException {
+      throw new JoranException("cannot build " + discriminatingValue);
+    }
+  }
+
+  static class NullAppenderFactory implements AppenderFactory<Object> {
+    public Appender<Object> buildAppender(Context context, String discriminatingValue) {
+      return null;
+    }
+  }
+
   static class ListAppenderFactory implements AppenderFactory<Object> {
 
     public Appender<Object> buildAppender(Context context, String discriminatingValue) throws JoranException {

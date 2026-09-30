@@ -17,6 +17,7 @@ package ch.qos.logback.core.joran.spi;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
@@ -26,8 +27,12 @@ import java.util.List;
 import org.junit.Test;
 import org.xml.sax.Attributes;
 
+import ch.qos.logback.core.Context;
 import ch.qos.logback.core.ContextBase;
 import ch.qos.logback.core.joran.action.Action;
+import ch.qos.logback.core.joran.action.NOPAction;
+import ch.qos.logback.core.status.Status;
+import ch.qos.logback.core.util.IncompatibleClassException;
 
 /**
  * Test SimpleRuleStore for various explicit rule combinations.
@@ -213,6 +218,92 @@ public class SimpleRuleStoreTest {
       List<Action> r = srs.matchActions(new ElementPath(s));
       assertNull(r);
     }
+  }
+
+  @Test
+  public void addRuleByClassNameInstantiatesTheActionWithTheStoreContext() {
+    Context context = new ContextBase();
+    SimpleRuleStore store = new SimpleRuleStore(context);
+    store.addRule(new ElementSelector("a"), NOPAction.class.getName());
+
+    List<Action> r = store.matchActions(new ElementPath("a"));
+    assertNotNull(r);
+    assertEquals(1, r.size());
+    assertTrue(r.get(0) instanceof NOPAction);
+    assertSame(context, r.get(0).getContext());
+    assertEquals(0, context.getStatusManager().getCount());
+  }
+
+  @Test
+  public void addRuleByClassNameReportsUninstantiableClassAndAddsNoRule() {
+    Context context = new ContextBase();
+    SimpleRuleStore store = new SimpleRuleStore(context);
+    store.addRule(new ElementSelector("a"), String.class.getName());
+
+    assertNull(store.matchActions(new ElementPath("a")));
+    List<Status> statuses = context.getStatusManager().getCopyOfStatusList();
+    assertEquals(1, statuses.size());
+    assertEquals(Status.ERROR, statuses.get(0).getLevel());
+    assertEquals("Could not instantiate class [java.lang.String]", statuses.get(0).getMessage());
+    assertTrue(statuses.get(0).getThrowable() instanceof IncompatibleClassException);
+  }
+
+  @Test
+  public void middleMatchFindsSelectorContainedAnywhereInThePath() {
+    srs.addRule(new ElementSelector("*/b/*"), new XAction(1));
+
+    List<Action> r = srs.matchActions(new ElementPath("a/b/c"));
+    assertNotNull(r);
+    assertEquals(1, r.size());
+    assertEquals(1, ((XAction) r.get(0)).id);
+
+    assertNull(srs.matchActions(new ElementPath("a/x/c")));
+  }
+
+  @Test
+  public void longestMiddleMatchWins() {
+    srs.addRule(new ElementSelector("*/b/*"), new XAction(1));
+    srs.addRule(new ElementSelector("*/b/c/*"), new XAction(2));
+    srs.addRule(new ElementSelector("*/x/*"), new XAction(3));
+
+    List<Action> r = srs.matchActions(new ElementPath("a/b/c/d"));
+    assertNotNull(r);
+    assertEquals(1, r.size());
+    assertEquals(2, ((XAction) r.get(0)).id);
+  }
+
+  @Test
+  public void selectorsStarredAtOneEndOnlyAreNotMiddleMatches() {
+    // "x/b/*" and "*/b/y" both contain "b", but only a selector starred at
+    // both ends matches a part found anywhere in the path
+    srs.addRule(new ElementSelector("x/b/*"), new XAction(1));
+    srs.addRule(new ElementSelector("*/b/y"), new XAction(2));
+
+    assertNull(srs.matchActions(new ElementPath("a/b/c")));
+  }
+
+  @Test
+  public void starStarSelectorDoesNotMatchOrdinaryPaths() {
+    // "*/*" has nothing between its two stars, so the middle part looked up
+    // in the path is "*/*" itself
+    srs.addRule(new ElementSelector("*/*"), new XAction(1));
+
+    assertNull(srs.matchActions(new ElementPath("a/b/c")));
+  }
+
+  @Test
+  public void loneKleeneStarMatchesNothing() {
+    srs.addRule(new ElementSelector("*"), new XAction(1));
+
+    assertNull(srs.matchActions(new ElementPath("a")));
+    assertNull(srs.matchActions(new ElementPath("a/b")));
+  }
+
+  @Test
+  public void toStringListsTheRules() {
+    srs.addRule(new ElementSelector("a"), new XAction(7));
+
+    assertEquals("SimpleRuleStore ( rules = {[a]=[XAction(7)]}   )", srs.toString());
   }
 
   class XAction extends Action {

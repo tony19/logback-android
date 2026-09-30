@@ -16,9 +16,13 @@
 package ch.qos.logback.core.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,7 +30,9 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import ch.qos.logback.core.util.LocationUtil;
 
@@ -36,6 +42,9 @@ import ch.qos.logback.core.util.LocationUtil;
  * @author Carl Harris
  */
 public class LocationUtilTest {
+
+  @Rule
+  public TemporaryFolder tmp = new TemporaryFolder();
 
   private static final String TEST_CLASSPATH_RESOURCE = "util/testResource.txt";
   private static final String TEST_PATTERN = "TEST RESOURCE";
@@ -79,6 +88,55 @@ public class LocationUtilTest {
     writer.close();
     URL url = file.toURI().toURL();
     validateResource(url);
+  }
+
+  @Test
+  public void testExplicitFileUrl() throws Exception {
+    File file = tmp.newFile("testResource.txt");
+    PrintWriter writer = new PrintWriter(file, "UTF-8");
+    writer.println(TEST_PATTERN);
+    writer.close();
+    String location = file.toURI().toURL().toString();
+
+    URL url = LocationUtil.urlForResource(location);
+
+    assertEquals(location, url.toString());
+    validateResource(url);
+  }
+
+  @Test
+  public void testUnknownUrlScheme() {
+    MalformedURLException e = assertThrows(MalformedURLException.class,
+        () -> LocationUtil.urlForResource("nosuchscheme:resource"));
+    assertTrue(e.getMessage(), e.getMessage().contains("nosuchscheme"));
+  }
+
+  @Test
+  public void testMissingImplicitClasspathResource() {
+    FileNotFoundException e = assertThrows(FileNotFoundException.class,
+        () -> LocationUtil.urlForResource("util/noSuchResource.txt"));
+    assertEquals("util/noSuchResource.txt", e.getMessage());
+  }
+
+  @Test
+  public void testMissingExplicitClasspathResource() {
+    String location = LocationUtil.CLASSPATH_SCHEME + "util/noSuchResource.txt";
+    FileNotFoundException e = assertThrows(FileNotFoundException.class,
+        () -> LocationUtil.urlForResource(location));
+    assertEquals(location, e.getMessage());
+  }
+
+  @Test
+  public void testNullLocation() {
+    NullPointerException e = assertThrows(NullPointerException.class,
+        () -> LocationUtil.urlForResource(null));
+    assertEquals("location is required", e.getMessage());
+  }
+
+  @Test
+  public void isInstantiable() {
+    // the class only has static members, but its implicit constructor is public
+    assertNotNull(new LocationUtil());
   }
 
   private void validateResource(URL url) throws IOException {

@@ -15,6 +15,7 @@
  */
 package ch.qos.logback.core.util;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -72,6 +73,12 @@ public class StringCollectionUtilTest {
     Collection<String> values = stringToList("A");
     StringCollectionUtil.removeMatching(values, "B");
     assertTrue(values.contains("A"));
+  }
+
+  @Test
+  public void isInstantiable() {
+    // the class only has static members, but its implicit constructor is public
+    assertNotNull(new StringCollectionUtil());
   }
 
   private List<String> stringToList(String... values) {

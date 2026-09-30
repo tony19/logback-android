@@ -20,13 +20,22 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
+import org.mockito.MockedStatic;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
 import ch.qos.logback.core.spi.LifeCycle;
+import ch.qos.logback.core.status.StatusManager;
 
 public class ContextBaseTest {
 
@@ -105,6 +114,116 @@ public class ContextBaseTest {
       }
     }
     assertTrue("executing thread should be a daemon thread.", executingThreads.get(0).isDaemon());
+  }
+
+  @Test
+  public void setStatusManagerRejectsNull() {
+    StatusManager original = context.getStatusManager();
+
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class, new ThrowingRunnable() {
+      @Override
+      public void run() {
+        context.setStatusManager(null);
+      }
+    });
+
+    assertEquals("null StatusManager not allowed", e.getMessage());
+    assertSame(original, context.getStatusManager());
+  }
+
+  @Test
+  public void setStatusManagerReplacesStatusManager() {
+    StatusManager replacement = new BasicStatusManager();
+    context.setStatusManager(replacement);
+    assertSame(replacement, context.getStatusManager());
+  }
+
+  @Test
+  public void nullNameIsAcceptedByUnnamedContext() {
+    context.setName(null);
+    assertNull(context.getName());
+    context.setName("hello");
+    assertEquals("hello", context.getName());
+  }
+
+  @Test
+  public void nullNameCannotReplaceExistingName() {
+    context.setName("hello");
+
+    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
+      @Override
+      public void run() {
+        context.setName(null);
+      }
+    });
+
+    assertEquals("hello", context.getName());
+  }
+
+  @Test
+  public void isStartedFollowsStartAndStop() {
+    assertFalse(context.isStarted());
+    context.start();
+    assertTrue(context.isStarted());
+    context.stop();
+    assertFalse(context.isStarted());
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
+  public void getExecutorServiceReturnsTheScheduledExecutorService() {
+    try {
+      ExecutorService executorService = context.getExecutorService();
+      assertSame(context.getScheduledExecutorService(), executorService);
+    } finally {
+      context.stop();
+    }
+  }
+
+  @Test
+  public void resetRemovesRegisteredShutdownHook() {
+    Thread hook = new Thread();
+    Runtime.getRuntime().addShutdownHook(hook);
+    boolean hookStillRegistered = true;
+    try {
+      context.putObject(CoreConstants.SHUTDOWN_HOOK_THREAD, hook);
+
+      context.reset();
+
+      assertNull(context.getObject(CoreConstants.SHUTDOWN_HOOK_THREAD));
+      // false: reset() already unregistered it
+      hookStillRegistered = Runtime.getRuntime().removeShutdownHook(hook);
+      assertFalse(hookStillRegistered);
+    } finally {
+      if (hookStillRegistered) {
+        Runtime.getRuntime().removeShutdownHook(hook);
+      }
+    }
+  }
+
+  @Test
+  public void resetToleratesShutdownInProgress() {
+    Thread hook = new Thread();
+    Runtime runtime = mock(Runtime.class);
+    doThrow(new IllegalStateException("Shutdown in progress")).when(runtime).removeShutdownHook(hook);
+    context.putObject(CoreConstants.SHUTDOWN_HOOK_THREAD, hook);
+    context.putProperty("keyA", "valA");
+
+    try (MockedStatic<Runtime> runtimeClass = mockStatic(Runtime.class)) {
+      runtimeClass.when(new MockedStatic.Verification() {
+        @Override
+        public void apply() {
+          Runtime.getRuntime();
+        }
+      }).thenReturn(runtime);
+
+      context.reset();
+    }
+
+    verify(runtime).removeShutdownHook(hook);
+    assertNull(context.getObject(CoreConstants.SHUTDOWN_HOOK_THREAD));
+    assertNull(context.getProperty("keyA"));
+    assertTrue(lifeCycleManager.isReset());
   }
 
   private static class InstrumentedContextBase extends ContextBase {

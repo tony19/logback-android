@@ -89,6 +89,21 @@ public class MarkerConverterTest {
     assertEquals("[testParent [ child1, child2, child3 ]]", result);
   }
   
+  @Test
+  public void testWithoutMarkers() {
+    LoggingEvent le = new LoggingEvent(this.getClass().getName(), lc.getLogger(Logger.ROOT_LOGGER_NAME),
+        Level.DEBUG, "test message", null, null);
+    assertEquals("", converter.convert(le));
+  }
+
+  @Test
+  public void testWithEmptyMarkerList() {
+    LoggingEvent le = new LoggingEvent(this.getClass().getName(), lc.getLogger(Logger.ROOT_LOGGER_NAME),
+        Level.DEBUG, "test message", null, null);
+    le.setMarkers(Collections.<Marker>emptyList());
+    assertEquals("", converter.convert(le));
+  }
+
   private ILoggingEvent createLoggingEvent(Marker marker) {
     LoggingEvent le = new LoggingEvent(this.getClass().getName(), lc.getLogger(Logger.ROOT_LOGGER_NAME),
         Level.DEBUG, "test message", null, null);

@@ -116,6 +116,10 @@ public class OptionTokenizer {
           break;
       }
 
+      if (tokenStream.pointer >= patternLength) {
+        // an escape sequence consumed the last char, leaving the quoted option unterminated
+        throw new ScanException("Unexpected end of pattern string in OptionTokenizer");
+      }
       c = pattern.charAt(tokenStream.pointer);
       tokenStream.pointer++;
     }

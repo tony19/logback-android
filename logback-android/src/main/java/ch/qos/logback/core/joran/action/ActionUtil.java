@@ -50,6 +50,7 @@ public class ActionUtil {
       ic.getContext().putProperty(key, value);
       break;
     case SYSTEM:
+    default: // every Scope has a case; sharing SYSTEM's branch leaves none unreachable
       OptionHelper.setSystemProperty(ic, key, value);
     }
   }
@@ -73,6 +74,7 @@ public class ActionUtil {
       cu.addProperties(props);
       break;
     case SYSTEM:
+    default: // every Scope has a case; sharing SYSTEM's branch leaves none unreachable
       OptionHelper.setSystemProperties(ic, props);
     }
   }

@@ -63,7 +63,7 @@ android {
         debug {
             debuggable true
             // Records JaCoCo coverage of the debug unit tests, which the
-            // Android-layer coverage gate at the end of this file checks.
+            // coverage gate at the end of this file checks.
             enableUnitTestCoverage true
         }
     }
@@ -137,37 +137,37 @@ afterEvaluate {
     }
 }
 
-// Coverage gate for the Android-specific layer (ch.qos.logback.{classic,core}.android):
-// its unit tests must cover 100% of its lines and branches, so that they pin
-// the behavior of every path. For each debug variant,
-// androidLayerCoverageReport<Variant> writes an HTML/XML report and
-// androidLayerCoverageVerification<Variant> enforces the rule;
-// verifyAndroidLayerCoverage runs both variants' checks.
-def androidLayerClasses = ['ch/qos/logback/classic/android/**', 'ch/qos/logback/core/android/**']
-def androidLayerCoverage = { JacocoReportBase task, String variant ->
+// Coverage gate for the whole library, Java and Kotlin: the unit tests must
+// cover 100% of the lines and branches of every class, so that they pin the
+// behavior of every path. For each debug variant, coverageReport<Variant>
+// writes an HTML/XML report (scripts/coverage-gaps.py lists what it misses)
+// and coverageVerification<Variant> enforces the rule; verifyCoverage runs
+// both variants' checks.
+def libraryClasses = ['ch/qos/logback/**', 'org/slf4j/impl/**']
+def libraryCoverage = { JacocoReportBase task, String variant ->
     def testTask = tasks.named("test${variant}UnitTest", Test)
     task.dependsOn(testTask)
     task.executionData.from(testTask.map { it.extensions.getByType(JacocoTaskExtension).destinationFile })
     task.classDirectories.from(files(
             tasks.named("compile${variant}Kotlin").flatMap { it.destinationDirectory },
             tasks.named("compile${variant}JavaWithJavac").flatMap { it.destinationDirectory },
-    ).asFileTree.matching { include androidLayerClasses })
+    ).asFileTree.matching { include libraryClasses })
     task.sourceDirectories.from(files('src/main/kotlin', 'src/main/java'))
 }
-def androidLayerVerifications = ['Jdk11Debug', 'Jdk8Debug'].collect { variant ->
-    tasks.register("androidLayerCoverageReport${variant}", JacocoReport) {
+def coverageVerifications = ['Jdk11Debug', 'Jdk8Debug'].collect { variant ->
+    tasks.register("coverageReport${variant}", JacocoReport) {
         group = 'verification'
-        description = "Reports the ${variant} unit tests' coverage of the Android-specific layer."
-        androidLayerCoverage(it, variant)
+        description = "Reports the ${variant} unit tests' coverage of the library."
+        libraryCoverage(it, variant)
         reports {
             html.required = true
             xml.required = true
         }
     }
-    tasks.register("androidLayerCoverageVerification${variant}", JacocoCoverageVerification) {
+    tasks.register("coverageVerification${variant}", JacocoCoverageVerification) {
         group = 'verification'
-        description = "Fails unless the ${variant} unit tests cover every line and branch of the Android-specific layer."
-        androidLayerCoverage(it, variant)
+        description = "Fails unless the ${variant} unit tests cover every line and branch of the library."
+        libraryCoverage(it, variant)
         violationRules {
             rule {
                 element = 'CLASS'
@@ -177,10 +177,10 @@ def androidLayerVerifications = ['Jdk11Debug', 'Jdk8Debug'].collect { variant ->
         }
     }
 }
-tasks.register('verifyAndroidLayerCoverage') {
+tasks.register('verifyCoverage') {
     group = 'verification'
-    description = 'Fails unless the unit tests cover every line and branch of the Android-specific layer.'
-    dependsOn androidLayerVerifications
+    description = 'Fails unless the unit tests cover every line and branch of the library.'
+    dependsOn coverageVerifications
 }
 
 dependencies {

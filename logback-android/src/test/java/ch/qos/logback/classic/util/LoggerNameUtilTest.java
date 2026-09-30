@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class LoggerNameUtilTest {
 
@@ -99,6 +100,25 @@ public class LoggerNameUtilTest {
 
     List<String> partList = computeNameParts("foo$Nested.bar");
     assertEquals(witnessList, partList);
+  }
+
+  @Test
+  public void firstSeparatorIsTheEarliestDotOrDollar() {
+    assertEquals(3, LoggerNameUtil.getFirstSeparatorIndexOf("com.foo$Bar"));
+    assertEquals(3, LoggerNameUtil.getFirstSeparatorIndexOf("Foo$Bar.baz"));
+    assertEquals(-1, LoggerNameUtil.getFirstSeparatorIndexOf("noSeparator"));
+  }
+
+  @Test
+  public void firstSeparatorSearchStartsAtTheBeginning() {
+    // a separator at index 0 is found, i.e. the search is not started past it
+    assertEquals(0, LoggerNameUtil.getFirstSeparatorIndexOf(".root"));
+    assertEquals(LoggerNameUtil.getSeparatorIndexOf("a.b.c", 0), LoggerNameUtil.getFirstSeparatorIndexOf("a.b.c"));
+  }
+
+  @Test
+  public void utilityClassKeepsItsPublicConstructor() {
+    assertNotNull(new LoggerNameUtil());
   }
 
   private List<String> computeNameParts(String loggerName) {
