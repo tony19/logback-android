@@ -198,7 +198,7 @@ dependencies {
     // plugin) and Mockito's Kotlin API
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
     testImplementation 'org.mockito.kotlin:mockito-kotlin:6.4.0'
-    testImplementation 'joda-time:joda-time:2.14.4'
+    testImplementation 'joda-time:joda-time:2.15.0'
 
     testImplementation 'com.icegreen:greenmail:2.1.14'
     testImplementation 'dom4j:dom4j:1.6.1'
