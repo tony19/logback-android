@@ -12,6 +12,16 @@ kotlin {
     // Library mode: every public declaration in the Kotlin sources must
     // state its visibility and types deliberately.
     explicitApi()
+
+    // Decouple what we publish from the Kotlin Gradle plugin version in the
+    // root build.gradle: consumers get kotlin-stdlib 2.2.x (not the plugin's
+    // version) and Kotlin 2.2 metadata, so apps on a Kotlin 2.2 compiler can
+    // still use this library. Raise these deliberately, not via plugin bumps.
+    coreLibrariesVersion = '2.2.20'
+    compilerOptions {
+        apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2
+        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2
+    }
 }
 
 android {
